@@ -1,6 +1,6 @@
-package xyz.lebster.value;
+package xyz.lebster.core.value;
 
-import xyz.lebster.node.Identifier;
+import xyz.lebster.core.node.Identifier;
 
 import java.util.HashMap;
 

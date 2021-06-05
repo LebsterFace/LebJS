@@ -1,4 +1,4 @@
-package xyz.lebster.value;
+package xyz.lebster.core.value;
 
 public class Undefined extends Value<Void> {
 	public Undefined() {

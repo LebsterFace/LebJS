@@ -1,10 +1,10 @@
-package xyz.lebster.node;
+package xyz.lebster.core.node;
 
-import xyz.lebster.Interpreter;
-import xyz.lebster.exception.LanguageException;
-import xyz.lebster.value.Number;
-import xyz.lebster.value.Type;
-import xyz.lebster.value.Value;
+import xyz.lebster.core.Interpreter;
+import xyz.lebster.core.exception.LanguageException;
+import xyz.lebster.core.value.Number;
+import xyz.lebster.core.value.Type;
+import xyz.lebster.core.value.Value;
 
 public class BinaryExpression extends Expression implements ASTNode {
 	// FIXME: Values which are not Number should work!

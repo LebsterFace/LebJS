@@ -1,4 +1,4 @@
-package xyz.lebster.node;
+package xyz.lebster.core.node;
 
 import java.util.ArrayList;
 

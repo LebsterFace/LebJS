@@ -1,7 +1,7 @@
-package xyz.lebster.node;
+package xyz.lebster.core.node;
 
-import xyz.lebster.Interpreter;
-import xyz.lebster.value.Function;
+import xyz.lebster.core.Interpreter;
+import xyz.lebster.core.value.Function;
 
 public class FunctionDeclaration extends ScopeNode {
 	public final Identifier name;

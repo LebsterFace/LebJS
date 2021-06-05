@@ -1,3 +1,3 @@
-package xyz.lebster.node;
+package xyz.lebster.core.node;
 
 abstract public class Expression implements ASTNode { }

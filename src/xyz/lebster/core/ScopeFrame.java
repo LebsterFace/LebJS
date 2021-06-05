@@ -1,10 +1,9 @@
-package xyz.lebster;
+package xyz.lebster.core;
 
-import xyz.lebster.node.Identifier;
-import xyz.lebster.node.Program;
-import xyz.lebster.node.ScopeNode;
-import xyz.lebster.value.Dictionary;
-import xyz.lebster.value.Value;
+import xyz.lebster.core.node.Identifier;
+import xyz.lebster.core.node.ScopeNode;
+import xyz.lebster.core.value.Dictionary;
+import xyz.lebster.core.value.Value;
 
 public class ScopeFrame {
 	public final ScopeNode node;

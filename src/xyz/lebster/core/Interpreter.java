@@ -1,12 +1,12 @@
-package xyz.lebster;
+package xyz.lebster.core;
 
-import xyz.lebster.exception.LanguageException;
-import xyz.lebster.exception.LanguageReferenceError;
-import xyz.lebster.node.Identifier;
-import xyz.lebster.node.Program;
-import xyz.lebster.node.ScopeNode;
-import xyz.lebster.value.Dictionary;
-import xyz.lebster.value.Value;
+import xyz.lebster.core.exception.LanguageException;
+import xyz.lebster.core.exception.LanguageReferenceError;
+import xyz.lebster.core.node.Identifier;
+import xyz.lebster.core.node.Program;
+import xyz.lebster.core.node.ScopeNode;
+import xyz.lebster.core.value.Dictionary;
+import xyz.lebster.core.value.Value;
 
 public class Interpreter {
     public static void dumpIndent(int indent) {

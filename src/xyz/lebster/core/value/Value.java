@@ -1,8 +1,7 @@
-package xyz.lebster.value;
+package xyz.lebster.core.value;
 
-import xyz.lebster.Interpreter;
-import xyz.lebster.node.ASTNode;
-import xyz.lebster.node.Expression;
+import xyz.lebster.core.Interpreter;
+import xyz.lebster.core.node.Expression;
 
 abstract public class Value<JType> extends Expression {
     public final Type type;

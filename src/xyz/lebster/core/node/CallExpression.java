@@ -1,12 +1,12 @@
-package xyz.lebster.node;
+package xyz.lebster.core.node;
 
-import xyz.lebster.Interpreter;
-import xyz.lebster.exception.LanguageException;
-import xyz.lebster.ScopeFrame;
-import xyz.lebster.value.Function;
-import xyz.lebster.value.Type;
-import xyz.lebster.value.Undefined;
-import xyz.lebster.value.Value;
+import xyz.lebster.core.Interpreter;
+import xyz.lebster.core.exception.LanguageException;
+import xyz.lebster.core.ScopeFrame;
+import xyz.lebster.core.value.Function;
+import xyz.lebster.core.value.Type;
+import xyz.lebster.core.value.Undefined;
+import xyz.lebster.core.value.Value;
 
 public class CallExpression extends Expression {
 	public final Identifier callee;

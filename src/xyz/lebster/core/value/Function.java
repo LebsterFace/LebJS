@@ -1,6 +1,6 @@
-package xyz.lebster.value;
+package xyz.lebster.core.value;
 
-import xyz.lebster.node.ScopeNode;
+import xyz.lebster.core.node.ScopeNode;
 
 public class Function extends Value<ScopeNode> {
 	public Function(ScopeNode value) {

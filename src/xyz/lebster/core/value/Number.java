@@ -1,4 +1,4 @@
-package xyz.lebster.value;
+package xyz.lebster.core.value;
 
 public class Number extends Value<Double> {
     public Number(double value) {

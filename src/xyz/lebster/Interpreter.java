@@ -1,6 +1,9 @@
 package xyz.lebster;
 
 import xyz.lebster.exception.LanguageException;
+import xyz.lebster.exception.LanguageReferenceError;
+import xyz.lebster.node.Identifier;
+import xyz.lebster.node.Program;
 import xyz.lebster.node.ScopeNode;
 import xyz.lebster.value.Dictionary;
 import xyz.lebster.value.Value;
@@ -11,34 +14,45 @@ public class Interpreter {
     }
 
     public final int maxStackSize;
-    protected final Dictionary globalObject;
-    protected final ScopeFrame[] callStack;
-    protected int currentScope = 0;
+    private final ScopeFrame[] callStack;
+    private int currentScope = 0;
 
-    public Interpreter(int maxStackSize, Dictionary globalObject) {
+    public Interpreter(int maxStackSize, Program program, Dictionary globalObject) {
         this.maxStackSize = maxStackSize;
-        this.globalObject = globalObject;
         this.callStack = new ScopeFrame[maxStackSize];
+        this.callStack[0] = new ScopeFrame(program, globalObject);
     }
 
-    public Interpreter(int maxStackSize) {
-        this(maxStackSize, new Dictionary());
+    public Interpreter(int maxStackSize, Program program) {
+        this(maxStackSize, program, new Dictionary());
     }
 
-    public Interpreter(Dictionary globalObject) {
-        this(32, globalObject);
+    public Interpreter(Program program) {
+        this(32, program, new Dictionary());
     }
 
-    public Interpreter() {
-        this(new Dictionary());
+    public Value<?> declareVariable(Identifier name, Value<?> value) {
+        return callStack[currentScope].setVariable(name, value);
     }
 
-    public Value<?> setGlobal(String name, Value<?> value) {
-        return this.globalObject.set(name, value);
+    public Value<?> setVariable(Identifier name, Value<?> value) throws LanguageReferenceError {
+        for (int i = currentScope; i >= 0; i--) {
+            if (callStack[i].containsVariable(name)) {
+                return callStack[i].setVariable(name, value);
+            }
+        }
+
+        throw new LanguageReferenceError("Unknown variable '" + name.value + "'");
     }
 
-    public Value<?> getGlobal(String name) {
-        return this.globalObject.get(name);
+    public Value<?> getVariable(Identifier name) throws LanguageReferenceError {
+        for (int i = currentScope; i >= 0; i--) {
+            if (callStack[i].containsVariable(name)) {
+                return callStack[i].getVariable(name);
+            }
+        }
+
+        throw new LanguageReferenceError("Unknown variable '" + name.value + "'");
     }
 
     public ScopeFrame enterScope(ScopeNode node) throws LanguageException {
@@ -69,6 +83,6 @@ public class Interpreter {
             throw new LanguageException("Invalid return statement");
         }
 
-        callStack[currentScope].doReturn(value);
+        callStack[currentScope].doExit(value);
     }
 }

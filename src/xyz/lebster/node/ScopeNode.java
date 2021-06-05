@@ -1,6 +1,4 @@
 package xyz.lebster.node;
-import xyz.lebster.Interpreter;
-import xyz.lebster.value.Value;
 
 import java.util.ArrayList;
 

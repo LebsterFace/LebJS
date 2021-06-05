@@ -1,21 +1,44 @@
 package xyz.lebster;
 
+import xyz.lebster.node.Identifier;
+import xyz.lebster.node.Program;
 import xyz.lebster.node.ScopeNode;
-import xyz.lebster.value.Undefined;
+import xyz.lebster.value.Dictionary;
 import xyz.lebster.value.Value;
 
 public class ScopeFrame {
 	public final ScopeNode node;
-	// FIXME: Other types of scope endings exist
-	public boolean didReturn = false;
-	public Value<?> returned = null;
+	public boolean didExit = false;
+	protected Value<?> exitValue = null;
+	private Dictionary variables;
 
-	public ScopeFrame(ScopeNode node) {
+	public ScopeFrame(ScopeNode node, Dictionary variables) {
 		this.node = node;
+		this.variables = variables;
 	}
 
-	public void doReturn(Value<?> value) {
-		this.returned = value;
-		this.didReturn = true;
+	public ScopeFrame(ScopeNode node) {
+		this(node, new Dictionary());
+	}
+
+	public void doExit(Value<?> value) {
+		this.exitValue = value;
+		this.didExit = true;
+	}
+
+	public Value<?> getExitValue() {
+		return exitValue;
+	}
+
+	public Value<?> setVariable(Identifier name, Value<?> value) {
+		return variables.set(name, value);
+	}
+
+	public Value<?> getVariable(Identifier name) {
+		return variables.get(name);
+	}
+
+	public boolean containsVariable(Identifier name) {
+		return variables.containsKey(name);
 	}
 }

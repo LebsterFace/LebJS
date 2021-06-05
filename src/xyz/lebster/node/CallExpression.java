@@ -9,23 +9,23 @@ import xyz.lebster.value.Undefined;
 import xyz.lebster.value.Value;
 
 public class CallExpression extends Expression {
-	public final String callee;
+	public final Identifier callee;
 
-	public CallExpression(String callee) {
+	public CallExpression(Identifier callee) {
 		this.callee = callee;
 	}
 
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpIndent(indent);
-		System.out.print("CallExpression '");
+		System.out.print("CallExpression ");
 		System.out.print(callee);
-		System.out.println("'");
+		System.out.println("");
 	}
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws LanguageException {
-		final Value<?> value = interpreter.getGlobal(callee);
+		final Value<?> value = interpreter.getVariable(callee);
 
 		if (value.type != Type.Function) {
 			throw new LanguageException("Can only call a function!");
@@ -39,8 +39,8 @@ public class CallExpression extends Expression {
 		for (ASTNode child : func.children) {
 			child.execute(interpreter);
 
-			if (frame.didReturn) {
-				returnValue = frame.returned;
+			if (frame.didExit) {
+				returnValue = frame.getExitValue();
 				break;
 			}
 		}

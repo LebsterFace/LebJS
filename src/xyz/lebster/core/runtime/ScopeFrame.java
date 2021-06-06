@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime;
 
+import xyz.lebster.core.exception.LReferenceError;
 import xyz.lebster.core.node.Identifier;
 import xyz.lebster.core.node.ScopeNode;
 import xyz.lebster.core.value.Dictionary;
@@ -33,7 +34,7 @@ public class ScopeFrame {
 		return variables.set(name, value);
 	}
 
-	public Value<?> getVariable(Identifier name) {
+	public Value<?> getVariable(Identifier name) throws LReferenceError {
 		return variables.get(name);
 	}
 

@@ -16,24 +16,29 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 		super(Type.Dictionary, value);
 	}
 
-	public Value<?> set(String name, Value<?> value) {
-		return this.value.put(new Identifier(name), value);
-	}
-
-	public Value<?> get(String name) {
-		return this.value.get(new Identifier(name));
-	}
-
 	public Value<?> set(Identifier name, Value<?> value) {
 		return this.value.put(name, value);
 	}
+	public Value<?> set(String name, Value<?> value) {
+		return set(new Identifier(name), value);
+	}
 
 	public Value<?> get(Identifier name) {
-		return this.value.get(name);
+		if (this.value.containsKey(name)) {
+			return this.value.get(name);
+		} else {
+			return new Undefined();
+		}
+	}
+	public Value<?> get(String name) {
+		return get(new Identifier(name));
 	}
 
 	public boolean containsKey(Identifier name) {
 		return this.value.containsKey(name);
+	}
+	public boolean containsKey(String name) {
+		return containsKey(new Identifier(name));
 	}
 
 	@Override
@@ -57,7 +62,9 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 	}
 
 	@Override
-	public Dictionary toDictionary() { return this; }
+	public Dictionary toDictionary() {
+		return this;
+	}
 
 	@Override
 	public void dump(int indent) {

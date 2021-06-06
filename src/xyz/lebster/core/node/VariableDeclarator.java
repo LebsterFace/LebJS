@@ -7,9 +7,9 @@ import xyz.lebster.core.value.Value;
 
 public class VariableDeclarator implements ASTNode {
 	public final Identifier name;
-	public final Value<?> init;
+	public final Expression init;
 
-	public VariableDeclarator(Identifier name, Value<?> init) {
+	public VariableDeclarator(Identifier name, Expression init) {
 		this.name = name;
 		this.init = init;
 	}
@@ -30,6 +30,6 @@ public class VariableDeclarator implements ASTNode {
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws LanguageException {
-		return interpreter.declareVariable(name, init);
+		return interpreter.declareVariable(name, init.execute(interpreter));
 	}
 }

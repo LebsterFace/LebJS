@@ -2,7 +2,7 @@ package xyz.lebster.core.node;
 
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.exception.LanguageException;
-import xyz.lebster.core.value.Number;
+import xyz.lebster.core.value.NumericLiteral;
 import xyz.lebster.core.value.Type;
 import xyz.lebster.core.value.Value;
 
@@ -35,10 +35,10 @@ public class BinaryExpression extends Expression implements ASTNode {
 			throw new LanguageException("Currently, only numbers can be added!");
 		}
 
-		double lhs = ((Number) leftValue).value;
-		double rhs = ((Number) rightValue).value;
+		double lhs = ((NumericLiteral) leftValue).value;
+		double rhs = ((NumericLiteral) rightValue).value;
 
-		return new Number(switch (op) {
+		return new NumericLiteral(switch (op) {
 			case Add -> lhs + rhs;
 			case Subtract -> lhs - rhs;
 			case Divide -> lhs / rhs;

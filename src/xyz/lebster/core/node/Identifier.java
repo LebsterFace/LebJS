@@ -16,7 +16,7 @@ public final class Identifier extends Expression {
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpIndent(indent);
-		System.out.print("Identifier '");
+		System.out.print("Identifier: '");
 		System.out.print(value);
 		System.out.println("'");
 	}

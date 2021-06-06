@@ -1,11 +1,21 @@
 package xyz.lebster.core.value;
 
+import xyz.lebster.core.exception.LanguageException;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.node.Expression;
 
 abstract public class Value<JType> extends Expression {
     public final Type type;
     public final JType value;
+
+    public StringLiteral toStringLiteral() throws LanguageException {
+        return new StringLiteral(String.valueOf(value));
+    }
+
+    public abstract BooleanLiteral toBooleanLiteral() throws LanguageException;
+    public abstract NumericLiteral toNumericLiteral() throws LanguageException;
+    public abstract Function toFunction() throws LanguageException;
+    public abstract Dictionary toDictionary() throws LanguageException;
 
     public Value(Type type, JType value) {
         this.type = type;

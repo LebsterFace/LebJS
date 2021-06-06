@@ -11,7 +11,6 @@ public class Main {
 
 		Identifier varA = new Identifier("a");
 		Identifier varB = new Identifier("b");
-		Identifier varC = new Identifier("c");
 		Identifier funcFoo = new Identifier("foo");
 
 		VariableDeclaration innerDefs = new VariableDeclaration(
@@ -25,21 +24,20 @@ public class Main {
 		FunctionDeclaration foo = new FunctionDeclaration(funcFoo);
 		// var a = 1, b = 2;
 		foo.append(innerDefs);
-		// return a + b + c;
-		foo.append(new ReturnStatement(new BinaryExpression(varA, new BinaryExpression(varB, varC, BinaryOp.Add), BinaryOp.Add)));
+		// return a + b;
+		foo.append(new ReturnStatement(new BinaryExpression(varA, varB, BinaryOp.Add)));
 		// }
 
 		program.append(foo);
 
-		// var c = 3;
+		Identifier varC = new Identifier("c");
+		// var c = foo();
 		program.append(new VariableDeclaration(
 				new VariableDeclarator[]{
-						new VariableDeclarator(varC, new Number(3))
+						new VariableDeclarator(varC, new CallExpression(funcFoo))
 				}
 		));
 
-		// foo();
-		program.append(new CallExpression(funcFoo));
 		System.out.println("------- PROGRAM DUMP -------");
 		program.dump(0);
 

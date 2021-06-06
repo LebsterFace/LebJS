@@ -31,6 +31,10 @@ public class Interpreter {
 		this(32, program, new Dictionary());
 	}
 
+	public Interpreter(Program program, Dictionary globalObject) {
+		this(32, program, globalObject);
+	}
+
 	public Value<?> declareVariable(Identifier name, Value<?> value) {
 		return callStack[currentScope].setVariable(name, value);
 	}

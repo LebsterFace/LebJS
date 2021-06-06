@@ -14,6 +14,11 @@ public class StringLiteral extends Value<String> {
 	}
 
 	@Override
+	public String toString() {
+		return value;
+	}
+
+	@Override
 	public StringLiteral toStringLiteral() {
 		return this;
 	}

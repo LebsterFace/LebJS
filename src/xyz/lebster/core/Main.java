@@ -14,10 +14,10 @@ public class Main {
 		Identifier funcFoo = new Identifier("foo");
 
 		VariableDeclaration innerDefs = new VariableDeclaration(
-				new VariableDeclarator[]{
-						new VariableDeclarator(varA, new Number(1)),
-						new VariableDeclarator(varB, new Number(2))
-				}
+			new VariableDeclarator[]{
+				new VariableDeclarator(varA, new Number(1)),
+				new VariableDeclarator(varB, new Number(2))
+			}
 		);
 
 		// function foo() {
@@ -33,9 +33,9 @@ public class Main {
 		Identifier varC = new Identifier("c");
 		// var c = foo();
 		program.append(new VariableDeclaration(
-				new VariableDeclarator[]{
-						new VariableDeclarator(varC, new CallExpression(funcFoo))
-				}
+			new VariableDeclarator[]{
+				new VariableDeclarator(varC, new CallExpression(funcFoo))
+			}
 		));
 
 		System.out.println("------- PROGRAM DUMP -------");

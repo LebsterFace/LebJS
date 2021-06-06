@@ -4,5 +4,8 @@ public enum Type {
     Dictionary,
     Number,
     Undefined,
-    Function
+    Function,
+    Boolean,
+    Null,
+    String
 }

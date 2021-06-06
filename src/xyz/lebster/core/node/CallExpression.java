@@ -33,20 +33,8 @@ public class CallExpression extends Expression {
 		}
 
 		final ScopeNode func = ((Function) value).value;
-		Value<?> returnValue = new Undefined();
-
-		// TODO: Probably can move this to ScopeNode
-		final ScopeFrame frame = interpreter.enterScope(func);
-		for (ASTNode child : func.children) {
-			child.execute(interpreter);
-
-			if (frame.didExit) {
-				returnValue = frame.getExitValue();
-				break;
-			}
-		}
-
+		Value<?> result = func.executeChildren(interpreter);
 		interpreter.exitScope(func);
-		return returnValue;
+		return result;
 	}
 }

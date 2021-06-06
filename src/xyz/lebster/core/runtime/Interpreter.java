@@ -35,6 +35,14 @@ public class Interpreter {
         return callStack[currentScope].setVariable(name, value);
     }
 
+    public void dumpVariables(int scope) {
+        callStack[scope].dumpVariables(0);
+    }
+
+    public void dumpVariables() {
+        dumpVariables(currentScope);
+    }
+
     public Value<?> setVariable(Identifier name, Value<?> value) throws LReferenceError {
         for (int i = currentScope; i >= 0; i--) {
             if (callStack[i].containsVariable(name)) {

@@ -47,6 +47,8 @@ public class Main {
 			final Value<?> result = program.execute(interpreter);
 			System.out.println("------- RESULT -------");
 			result.dump(0);
+			System.out.println("------- VARIABLES -------");
+			interpreter.dumpVariables();
 		} catch (LanguageException e) {
 			System.out.println("------- ERROR -------");
 			e.printStackTrace();

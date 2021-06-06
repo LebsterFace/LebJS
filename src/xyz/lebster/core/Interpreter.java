@@ -72,9 +72,9 @@ public class Interpreter {
             throw new LanguageException("Attempting to exit invalid scope");
         }
 
-        currentScope--;
         final ScopeFrame frame = callStack[currentScope];
         callStack[currentScope] = null;
+        currentScope--;
         return frame;
     }
 

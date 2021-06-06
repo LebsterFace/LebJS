@@ -7,5 +7,6 @@ public enum Type {
     Function,
     Boolean,
     Null,
-    String
+    String,
+    NativeFunction
 }

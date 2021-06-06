@@ -86,11 +86,11 @@ public class Interpreter {
         return frame;
     }
 
-    public void doReturn(Value<?> value) throws LanguageException {
-        if (currentScope == 0) {
-            throw new LanguageException("Invalid return statement");
-        }
+	public void doExit(Value<?> value) throws LanguageException {
+		if (currentScope == 0) {
+			throw new LanguageException("Invalid return statement");
+		}
 
-        callStack[currentScope].doExit(value);
-    }
+		callStack[currentScope].doExit(value);
+	}
 }

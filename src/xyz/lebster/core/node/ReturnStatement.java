@@ -26,7 +26,7 @@ public class ReturnStatement implements ASTNode {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws LanguageException {
 		final Value<?> value = argument.execute(interpreter);
-		interpreter.doReturn(value);
+		interpreter.doExit(value);
 		return value;
 	}
 }

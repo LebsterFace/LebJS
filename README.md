@@ -8,5 +8,4 @@
  - No arguments
  - No loops
  - No conditionals
- - Only `Number`, `Undefined`, `Dictionary`, `Function` types
  - Very untested

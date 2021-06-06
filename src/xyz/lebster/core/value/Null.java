@@ -2,10 +2,17 @@ package xyz.lebster.core.value;
 
 import xyz.lebster.core.exception.LanguageException;
 import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.core.runtime.Interpreter;
 
 public class Null extends Value<Void> {
 	public Null() {
 		super(Type.Null, null);
+	}
+
+	@Override
+	public void dump(int indent) {
+		Interpreter.dumpIndent(indent);
+		System.out.println("null");
 	}
 
 	@Override

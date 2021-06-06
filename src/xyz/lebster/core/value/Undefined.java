@@ -2,10 +2,17 @@ package xyz.lebster.core.value;
 
 import xyz.lebster.core.exception.LanguageException;
 import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.core.runtime.Interpreter;
 
 public class Undefined extends Value<Void> {
 	public Undefined() {
 		super(Type.Undefined, null);
+	}
+
+	@Override
+	public void dump(int indent) {
+		Interpreter.dumpIndent(indent);
+		System.out.println("undefined");
 	}
 
 	@Override

@@ -1,7 +1,7 @@
-package xyz.lebster.core;
+package xyz.lebster.core.runtime;
 
 import xyz.lebster.core.exception.LanguageException;
-import xyz.lebster.core.exception.LanguageReferenceError;
+import xyz.lebster.core.exception.LReferenceError;
 import xyz.lebster.core.node.Identifier;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.ScopeNode;
@@ -35,24 +35,24 @@ public class Interpreter {
         return callStack[currentScope].setVariable(name, value);
     }
 
-    public Value<?> setVariable(Identifier name, Value<?> value) throws LanguageReferenceError {
+    public Value<?> setVariable(Identifier name, Value<?> value) throws LReferenceError {
         for (int i = currentScope; i >= 0; i--) {
             if (callStack[i].containsVariable(name)) {
                 return callStack[i].setVariable(name, value);
             }
         }
 
-        throw new LanguageReferenceError("Unknown variable '" + name.value + "'");
+        throw new LReferenceError("Unknown variable '" + name.value + "'");
     }
 
-    public Value<?> getVariable(Identifier name) throws LanguageReferenceError {
+    public Value<?> getVariable(Identifier name) throws LReferenceError {
         for (int i = currentScope; i >= 0; i--) {
             if (callStack[i].containsVariable(name)) {
                 return callStack[i].getVariable(name);
             }
         }
 
-        throw new LanguageReferenceError("Unknown variable '" + name.value + "'");
+        throw new LReferenceError("Unknown variable '" + name.value + "'");
     }
 
     public ScopeFrame enterScope(ScopeNode node) throws LanguageException {

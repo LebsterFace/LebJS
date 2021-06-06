@@ -1,8 +1,9 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.core.Interpreter;
+import xyz.lebster.core.exception.LTypeError;
+import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.exception.LanguageException;
-import xyz.lebster.core.ScopeFrame;
+import xyz.lebster.core.runtime.ScopeFrame;
 import xyz.lebster.core.value.Function;
 import xyz.lebster.core.value.Type;
 import xyz.lebster.core.value.Undefined;
@@ -28,7 +29,7 @@ public class CallExpression extends Expression {
 		final Value<?> value = interpreter.getVariable(callee);
 
 		if (value.type != Type.Function) {
-			throw new LanguageException("Can only call a function!");
+			throw new LTypeError("Can only call a function!");
 		}
 
 		final ScopeNode func = ((Function) value).value;

@@ -1,6 +1,6 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.core.Interpreter;
+import xyz.lebster.core.runtime.Interpreter;
 
 public enum BinaryOp {
 	Add,

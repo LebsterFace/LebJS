@@ -2,6 +2,7 @@ package xyz.lebster.core;
 
 import xyz.lebster.core.exception.LanguageException;
 import xyz.lebster.core.node.*;
+import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Number;
 import xyz.lebster.core.value.Value;
 

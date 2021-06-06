@@ -1,6 +1,6 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.Interpreter;
+import xyz.lebster.core.runtime.Interpreter;
 
 public class StringLiteral extends Value<String> {
 	public StringLiteral() {

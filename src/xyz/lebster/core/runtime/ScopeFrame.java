@@ -1,4 +1,4 @@
-package xyz.lebster.core;
+package xyz.lebster.core.runtime;
 
 import xyz.lebster.core.node.Identifier;
 import xyz.lebster.core.node.ScopeNode;

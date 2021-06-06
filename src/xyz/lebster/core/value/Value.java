@@ -1,6 +1,6 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.Interpreter;
+import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.node.Expression;
 
 abstract public class Value<JType> extends Expression {

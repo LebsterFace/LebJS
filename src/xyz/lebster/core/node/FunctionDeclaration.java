@@ -3,19 +3,40 @@ package xyz.lebster.core.node;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Function;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 public class FunctionDeclaration extends ScopeNode {
 	public final Identifier name;
+	public final Identifier[] arguments;
 
-	public FunctionDeclaration(Identifier name) {
+	public FunctionDeclaration(Identifier name, Identifier[] arguments) {
 		this.name = name;
+		this.arguments = arguments;
+	}
+
+	public FunctionDeclaration(String name, Identifier[] arguments) {
+		this(new Identifier(name), arguments);
+	}
+
+	public FunctionDeclaration(Identifier name, String[] arguments) {
+		this(name, Stream.of(arguments).map(Identifier::new).toArray(Identifier[]::new));
 	}
 
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpIndent(indent);
-		System.out.print("FunctionDeclaration ");
-		System.out.print(name);
-		System.out.println(":");
+		System.out.print("FunctionDeclaration '");
+		System.out.print(name.value);
+
+		System.out.print("(");
+		System.out.print(arguments[0].value);
+		for(int i = 1; i < arguments.length; i++) {
+			System.out.print(", ");
+			System.out.print(arguments[i].value);
+		}
+		System.out.println(")':");
+
 		for (ASTNode child : children) child.dump(indent + 1);
 	}
 
@@ -27,6 +48,6 @@ public class FunctionDeclaration extends ScopeNode {
 	}
 
 	public CallExpression getCall() {
-		return new CallExpression(name);
+		return new CallExpression(name, new Expression[0]);
 	}
 }

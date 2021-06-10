@@ -3,14 +3,19 @@ package xyz.lebster.core.node;
 import xyz.lebster.core.exception.LTypeError;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.exception.LanguageException;
-import xyz.lebster.core.runtime.ScopeFrame;
 import xyz.lebster.core.value.*;
 
 public class CallExpression extends Expression {
 	public final Identifier callee;
+	public final Expression[] arguments;
 
-	public CallExpression(Identifier callee) {
+	public CallExpression(Identifier callee, Expression... args) {
 		this.callee = callee;
+		this.arguments = args;
+	}
+
+	public CallExpression(String callee, Expression... args) {
+		this(new Identifier(callee), args);
 	}
 
 	@Override
@@ -18,7 +23,16 @@ public class CallExpression extends Expression {
 		Interpreter.dumpIndent(indent);
 		System.out.print("CallExpression ");
 		System.out.print(callee);
-		System.out.println("");
+		System.out.println(":");
+		for (Expression argument : arguments) {
+			argument.dump(indent + 1);
+		}
+	}
+
+	private Value<?>[] executeArguments(Interpreter interpreter) throws LanguageException {
+		final Value<?>[] result = new Value<?>[arguments.length];
+		for (int i = 0; i < arguments.length; i++) result[i] = arguments[i].execute(interpreter);
+		return result;
 	}
 
 	@Override
@@ -26,13 +40,15 @@ public class CallExpression extends Expression {
 		final Value<?> value = interpreter.getVariable(callee);
 
 		if (value.type == Type.Function) {
-			final ScopeNode func = ((Function) value).value;
-			final Value<?> result = func.executeChildren(interpreter);
-			interpreter.exitScope(func);
+			final Function func = (Function) value;
+			final Value<?>[] arguments = this.executeArguments(interpreter);
+			final Value<?> result = func.executeChildren(interpreter, arguments);
+			interpreter.exitScope(func.value);
 			return result;
 		} else if (value.type == Type.NativeFunction) {
 			final NativeCode code = ((NativeFunction) value).value;
-			final Value<?> result = code.execute(interpreter, null);
+			final Value<?>[] arguments = this.executeArguments(interpreter);
+			final Value<?> result = code.execute(interpreter, arguments);
 			return result;
 		} else {
 			throw new LTypeError("Can only call a function!");

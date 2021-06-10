@@ -15,20 +15,4 @@ abstract public class ScopeNode implements ASTNode {
         this.children.add(node);
         return this;
     }
-
-    public Value<?> executeChildren(Interpreter interpreter) throws LanguageException {
-        Value<?> result = new Undefined();
-        final ScopeFrame frame = interpreter.enterScope(this);
-
-        for (ASTNode child : this.children) {
-            child.execute(interpreter);
-
-            if (frame.didExit) {
-                result = frame.getExitValue();
-                break;
-            }
-        }
-
-        return result;
-    }
 }

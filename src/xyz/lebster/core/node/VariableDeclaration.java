@@ -15,7 +15,7 @@ public class VariableDeclaration implements ASTNode {
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpIndent(indent);
-		System.out.println("VariableDeclarator:");
+		System.out.println("VariableDeclaration:");
 		for (VariableDeclarator declarator : declarations) declarator.dump(indent + 1);
 	}
 

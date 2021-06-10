@@ -8,9 +8,7 @@ import xyz.lebster.core.value.Value;
 public class Program extends ScopeNode {
     @Override
     public void dump(int indent) {
-        Interpreter.dumpIndent(indent);
-        System.out.println("Program:");
-        for (ASTNode child : children) child.dump(indent + 1);
+        for (ASTNode child : children) child.dump(indent);
     }
 
     @Override

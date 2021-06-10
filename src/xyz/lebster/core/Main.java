@@ -5,6 +5,7 @@ import xyz.lebster.core.node.*;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.*;
 import xyz.lebster.parser.Lexer;
+import xyz.lebster.parser.Parser;
 import xyz.lebster.parser.Token;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class Main {
 		return result;
 	}
 
-	public static void execProgram(Program program) {
+	public static void execProgram(Program program, boolean showDebug) {
 		final Dictionary globalObject = new Dictionary();
 
 		globalObject.set("print", new NativeFunction((interpreter, values) -> {
@@ -46,25 +47,42 @@ public class Main {
 			return new Undefined();
 		}));
 
-		System.out.println("------- PROGRAM DUMP -------");
-		program.dump(0);
+		if (showDebug) {
+			System.out.println("------- PROGRAM DUMP -------");
+			program.dump(0);
+		}
 
 		try {
 			final Interpreter interpreter = new Interpreter(program, globalObject);
-			System.out.println("------- EXECUTION -------");
+			if (showDebug) System.out.println("------- EXECUTION -------");
 			final Value<?> result = program.execute(interpreter);
-			System.out.println("------- LAST VALUE -------");
-			result.dump(0);
-			System.out.println("------- VARIABLES -------");
-			interpreter.dumpVariables();
+			if (showDebug) {
+				System.out.println("------- LAST VALUE -------");
+				result.dump(0);
+			}
+
+			if (showDebug) {
+				System.out.println("------- VARIABLES -------");
+				interpreter.dumpVariables();
+			}
+
 		} catch (LanguageException e) {
 			e.printStackTrace();
 		}
 
-		System.out.println("------- [[ END ]] -------");
+		if (showDebug) System.out.println("------- [[ END ]] -------");
 	}
 
 	public static void main(String[] args) {
-		execProgram(programOne());
+		String source = null;
+		try {
+			byte[] encoded = encoded = Files.readAllBytes(Path.of(System.getProperty("user.dir"), "tests/print.js"));
+			source = new String(encoded, Charset.defaultCharset());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		execProgram(new Parser(source).parse(), false);
 	}
 }

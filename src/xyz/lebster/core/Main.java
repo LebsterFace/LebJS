@@ -5,6 +5,7 @@ import xyz.lebster.core.node.*;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.*;
 import xyz.lebster.parser.Lexer;
+import xyz.lebster.parser.Parser;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -77,10 +78,6 @@ public class Main {
 			return;
 		}
 
-		System.out.println("-- Tokens --\n");
-		for (final Lexer lexer = new Lexer(source); !lexer.isFinished(); ) {
-			System.out.println(lexer.next());
-		}
-		System.out.println("\n-- End of tokens --");
+		execProgram(new Parser(new Lexer(source)).parse(), true);
 	}
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 public class Lexer {
 	private final String source;
+	private final StringBuilder builder = new StringBuilder();
 	private final int length;
 
 	private int index = -1;
@@ -48,6 +49,11 @@ public class Lexer {
 		}
 	}
 
+	private void collect() {
+		builder.append(currentChar);
+		consume();
+	}
+
 	private void consumeWhitespace() {
 		while (Character.isWhitespace(currentChar)) {
 			consume();
@@ -69,10 +75,11 @@ public class Lexer {
 		int start = index;
 		TokenType tokenType;
 		String value = null;
+		builder.setLength(0);
 
 		if (isIdentifierStart()) {
-			while (isIdentifierMiddle()) consume();
-			value = source.substring(start, index);
+			while (isIdentifierMiddle()) collect();
+			value = builder.toString();
 			tokenType = keywords.getOrDefault(value, TokenType.Identifier);
 		} else if (symbols.containsKey(currentChar)) {
 			tokenType = symbols.get(currentChar);
@@ -81,9 +88,9 @@ public class Lexer {
 			tokenType = TokenType.StringLiteral;
 			final char stringType = currentChar;
 			consume();
-			while (currentChar != stringType) consume();
+			while (currentChar != stringType) collect();
 			consume();
-			value = source.substring(start + 1, index - 1);
+			value = builder.toString();
 		} else {
 			tokenType = TokenType.Invalid;
 			consume();

@@ -77,6 +77,10 @@ public class Main {
 			return;
 		}
 
-
+		System.out.println("Tokens:");
+		for (final Lexer lexer = new Lexer(source); !lexer.isFinished(); ) {
+			System.out.println(lexer.next());
+		}
+		System.out.println("-- End of tokens --");
 	}
 }

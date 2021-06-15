@@ -1,105 +1,89 @@
 package xyz.lebster.parser;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Lexer {
-	private final ArrayList<Token> result = new ArrayList<>();
-	private final StringBuffer buffer = new StringBuffer();
-	private TokenType last;
-	private final char[] chars;
-	private int index = 0;
+	private final String source;
+	private final int length;
+
+	private int index = -1;
+	private char currentChar = '\0';
+
+	private static final HashMap<String, TokenType> keywords = new HashMap<>();
+	private static final HashMap<Character, TokenType> symbols = new HashMap<>();
+
+	static {
+		keywords.put("let", TokenType.Let);
+		symbols.put('=', TokenType.Assign);
+	}
 
 	public Lexer(String source) {
-		this.chars = source.toCharArray();
+		this.source = source;
+		this.length = source.length();
+		consume();
 	}
 
-	private void finish(Token t) {
-		result.add(t);
-		buffer.setLength(0);
+	public boolean isFinished() {
+		return index == length;
 	}
 
-	private void finishLast() {
-		if (last == null) {
-			return;
-		}
-
-		finish(new Token(last, buffer));
-		last = null;
+	private boolean isDigit() {
+		return currentChar >= '0' && currentChar <= '9';
 	}
 
-	private void next() {
-		buffer.append(chars[index]);
+	private boolean isAlphabetical() {
+		return (currentChar >= 'A' && currentChar <= 'Z') || (currentChar >= 'a' && currentChar <= 'z');
+	}
+
+	private void consume() {
 		index++;
-	}
-
-	// TODO: Exception instead of error
-	private void fail(String msg) {
-		throw new Error(msg + " @ index " + index);
-	}
-
-	private void tokenizeString(char initial) {
-		finishLast();
-		index++;
-		last = TokenType.StringLiteral;
-		while (chars[index] != initial) next();
-		finishLast();
-		index++;
-	}
-
-	private static final HashMap<Character, TokenType> punctuation = new HashMap<>();
-	static {
-		punctuation.put('(', TokenType.LParen);
-		punctuation.put(')', TokenType.RParen);
-		punctuation.put(';', TokenType.Semicolon);
-	}
-
-	private void tokenizePunctuation(char initial) {
-		finishLast();
-		next();
-		if (punctuation.containsKey(initial)) {
-			last = punctuation.get(initial);
-			finishLast();
+		if (index >= length - 1) {
+			currentChar = '\0';
 		} else {
-			fail("Unexpected symbol '" + initial + "'");
+			currentChar = source.charAt(index);
 		}
 	}
 
-	private void tokenizeIdentifier() {
-		finishLast();
-		next();
-		last = TokenType.Identifier;
-
-		while (Character.isAlphabetic(chars[index]))
-			next();
-
-		finishLast();
+	private void consumeWhitespace() {
+		while (Character.isWhitespace(currentChar)) {
+			consume();
+		}
 	}
 
-	public Token[] tokenize() {
-		while (index < chars.length) {
-			final char c = chars[index];
-			switch (c) {
-				case ' ': case '\t':
-				case '\n': case '\r':
-					break;
+	private boolean isIdentifierStart() {
+		return isAlphabetical() || currentChar == '_' || currentChar == '$';
+	}
 
-				case '"': case '\'':
-					tokenizeString(c);
-					break;
+	private boolean isIdentifierMiddle() {
+		return isIdentifierStart() || isDigit();
+	}
 
-				default:
-					if (Character.isAlphabetic(c)) {
-						tokenizeIdentifier();
-					} else {
-						tokenizePunctuation(c);
-					}
+	public Token next() {
+		if (index == length) return null;
+		consumeWhitespace();
 
-					break;
+		int start = index;
+		int end = -1;
+		TokenType tokenType = null;
+		String value = null;
+
+		if (isIdentifierStart()) {
+			while (isIdentifierMiddle()) {
+				consume();
 			}
+
+			tokenType = TokenType.Identifier;
+		} else if (symbols.containsKey(currentChar)) {
+			tokenType = symbols.get(currentChar);
+			consume();
+		} else {
+			tokenType = TokenType.Invalid;
+			consume();
 		}
 
-		final Token[] array = new Token[0];
-		return result.toArray(array);
+		if (value == null) value = source.substring(start, index);
+		if (end == -1) end = index;
+
+		return new Token(tokenType, value, start, end);
 	}
 }

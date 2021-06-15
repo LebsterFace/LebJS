@@ -1,1 +1,1 @@
-print("Hello world");
+let myName = "Lebster"

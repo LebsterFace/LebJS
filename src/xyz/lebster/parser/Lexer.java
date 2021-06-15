@@ -74,6 +74,13 @@ public class Lexer {
 		} else if (symbols.containsKey(currentChar)) {
 			tokenType = symbols.get(currentChar);
 			consume();
+		} else if (currentChar == '"' || currentChar == '\'') {
+			tokenType = TokenType.StringLiteral;
+			final char stringType = currentChar;
+			consume();
+			while (currentChar != stringType) consume();
+			consume();
+			value = source.substring(start + 1, index - 1);
 		} else {
 			tokenType = TokenType.Invalid;
 			consume();

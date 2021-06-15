@@ -27,6 +27,10 @@ public class Lexer {
 		return index == length;
 	}
 
+	private void fail(String message) {
+		throw new Error(message);
+	}
+
 	private boolean isDigit() {
 		return currentChar >= '0' && currentChar <= '9';
 	}
@@ -37,7 +41,7 @@ public class Lexer {
 
 	private void consume() {
 		index++;
-		if (index >= length - 1) {
+		if (index == length) {
 			currentChar = '\0';
 		} else {
 			currentChar = source.charAt(index);
@@ -63,7 +67,6 @@ public class Lexer {
 		consumeWhitespace();
 
 		int start = index;
-		int end = -1;
 		TokenType tokenType;
 		String value = null;
 
@@ -87,8 +90,6 @@ public class Lexer {
 		}
 
 		if (value == null) value = source.substring(start, index);
-		if (end == -1) end = index;
-
-		return new Token(tokenType, value, start, end);
+		return new Token(tokenType, value, start, index);
 	}
 }

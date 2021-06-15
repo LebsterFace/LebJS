@@ -7,6 +7,5 @@ public enum TokenType {
 	LParen,
 	RParen,
 	Assign,
-	Let,
-	Invalid
+	Let
 }

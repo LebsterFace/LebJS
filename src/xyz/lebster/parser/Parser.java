@@ -4,11 +4,13 @@ import xyz.lebster.core.node.*;
 import xyz.lebster.core.value.StringLiteral;
 
 public class Parser {
-	public final Lexer lexer;
+	public final Token[] tokens;
 	private Token currentToken;
+	private Program program;
+	private int index = -1;
 
-	public Parser(Lexer lexer) {
-		this.lexer = lexer;
+	public Parser(Token[] tokens) {
+		this.tokens = tokens;
 	}
 
 	private void expected(TokenType t) {
@@ -16,27 +18,42 @@ public class Parser {
 	}
 
 	private Token consume() {
-		final Token oldToken = currentToken;
-		currentToken = lexer.next();
-		return oldToken;
+		index++;
+		if (index == tokens.length) {
+			currentToken = null;
+			return null;
+		} else {
+			final Token oldToken = currentToken;
+			currentToken = tokens[index];
+			return oldToken;
+		}
 	}
 
 	private boolean match(TokenType t) {
 		return currentToken.type() == t;
 	}
 
-	private Token consume(TokenType t) {
+	private Token require(TokenType t) {
 		if (!match(t)) expected(t);
 		return consume();
 	}
 
+	private Token accept(TokenType t) {
+		return match(t) ? consume() : null;
+	}
+
 	public Program parse() {
-		final Program program = new Program();
+		program = new Program();
 		consume();
 
-		while (!lexer.isFinished()) {
+		while (index < tokens.length) {
 			if (matchDeclaration()) {
 				program.append(parseDeclaration());
+			} else if (currentToken.type() == TokenType.Identifier) {
+				// Copied from Parser.parseExpression[case: Identifier]
+				final Identifier identifier = new Identifier(consume().value());
+				final CallExpression callExpression = parseCallExpression(identifier);
+				program.append(callExpression == null ? identifier : callExpression);
 			} else {
 				throw new Error("I can't handle this!!!"); // YOU CAN'T HANDLE THE TRUTH!
 			}
@@ -45,10 +62,17 @@ public class Parser {
 		return program;
 	}
 
+	private CallExpression parseCallExpression(Identifier identifier) {
+		if (accept(TokenType.LParen) == null) return null;
+		final Expression argument = parseExpression();
+		require(TokenType.RParen);
+		return new CallExpression(identifier, argument);
+	}
+
 	private VariableDeclaration parseDeclaration() {
-		consume(TokenType.Let);
-		final Token identifier = consume(TokenType.Identifier);
-		consume(TokenType.Assign);
+		require(TokenType.Let);
+		final Token identifier = require(TokenType.Identifier);
+		require(TokenType.Assign);
 		final Expression value = parseExpression();
 		return new VariableDeclaration(new VariableDeclarator[] {
 			new VariableDeclarator(new Identifier(identifier.value()), value)
@@ -57,10 +81,14 @@ public class Parser {
 
 	private Expression parseExpression() {
 		return switch (currentToken.type()) {
-			case StringLiteral -> new StringLiteral(currentToken.value());
-			default -> {
-				throw new Error("Unsupported expression type");
+			case StringLiteral -> new StringLiteral(consume().value());
+			case Identifier -> {
+				final Identifier identifier = new Identifier(consume().value());
+				final CallExpression callExpression = parseCallExpression(identifier);
+				yield callExpression == null ? identifier : callExpression;
 			}
+
+			default -> throw new Error("Unsupported expression type");
 		};
 	}
 

@@ -6,6 +6,7 @@ import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.*;
 import xyz.lebster.parser.Lexer;
 import xyz.lebster.parser.Parser;
+import xyz.lebster.parser.Token;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -40,6 +41,10 @@ public class Main {
 			System.out.println(values[0].toStringLiteral());
 			return new Undefined();
 		}));
+
+		globalObject.set("greet", new NativeFunction((interpreter, values) ->
+			new StringLiteral("Hello, " + values[0].toStringLiteral().value)
+		));
 
 		if (showDebug) {
 			System.out.println("------- PROGRAM DUMP -------");
@@ -78,6 +83,9 @@ public class Main {
 			return;
 		}
 
-		execProgram(new Parser(new Lexer(source)).parse(), true);
+
+		final Token[] tokens = new Lexer(source).tokenize();
+		for (Token token : tokens) System.out.println(token);
+		execProgram(new Parser(tokens).parse(), true);
 	}
 }

@@ -1,6 +1,8 @@
 package xyz.lebster.parser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Lexer {
 	private final String source;
@@ -15,7 +17,10 @@ public class Lexer {
 
 	static {
 		keywords.put("let", TokenType.Let);
+
 		symbols.put('=', TokenType.Assign);
+		symbols.put('(', TokenType.LParen);
+		symbols.put(')', TokenType.RParen);
 	}
 
 	public Lexer(String source) {
@@ -26,10 +31,6 @@ public class Lexer {
 
 	public boolean isFinished() {
 		return index == length;
-	}
-
-	private void fail(String message) {
-		throw new Error(message);
 	}
 
 	private boolean isDigit() {
@@ -92,11 +93,24 @@ public class Lexer {
 			consume();
 			value = builder.toString();
 		} else {
-			tokenType = TokenType.Invalid;
-			consume();
+			throw new Error("Invalid character '" + currentChar + "' at " + getRow() + ":" + getColumn());
 		}
 
 		if (value == null) value = source.substring(start, index);
 		return new Token(tokenType, value, start, index);
+	}
+
+	private int getColumn() {
+		return 0;
+	}
+
+	private int getRow() {
+		return 0;
+	}
+
+	public Token[] tokenize() {
+		final List<Token> result = new ArrayList<Token>();
+		while (!isFinished()) result.add(next());
+		return result.toArray(new Token[result.size()]);
 	}
 }

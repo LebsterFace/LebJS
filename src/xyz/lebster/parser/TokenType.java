@@ -2,8 +2,11 @@ package xyz.lebster.parser;
 
 public enum TokenType {
 	Identifier,
+	NumericLiteral,
+	StringLiteral,
 	LParen,
 	RParen,
-	Semicolon,
-	StringLiteral,
+	Assign,
+	Let,
+	Invalid
 }

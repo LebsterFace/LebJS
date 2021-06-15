@@ -64,15 +64,13 @@ public class Lexer {
 
 		int start = index;
 		int end = -1;
-		TokenType tokenType = null;
+		TokenType tokenType;
 		String value = null;
 
 		if (isIdentifierStart()) {
-			while (isIdentifierMiddle()) {
-				consume();
-			}
-
-			tokenType = TokenType.Identifier;
+			while (isIdentifierMiddle()) consume();
+			value = source.substring(start, index);
+			tokenType = keywords.getOrDefault(value, TokenType.Identifier);
 		} else if (symbols.containsKey(currentChar)) {
 			tokenType = symbols.get(currentChar);
 			consume();

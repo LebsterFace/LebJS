@@ -65,6 +65,10 @@ public class Lexer {
 		}
 	}
 
+	private boolean peek(String compare) {
+		return source.startsWith(compare, index);
+	}
+
 	private boolean isIdentifierStart() {
 		return isAlphabetical(currentChar) || currentChar == '_' || currentChar == '$';
 	}

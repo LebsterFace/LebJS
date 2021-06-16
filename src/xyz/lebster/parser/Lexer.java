@@ -33,12 +33,16 @@ public class Lexer {
 		return index == length;
 	}
 
-	private boolean isDigit() {
-		return currentChar >= '0' && currentChar <= '9';
+	private boolean isDigit(char c) {
+		return c >= '0' && c <= '9';
 	}
 
-	private boolean isAlphabetical() {
-		return (currentChar >= 'A' && currentChar <= 'Z') || (currentChar >= 'a' && currentChar <= 'z');
+	private boolean isAlphabetical(char c) {
+		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+	}
+
+	private boolean isTerminator(char c) {
+		return c == '\n';
 	}
 
 	private void consume() {
@@ -56,17 +60,17 @@ public class Lexer {
 	}
 
 	private void consumeWhitespace() {
-		while (Character.isWhitespace(currentChar)) {
+		while (currentChar == '\t' || currentChar == 0xB || currentChar == 0xC || currentChar == ' ') {
 			consume();
 		}
 	}
 
 	private boolean isIdentifierStart() {
-		return isAlphabetical() || currentChar == '_' || currentChar == '$';
+		return isAlphabetical(currentChar) || currentChar == '_' || currentChar == '$';
 	}
 
 	private boolean isIdentifierMiddle() {
-		return isIdentifierStart() || isDigit();
+		return isIdentifierStart() || isDigit(currentChar);
 	}
 
 	public Token next() {

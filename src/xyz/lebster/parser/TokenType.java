@@ -9,7 +9,9 @@ public enum TokenType {
 	LParen,
 	RParen,
 	Assign,
-	Let,
 	Terminator,
-	EOF
+	EOF,
+	Semicolon,
+
+	Let,
 }

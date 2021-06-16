@@ -21,6 +21,7 @@ public class Lexer {
 		symbols.put('=', TokenType.Assign);
 		symbols.put('(', TokenType.LParen);
 		symbols.put(')', TokenType.RParen);
+		symbols.put(';', TokenType.Semicolon);
 	}
 
 	public Lexer(String source) {

@@ -105,15 +105,24 @@ public class Lexer {
 	}
 
 	private int getColumn() {
-		return 0;
+		int i = index - 1;
+		while (!isTerminator(source.charAt(i))) i--;
+		return index - i;
 	}
 
 	private int getRow() {
-		return 0;
+		int result = 1;
+		for (int i = 0; i < index; i++) {
+			if (isTerminator(source.charAt(i))) {
+				result++;
+			}
+		}
+
+		return result;
 	}
 
 	public Token[] tokenize() {
-		final List<Token> result = new ArrayList<Token>();
+		final List<Token> result = new ArrayList<>();
 		while (!isFinished()) result.add(next());
 		return result.toArray(new Token[result.size()]);
 	}

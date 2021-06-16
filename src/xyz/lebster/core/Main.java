@@ -72,11 +72,20 @@ public class Main {
 		if (showDebug) System.out.println("------- [[ END ]] -------");
 	}
 
+	public static void execProgram(String source, boolean showDebug) {
+		final Token[] tokens = new Lexer(source).tokenize();
+		if (showDebug) {
+			for (Token token : tokens) System.out.println(token);
+		}
+
+		execProgram(new Parser(tokens).parse(), showDebug);
+	}
+
 	public static void main(String[] args) {
 		String source;
 
 		try {
-			byte[] encoded = Files.readAllBytes(Path.of(System.getProperty("user.dir"), "tests/print.js"));
+			byte[] encoded = Files.readAllBytes(Path.of(args[0]));
 			source = new String(encoded, Charset.defaultCharset());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -84,8 +93,6 @@ public class Main {
 		}
 
 
-		final Token[] tokens = new Lexer(source).tokenize();
-		for (Token token : tokens) System.out.println(token);
-		execProgram(new Parser(tokens).parse(), true);
+		execProgram(source, false);
 	}
 }

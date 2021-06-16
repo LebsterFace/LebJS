@@ -1,12 +1,12 @@
 package xyz.lebster.parser;
 
+import xyz.lebster.core.exception.NotImplementedException;
 import xyz.lebster.core.node.*;
 import xyz.lebster.core.value.StringLiteral;
 
 public class Parser {
 	public final Token[] tokens;
 	private Token currentToken;
-	private Program program;
 	private int index = -1;
 
 	public Parser(Token[] tokens) {
@@ -42,20 +42,23 @@ public class Parser {
 		return match(t) ? consume() : null;
 	}
 
+	private Expression disambiguateIdentifier() {
+		final Identifier identifier = new Identifier(consume().value());
+		final CallExpression callExpression = parseCallExpression(identifier);
+		return callExpression == null ? identifier : callExpression;
+	}
+
 	public Program parse() {
-		program = new Program();
+		final Program program = new Program();
 		consume();
 
 		while (index < tokens.length) {
 			if (matchDeclaration()) {
 				program.append(parseDeclaration());
 			} else if (currentToken.type() == TokenType.Identifier) {
-				// Copied from Parser.parseExpression[case: Identifier]
-				final Identifier identifier = new Identifier(consume().value());
-				final CallExpression callExpression = parseCallExpression(identifier);
-				program.append(callExpression == null ? identifier : callExpression);
+				program.append(disambiguateIdentifier());
 			} else {
-				throw new Error("I can't handle this!!!"); // YOU CAN'T HANDLE THE TRUTH!
+				throw new NotImplementedException("Support for token '" + currentToken.type() + "'");
 			}
 		}
 
@@ -82,13 +85,8 @@ public class Parser {
 	private Expression parseExpression() {
 		return switch (currentToken.type()) {
 			case StringLiteral -> new StringLiteral(consume().value());
-			case Identifier -> {
-				final Identifier identifier = new Identifier(consume().value());
-				final CallExpression callExpression = parseCallExpression(identifier);
-				yield callExpression == null ? identifier : callExpression;
-			}
-
-			default -> throw new Error("Unsupported expression type");
+			case Identifier -> disambiguateIdentifier();
+			default -> throw new NotImplementedException("Expression type '" + currentToken.type() + "'");
 		};
 	}
 

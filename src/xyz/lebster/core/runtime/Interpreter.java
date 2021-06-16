@@ -67,7 +67,7 @@ public class Interpreter {
 			}
 		}
 
-		throw new LReferenceError("Unknown variable " + name);
+		throw new LReferenceError(name.value + " is not defined");
 	}
 	public Value<?> getVariable(String name) throws LReferenceError {
 		return this.getVariable(new Identifier(name));

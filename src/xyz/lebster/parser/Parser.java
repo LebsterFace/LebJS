@@ -53,6 +53,9 @@ public class Parser {
 			} else if (matchExpression()) {
 				program.append(parseExpression());
 			} else {
+				System.out.println("------- PARTIAL TREE -------");
+				program.dump(0);
+				System.out.println("------- ERROR -------");
 				throw new NotImplementedException("Support for token '" + currentToken.type() + "'");
 			}
 		}

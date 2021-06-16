@@ -88,6 +88,7 @@ public class Main {
 
 	public static void execProgram(String source, boolean showDebug) {
 		final Token[] tokens = new Lexer(source).tokenize();
+		System.out.println("------- TOKENS -------");
 		if (showDebug) {
 			for (Token token : tokens) System.out.println(token);
 		}

@@ -4,6 +4,8 @@ public enum TokenType {
 	Identifier,
 	NumericLiteral,
 	StringLiteral,
+	BooleanLiteral,
+
 	LParen,
 	RParen,
 	Assign,

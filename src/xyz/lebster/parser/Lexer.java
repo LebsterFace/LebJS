@@ -93,7 +93,11 @@ public class Lexer {
 		} else if (isIdentifierStart()) {
 			while (isIdentifierMiddle()) collect();
 			value = builder.toString();
-			tokenType = keywords.getOrDefault(value, TokenType.Identifier);
+			if (value.equals("true") || value.equals("false")) {
+				tokenType = TokenType.BooleanLiteral;
+			} else {
+				tokenType = keywords.getOrDefault(value, TokenType.Identifier);
+			}
 		} else if (symbols.containsKey(currentChar)) {
 			tokenType = symbols.get(currentChar);
 			consume();
@@ -103,6 +107,16 @@ public class Lexer {
 			consume();
 			while (currentChar != stringType) collect();
 			consume();
+			value = builder.toString();
+		}  else if (isDigit(currentChar)) {
+			tokenType = TokenType.NumericLiteral;
+			int decimalPos = -1;
+
+			while (isDigit(currentChar) || (currentChar == '.' && decimalPos == -1)) {
+				if (currentChar == '.') decimalPos = index;
+				collect();
+			}
+
 			value = builder.toString();
 		} else {
 			throw new Error(StringEscapeUtils.escapeJavaString("Invalid character '" + currentChar + "' at " + getRow() + ":" + getColumn()));

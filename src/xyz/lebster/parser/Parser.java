@@ -2,6 +2,8 @@ package xyz.lebster.parser;
 
 import xyz.lebster.core.exception.NotImplementedException;
 import xyz.lebster.core.node.*;
+import xyz.lebster.core.value.BooleanLiteral;
+import xyz.lebster.core.value.NumericLiteral;
 import xyz.lebster.core.value.StringLiteral;
 
 public class Parser {
@@ -37,12 +39,6 @@ public class Parser {
 		return match(t) ? consume() : null;
 	}
 
-	private Expression disambiguateIdentifier() {
-		final Identifier identifier = new Identifier(consume().value());
-		final CallExpression callExpression = parseCallExpression(identifier);
-		return callExpression == null ? identifier : callExpression;
-	}
-
 	public Program parse() {
 		final Program program = new Program();
 		consume();
@@ -52,8 +48,8 @@ public class Parser {
 				break;
 			} else if (matchDeclaration()) {
 				program.append(parseDeclaration());
-			} else if (currentToken.type() == TokenType.Identifier) {
-				program.append(disambiguateIdentifier());
+			} else if (matchExpression()) {
+				program.append(parseExpression());
 			} else {
 				throw new NotImplementedException("Support for token '" + currentToken.type() + "'");
 			}
@@ -82,7 +78,15 @@ public class Parser {
 	private Expression parseExpression() {
 		return switch (currentToken.type()) {
 			case StringLiteral -> new StringLiteral(consume().value());
-			case Identifier -> disambiguateIdentifier();
+			case NumericLiteral -> new NumericLiteral(Double.parseDouble(consume().value()));
+			case BooleanLiteral -> new BooleanLiteral(consume().value().equals("true"));
+
+			case Identifier -> {
+				final Identifier identifier = new Identifier(consume().value());
+				final CallExpression callExpression = parseCallExpression(identifier);
+				yield callExpression == null ? identifier : callExpression;
+			}
+
 			default -> throw new NotImplementedException("Expression type '" + currentToken.type() + "'");
 		};
 	}
@@ -90,5 +94,11 @@ public class Parser {
 	private boolean matchDeclaration() {
 		final TokenType t = currentToken.type();
 		return t == TokenType.Let;
+	}
+
+	private boolean matchExpression() {
+		final TokenType t = currentToken.type();
+		return t == TokenType.StringLiteral || t == TokenType.NumericLiteral ||
+				t == TokenType.BooleanLiteral || t == TokenType.Identifier;
 	}
 }

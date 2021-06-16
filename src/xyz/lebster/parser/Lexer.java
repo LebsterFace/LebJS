@@ -87,9 +87,7 @@ public class Lexer {
 		String value = null;
 		builder.setLength(0);
 
-		if (isFinished()) {
-			tokenType = TokenType.EOF;
-		} else if (isTerminator(currentChar)) {
+		if (isTerminator(currentChar)) {
 			tokenType = TokenType.Terminator;
 			consume();
 		} else if (isIdentifierStart()) {
@@ -116,7 +114,7 @@ public class Lexer {
 
 	private int getColumn() {
 		int i = index - 1;
-		while (!isTerminator(source.charAt(i))) i--;
+		while (i >= 0 && !isTerminator(source.charAt(i))) i--;
 		return index - i;
 	}
 
@@ -134,6 +132,7 @@ public class Lexer {
 	public Token[] tokenize() {
 		final List<Token> result = new ArrayList<>();
 		while (!isFinished()) result.add(next());
+		result.add(new Token(TokenType.EOF, "", length, length));
 		return result.toArray(new Token[0]);
 	}
 }

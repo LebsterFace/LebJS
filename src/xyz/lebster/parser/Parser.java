@@ -18,15 +18,10 @@ public class Parser {
 	}
 
 	private Token consume() {
-		index++;
-		if (index == tokens.length) {
-			currentToken = null;
-			return null;
-		} else {
-			final Token oldToken = currentToken;
-			currentToken = tokens[index];
-			return oldToken;
-		}
+		final Token oldToken = currentToken;
+		if (index + 1 != tokens.length) index++;
+		currentToken = tokens[index];
+		return oldToken;
 	}
 
 	private boolean match(TokenType t) {
@@ -53,7 +48,9 @@ public class Parser {
 		consume();
 
 		while (index < tokens.length) {
-			if (matchDeclaration()) {
+			if (currentToken.type() == TokenType.EOF) {
+				break;
+			} else if (matchDeclaration()) {
 				program.append(parseDeclaration());
 			} else if (currentToken.type() == TokenType.Identifier) {
 				program.append(disambiguateIdentifier());

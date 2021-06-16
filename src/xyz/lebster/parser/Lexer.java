@@ -76,13 +76,19 @@ public class Lexer {
 	public Token next() {
 		if (index == length) return null;
 		consumeWhitespace();
+		if (currentChar == '\r') consume();
 
 		int start = index;
 		TokenType tokenType;
 		String value = null;
 		builder.setLength(0);
 
-		if (isIdentifierStart()) {
+		if (isFinished()) {
+			tokenType = TokenType.EOF;
+		} else if (isTerminator(currentChar)) {
+			tokenType = TokenType.Terminator;
+			consume();
+		} else if (isIdentifierStart()) {
 			while (isIdentifierMiddle()) collect();
 			value = builder.toString();
 			tokenType = keywords.getOrDefault(value, TokenType.Identifier);
@@ -97,7 +103,7 @@ public class Lexer {
 			consume();
 			value = builder.toString();
 		} else {
-			throw new Error("Invalid character '" + currentChar + "' at " + getRow() + ":" + getColumn());
+			throw new Error(StringEscapeUtils.escapeJavaString("Invalid character '" + currentChar + "' at " + getRow() + ":" + getColumn()));
 		}
 
 		if (value == null) value = source.substring(start, index);

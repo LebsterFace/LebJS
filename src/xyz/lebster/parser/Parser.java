@@ -46,6 +46,8 @@ public class Parser {
 		while (index < tokens.length) {
 			if (currentToken.type() == TokenType.EOF) {
 				break;
+			} else if (currentToken.type() == TokenType.Terminator || currentToken.type() == TokenType.Semicolon) {
+				consume();
 			} else if (matchDeclaration()) {
 				program.append(parseDeclaration());
 			} else if (matchExpression()) {

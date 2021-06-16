@@ -130,6 +130,6 @@ public class Lexer {
 	public Token[] tokenize() {
 		final List<Token> result = new ArrayList<>();
 		while (!isFinished()) result.add(next());
-		return result.toArray(new Token[result.size()]);
+		return result.toArray(new Token[0]);
 	}
 }

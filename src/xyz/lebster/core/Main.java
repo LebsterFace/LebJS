@@ -14,13 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Main {
-	public static Program programOne() {
-		return (Program) new Program()
+	public static final Program programOne = (Program) new Program()
 		.append(new FunctionDeclaration(
 			new Identifier("greet"),
-			new Identifier[] {
-				new Identifier("name")
-			}
+			new Identifier("name")
 		).append(new CallExpression("print",
 			new BinaryExpression(
 				new StringLiteral("Hello "),
@@ -32,7 +29,24 @@ public class Main {
 			"greet",
 			new StringLiteral("world")
 		));
-	}
+
+	public static final Program programTwo = (Program) new Program()
+		.append(new FunctionDeclaration(
+			new Identifier("add"),
+			new Identifier("num1"),
+			new Identifier("num2")
+			).append(new CallExpression("print",
+			new BinaryExpression(
+				new Identifier("num1"),
+				new Identifier("num2"),
+				BinaryOp.Add
+			)
+		)))
+		.append(new CallExpression(
+			"add",
+			new NumericLiteral(2.456),
+			new NumericLiteral(2.553)
+		));
 
 	public static void execProgram(Program program, boolean showDebug) {
 		final Dictionary globalObject = new Dictionary();

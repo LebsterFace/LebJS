@@ -46,10 +46,9 @@ public class CallExpression extends Expression {
 			interpreter.exitScope(func.value);
 			return result;
 		} else if (value.type == Type.NativeFunction) {
-			final NativeCode code = ((NativeFunction) value).value;
+			final NativeCode code = (NativeCode) value.value;
 			final Value<?>[] arguments = this.executeArguments(interpreter);
-			final Value<?> result = code.execute(interpreter, arguments);
-			return result;
+			return code.execute(interpreter, arguments);
 		} else {
 			throw new LTypeError("Can only call a function!");
 		}

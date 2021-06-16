@@ -19,6 +19,8 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 	public Value<?> set(Identifier name, Value<?> value) {
 		return this.value.put(name, value);
 	}
+
+	@SuppressWarnings("UnusedReturnValue")
 	public Value<?> set(String name, Value<?> value) {
 		return set(new Identifier(name), value);
 	}
@@ -30,6 +32,7 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 			return new Undefined();
 		}
 	}
+
 	public Value<?> get(String name) {
 		return get(new Identifier(name));
 	}
@@ -37,6 +40,7 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 	public boolean containsKey(Identifier name) {
 		return this.value.containsKey(name);
 	}
+	
 	public boolean containsKey(String name) {
 		return containsKey(new Identifier(name));
 	}

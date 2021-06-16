@@ -34,8 +34,8 @@ public class BinaryExpression extends Expression implements ASTNode {
 		final Value<?> rightValue = right.execute(interpreter);
 
 		if (leftValue.type == Type.Number && rightValue.type == Type.Number) {
-			final double lhs = ((NumericLiteral) leftValue).value;
-			final double rhs = ((NumericLiteral) rightValue).value;
+			final double lhs = (double) leftValue.value;
+			final double rhs = (double) rightValue.value;
 
 			return new NumericLiteral(switch (op) {
 				case Add -> lhs + rhs;
@@ -44,8 +44,8 @@ public class BinaryExpression extends Expression implements ASTNode {
 				case Multiply -> lhs * rhs;
 			});
 		} else if (op == BinaryOp.Add && leftValue.type == Type.String && rightValue.type == Type.String) {
-			final String lhs = ((StringLiteral) leftValue).value;
-			final String rhs = ((StringLiteral) rightValue).value;
+			final String lhs = (String) leftValue.value;
+			final String rhs = (String) rightValue.value;
 
 			return new StringLiteral(lhs + rhs);
 		} else {

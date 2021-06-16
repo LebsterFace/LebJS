@@ -5,13 +5,7 @@ import xyz.lebster.core.exception.LanguageException;
 import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
 
-public class VariableDeclaration implements ASTNode {
-	public VariableDeclarator[] declarations;
-
-	public VariableDeclaration(VariableDeclarator[] declarations) {
-		this.declarations = declarations;
-	}
-
+public record VariableDeclaration(VariableDeclarator[] declarations) implements ASTNode {
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpIndent(indent);

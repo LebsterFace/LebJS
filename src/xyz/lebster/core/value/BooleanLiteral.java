@@ -1,6 +1,5 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.exception.LanguageException;
 import xyz.lebster.core.exception.NotImplementedException;
 
 public class BooleanLiteral extends Value<Boolean> {

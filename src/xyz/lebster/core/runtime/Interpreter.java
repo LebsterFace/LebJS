@@ -80,10 +80,10 @@ public class Interpreter {
 		return this.setGlobal(new Identifier(name), value);
 	}
 
-	public Value<?> getGlobal(Identifier name) throws LReferenceError {
+	public Value<?> getGlobal(Identifier name) {
 		return callStack[0].getVariable(name);
 	}
-	public Value<?> getGlobal(String name) throws LReferenceError {
+	public Value<?> getGlobal(String name) {
 		return this.getGlobal(new Identifier(name));
 	}
 
@@ -97,6 +97,7 @@ public class Interpreter {
 		return frame;
 	}
 
+	@SuppressWarnings("UnusedReturnValue")
 	public ScopeFrame exitScope(ScopeNode node) throws LanguageException {
 		if (currentScope == 0) {
 			throw new LanguageException("Exiting scope while at top level");

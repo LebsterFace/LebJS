@@ -3,23 +3,22 @@ package xyz.lebster.core.node;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Function;
 
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class FunctionDeclaration extends ScopeNode {
 	public final Identifier name;
 	public final Identifier[] arguments;
 
-	public FunctionDeclaration(Identifier name, Identifier[] arguments) {
+	public FunctionDeclaration(Identifier name, Identifier... arguments) {
 		this.name = name;
 		this.arguments = arguments;
 	}
 
-	public FunctionDeclaration(String name, Identifier[] arguments) {
+	public FunctionDeclaration(String name, Identifier... arguments) {
 		this(new Identifier(name), arguments);
 	}
 
-	public FunctionDeclaration(Identifier name, String[] arguments) {
+	public FunctionDeclaration(Identifier name, String... arguments) {
 		this(name, Stream.of(arguments).map(Identifier::new).toArray(Identifier[]::new));
 	}
 
@@ -48,6 +47,6 @@ public class FunctionDeclaration extends ScopeNode {
 	}
 
 	public CallExpression getCall() {
-		return new CallExpression(name, new Expression[0]);
+		return new CallExpression(name);
 	}
 }

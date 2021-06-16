@@ -1,6 +1,5 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.exception.LanguageException;
 import xyz.lebster.core.exception.NotImplementedException;
 import xyz.lebster.core.runtime.Interpreter;
 

@@ -12,7 +12,7 @@ public class NumericLiteral extends Value<Double> {
 
     @Override
     public BooleanLiteral toBooleanLiteral() {
-        return new BooleanLiteral(value == 0 ? false : true);
+        return new BooleanLiteral(value != 0);
     }
 
     @Override

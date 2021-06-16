@@ -93,6 +93,6 @@ public class Main {
 		}
 
 
-		execProgram(source, false);
+		execProgram(source, true);
 	}
 }

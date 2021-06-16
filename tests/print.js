@@ -1,3 +1,3 @@
-let myName = "Lebster"
-let greeting = greet(myName)
-print(greeting)
+let myName = "Lebster";
+let greeting = greet(myName);
+print(greeting);

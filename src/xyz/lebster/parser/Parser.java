@@ -70,7 +70,7 @@ public class Parser {
 			} else if (matchDeclaration()) {
 				program.append(parseDeclaration());
 			} else if (matchExpression()) {
-				program.append(parseExpression());
+				program.append(parseExpression(0, true));
 			} else {
 				System.out.println("------- PARTIAL TREE -------");
 				program.dump(0);
@@ -84,7 +84,7 @@ public class Parser {
 
 	private CallExpression parseCallExpression(Identifier identifier) {
 		if (accept(TokenType.LParen) == null) return null;
-		final Expression argument = parseExpression();
+		final Expression argument = parseExpression(0, true);
 		require(TokenType.RParen);
 		return new CallExpression(identifier, argument);
 	}
@@ -93,14 +93,64 @@ public class Parser {
 		require(TokenType.Let);
 		final Token identifier = require(TokenType.Identifier);
 		require(TokenType.Assign);
-		final Expression value = parseExpression();
+		final Expression value = parseExpression(0, true);
 		return new VariableDeclaration(new VariableDeclarator[] {
 			new VariableDeclarator(new Identifier(identifier.value()), value)
 		});
 	}
 
-	private Expression parseExpression() {
+	private Expression parseExpression(int minPrecedence, boolean isLeftAssoc) {
+		Expression expression = parsePrimaryExpression();
+
+		while (matchSecondaryExpression()) {
+			final int newPrecedence = precedence.get(currentToken.type());
+
+			if (newPrecedence < minPrecedence || newPrecedence == minPrecedence && isLeftAssoc) {
+				break;
+			}
+
+			boolean newAssoc = associativity.get(currentToken.type());
+			expression = parseSecondaryExpression(expression, newPrecedence, newAssoc);
+		}
+
+		return expression;
+	}
+
+	private Expression parseSecondaryExpression(Expression left, int minPrecedence, boolean isLeftAssoc) {
+		switch (currentToken.type()) {
+			case Plus: {
+				consume();
+				return new BinaryExpression(left, parseExpression(minPrecedence, isLeftAssoc), BinaryOp.Add);
+			}
+
+			case Minus: {
+				consume();
+				return new BinaryExpression(left, parseExpression(minPrecedence, isLeftAssoc), BinaryOp.Subtract);
+			}
+
+			case Multiply: {
+				consume();
+				return new BinaryExpression(left, parseExpression(minPrecedence, isLeftAssoc), BinaryOp.Multiply);
+			}
+
+			case Divide: {
+				consume();
+				return new BinaryExpression(left, parseExpression(minPrecedence, isLeftAssoc), BinaryOp.Divide);
+			}
+
+			default: return left;
+		}
+	}
+
+	private Expression parsePrimaryExpression() {
 		return switch (currentToken.type()) {
+			case LParen -> {
+				consume();
+				final Expression expression = parseExpression(0, true);
+				require(TokenType.RParen);
+				yield expression;
+			}
+
 			case StringLiteral -> new StringLiteral(consume().value());
 			case NumericLiteral -> new NumericLiteral(Double.parseDouble(consume().value()));
 			case BooleanLiteral -> new BooleanLiteral(consume().value().equals("true"));
@@ -123,6 +173,15 @@ public class Parser {
 	private boolean matchExpression() {
 		final TokenType t = currentToken.type();
 		return t == TokenType.StringLiteral || t == TokenType.NumericLiteral ||
-				t == TokenType.BooleanLiteral || t == TokenType.Identifier;
+				t == TokenType.BooleanLiteral || t == TokenType.Identifier ||
+				t == TokenType.LParen;
+	}
+
+
+
+	private boolean matchSecondaryExpression() {
+		final TokenType t = currentToken.type();
+		return t == TokenType.Plus || t == TokenType.Minus ||
+				t == TokenType.Multiply || t == TokenType.Divide;
 	}
 }

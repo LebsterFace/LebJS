@@ -22,6 +22,10 @@ public class Lexer {
 		symbols.put('(', TokenType.LParen);
 		symbols.put(')', TokenType.RParen);
 		symbols.put(';', TokenType.Semicolon);
+		symbols.put('+', TokenType.Plus);
+		symbols.put('-', TokenType.Minus);
+		symbols.put('*', TokenType.Multiply);
+		symbols.put('/', TokenType.Divide);
 	}
 
 	public Lexer(String source) {

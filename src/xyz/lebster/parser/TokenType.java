@@ -14,4 +14,9 @@ public enum TokenType {
 	Semicolon,
 
 	Let,
+
+	Plus,
+	Minus,
+	Multiply,
+	Divide,
 }

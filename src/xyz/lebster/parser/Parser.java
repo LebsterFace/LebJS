@@ -6,10 +6,29 @@ import xyz.lebster.core.value.BooleanLiteral;
 import xyz.lebster.core.value.NumericLiteral;
 import xyz.lebster.core.value.StringLiteral;
 
+import java.util.HashMap;
+
 public class Parser {
 	public final Token[] tokens;
 	private Token currentToken;
 	private int index = -1;
+
+	private static final HashMap<TokenType, Integer> precedence = new HashMap<>();
+	private static final HashMap<TokenType, Boolean> associativity = new HashMap<>();
+
+	static {
+//		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table
+		precedence.put(TokenType.Multiply, 15);
+		precedence.put(TokenType.Divide, 15);
+		precedence.put(TokenType.Plus, 14);
+		precedence.put(TokenType.Minus, 14);
+
+//		true = left, false = right
+		associativity.put(TokenType.Multiply, true);
+		associativity.put(TokenType.Divide, true);
+		associativity.put(TokenType.Plus, true);
+		associativity.put(TokenType.Minus, true);
+	}
 
 	public Parser(Token[] tokens) {
 		this.tokens = tokens;

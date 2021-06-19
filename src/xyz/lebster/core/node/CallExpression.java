@@ -2,11 +2,9 @@ package xyz.lebster.core.node;
 
 import xyz.lebster.core.exception.LTypeError;
 import xyz.lebster.core.exception.LanguageException;
+import xyz.lebster.core.runtime.CallFrame;
 import xyz.lebster.core.runtime.Interpreter;
-import xyz.lebster.core.value.Function;
-import xyz.lebster.core.value.NativeCode;
-import xyz.lebster.core.value.Type;
-import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.*;
 
 public class CallExpression implements Expression {
 	public final Expression callee;
@@ -47,16 +45,25 @@ public class CallExpression implements Expression {
 
 		if (value.type == Type.Function) {
 			final Function func = (Function) value;
-			final Value<?>[] arguments = this.executeArguments(interpreter);
-			final Value<?> result = func.executeChildren(interpreter, arguments);
-			interpreter.exitScope(func.value);
-			return result;
+			return func.executeChildren(interpreter, this.executeArguments(interpreter));
 		} else if (value.type == Type.NativeFunction) {
-			final NativeCode code = (NativeCode) value.value;
-			final Value<?>[] arguments = this.executeArguments(interpreter);
-			return code.execute(interpreter, arguments);
+			final CallFrame frame = interpreter.enterCallFrame(getCorrectThis(interpreter));
+
+			final NativeCode func = (NativeCode) value.value;
+			final Value<?> result = func.execute(interpreter, this.executeArguments(interpreter));
+
+			interpreter.exitCallFrame(frame);
+			return result;
 		} else {
 			throw new LTypeError("'LittleLang::" + value.getClass().getSimpleName() + "' is not a function");
+		}
+	}
+
+	private Value<?> getCorrectThis(Interpreter interpreter) throws LanguageException {
+		if (callee instanceof MemberExpression) {
+			return ((MemberExpression) callee).object().execute(interpreter);
+		} else {
+			return new Undefined();
 		}
 	}
 }

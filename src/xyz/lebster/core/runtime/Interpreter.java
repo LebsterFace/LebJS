@@ -9,25 +9,32 @@ import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
 
 public class Interpreter {
-	public final int maxStackSize;
-	private final ScopeFrame[] callStack;
-	private int currentScope = 0;
-	public Interpreter(int maxStackSize, Program program, Dictionary globalObject) {
-		this.maxStackSize = maxStackSize;
-		this.callStack = new ScopeFrame[maxStackSize];
-		this.callStack[0] = new ScopeFrame(program, globalObject);
-	}
+	public final int maxScopeFrames;
+	public final int maxCallFrames;
+	private final ScopeFrame[] scopeStack;
+	private final CallFrame[] callStack;
+	private int currentScopeFrame = 0;
+	private int currentCallFrame = 0;
 
-	public Interpreter(int maxStackSize, Program program) {
-		this(maxStackSize, program, new Dictionary());
-	}
-
-	public Interpreter(Program program) {
-		this(32, program, new Dictionary());
+	public Interpreter(Program program, Dictionary globalObject, int maxScopeFrames, int maxCallFrames) {
+		this.maxScopeFrames = maxScopeFrames;
+		this.maxCallFrames = maxCallFrames;
+		this.scopeStack = new ScopeFrame[maxScopeFrames];
+		this.callStack = new CallFrame[maxCallFrames];
+		scopeStack[0] = new ScopeFrame(program, globalObject);
+		callStack[0] = new CallFrame(globalObject);
 	}
 
 	public Interpreter(Program program, Dictionary globalObject) {
-		this(32, program, globalObject);
+		this(program, globalObject, 120, 32);
+	}
+
+	public Interpreter(Program program, int maxScopeFrames, int maxCallFrames) {
+		this(program, new Dictionary(), maxScopeFrames, maxCallFrames);
+	}
+
+	public Interpreter(Program program) {
+		this(program, new Dictionary());
 	}
 
 	public static void dumpIndent(int indent) {
@@ -35,21 +42,21 @@ public class Interpreter {
 	}
 
 	public Value<?> declareVariable(Identifier name, Value<?> value) {
-		return callStack[currentScope].setVariable(name, value);
+		return scopeStack[currentScopeFrame].setVariable(name, value);
 	}
 
 	public void dumpVariables(int scope) {
-		callStack[scope].dumpVariables(0);
+		scopeStack[scope].dumpVariables(0);
 	}
 
 	public void dumpVariables() {
-		dumpVariables(currentScope);
+		dumpVariables(currentScopeFrame);
 	}
 
 	public Value<?> setVariable(Identifier name, Value<?> value) throws LReferenceError {
-		for (int i = currentScope; i >= 0; i--) {
-			if (callStack[i].containsVariable(name)) {
-				return callStack[i].setVariable(name, value);
+		for (int i = currentScopeFrame; i >= 0; i--) {
+			if (scopeStack[i].containsVariable(name)) {
+				return scopeStack[i].setVariable(name, value);
 			}
 		}
 
@@ -61,9 +68,9 @@ public class Interpreter {
 	}
 
 	public Value<?> getVariable(Identifier name) throws LReferenceError {
-		for (int i = currentScope; i >= 0; i--) {
-			if (callStack[i].containsVariable(name)) {
-				return callStack[i].getVariable(name);
+		for (int i = currentScopeFrame; i >= 0; i--) {
+			if (scopeStack[i].containsVariable(name)) {
+				return scopeStack[i].getVariable(name);
 			}
 		}
 
@@ -75,7 +82,7 @@ public class Interpreter {
 	}
 
 	public Value<?> setGlobal(Identifier name, Value<?> value) {
-		return callStack[0].setVariable(name, value);
+		return scopeStack[0].setVariable(name, value);
 	}
 
 	public Value<?> setGlobal(String name, Value<?> value) {
@@ -83,7 +90,7 @@ public class Interpreter {
 	}
 
 	public Value<?> getGlobal(Identifier name) {
-		return callStack[0].getVariable(name);
+		return scopeStack[0].getVariable(name);
 	}
 
 	public Value<?> getGlobal(String name) {
@@ -91,38 +98,59 @@ public class Interpreter {
 	}
 
 	public ScopeFrame enterScope(ScopeNode node) throws LanguageException {
-		if (currentScope + 1 == maxStackSize) {
+		if (currentScopeFrame + 1 == maxScopeFrames) {
 			throw new LanguageException("Maximum call stack size exceeded");
 		}
 
 		final ScopeFrame frame = new ScopeFrame(node);
-		callStack[++currentScope] = frame;
+		scopeStack[++currentScopeFrame] = frame;
 		return frame;
 	}
 
-	@SuppressWarnings("UnusedReturnValue")
-	public ScopeFrame exitScope(ScopeNode node) throws LanguageException {
-		if (currentScope == 0) {
-			throw new LanguageException("Exiting scope while at top level");
-		} else if (callStack[currentScope].node != node) {
-			throw new LanguageException("Attempting to exit invalid scope");
+	public void exitScope(ScopeFrame frame) throws LanguageException {
+		if (currentScopeFrame == 0) {
+			throw new LanguageException("Exiting ScopeFrame while at top level");
+		} else if (scopeStack[currentScopeFrame] != frame) {
+			throw new LanguageException("Attempting to exit invalid ScopeFrame");
 		}
 
-		final ScopeFrame frame = callStack[currentScope];
-		callStack[currentScope] = null;
-		currentScope--;
-		return frame;
+		scopeStack[currentScopeFrame--] = null;
 	}
 
-	public void doExit(Value<?> value) throws LanguageException {
-		if (currentScope == 0) {
+	public Value<?> doExit(Value<?> value) throws LanguageException {
+		if (currentScopeFrame == 0) {
 			throw new LanguageException("Invalid return statement");
 		}
 
-		callStack[currentScope].doExit(value);
+		scopeStack[currentScopeFrame].doExit(value);
+		return value;
 	}
 
-	public String thisValue() {
-		return "foobar";
+	public CallFrame enterCallFrame(Value<?> thisValue) throws LanguageException {
+		if (currentCallFrame + 1 == maxCallFrames) {
+			throw new LanguageException("Maximum call stack size exceeded");
+		}
+
+		final CallFrame frame = new CallFrame(thisValue);
+		callStack[++currentCallFrame] = frame;
+		return frame;
+	}
+
+	public void exitCallFrame(CallFrame frame) throws LanguageException {
+		if (currentCallFrame == 0) {
+			throw new LanguageException("Exiting CallFrame while at top level");
+		} else if (callStack[currentCallFrame] != frame) {
+			throw new LanguageException("Attempting to exit invalid CallFrame");
+		}
+
+		callStack[currentCallFrame--] = null;
+	}
+
+	public CallFrame getCallFrame() {
+		return callStack[currentCallFrame];
+	}
+
+	public Value<?> thisValue() {
+		return getCallFrame().thisValue();
 	}
 }

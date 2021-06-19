@@ -51,13 +51,14 @@ public class Lexer {
 		return c == '\n';
 	}
 
-	private void consume() {
-		index++;
-		if (index == length) {
+	private char consume() {
+		final char old = currentChar;
+		if (++index == length) {
 			currentChar = '\0';
 		} else {
 			currentChar = source.charAt(index);
 		}
+		return old;
 	}
 
 	private void collect() {

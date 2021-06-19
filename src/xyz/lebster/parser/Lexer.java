@@ -88,35 +88,32 @@ public class Lexer {
 		if (index == length) return null;
 		consumeWhitespace();
 		if (currentChar == '\r') consume();
-
 		int start = index;
-		TokenType tokenType;
-		String value = null;
 		builder.setLength(0);
 
 		if (isTerminator(currentChar)) {
-			tokenType = TokenType.Terminator;
 			consume();
+			return new Token(TokenType.Terminator, start, index);
 		} else if (isIdentifierStart()) {
 			while (isIdentifierMiddle()) collect();
-			value = builder.toString();
+
+			final String value = builder.toString();
 			if (value.equals("true") || value.equals("false")) {
-				tokenType = TokenType.BooleanLiteral;
+				return new Token(TokenType.BooleanLiteral, value, start, index);
+			} else if (keywords.containsKey(value)) {
+				return new Token(keywords.get(value), start, index);
 			} else {
-				tokenType = keywords.getOrDefault(value, TokenType.Identifier);
+				return new Token(TokenType.Identifier, value, start, index);
 			}
 		} else if (symbols.containsKey(currentChar)) {
-			tokenType = symbols.get(currentChar);
-			consume();
+			return new Token(symbols.get(consume()), start, index);
 		} else if (currentChar == '"' || currentChar == '\'') {
-			tokenType = TokenType.StringLiteral;
 			final char stringType = currentChar;
 			consume();
 			while (currentChar != stringType) collect();
 			consume();
-			value = builder.toString();
+			return new Token(TokenType.StringLiteral, builder.toString(), start, index);
 		}  else if (isDigit(currentChar)) {
-			tokenType = TokenType.NumericLiteral;
 			int decimalPos = -1;
 
 			while (isDigit(currentChar) || (currentChar == '.' && decimalPos == -1)) {
@@ -124,13 +121,10 @@ public class Lexer {
 				collect();
 			}
 
-			value = builder.toString();
+			return new Token(TokenType.NumericLiteral, builder.toString(), start, index);
 		} else {
-			throw new Error(StringEscapeUtils.escapeJavaString("Invalid character '" + currentChar + "' at " + getRow() + ":" + getColumn()));
+			throw new Error(StringEscapeUtils.escape("Invalid character '" + currentChar + "' at " + getRow() + ":" + getColumn()));
 		}
-
-		if (value == null) value = source.substring(start, index);
-		return new Token(tokenType, value, start, index);
 	}
 
 	private int getColumn() {

@@ -10,16 +10,55 @@ public class Lexer {
 
 	static {
 		keywords.put("let", TokenType.Let);
+		keywords.put("break", TokenType.Break);
+		keywords.put("case", TokenType.Case);
+		keywords.put("catch", TokenType.Catch);
+		keywords.put("class", TokenType.Class);
+		keywords.put("const", TokenType.Const);
+		keywords.put("continue", TokenType.Continue);
+		keywords.put("debugger", TokenType.Debugger);
+		keywords.put("default", TokenType.Default);
+		keywords.put("delete", TokenType.Delete);
+		keywords.put("do", TokenType.Do);
+		keywords.put("else", TokenType.Else);
+		keywords.put("export", TokenType.Export);
+		keywords.put("extends", TokenType.Extends);
+		keywords.put("finally", TokenType.Finally);
+		keywords.put("for", TokenType.For);
+		keywords.put("function", TokenType.Function);
+		keywords.put("if", TokenType.If);
+		keywords.put("import", TokenType.Import);
+		keywords.put("in", TokenType.In);
+		keywords.put("instanceof", TokenType.Instanceof);
+		keywords.put("new", TokenType.New);
+		keywords.put("return", TokenType.Return);
+		keywords.put("super", TokenType.Super);
+		keywords.put("switch", TokenType.Switch);
+		keywords.put("this", TokenType.This);
+		keywords.put("throw", TokenType.Throw);
+		keywords.put("try", TokenType.Try);
+		keywords.put("typeof", TokenType.Typeof);
+		keywords.put("var", TokenType.Var);
+		keywords.put("void", TokenType.Void);
+		keywords.put("while", TokenType.While);
+		keywords.put("with", TokenType.With);
+		keywords.put("yield", TokenType.Yield);
 
 		symbols.put('=', TokenType.Equals);
 		symbols.put('(', TokenType.LParen);
 		symbols.put(')', TokenType.RParen);
+		symbols.put('{', TokenType.LBrace);
+		symbols.put('}', TokenType.RBrace);
+		symbols.put('[', TokenType.LBracket);
+		symbols.put(']', TokenType.RBracket);
 		symbols.put(';', TokenType.Semicolon);
 		symbols.put('+', TokenType.Plus);
 		symbols.put('-', TokenType.Minus);
 		symbols.put('*', TokenType.Multiply);
 		symbols.put('/', TokenType.Divide);
 		symbols.put('.', TokenType.Period);
+		symbols.put(',', TokenType.Comma);
+		symbols.put('!', TokenType.Bang);
 	}
 
 	private final String source;

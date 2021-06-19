@@ -15,10 +15,6 @@ public class CallExpression implements Expression {
 		this.arguments = args;
 	}
 
-	public CallExpression(String callee, Expression... args) {
-		this(new Identifier(callee), args);
-	}
-
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpIndent(indent);

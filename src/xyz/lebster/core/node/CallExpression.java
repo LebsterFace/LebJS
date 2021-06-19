@@ -21,11 +21,14 @@ public class CallExpression extends Expression {
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpIndent(indent);
-		System.out.print("CallExpression ");
-		System.out.print(callee);
-		System.out.println(":");
+		System.out.println("CallExpression:");
+		Interpreter.dumpIndent(indent + 1);
+		System.out.println("Callee:");
+		callee.dump(indent + 2);
+		Interpreter.dumpIndent(indent + 1);
+		System.out.println(arguments.length > 0 ? "Arguments:" : "[[NO ARGS]]");
 		for (Expression argument : arguments) {
-			argument.dump(indent + 1);
+			argument.dump(indent + 2);
 		}
 	}
 

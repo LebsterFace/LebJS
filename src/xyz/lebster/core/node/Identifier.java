@@ -1,12 +1,12 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.exception.LanguageException;
+import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Value;
 
 import java.util.Objects;
 
-public final class Identifier extends Expression {
+public final class Identifier implements Expression {
 	public final String value;
 
 	public Identifier(String name) {

@@ -5,16 +5,7 @@ import xyz.lebster.core.exception.NotImplementedException;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Value;
 
-public class AssignmentExpression extends Expression {
-	public final Expression left;
-	public final Expression right;
-	public final AssignmentOp op;
-
-	public AssignmentExpression(Expression left, Expression right, AssignmentOp op) {
-		this.left = left;
-		this.right = right;
-		this.op = op;
-	}
+public record AssignmentExpression(Expression left, Expression right, AssignmentOp op) implements Expression {
 
 	@Override
 	public void dump(int indent) {

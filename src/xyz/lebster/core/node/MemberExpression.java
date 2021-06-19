@@ -5,14 +5,7 @@ import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
 
-public class MemberExpression extends Expression {
-	public final Expression object;
-	public final Identifier property;
-
-	public MemberExpression(Expression object, Identifier property) {
-		this.object = object;
-		this.property = property;
-	}
+public record MemberExpression(Expression object, Identifier property) implements Expression {
 
 	@Override
 	public void dump(int indent) {

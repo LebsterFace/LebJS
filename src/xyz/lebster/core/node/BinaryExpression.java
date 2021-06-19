@@ -1,23 +1,14 @@
 package xyz.lebster.core.node;
 
+import xyz.lebster.core.exception.LanguageException;
 import xyz.lebster.core.exception.NotImplementedException;
 import xyz.lebster.core.runtime.Interpreter;
-import xyz.lebster.core.exception.LanguageException;
 import xyz.lebster.core.value.NumericLiteral;
 import xyz.lebster.core.value.StringLiteral;
 import xyz.lebster.core.value.Type;
 import xyz.lebster.core.value.Value;
 
-public class BinaryExpression extends Expression implements ASTNode {
-	public final Expression left;
-	public final Expression right;
-	public final BinaryOp op;
-
-	public BinaryExpression(Expression left, Expression right, BinaryOp op) {
-		this.left = left;
-		this.right = right;
-		this.op = op;
-	}
+public record BinaryExpression(Expression left, Expression right, BinaryOp op) implements ASTNode, Expression {
 
 	@Override
 	public void dump(int indent) {
@@ -49,11 +40,7 @@ public class BinaryExpression extends Expression implements ASTNode {
 
 			return new StringLiteral(lhs + rhs);
 		} else {
-			throw new NotImplementedException("BinaryExpression (" +
-				leftValue.type + ", " +
-				op + ", " +
-				rightValue.type +
-			")");
+			throw new NotImplementedException("BinaryExpression (" + leftValue.type + ", " + op + ", " + rightValue.type + ")");
 		}
 	}
 }

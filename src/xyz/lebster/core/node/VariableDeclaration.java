@@ -5,7 +5,7 @@ import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
 
-public record VariableDeclaration(VariableDeclarator[] declarations) implements ASTNode {
+public record VariableDeclaration(VariableDeclarator... declarations) implements ASTNode {
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpIndent(indent);

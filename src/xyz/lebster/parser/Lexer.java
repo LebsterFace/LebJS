@@ -26,6 +26,7 @@ public class Lexer {
 		symbols.put('-', TokenType.Minus);
 		symbols.put('*', TokenType.Multiply);
 		symbols.put('/', TokenType.Divide);
+		symbols.put('.', TokenType.Period);
 	}
 
 	public Lexer(String source) {

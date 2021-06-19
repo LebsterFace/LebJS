@@ -24,11 +24,15 @@ public class Parser {
 		precedence.put(TokenType.Divide, 15);
 		precedence.put(TokenType.Plus, 14);
 		precedence.put(TokenType.Minus, 14);
+		precedence.put(TokenType.Period, 20);
+		precedence.put(TokenType.LParen, 21);
+		precedence.put(TokenType.RParen, 21);
 
 		associativity.put(TokenType.Multiply, Left);
 		associativity.put(TokenType.Divide, Left);
 		associativity.put(TokenType.Plus, Left);
 		associativity.put(TokenType.Minus, Left);
+		associativity.put(TokenType.Period, Left);
 	}
 
 	public Parser(Token[] tokens) {

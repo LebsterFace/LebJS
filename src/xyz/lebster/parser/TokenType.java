@@ -8,7 +8,7 @@ public enum TokenType {
 
 	LParen,
 	RParen,
-	Assign,
+	Equals,
 	Terminator,
 	EOF,
 	Semicolon,

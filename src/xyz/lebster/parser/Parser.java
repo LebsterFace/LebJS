@@ -101,7 +101,7 @@ public class Parser {
 	private VariableDeclaration parseDeclaration() {
 		require(TokenType.Let);
 		final Token identifier = require(TokenType.Identifier);
-		require(TokenType.Assign);
+		require(TokenType.Equals);
 		final Expression value = parseExpression(0, Left);
 		return new VariableDeclaration(new VariableDeclarator[] {
 			new VariableDeclarator(new Identifier(identifier.value), value)

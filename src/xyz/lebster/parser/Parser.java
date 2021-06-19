@@ -6,6 +6,7 @@ import xyz.lebster.core.value.BooleanLiteral;
 import xyz.lebster.core.value.NumericLiteral;
 import xyz.lebster.core.value.StringLiteral;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static xyz.lebster.parser.Associativity.*;
@@ -87,11 +88,14 @@ public class Parser {
 		return program;
 	}
 
-	private CallExpression parseCallExpression(Identifier identifier) {
-		if (accept(TokenType.LParen) == null) return null;
-		final Expression argument = parseExpression(0, Left);
+	private CallExpression parseCallExpression(Expression left) {
+		final ArrayList<Expression> arguments = new ArrayList<>();
+		while (matchExpression()) {
+			arguments.add(parseExpression(0, Left));
+		}
+
 		require(TokenType.RParen);
-		return new CallExpression(identifier, argument);
+		return new CallExpression(left, arguments.toArray(new Expression[0]));
 	}
 
 	private VariableDeclaration parseDeclaration() {
@@ -143,6 +147,11 @@ public class Parser {
 				return new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Divide);
 			}
 
+			case LParen: {
+				consume();
+				return parseCallExpression(left);
+			}
+
 			default: return left;
 		}
 	}
@@ -159,12 +168,7 @@ public class Parser {
 			case StringLiteral -> new StringLiteral(consume().value());
 			case NumericLiteral -> new NumericLiteral(Double.parseDouble(consume().value()));
 			case BooleanLiteral -> new BooleanLiteral(consume().value().equals("true"));
-
-			case Identifier -> {
-				final Identifier identifier = new Identifier(consume().value());
-				final CallExpression callExpression = parseCallExpression(identifier);
-				yield callExpression == null ? identifier : callExpression;
-			}
+			case Identifier -> new Identifier(consume().value());
 
 			default -> throw new NotImplementedException("Expression type '" + currentToken.type() + "'");
 		};
@@ -182,11 +186,10 @@ public class Parser {
 				t == TokenType.LParen;
 	}
 
-
-
 	private boolean matchSecondaryExpression() {
 		final TokenType t = currentToken.type();
-		return t == TokenType.Plus || t == TokenType.Minus ||
-				t == TokenType.Multiply || t == TokenType.Divide;
+		return  t == TokenType.Plus || t == TokenType.Minus ||
+				t == TokenType.Multiply || t == TokenType.Divide ||
+				t == TokenType.Period || t == TokenType.LParen;
 	}
 }

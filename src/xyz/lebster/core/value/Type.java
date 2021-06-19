@@ -1,12 +1,12 @@
 package xyz.lebster.core.value;
 
 public enum Type {
-    Dictionary,
-    Number,
-    Undefined,
-    Function,
-    Boolean,
-    Null,
-    String,
-    NativeFunction
+	Dictionary,
+	Number,
+	Undefined,
+	Function,
+	Boolean,
+	Null,
+	String,
+	NativeFunction
 }

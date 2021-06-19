@@ -30,7 +30,7 @@ public class FunctionDeclaration extends ScopeNode {
 
 		System.out.print("(");
 		System.out.print(arguments[0].value);
-		for(int i = 1; i < arguments.length; i++) {
+		for (int i = 1; i < arguments.length; i++) {
 			System.out.print(", ");
 			System.out.print(arguments[i].value);
 		}

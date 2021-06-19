@@ -9,12 +9,5 @@ public enum AssignmentOp {
 		Interpreter.dumpIndent(indent);
 		System.out.print("AssignmentOp: ");
 		System.out.println(this);
-
-//		System.out.println(switch (this) {
-//			case Add -> "+";
-//			case Divide -> "/";
-//			case Multiply -> "*";
-//			case Subtract -> "-";
-//		});
 	}
 }

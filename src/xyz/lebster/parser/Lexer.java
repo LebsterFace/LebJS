@@ -5,13 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Lexer {
-	private final String source;
-	private final StringBuilder builder = new StringBuilder();
-	private final int length;
-
-	private int index = -1;
-	private char currentChar = '\0';
-
 	private static final HashMap<String, TokenType> keywords = new HashMap<>();
 	private static final HashMap<Character, TokenType> symbols = new HashMap<>();
 
@@ -28,6 +21,12 @@ public class Lexer {
 		symbols.put('/', TokenType.Divide);
 		symbols.put('.', TokenType.Period);
 	}
+
+	private final String source;
+	private final StringBuilder builder = new StringBuilder();
+	private final int length;
+	private int index = -1;
+	private char currentChar = '\0';
 
 	public Lexer(String source) {
 		this.source = source;
@@ -113,7 +112,7 @@ public class Lexer {
 			while (currentChar != stringType) collect();
 			consume();
 			return new Token(TokenType.StringLiteral, builder.toString(), start, index);
-		}  else if (isDigit(currentChar)) {
+		} else if (isDigit(currentChar)) {
 			int decimalPos = -1;
 
 			while (isDigit(currentChar) || (currentChar == '.' && decimalPos == -1)) {

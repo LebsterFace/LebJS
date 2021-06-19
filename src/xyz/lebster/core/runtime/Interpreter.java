@@ -9,14 +9,9 @@ import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
 
 public class Interpreter {
-	public static void dumpIndent(int indent) {
-		System.out.print("  ".repeat(indent));
-	}
-
 	public final int maxStackSize;
 	private final ScopeFrame[] callStack;
 	private int currentScope = 0;
-
 	public Interpreter(int maxStackSize, Program program, Dictionary globalObject) {
 		this.maxStackSize = maxStackSize;
 		this.callStack = new ScopeFrame[maxStackSize];
@@ -33,6 +28,10 @@ public class Interpreter {
 
 	public Interpreter(Program program, Dictionary globalObject) {
 		this(32, program, globalObject);
+	}
+
+	public static void dumpIndent(int indent) {
+		System.out.print("  ".repeat(indent));
 	}
 
 	public Value<?> declareVariable(Identifier name, Value<?> value) {
@@ -56,6 +55,7 @@ public class Interpreter {
 
 		throw new LReferenceError("Unknown variable " + name);
 	}
+
 	public Value<?> setVariable(String name, Value<?> value) throws LReferenceError {
 		return this.setVariable(new Identifier(name), value);
 	}
@@ -69,6 +69,7 @@ public class Interpreter {
 
 		throw new LReferenceError(name.value + " is not defined");
 	}
+
 	public Value<?> getVariable(String name) throws LReferenceError {
 		return this.getVariable(new Identifier(name));
 	}
@@ -76,6 +77,7 @@ public class Interpreter {
 	public Value<?> setGlobal(Identifier name, Value<?> value) {
 		return callStack[0].setVariable(name, value);
 	}
+
 	public Value<?> setGlobal(String name, Value<?> value) {
 		return this.setGlobal(new Identifier(name), value);
 	}
@@ -83,6 +85,7 @@ public class Interpreter {
 	public Value<?> getGlobal(Identifier name) {
 		return callStack[0].getVariable(name);
 	}
+
 	public Value<?> getGlobal(String name) {
 		return this.getGlobal(new Identifier(name));
 	}

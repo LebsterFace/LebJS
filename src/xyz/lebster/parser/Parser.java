@@ -9,13 +9,10 @@ import xyz.lebster.core.value.StringLiteral;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static xyz.lebster.parser.Associativity.*;
+import static xyz.lebster.parser.Associativity.Left;
+import static xyz.lebster.parser.Associativity.Right;
 
 public class Parser {
-	public final Token[] tokens;
-	private Token currentToken;
-	private int index = -1;
-
 	private static final HashMap<TokenType, Integer> precedence = new HashMap<>();
 	private static final HashMap<TokenType, Associativity> associativity = new HashMap<>();
 
@@ -37,6 +34,10 @@ public class Parser {
 		associativity.put(TokenType.Period, Left);
 		associativity.put(TokenType.Equals, Right);
 	}
+
+	public final Token[] tokens;
+	private Token currentToken;
+	private int index = -1;
 
 	public Parser(Token[] tokens) {
 		this.tokens = tokens;
@@ -105,9 +106,9 @@ public class Parser {
 		final Token identifier = require(TokenType.Identifier);
 		require(TokenType.Equals);
 		final Expression value = parseExpression(0, Left);
-		return new VariableDeclaration(new VariableDeclarator[] {
+		return new VariableDeclaration(
 			new VariableDeclarator(new Identifier(identifier.value), value)
-		});
+		);
 	}
 
 	private Expression parseExpression(int minPrecedence, Associativity assoc) {
@@ -165,7 +166,8 @@ public class Parser {
 				return new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentOp.Equals);
 			}
 
-			default: return left;
+			default:
+				return left;
 		}
 	}
 
@@ -194,16 +196,21 @@ public class Parser {
 
 	private boolean matchExpression() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.StringLiteral || t == TokenType.NumericLiteral ||
-				t == TokenType.BooleanLiteral || t == TokenType.Identifier ||
-				t == TokenType.LParen;
+		return t == TokenType.StringLiteral  ||
+			   t == TokenType.NumericLiteral ||
+			   t == TokenType.BooleanLiteral ||
+			   t == TokenType.Identifier 	 ||
+			   t == TokenType.LParen;
 	}
 
 	private boolean matchSecondaryExpression() {
 		final TokenType t = currentToken.type;
-		return  t == TokenType.Plus|| t == TokenType.Minus ||
-				t == TokenType.Multiply || t == TokenType.Divide ||
-				t == TokenType.Period || t == TokenType.LParen ||
-				t == TokenType.Equals;
+		return t == TokenType.Plus	   ||
+			   t == TokenType.Minus	   ||
+			   t == TokenType.Multiply ||
+			   t == TokenType.Divide   ||
+			   t == TokenType.Period   ||
+			   t == TokenType.LParen   ||
+			   t == TokenType.Equals;
 	}
 }

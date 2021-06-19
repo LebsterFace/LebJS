@@ -7,6 +7,7 @@ public class StringWrapper extends LiteralWrapper<StringLiteral> {
 		super(s);
 		set("length", new NumericLiteral(s.value.length()));
 	}
+
 	@Override
 	public StringPrototype getPrototype() {
 		return StringPrototype.instance;

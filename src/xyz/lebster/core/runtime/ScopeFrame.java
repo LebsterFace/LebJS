@@ -7,9 +7,9 @@ import xyz.lebster.core.value.Value;
 
 public class ScopeFrame {
 	public final ScopeNode node;
+	private final Dictionary variables;
 	public boolean didExit = false;
 	protected Value<?> exitValue = null;
-	private final Dictionary variables;
 
 	public ScopeFrame(ScopeNode node, Dictionary variables) {
 		this.node = node;

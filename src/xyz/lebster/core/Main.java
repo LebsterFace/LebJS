@@ -88,10 +88,10 @@ public class Main {
 
 	public static void execProgram(String source, boolean showDebug) {
 		final Token[] tokens = new Lexer(source).tokenize();
-//		if (showDebug) {
-//			System.out.println("------- TOKENS -------");
-//			for (Token token : tokens) System.out.println(token);
-//		}
+		// if (showDebug) {
+		// 	System.out.println("------- TOKENS -------");
+		// 	for (Token token : tokens) System.out.println(token);
+		// }
 
 		execProgram(new Parser(tokens).parse(), showDebug);
 	}

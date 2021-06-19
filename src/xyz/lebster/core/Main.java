@@ -108,6 +108,6 @@ public class Main {
 		}
 
 
-		execProgram(source, true);
+		execProgram(source, args.length > 1 && args[1].equals("debug"));
 	}
 }

@@ -147,6 +147,12 @@ public class Parser {
 				return new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Divide);
 			}
 
+			case Period: {
+				consume();
+				final String prop = require(TokenType.Identifier).value();
+				return new MemberExpression(left, new Identifier(prop));
+			}
+
 			case LParen: {
 				consume();
 				return parseCallExpression(left);

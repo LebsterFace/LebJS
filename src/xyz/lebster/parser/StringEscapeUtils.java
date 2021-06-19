@@ -5,7 +5,7 @@ public class StringEscapeUtils {
 		return Integer.toHexString(character).toUpperCase();
 	}
 
-	public static String escapeJavaString(String str) {
+	public static String escape(String str) {
 		if (str == null) return null;
 		final int length = str.length();
 		final StringBuilder res = new StringBuilder(length);
@@ -32,11 +32,7 @@ public class StringEscapeUtils {
 					}
 				}
 			} else {
-				switch (ch) {
-					case '"' -> res.append('\\').append('"');
-					case '\\' -> res.append('\\').append('\\');
-					default -> res.append(ch);
-				}
+				res.append(ch);
 			}
 		}
 

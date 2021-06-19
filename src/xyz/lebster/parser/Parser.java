@@ -41,7 +41,7 @@ public class Parser {
 	}
 
 	private void expected(TokenType t) {
-		throw new Error("Unexpected token " + currentToken.type() + ". Expected " + t);
+		throw new Error("Unexpected token " + currentToken.type + ". Expected " + t);
 	}
 
 	private Token consume() {
@@ -52,7 +52,7 @@ public class Parser {
 	}
 
 	private boolean match(TokenType t) {
-		return currentToken.type() == t;
+		return currentToken.type == t;
 	}
 
 	private Token require(TokenType t) {
@@ -69,9 +69,9 @@ public class Parser {
 		consume();
 
 		while (index < tokens.length) {
-			if (currentToken.type() == TokenType.EOF) {
+			if (currentToken.type == TokenType.EOF) {
 				break;
-			} else if (currentToken.type() == TokenType.Terminator || currentToken.type() == TokenType.Semicolon) {
+			} else if (currentToken.type == TokenType.Terminator || currentToken.type == TokenType.Semicolon) {
 				consume();
 			} else if (matchDeclaration()) {
 				program.append(parseDeclaration());
@@ -81,7 +81,7 @@ public class Parser {
 				System.out.println("------- PARTIAL TREE -------");
 				program.dump(0);
 				System.out.println("------- ERROR -------");
-				throw new NotImplementedException("Support for token '" + currentToken.type() + "'");
+				throw new NotImplementedException("Support for token '" + currentToken.type + "'");
 			}
 		}
 
@@ -104,7 +104,7 @@ public class Parser {
 		require(TokenType.Assign);
 		final Expression value = parseExpression(0, Left);
 		return new VariableDeclaration(new VariableDeclarator[] {
-			new VariableDeclarator(new Identifier(identifier.value()), value)
+			new VariableDeclarator(new Identifier(identifier.value), value)
 		});
 	}
 
@@ -112,13 +112,13 @@ public class Parser {
 		Expression latestExpr = parsePrimaryExpression();
 
 		while (matchSecondaryExpression()) {
-			final int newPrecedence = precedence.get(currentToken.type());
+			final int newPrecedence = precedence.get(currentToken.type);
 
 			if (newPrecedence < minPrecedence || newPrecedence == minPrecedence && assoc == Left) {
 				break;
 			}
 
-			final Associativity newAssoc = associativity.get(currentToken.type());
+			final Associativity newAssoc = associativity.get(currentToken.type);
 			latestExpr = parseSecondaryExpression(latestExpr, newPrecedence, newAssoc);
 		}
 
@@ -126,7 +126,7 @@ public class Parser {
 	}
 
 	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) {
-		switch (currentToken.type()) {
+		switch (currentToken.type) {
 			case Plus: {
 				consume();
 				return new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Add);
@@ -149,7 +149,7 @@ public class Parser {
 
 			case Period: {
 				consume();
-				final String prop = require(TokenType.Identifier).value();
+				final String prop = require(TokenType.Identifier).value;
 				return new MemberExpression(left, new Identifier(prop));
 			}
 
@@ -163,7 +163,7 @@ public class Parser {
 	}
 
 	private Expression parsePrimaryExpression() {
-		return switch (currentToken.type()) {
+		return switch (currentToken.type) {
 			case LParen -> {
 				consume();
 				final Expression expression = parseExpression(0, Left);
@@ -171,29 +171,29 @@ public class Parser {
 				yield expression;
 			}
 
-			case StringLiteral -> new StringLiteral(consume().value());
-			case NumericLiteral -> new NumericLiteral(Double.parseDouble(consume().value()));
-			case BooleanLiteral -> new BooleanLiteral(consume().value().equals("true"));
-			case Identifier -> new Identifier(consume().value());
+			case StringLiteral -> new StringLiteral(consume().value);
+			case NumericLiteral -> new NumericLiteral(Double.parseDouble(consume().value));
+			case BooleanLiteral -> new BooleanLiteral(consume().value.equals("true"));
+			case Identifier -> new Identifier(consume().value);
 
-			default -> throw new NotImplementedException("Expression type '" + currentToken.type() + "'");
+			default -> throw new NotImplementedException("Expression type '" + currentToken.type + "'");
 		};
 	}
 
 	private boolean matchDeclaration() {
-		final TokenType t = currentToken.type();
+		final TokenType t = currentToken.type;
 		return t == TokenType.Let;
 	}
 
 	private boolean matchExpression() {
-		final TokenType t = currentToken.type();
+		final TokenType t = currentToken.type;
 		return t == TokenType.StringLiteral || t == TokenType.NumericLiteral ||
 				t == TokenType.BooleanLiteral || t == TokenType.Identifier ||
 				t == TokenType.LParen;
 	}
 
 	private boolean matchSecondaryExpression() {
-		final TokenType t = currentToken.type();
+		final TokenType t = currentToken.type;
 		return  t == TokenType.Plus || t == TokenType.Minus ||
 				t == TokenType.Multiply || t == TokenType.Divide ||
 				t == TokenType.Period || t == TokenType.LParen;

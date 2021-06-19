@@ -1,7 +1,7 @@
 package xyz.lebster.core.runtime;
 
-import xyz.lebster.core.exception.LReferenceError;
-import xyz.lebster.core.exception.LanguageException;
+import xyz.lebster.exception.ReferenceError;
+import xyz.lebster.exception.LanguageError;
 import xyz.lebster.core.node.Identifier;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.ScopeNode;
@@ -53,31 +53,31 @@ public class Interpreter {
 		dumpVariables(currentScopeFrame);
 	}
 
-	public Value<?> setVariable(Identifier name, Value<?> value) throws LReferenceError {
+	public Value<?> setVariable(Identifier name, Value<?> value) throws ReferenceError {
 		for (int i = currentScopeFrame; i >= 0; i--) {
 			if (scopeStack[i].containsVariable(name)) {
 				return scopeStack[i].setVariable(name, value);
 			}
 		}
 
-		throw new LReferenceError("Unknown variable " + name);
+		throw new ReferenceError("Unknown variable " + name);
 	}
 
-	public Value<?> setVariable(String name, Value<?> value) throws LReferenceError {
+	public Value<?> setVariable(String name, Value<?> value) throws ReferenceError {
 		return this.setVariable(new Identifier(name), value);
 	}
 
-	public Value<?> getVariable(Identifier name) throws LReferenceError {
+	public Value<?> getVariable(Identifier name) throws ReferenceError {
 		for (int i = currentScopeFrame; i >= 0; i--) {
 			if (scopeStack[i].containsVariable(name)) {
 				return scopeStack[i].getVariable(name);
 			}
 		}
 
-		throw new LReferenceError(name.value + " is not defined");
+		throw new ReferenceError(name.value + " is not defined");
 	}
 
-	public Value<?> getVariable(String name) throws LReferenceError {
+	public Value<?> getVariable(String name) throws ReferenceError {
 		return this.getVariable(new Identifier(name));
 	}
 
@@ -97,9 +97,9 @@ public class Interpreter {
 		return this.getGlobal(new Identifier(name));
 	}
 
-	public ScopeFrame enterScope(ScopeNode node) throws LanguageException {
+	public ScopeFrame enterScope(ScopeNode node) throws LanguageError {
 		if (currentScopeFrame + 1 == maxScopeFrames) {
-			throw new LanguageException("Maximum call stack size exceeded");
+			throw new LanguageError("Maximum call stack size exceeded");
 		}
 
 		final ScopeFrame frame = new ScopeFrame(node);
@@ -107,28 +107,28 @@ public class Interpreter {
 		return frame;
 	}
 
-	public void exitScope(ScopeFrame frame) throws LanguageException {
+	public void exitScope(ScopeFrame frame) throws LanguageError {
 		if (currentScopeFrame == 0) {
-			throw new LanguageException("Exiting ScopeFrame while at top level");
+			throw new LanguageError("Exiting ScopeFrame while at top level");
 		} else if (scopeStack[currentScopeFrame] != frame) {
-			throw new LanguageException("Attempting to exit invalid ScopeFrame");
+			throw new LanguageError("Attempting to exit invalid ScopeFrame");
 		}
 
 		scopeStack[currentScopeFrame--] = null;
 	}
 
-	public Value<?> doExit(Value<?> value) throws LanguageException {
+	public Value<?> doExit(Value<?> value) throws LanguageError {
 		if (currentScopeFrame == 0) {
-			throw new LanguageException("Invalid return statement");
+			throw new LanguageError("Invalid return statement");
 		}
 
 		scopeStack[currentScopeFrame].doExit(value);
 		return value;
 	}
 
-	public CallFrame enterCallFrame(Value<?> thisValue) throws LanguageException {
+	public CallFrame enterCallFrame(Value<?> thisValue) throws LanguageError {
 		if (currentCallFrame + 1 == maxCallFrames) {
-			throw new LanguageException("Maximum call stack size exceeded");
+			throw new LanguageError("Maximum call stack size exceeded");
 		}
 
 		final CallFrame frame = new CallFrame(thisValue);
@@ -136,11 +136,11 @@ public class Interpreter {
 		return frame;
 	}
 
-	public void exitCallFrame(CallFrame frame) throws LanguageException {
+	public void exitCallFrame(CallFrame frame) throws LanguageError {
 		if (currentCallFrame == 0) {
-			throw new LanguageException("Exiting CallFrame while at top level");
+			throw new LanguageError("Exiting CallFrame while at top level");
 		} else if (callStack[currentCallFrame] != frame) {
-			throw new LanguageException("Attempting to exit invalid CallFrame");
+			throw new LanguageError("Attempting to exit invalid CallFrame");
 		}
 
 		callStack[currentCallFrame--] = null;

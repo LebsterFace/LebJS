@@ -1,6 +1,6 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.exception.NotImplemented;
 
 public class BooleanLiteral extends Value<Boolean> {
 	public BooleanLiteral(Boolean value) {
@@ -18,12 +18,12 @@ public class BooleanLiteral extends Value<Boolean> {
 	}
 
 	@Override
-	public Function toFunction() throws NotImplementedException {
-		throw new NotImplementedException("BooleanLiteral -> Function");
+	public Function toFunction() throws NotImplemented {
+		throw new NotImplemented("BooleanLiteral -> Function");
 	}
 
 	@Override
-	public Dictionary toDictionary() throws NotImplementedException {
-		throw new NotImplementedException("BooleanLiteral -> toDictionary");
+	public Dictionary toDictionary() throws NotImplemented {
+		throw new NotImplemented("BooleanLiteral -> toDictionary");
 	}
 }

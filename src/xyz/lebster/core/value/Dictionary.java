@@ -1,6 +1,6 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.node.Identifier;
 import xyz.lebster.core.runtime.Interpreter;
 
@@ -62,8 +62,8 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 	}
 
 	@Override
-	public Function toFunction() throws NotImplementedException {
-		throw new NotImplementedException("Dictionary -> Function");
+	public Function toFunction() throws NotImplemented {
+		throw new NotImplemented("Dictionary -> Function");
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.runtime.Interpreter;
 
 public class NativeFunction extends Value<NativeCode> {
@@ -24,13 +24,13 @@ public class NativeFunction extends Value<NativeCode> {
 	}
 
 	@Override
-	public Function toFunction() throws NotImplementedException {
-		throw new NotImplementedException("NativeFunction -> Function");
+	public Function toFunction() throws NotImplemented {
+		throw new NotImplemented("NativeFunction -> Function");
 	}
 
 	@Override
-	public Dictionary toDictionary() throws NotImplementedException {
-		throw new NotImplementedException("NativeFunction -> Dictionary");
+	public Dictionary toDictionary() throws NotImplemented {
+		throw new NotImplemented("NativeFunction -> Dictionary");
 	}
 
 	@Override

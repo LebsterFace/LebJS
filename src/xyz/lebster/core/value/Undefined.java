@@ -1,6 +1,6 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.runtime.Interpreter;
 
 public class Undefined extends Value<Void> {
@@ -30,8 +30,8 @@ public class Undefined extends Value<Void> {
 	}
 
 	@Override
-	public Function toFunction() throws NotImplementedException {
-		throw new NotImplementedException("Undefined -> Function");
+	public Function toFunction() throws NotImplemented {
+		throw new NotImplemented("Undefined -> Function");
 	}
 
 	@Override

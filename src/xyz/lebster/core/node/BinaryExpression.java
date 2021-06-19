@@ -1,7 +1,7 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.core.exception.LanguageException;
-import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.exception.LanguageError;
+import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.NumericLiteral;
 import xyz.lebster.core.value.StringLiteral;
@@ -20,7 +20,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+	public Value<?> execute(Interpreter interpreter) throws LanguageError {
 		final Value<?> leftValue = left.execute(interpreter);
 		final Value<?> rightValue = right.execute(interpreter);
 
@@ -40,7 +40,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 
 			return new StringLiteral(lhs + rhs);
 		} else {
-			throw new NotImplementedException("BinaryExpression (" + leftValue.type + ", " + op + ", " + rightValue.type + ")");
+			throw new NotImplemented("BinaryExpression (" + leftValue.type + ", " + op + ", " + rightValue.type + ")");
 		}
 	}
 }

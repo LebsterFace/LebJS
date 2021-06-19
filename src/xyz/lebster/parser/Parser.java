@@ -1,6 +1,7 @@
 package xyz.lebster.parser;
 
-import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.exception.NotImplemented;
+import xyz.lebster.exception.ParseError;
 import xyz.lebster.core.node.*;
 import xyz.lebster.core.value.BooleanLiteral;
 import xyz.lebster.core.value.NumericLiteral;
@@ -43,8 +44,8 @@ public class Parser {
 		this.tokens = tokens;
 	}
 
-	private void expected(TokenType t) {
-		throw new Error("Unexpected token " + currentToken.type + ". Expected " + t);
+	private void expected(TokenType t) throws ParseError {
+		throw new ParseError("Unexpected token " + currentToken.type + ". Expected " + t);
 	}
 
 	private Token consume() {
@@ -58,7 +59,7 @@ public class Parser {
 		return currentToken.type == t;
 	}
 
-	private Token require(TokenType t) {
+	private Token require(TokenType t) throws ParseError {
 		if (!match(t)) expected(t);
 		return consume();
 	}
@@ -67,7 +68,7 @@ public class Parser {
 		return match(t) ? consume() : null;
 	}
 
-	public Program parse() {
+	public Program parse() throws ParseError, NotImplemented {
 		final Program program = new Program();
 		consume();
 
@@ -84,14 +85,14 @@ public class Parser {
 				System.out.println("------- PARTIAL TREE -------");
 				program.dump(0);
 				System.out.println("------- ERROR -------");
-				throw new NotImplementedException("Support for token '" + currentToken.type + "'");
+				throw new NotImplemented("Support for token '" + currentToken.type + "'");
 			}
 		}
 
 		return program;
 	}
 
-	private CallExpression parseCallExpression(Expression left) {
+	private CallExpression parseCallExpression(Expression left) throws ParseError, NotImplemented {
 		final ArrayList<Expression> arguments = new ArrayList<>();
 		while (matchExpression()) {
 			arguments.add(parseExpression(0, Left));
@@ -101,7 +102,7 @@ public class Parser {
 		return new CallExpression(left, arguments.toArray(new Expression[0]));
 	}
 
-	private VariableDeclaration parseDeclaration() {
+	private VariableDeclaration parseDeclaration() throws ParseError, NotImplemented {
 		require(TokenType.Let);
 		final Token identifier = require(TokenType.Identifier);
 		require(TokenType.Equals);
@@ -111,7 +112,7 @@ public class Parser {
 		);
 	}
 
-	private Expression parseExpression(int minPrecedence, Associativity assoc) {
+	private Expression parseExpression(int minPrecedence, Associativity assoc) throws ParseError, NotImplemented {
 		Expression latestExpr = parsePrimaryExpression();
 
 		while (matchSecondaryExpression()) {
@@ -128,7 +129,7 @@ public class Parser {
 		return latestExpr;
 	}
 
-	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) {
+	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws ParseError, NotImplemented {
 		switch (currentToken.type) {
 			case Plus: {
 				consume();
@@ -171,7 +172,7 @@ public class Parser {
 		}
 	}
 
-	private Expression parsePrimaryExpression() {
+	private Expression parsePrimaryExpression() throws ParseError, NotImplemented {
 		return switch (currentToken.type) {
 			case LParen -> {
 				consume();
@@ -185,7 +186,7 @@ public class Parser {
 			case BooleanLiteral -> new BooleanLiteral(consume().value.equals("true"));
 			case Identifier -> new Identifier(consume().value);
 
-			default -> throw new NotImplementedException("Expression type '" + currentToken.type + "'");
+			default -> throw new NotImplemented("Expression type '" + currentToken.type + "'");
 		};
 	}
 

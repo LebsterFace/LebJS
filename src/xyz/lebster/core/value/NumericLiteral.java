@@ -1,6 +1,6 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.exception.NotImplemented;
 
 public class NumericLiteral extends Value<Double> {
 	public NumericLiteral(double value) {
@@ -18,12 +18,12 @@ public class NumericLiteral extends Value<Double> {
 	}
 
 	@Override
-	public Function toFunction() throws NotImplementedException {
-		throw new NotImplementedException("NumericLiteral -> Function ");
+	public Function toFunction() throws NotImplemented {
+		throw new NotImplemented("NumericLiteral -> Function ");
 	}
 
 	@Override
-	public Dictionary toDictionary() throws NotImplementedException {
-		throw new NotImplementedException("NumericLiteral -> Dictionary ");
+	public Dictionary toDictionary() throws NotImplemented {
+		throw new NotImplemented("NumericLiteral -> Dictionary ");
 	}
 }

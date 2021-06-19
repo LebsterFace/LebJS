@@ -1,6 +1,6 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.runtime.Interpreter;
 
 public class StringLiteral extends Value<String> {
@@ -39,8 +39,8 @@ public class StringLiteral extends Value<String> {
 	}
 
 	@Override
-	public Function toFunction() throws NotImplementedException {
-		throw new NotImplementedException("StringLiteral -> Function");
+	public Function toFunction() throws NotImplemented {
+		throw new NotImplemented("StringLiteral -> Function");
 	}
 
 	@Override

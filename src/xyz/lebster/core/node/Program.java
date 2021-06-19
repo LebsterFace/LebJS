@@ -1,6 +1,6 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.core.exception.LanguageException;
+import xyz.lebster.exception.LanguageError;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
@@ -12,7 +12,7 @@ public class Program extends ScopeNode {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+	public Value<?> execute(Interpreter interpreter) throws LanguageError {
 		Value<?> lastValue = new Undefined();
 		for (ASTNode node : children) lastValue = node.execute(interpreter);
 		return lastValue;

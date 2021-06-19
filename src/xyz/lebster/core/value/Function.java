@@ -1,7 +1,7 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.exception.LanguageException;
-import xyz.lebster.core.exception.NotImplementedException;
+import xyz.lebster.exception.LanguageError;
+import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.FunctionDeclaration;
 import xyz.lebster.core.runtime.CallFrame;
@@ -14,8 +14,8 @@ public class Function extends Value<FunctionDeclaration> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral() throws NotImplementedException {
-		throw new NotImplementedException("Function -> StringLiteral");
+	public StringLiteral toStringLiteral() throws NotImplemented {
+		throw new NotImplemented("Function -> StringLiteral");
 	}
 
 	@Override
@@ -34,8 +34,8 @@ public class Function extends Value<FunctionDeclaration> {
 	}
 
 	@Override
-	public Dictionary toDictionary() throws NotImplementedException {
-		throw new NotImplementedException("Function -> Dictionary");
+	public Dictionary toDictionary() throws NotImplemented {
+		throw new NotImplemented("Function -> Dictionary");
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class Function extends Value<FunctionDeclaration> {
 		System.out.println("Function");
 	}
 
-	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws LanguageException {
+	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws LanguageError {
 		Value<?> result = new Undefined();
 		final ScopeFrame scope = interpreter.enterScope(value);
 		final CallFrame frame = interpreter.enterCallFrame(this);

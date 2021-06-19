@@ -1,2 +1,1 @@
-let foo = "foobar";
-print(foo.reverse());
+"foobar".reverse()

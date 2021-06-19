@@ -45,11 +45,7 @@ public class StringLiteral extends Value<String> {
 
 	@Override
 	public Dictionary toDictionary() {
-		final Dictionary result = new Dictionary();
-		result.set("length", new NumericLiteral(value.length()));
-		result.set("reverse", new NativeFunction((interpreter, arguments) -> new StringLiteral(new StringBuilder(value).reverse().toString())));
-
-		return result;
+		return new StringWrapper(this);
 	}
 
 	@Override

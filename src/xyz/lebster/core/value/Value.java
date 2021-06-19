@@ -20,6 +20,10 @@ abstract public class Value<JType> implements Expression {
 
     public abstract Dictionary toDictionary();
 
+    public Dictionary getPrototype() {
+        return ObjectPrototype.instance;
+    }
+
     public Value(Type type, JType value) {
         this.type = type;
         this.value = value;

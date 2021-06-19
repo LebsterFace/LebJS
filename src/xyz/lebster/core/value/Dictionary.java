@@ -26,23 +26,24 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 	}
 
 	public Value<?> get(Identifier name) {
-		if (this.value.containsKey(name)) {
-			return this.value.get(name);
-		} else {
-			return new Undefined();
-		}
-	}
+		Dictionary object = this;
 
-	public Value<?> get(String name) {
-		return get(new Identifier(name));
+		while (true) {
+			if (object == null) {
+				// End of prototype chain; property does not exist.
+				return new Undefined();
+			} else if (object.containsKey(name)) {
+				// Property was found
+				return object.value.get(name);
+			} else {
+				// Property does not exist on current object. Move up prototype chain
+				object = object.getPrototype();
+			}
+		}
 	}
 
 	public boolean containsKey(Identifier name) {
 		return this.value.containsKey(name);
-	}
-	
-	public boolean containsKey(String name) {
-		return containsKey(new Identifier(name));
 	}
 
 	@Override

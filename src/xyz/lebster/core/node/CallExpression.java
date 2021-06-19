@@ -6,10 +6,10 @@ import xyz.lebster.core.exception.LanguageException;
 import xyz.lebster.core.value.*;
 
 public class CallExpression extends Expression {
-	public final Identifier callee;
+	public final Expression callee;
 	public final Expression[] arguments;
 
-	public CallExpression(Identifier callee, Expression... args) {
+	public CallExpression(Expression callee, Expression... args) {
 		this.callee = callee;
 		this.arguments = args;
 	}
@@ -37,7 +37,7 @@ public class CallExpression extends Expression {
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws LanguageException {
-		final Value<?> value = interpreter.getVariable(callee);
+		final Value<?> value = callee.execute(interpreter);
 
 		if (value.type == Type.Function) {
 			final Function func = (Function) value;
@@ -50,7 +50,7 @@ public class CallExpression extends Expression {
 			final Value<?>[] arguments = this.executeArguments(interpreter);
 			return code.execute(interpreter, arguments);
 		} else {
-			throw new LTypeError("Can only call a function!");
+			throw new LTypeError("'LittleLang::" + value.getClass().getSimpleName() + "' is not a function");
 		}
 	}
 }

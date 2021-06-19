@@ -28,12 +28,14 @@ public class Parser {
 		precedence.put(TokenType.Period, 20);
 		precedence.put(TokenType.LParen, 21);
 		precedence.put(TokenType.RParen, 21);
+		precedence.put(TokenType.Equals, 3);
 
 		associativity.put(TokenType.Multiply, Left);
 		associativity.put(TokenType.Divide, Left);
 		associativity.put(TokenType.Plus, Left);
 		associativity.put(TokenType.Minus, Left);
 		associativity.put(TokenType.Period, Left);
+		associativity.put(TokenType.Equals, Right);
 	}
 
 	public Parser(Token[] tokens) {
@@ -158,6 +160,11 @@ public class Parser {
 				return parseCallExpression(left);
 			}
 
+			case Equals: {
+				consume();
+				return new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentOp.Equals);
+			}
+
 			default: return left;
 		}
 	}
@@ -194,8 +201,9 @@ public class Parser {
 
 	private boolean matchSecondaryExpression() {
 		final TokenType t = currentToken.type;
-		return  t == TokenType.Plus || t == TokenType.Minus ||
+		return  t == TokenType.Plus|| t == TokenType.Minus ||
 				t == TokenType.Multiply || t == TokenType.Divide ||
-				t == TokenType.Period || t == TokenType.LParen;
+				t == TokenType.Period || t == TokenType.LParen ||
+				t == TokenType.Equals;
 	}
 }

@@ -118,4 +118,8 @@ public class Interpreter {
 
 		callStack[currentScope].doExit(value);
 	}
+
+	public String thisValue() {
+		return "foobar";
+	}
 }

@@ -1,6 +1,6 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.exception.LanguageError;
+import xyz.lebster.core.runtime.CallFrame;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
@@ -28,5 +28,11 @@ public final class MemberExpression extends Expression {
 	public Value<?> execute(Interpreter interpreter) throws LanguageException {
 		final Dictionary obj = object.execute(interpreter).toDictionary();
 		return obj.get(property);
+	}
+
+	@Override
+	public CallFrame toCallFrame(Interpreter interpreter) throws LanguageException {
+		final Dictionary obj = object.execute(interpreter).toDictionary();
+		return new CallFrame(obj.get(property), obj);
 	}
 }

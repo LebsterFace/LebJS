@@ -22,7 +22,7 @@ public class Interpreter {
 		this.scopeStack = new ScopeFrame[maxScopeFrames];
 		this.callStack = new CallFrame[maxCallFrames];
 		scopeStack[0] = new ScopeFrame(program, globalObject);
-		callStack[0] = new CallFrame(globalObject);
+		callStack[0] = new CallFrame(null, globalObject);
 	}
 
 	public Interpreter(Program program, Dictionary globalObject) {

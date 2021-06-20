@@ -1,9 +1,10 @@
 package xyz.lebster.core.value;
 
+import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.runtime.Interpreter;
 
-public class NativeFunction extends Value<NativeCode> {
+public class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(NativeCode value) {
 		super(Type.NativeFunction, value);
 	}
@@ -37,5 +38,10 @@ public class NativeFunction extends Value<NativeCode> {
 	public void dump(int indent) {
 		Interpreter.dumpIndent(indent);
 		System.out.println("NativeFunction");
+	}
+
+	@Override
+	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws LanguageException {
+		return value.execute(interpreter, arguments);
 	}
 }

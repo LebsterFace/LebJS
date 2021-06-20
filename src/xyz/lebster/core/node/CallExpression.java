@@ -29,37 +29,22 @@ public class CallExpression extends Expression {
 		}
 	}
 
-	private Value<?>[] executeArguments(Interpreter interpreter) throws LanguageError {
-		final Value<?>[] result = new Value<?>[arguments.length];
-		for (int i = 0; i < arguments.length; i++) result[i] = arguments[i].execute(interpreter);
-		return result;
-	}
-
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageError {
-		final Value<?> value = callee.execute(interpreter);
+	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+		final CallFrame frame = callee.toCallFrame(interpreter);
 
-		if (value.type == Type.Function) {
-			final Function func = (Function) value;
-			return func.executeChildren(interpreter, this.executeArguments(interpreter));
-		} else if (value.type == Type.NativeFunction) {
-			final CallFrame frame = interpreter.enterCallFrame(getCorrectThis(interpreter));
-
-			final NativeCode func = (NativeCode) value.value;
-			final Value<?> result = func.execute(interpreter, this.executeArguments(interpreter));
-
-			interpreter.exitCallFrame(frame);
-			return result;
-		} else {
-			throw new TypeError("'LittleLang::" + value.getClass().getSimpleName() + "' is not a function");
+		if (!(frame.executedCallee() instanceof final Executable<?> executable)) {
+			throw new TypeError(frame.executedCallee().getClass().getCanonicalName() + " is not a function");
 		}
-	}
 
-	private Value<?> getCorrectThis(Interpreter interpreter) throws LanguageError {
-		if (callee instanceof MemberExpression) {
-			return ((MemberExpression) callee).object().execute(interpreter);
-		} else {
-			return new Undefined();
+		final Value<?>[] args = new Value<?>[arguments.length];
+		for (int i = 0; i < arguments.length; i++) {
+			args[i] = arguments[i].execute(interpreter);
 		}
+
+		interpreter.enterCallFrame(frame);
+		final Value<?> returnValue = executable.executeChildren(interpreter, args);
+		interpreter.exitCallFrame(frame);
+		return returnValue;
 	}
 }

@@ -185,6 +185,10 @@ public class Parser {
 			case NumericLiteral -> new NumericLiteral(Double.parseDouble(consume().value));
 			case BooleanLiteral -> new BooleanLiteral(consume().value.equals("true"));
 			case Identifier -> new Identifier(consume().value);
+			case This -> {
+				consume();
+				yield new Identifier("this");
+			}
 
 			default -> throw new CannotParse("Expression type '" + currentToken.type + "'");
 		};
@@ -200,6 +204,7 @@ public class Parser {
 		return t == TokenType.StringLiteral  ||
 			   t == TokenType.NumericLiteral ||
 			   t == TokenType.BooleanLiteral ||
+			   t == TokenType.This			 ||
 			   t == TokenType.Identifier 	 ||
 			   t == TokenType.LParen;
 	}

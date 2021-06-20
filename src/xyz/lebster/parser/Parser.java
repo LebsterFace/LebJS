@@ -1,7 +1,7 @@
 package xyz.lebster.parser;
 
 import xyz.lebster.exception.CannotParse;
-import xyz.lebster.exception.ParseError;
+import xyz.lebster.exception.ParseException;
 import xyz.lebster.core.node.*;
 import xyz.lebster.core.value.BooleanLiteral;
 import xyz.lebster.core.value.NumericLiteral;
@@ -44,8 +44,8 @@ public class Parser {
 		this.tokens = tokens;
 	}
 
-	private void expected(TokenType t) throws ParseError {
-		throw new ParseError("Unexpected token " + currentToken.type + ". Expected " + t);
+	private void expected(TokenType t) throws ParseException {
+		throw new ParseException("Unexpected token " + currentToken.type + ". Expected " + t);
 	}
 
 	private Token consume() {
@@ -59,7 +59,7 @@ public class Parser {
 		return currentToken.type == t;
 	}
 
-	private Token require(TokenType t) throws ParseError {
+	private Token require(TokenType t) throws ParseException {
 		if (!match(t)) expected(t);
 		return consume();
 	}
@@ -68,7 +68,7 @@ public class Parser {
 		return match(t) ? consume() : null;
 	}
 
-	public Program parse() throws ParseError {
+	public Program parse() throws ParseException {
 		final Program program = new Program();
 		consume();
 
@@ -92,7 +92,7 @@ public class Parser {
 		return program;
 	}
 
-	private CallExpression parseCallExpression(Expression left) throws ParseError {
+	private CallExpression parseCallExpression(Expression left) throws ParseException {
 		final ArrayList<Expression> arguments = new ArrayList<>();
 		while (matchExpression()) {
 			arguments.add(parseExpression(0, Left));
@@ -102,7 +102,7 @@ public class Parser {
 		return new CallExpression(left, arguments.toArray(new Expression[0]));
 	}
 
-	private VariableDeclaration parseDeclaration() throws ParseError {
+	private VariableDeclaration parseDeclaration() throws ParseException {
 		require(TokenType.Let);
 		final Token identifier = require(TokenType.Identifier);
 		require(TokenType.Equals);
@@ -112,7 +112,7 @@ public class Parser {
 		);
 	}
 
-	private Expression parseExpression(int minPrecedence, Associativity assoc) throws ParseError {
+	private Expression parseExpression(int minPrecedence, Associativity assoc) throws ParseException {
 		Expression latestExpr = parsePrimaryExpression();
 
 		while (matchSecondaryExpression()) {
@@ -129,7 +129,7 @@ public class Parser {
 		return latestExpr;
 	}
 
-	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws ParseError {
+	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws ParseException {
 		switch (currentToken.type) {
 			case Plus: {
 				consume();
@@ -172,7 +172,7 @@ public class Parser {
 		}
 	}
 
-	private Expression parsePrimaryExpression() throws ParseError {
+	private Expression parsePrimaryExpression() throws ParseException {
 		return switch (currentToken.type) {
 			case LParen -> {
 				consume();

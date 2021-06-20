@@ -1,6 +1,6 @@
 package xyz.lebster.parser;
 
-import xyz.lebster.exception.ParseError;
+import xyz.lebster.exception.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -123,7 +123,7 @@ public class Lexer {
 		return isIdentifierStart() || isDigit(currentChar);
 	}
 
-	public Token next() throws ParseError {
+	public Token next() throws ParseException {
 		if (index == length) return null;
 		consumeWhitespace();
 		if (currentChar == '\r') consume();
@@ -162,7 +162,7 @@ public class Lexer {
 
 			return new Token(TokenType.NumericLiteral, builder.toString(), start, index);
 		} else {
-			throw new ParseError(StringEscapeUtils.escape("Invalid character '" + currentChar + "' at " + getRow() + ":" + getColumn()));
+			throw new ParseException(StringEscapeUtils.escape("Invalid character '" + currentChar + "' at " + getRow() + ":" + getColumn()));
 		}
 	}
 
@@ -183,7 +183,7 @@ public class Lexer {
 		return result;
 	}
 
-	public Token[] tokenize() throws ParseError {
+	public Token[] tokenize() throws ParseException {
 		final List<Token> result = new ArrayList<>();
 		while (!isFinished()) result.add(next());
 		result.add(new Token(TokenType.EOF, "", length, length));

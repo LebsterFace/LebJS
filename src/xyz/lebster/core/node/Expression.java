@@ -1,4 +1,4 @@
 package xyz.lebster.core.node;
 
-public interface Expression extends ASTNode {
+public abstract class Expression implements ASTNode {
 }

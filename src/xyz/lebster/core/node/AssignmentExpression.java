@@ -5,7 +5,16 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.NotImplemented;
 
-public record AssignmentExpression(Expression left, Expression right, AssignmentOp op) implements Expression {
+public final class AssignmentExpression extends Expression {
+	private final Expression left;
+	private final Expression right;
+	private final AssignmentOp op;
+
+	public AssignmentExpression(Expression left, Expression right, AssignmentOp op) {
+		this.left = left;
+		this.right = right;
+		this.op = op;
+	}
 
 	@Override
 	public void dump(int indent) {

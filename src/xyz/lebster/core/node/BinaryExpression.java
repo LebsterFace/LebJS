@@ -8,7 +8,16 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.NotImplemented;
 
-public record BinaryExpression(Expression left, Expression right, BinaryOp op) implements ASTNode, Expression {
+public final class BinaryExpression extends Expression implements ASTNode {
+	private final Expression left;
+	private final Expression right;
+	private final BinaryOp op;
+
+	public BinaryExpression(Expression left, Expression right, BinaryOp op) {
+		this.left = left;
+		this.right = right;
+		this.op = op;
+	}
 
 	@Override
 	public void dump(int indent) {

@@ -6,7 +6,15 @@ import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 
-public record MemberExpression(Expression object, Identifier property) implements Expression {
+// FIXME: Support computed properties
+public final class MemberExpression extends Expression {
+	private final Expression object;
+	private final Identifier property;
+
+	public MemberExpression(Expression object, Identifier property) {
+		this.object = object;
+		this.property = property;
+	}
 
 	@Override
 	public void dump(int indent) {

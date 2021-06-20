@@ -6,7 +6,7 @@ import xyz.lebster.core.value.Value;
 
 import java.util.Objects;
 
-public final class Identifier implements Expression {
+public final class Identifier extends Expression {
 	public final String value;
 
 	public Identifier(String name) {

@@ -6,7 +6,7 @@ import xyz.lebster.exception.LanguageException;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.*;
 
-public class CallExpression implements Expression {
+public class CallExpression extends Expression {
 	public final Expression callee;
 	public final Expression[] arguments;
 

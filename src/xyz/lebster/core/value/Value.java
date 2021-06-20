@@ -4,7 +4,7 @@ import xyz.lebster.core.node.Expression;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.prototype.ObjectPrototype;
 
-abstract public class Value<JType> implements Expression {
+abstract public class Value<JType> extends Expression {
 	public final Type type;
 	public final JType value;
 

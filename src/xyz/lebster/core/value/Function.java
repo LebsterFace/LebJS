@@ -7,6 +7,8 @@ import xyz.lebster.core.node.FunctionDeclaration;
 import xyz.lebster.core.runtime.CallFrame;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.runtime.ScopeFrame;
+import xyz.lebster.exception.LanguageException;
+import xyz.lebster.exception.NotImplemented;
 
 public class Function extends Value<FunctionDeclaration> {
 	public Function(FunctionDeclaration value) {
@@ -44,7 +46,7 @@ public class Function extends Value<FunctionDeclaration> {
 		System.out.println("Function");
 	}
 
-	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws LanguageError {
+	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws LanguageException {
 		Value<?> result = new Undefined();
 		final ScopeFrame scope = interpreter.enterScope(value);
 		final CallFrame frame = interpreter.enterCallFrame(this);
@@ -55,7 +57,6 @@ public class Function extends Value<FunctionDeclaration> {
 
 		for (ASTNode child : value.children) {
 			child.execute(interpreter);
-
 			if (scope.didExit) {
 				result = scope.getExitValue();
 				break;

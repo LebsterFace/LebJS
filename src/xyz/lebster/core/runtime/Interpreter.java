@@ -1,7 +1,7 @@
 package xyz.lebster.core.runtime;
 
 import xyz.lebster.exception.ReferenceError;
-import xyz.lebster.exception.LanguageError;
+import xyz.lebster.exception.LanguageException;
 import xyz.lebster.core.node.Identifier;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.ScopeNode;
@@ -97,9 +97,9 @@ public class Interpreter {
 		return this.getGlobal(new Identifier(name));
 	}
 
-	public ScopeFrame enterScope(ScopeNode node) throws LanguageError {
+	public ScopeFrame enterScope(ScopeNode node) throws LanguageException {
 		if (currentScopeFrame + 1 == maxScopeFrames) {
-			throw new LanguageError("Maximum call stack size exceeded");
+			throw new LanguageException("Maximum call stack size exceeded");
 		}
 
 		final ScopeFrame frame = new ScopeFrame(node);
@@ -107,40 +107,38 @@ public class Interpreter {
 		return frame;
 	}
 
-	public void exitScope(ScopeFrame frame) throws LanguageError {
+	public void exitScope(ScopeFrame frame) throws LanguageException {
 		if (currentScopeFrame == 0) {
-			throw new LanguageError("Exiting ScopeFrame while at top level");
+			throw new LanguageException("Exiting ScopeFrame while at top level");
 		} else if (scopeStack[currentScopeFrame] != frame) {
-			throw new LanguageError("Attempting to exit invalid ScopeFrame");
+			throw new LanguageException("Attempting to exit invalid ScopeFrame");
 		}
 
 		scopeStack[currentScopeFrame--] = null;
 	}
 
-	public Value<?> doExit(Value<?> value) throws LanguageError {
+	public Value<?> doExit(Value<?> value) throws LanguageException {
 		if (currentScopeFrame == 0) {
-			throw new LanguageError("Invalid return statement");
+			throw new LanguageException("Invalid return statement");
 		}
 
 		scopeStack[currentScopeFrame].doExit(value);
 		return value;
 	}
 
-	public CallFrame enterCallFrame(Value<?> thisValue) throws LanguageError {
+	public void enterCallFrame(CallFrame frame) throws LanguageException {
 		if (currentCallFrame + 1 == maxCallFrames) {
-			throw new LanguageError("Maximum call stack size exceeded");
+			throw new LanguageException("Maximum call stack size exceeded");
 		}
 
-		final CallFrame frame = new CallFrame(thisValue);
 		callStack[++currentCallFrame] = frame;
-		return frame;
 	}
 
-	public void exitCallFrame(CallFrame frame) throws LanguageError {
+	public void exitCallFrame(CallFrame frame) throws LanguageException {
 		if (currentCallFrame == 0) {
-			throw new LanguageError("Exiting CallFrame while at top level");
+			throw new LanguageException("Exiting CallFrame while at top level");
 		} else if (callStack[currentCallFrame] != frame) {
-			throw new LanguageError("Attempting to exit invalid CallFrame");
+			throw new LanguageException("Attempting to exit invalid CallFrame");
 		}
 
 		callStack[currentCallFrame--] = null;

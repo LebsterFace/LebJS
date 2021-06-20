@@ -1,8 +1,8 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.exception.TypeError;
-import xyz.lebster.exception.LanguageError;
 import xyz.lebster.core.runtime.CallFrame;
+import xyz.lebster.exception.TypeError;
+import xyz.lebster.exception.LanguageException;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.*;
 

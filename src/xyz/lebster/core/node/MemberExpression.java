@@ -4,6 +4,7 @@ import xyz.lebster.exception.LanguageError;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.exception.LanguageException;
 
 public record MemberExpression(Expression object, Identifier property) implements Expression {
 
@@ -16,7 +17,7 @@ public record MemberExpression(Expression object, Identifier property) implement
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageError {
+	public Value<?> execute(Interpreter interpreter) throws LanguageException {
 		final Dictionary obj = object.execute(interpreter).toDictionary();
 		return obj.get(property);
 	}

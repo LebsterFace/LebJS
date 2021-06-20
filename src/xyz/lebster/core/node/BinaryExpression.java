@@ -1,12 +1,12 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.exception.LanguageError;
-import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.NumericLiteral;
 import xyz.lebster.core.value.StringLiteral;
 import xyz.lebster.core.value.Type;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.exception.LanguageException;
+import xyz.lebster.exception.NotImplemented;
 
 public record BinaryExpression(Expression left, Expression right, BinaryOp op) implements ASTNode, Expression {
 
@@ -20,7 +20,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageError {
+	public Value<?> execute(Interpreter interpreter) throws LanguageException {
 		final Value<?> leftValue = left.execute(interpreter);
 		final Value<?> rightValue = right.execute(interpreter);
 

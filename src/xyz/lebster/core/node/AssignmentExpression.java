@@ -1,9 +1,9 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.exception.LanguageError;
-import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.exception.LanguageException;
+import xyz.lebster.exception.NotImplemented;
 
 public record AssignmentExpression(Expression left, Expression right, AssignmentOp op) implements Expression {
 
@@ -17,7 +17,7 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageError {
+	public Value<?> execute(Interpreter interpreter) throws LanguageException {
 		if (left instanceof Identifier) {
 			final Value<?> rhs = right.execute(interpreter);
 			interpreter.setVariable((Identifier) left, rhs);

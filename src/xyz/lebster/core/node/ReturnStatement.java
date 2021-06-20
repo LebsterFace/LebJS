@@ -1,6 +1,6 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.exception.LanguageError;
+import xyz.lebster.exception.LanguageException;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
@@ -24,7 +24,7 @@ public class ReturnStatement implements ASTNode {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageError {
+	public Value<?> execute(Interpreter interpreter) throws LanguageException {
 		return interpreter.doExit(argument.execute(interpreter));
 	}
 }

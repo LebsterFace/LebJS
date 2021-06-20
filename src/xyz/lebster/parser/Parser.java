@@ -1,6 +1,6 @@
 package xyz.lebster.parser;
 
-import xyz.lebster.exception.NotImplemented;
+import xyz.lebster.exception.CannotParse;
 import xyz.lebster.exception.ParseError;
 import xyz.lebster.core.node.*;
 import xyz.lebster.core.value.BooleanLiteral;
@@ -68,7 +68,7 @@ public class Parser {
 		return match(t) ? consume() : null;
 	}
 
-	public Program parse() throws ParseError, NotImplemented {
+	public Program parse() throws ParseError {
 		final Program program = new Program();
 		consume();
 
@@ -85,14 +85,14 @@ public class Parser {
 				System.out.println("------- PARTIAL TREE -------");
 				program.dump(0);
 				System.out.println("------- ERROR -------");
-				throw new NotImplemented("Support for token '" + currentToken.type + "'");
+				throw new CannotParse("Token '" + currentToken.type + "'");
 			}
 		}
 
 		return program;
 	}
 
-	private CallExpression parseCallExpression(Expression left) throws ParseError, NotImplemented {
+	private CallExpression parseCallExpression(Expression left) throws ParseError {
 		final ArrayList<Expression> arguments = new ArrayList<>();
 		while (matchExpression()) {
 			arguments.add(parseExpression(0, Left));
@@ -102,7 +102,7 @@ public class Parser {
 		return new CallExpression(left, arguments.toArray(new Expression[0]));
 	}
 
-	private VariableDeclaration parseDeclaration() throws ParseError, NotImplemented {
+	private VariableDeclaration parseDeclaration() throws ParseError {
 		require(TokenType.Let);
 		final Token identifier = require(TokenType.Identifier);
 		require(TokenType.Equals);
@@ -112,7 +112,7 @@ public class Parser {
 		);
 	}
 
-	private Expression parseExpression(int minPrecedence, Associativity assoc) throws ParseError, NotImplemented {
+	private Expression parseExpression(int minPrecedence, Associativity assoc) throws ParseError {
 		Expression latestExpr = parsePrimaryExpression();
 
 		while (matchSecondaryExpression()) {
@@ -129,7 +129,7 @@ public class Parser {
 		return latestExpr;
 	}
 
-	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws ParseError, NotImplemented {
+	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws ParseError {
 		switch (currentToken.type) {
 			case Plus: {
 				consume();
@@ -172,7 +172,7 @@ public class Parser {
 		}
 	}
 
-	private Expression parsePrimaryExpression() throws ParseError, NotImplemented {
+	private Expression parsePrimaryExpression() throws ParseError {
 		return switch (currentToken.type) {
 			case LParen -> {
 				consume();
@@ -186,7 +186,7 @@ public class Parser {
 			case BooleanLiteral -> new BooleanLiteral(consume().value.equals("true"));
 			case Identifier -> new Identifier(consume().value);
 
-			default -> throw new NotImplemented("Expression type '" + currentToken.type + "'");
+			default -> throw new CannotParse("Expression type '" + currentToken.type + "'");
 		};
 	}
 

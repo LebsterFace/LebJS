@@ -1,6 +1,6 @@
 package xyz.lebster.exception;
 
-public class ReferenceError extends LanguageError {
+public class ReferenceError extends LanguageException {
 	public ReferenceError(String message) {
 		super(message);
 	}

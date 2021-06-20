@@ -1,4 +1,5 @@
-print(this)
-bind("Hello World")
-print(this)
-unbind()
+expect(this globalThis);
+let myVariable = "Hello";
+bind(myVariable);
+expect(this myVariable);
+unbind();

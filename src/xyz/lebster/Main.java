@@ -1,11 +1,10 @@
 package xyz.lebster;
 
-import xyz.lebster.exception.LanguageError;
-import xyz.lebster.exception.NotImplemented;
-import xyz.lebster.exception.ParseError;
+import xyz.lebster.exception.LanguageException;
 import xyz.lebster.core.node.*;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.*;
+import xyz.lebster.exception.ParseError;
 import xyz.lebster.parser.Lexer;
 import xyz.lebster.parser.Parser;
 
@@ -28,18 +27,32 @@ public class Main {
 		));
 	}
 
+	public static final String ANSI_RESET = "\u001B[0m";
+	public static final String ANSI_RED = "\u001B[31m";
+
 	public static void main(String[] args) {
 		final CommandLineArgs CLArgs = CommandLineArgs.fromArgs(args);
-		try {
-			switch (CLArgs.mode()) {
-				case REPL -> repl(CLArgs.showAST());
-				case File -> execute(parseFile(CLArgs.sourceCode()), CLArgs.showAST());
-				case Script -> execute(parse(CLArgs.sourceCode()), CLArgs.showAST()).dump(0);
+		if (CLArgs.mode() == ExecutionMode.REPL) {
+			repl(CLArgs.showAST());
+		} else if (CLArgs.mode() == ExecutionMode.File) {
+			try {
+				final String source = new String(Files.readAllBytes(Path.of(CLArgs.fileName())), Charset.defaultCharset());
+				executeWithHandling(source, CLArgs.showAST());
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (LanguageError e) {
+		} else {
+			throw new CommandLineArgumentException("Mode could not be inferred");
+		}
+	}
 
-		} catch (IOException e) {
-
+	public static void executeWithHandling(String source, boolean showAST) {
+		try {
+			final Value<?> lastValue = execute(parse(source), showAST);
+			System.out.print("Last Value: ");
+			lastValue.dump(0);
+		} catch (ParseError | LanguageException e) {
+			System.err.println(ANSI_RED + e.getClass().getSimpleName() + ": " + e.getLocalizedMessage() + ANSI_RESET);
 		}
 	}
 
@@ -52,29 +65,19 @@ public class Main {
 			final String next = scanner.nextLine();
 			if (next.isBlank()) continue;
 			else if (next.equals(".exit")) break;
-			try {
-				execute(parse(next), showAST).dump(0);
-			} catch (ParseError e) {
-				System.err.println("\u001B[31mFailed to parse.\n" + e.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
-			} catch (LanguageError e) {
-				System.err.println(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
-			}
+			executeWithHandling(next, showAST);
 		}
 	}
 
-	public static Program parseFile(String filename) throws IOException, NotImplemented, ParseError {
-		final String source = new String(Files.readAllBytes(Path.of(filename)), Charset.defaultCharset());
-		return parse(source);
-	}
-
-	public static Program parse(String source) throws ParseError, NotImplemented {
+	public static Program parse(String source) throws ParseError {
 		return new Parser(new Lexer(source).tokenize()).parse();
 	}
 
-	public static Value<?> execute(Program program, boolean showAST) throws LanguageError {
+	public static Value<?> execute(Program program, boolean showAST) throws LanguageException {
 		if (showAST) {
+			System.out.println("------- AST -------");
 			program.dump(0);
-			System.out.println("------- EXECUTION -------");
+			System.out.println("------- END -------");
 		}
 
 		return program.execute(new Interpreter(program, globalObject));

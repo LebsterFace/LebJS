@@ -190,7 +190,7 @@ public class Parser {
 			case Identifier -> new Identifier(consume().value);
 			case This -> {
 				consume();
-				yield new Identifier("this");
+				yield new ThisKeyword();
 			}
 
 			default -> throw new CannotParse("Expression type '" + currentToken.type + "'");

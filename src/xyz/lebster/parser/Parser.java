@@ -96,6 +96,9 @@ public class Parser {
 		final ArrayList<Expression> arguments = new ArrayList<>();
 		while (matchExpression()) {
 			arguments.add(parseExpression(0, Left));
+			if (accept(TokenType.Comma) == null) {
+				break;
+			}
 		}
 
 		require(TokenType.RParen);

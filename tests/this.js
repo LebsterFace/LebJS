@@ -1,5 +1,5 @@
-expect(this globalThis);
-let myVariable = "Hello";
-bind(myVariable);
-expect(this myVariable);
+expect(globalThis, this);
+bind("Hello");
+expect("Hello", this);
 unbind();
+expect(globalThis, this);

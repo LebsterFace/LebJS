@@ -8,12 +8,10 @@ public record CommandLineArgs(boolean showAST, String fileName, ExecutionMode mo
 
 		for (final String arg : args) {
 			if (arg.startsWith("-")) {
-				if (arg.equalsIgnoreCase("-A") || arg.equalsIgnoreCase("-ast")) {
-					showAST = true;
-				} else if (arg.equalsIgnoreCase("-r") || arg.equalsIgnoreCase("-repl")) {
-					mode = ExecutionMode.REPL;
-				} else if (arg.equalsIgnoreCase("-f") || arg.equalsIgnoreCase("-file")) {
-					mode = ExecutionMode.File;
+				switch (arg.toLowerCase()) {
+					case "-a", "-ast" -> showAST = true;
+					case "-r", "-repl" -> mode = ExecutionMode.REPL;
+					case "-f", "-file" -> mode = ExecutionMode.File;
 				}
 			} else {
 				if (fileName == null) {

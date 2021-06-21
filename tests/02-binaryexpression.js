@@ -1,0 +1,11 @@
+expect(10, 5+5);
+expect(10, 5 + 5);
+expect(10, 5 +5);
+expect(10, 5*2);
+expect(7, 1 + 2 * 3);
+expect(7, 1 + 2 *3);
+expect(7, 1 + 2*3);
+expect(7, 1+2      * 3 );
+expect(9, (1+2)*3);
+expect(9, ( 1 + 2 ) *3);
+expect(9, ( 1+2)*3);

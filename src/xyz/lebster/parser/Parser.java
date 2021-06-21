@@ -1,11 +1,10 @@
 package xyz.lebster.parser;
 
+import xyz.lebster.core.node.ThisKeyword;
+import xyz.lebster.core.value.*;
 import xyz.lebster.exception.CannotParse;
 import xyz.lebster.exception.ParseException;
 import xyz.lebster.core.node.*;
-import xyz.lebster.core.value.BooleanLiteral;
-import xyz.lebster.core.value.NumericLiteral;
-import xyz.lebster.core.value.StringLiteral;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -188,9 +187,30 @@ public class Parser {
 			case NumericLiteral -> new NumericLiteral(Double.parseDouble(consume().value));
 			case BooleanLiteral -> new BooleanLiteral(consume().value.equals("true"));
 			case Identifier -> new Identifier(consume().value);
+
 			case This -> {
 				consume();
 				yield new ThisKeyword();
+			}
+
+			case Null -> {
+				consume();
+				yield new Null();
+			}
+
+			case Infinity -> {
+				consume();
+				yield new NumericLiteral(Double.POSITIVE_INFINITY);
+			}
+
+			case NaN -> {
+				consume();
+				yield new NumericLiteral(Double.NaN);
+			}
+
+			case Undefined -> {
+				consume();
+				yield new Undefined();
 			}
 
 			default -> throw new CannotParse("Expression type '" + currentToken.type + "'");
@@ -207,6 +227,10 @@ public class Parser {
 		return t == TokenType.StringLiteral  ||
 			   t == TokenType.NumericLiteral ||
 			   t == TokenType.BooleanLiteral ||
+			   t == TokenType.Null			 ||
+			   t == TokenType.Infinity		 ||
+			   t == TokenType.Undefined		 ||
+			   t == TokenType.NaN			 ||
 			   t == TokenType.This			 ||
 			   t == TokenType.Identifier 	 ||
 			   t == TokenType.LParen;

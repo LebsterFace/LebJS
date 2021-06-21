@@ -30,8 +30,11 @@ public class Lexer {
 		keywords.put("if", TokenType.If);
 		keywords.put("import", TokenType.Import);
 		keywords.put("in", TokenType.In);
+		keywords.put("Infinity", TokenType.Infinity);
 		keywords.put("instanceof", TokenType.Instanceof);
+		keywords.put("NaN", TokenType.NaN);
 		keywords.put("new", TokenType.New);
+		keywords.put("null", TokenType.Null);
 		keywords.put("return", TokenType.Return);
 		keywords.put("super", TokenType.Super);
 		keywords.put("switch", TokenType.Switch);
@@ -39,6 +42,7 @@ public class Lexer {
 		keywords.put("throw", TokenType.Throw);
 		keywords.put("try", TokenType.Try);
 		keywords.put("typeof", TokenType.Typeof);
+		keywords.put("undefined", TokenType.Undefined);
 		keywords.put("var", TokenType.Var);
 		keywords.put("void", TokenType.Void);
 		keywords.put("while", TokenType.While);

@@ -43,25 +43,27 @@ public class ScriptExecutor {
 			final String next = scanner.nextLine();
 			if (next.isBlank()) continue;
 			else if (next.equals(".exit")) break;
-			executeWithHandling(next, globalObject, showAST);
+			executeWithHandling(next, globalObject, showAST, true);
 		}
 	}
 
 	public static boolean executeFileWithHandling(Path path, Dictionary globalObject, boolean showAST) {
 		try {
 			final String source = Files.readString(path, Charset.defaultCharset());
-			return ScriptExecutor.executeWithHandling(source, globalObject, showAST);
+			return ScriptExecutor.executeWithHandling(source, globalObject, showAST, false);
 		} catch (IOException e) {
 			handleError(e);
 			return false;
 		}
 	}
 
-	public static boolean executeWithHandling(String source, Dictionary globalObject, boolean showAST) {
+	public static boolean executeWithHandling(String source, Dictionary globalObject, boolean showAST, boolean showLastValue) {
 		try {
 			final Value<?> lastValue = execute(parse(source), globalObject, showAST);
-			System.out.print("Last Value: ");
-			lastValue.dump(0);
+			if (showLastValue) {
+				System.out.print("Last Value: ");
+				lastValue.dump(0);
+			}
 			return true;
 		} catch (ParseException | LanguageException e) {
 			handleError(e);

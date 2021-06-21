@@ -1,5 +1,8 @@
 package xyz.lebster;
 
 public enum ExecutionMode {
-	File, REPL, Default
+	File,
+	REPL,
+	Tests,
+	Default
 }

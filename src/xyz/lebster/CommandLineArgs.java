@@ -12,6 +12,7 @@ public record CommandLineArgs(boolean showAST, String fileName, ExecutionMode mo
 					case "-a", "-ast" -> showAST = true;
 					case "-r", "-repl" -> mode = ExecutionMode.REPL;
 					case "-f", "-file" -> mode = ExecutionMode.File;
+					case "-t", "-tests", "-test" -> mode = ExecutionMode.Tests;
 				}
 			} else {
 				if (fileName == null) {

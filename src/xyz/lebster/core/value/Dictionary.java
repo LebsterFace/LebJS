@@ -78,7 +78,13 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 		for (Map.Entry<Identifier, Value<?>> entry : this.value.entrySet()) {
 			System.out.print(entry.getKey());
 			System.out.print(": ");
-			entry.getValue().dump(0);
+			final Value<?> value = entry.getValue();
+//			FIXME: Circular dependency
+			if (value == this) {
+				System.out.println("[[self]]");
+			} else {
+				entry.getValue().dump(0);
+			}
 		}
 	}
 }

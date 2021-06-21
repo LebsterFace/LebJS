@@ -1,9 +1,7 @@
 package xyz.lebster;
 
-import xyz.lebster.core.value.BooleanLiteral;
-import xyz.lebster.core.value.Dictionary;
-import xyz.lebster.core.value.NativeFunction;
-import xyz.lebster.core.value.Value;
+import xyz.lebster.core.runtime.CallFrame;
+import xyz.lebster.core.value.*;
 import xyz.lebster.exception.LanguageException;
 
 import java.io.File;
@@ -18,7 +16,7 @@ public class Testing {
 		for (final File file : files) {
 			if (!file.isFile()) continue;
 			totalTests++;
-			System.out.println(Main.ANSI_GREEN + "Running test '" + file.getName() + "'..." + Main.ANSI_RESET);
+			System.out.println(Main.ANSI_GREEN + "Testing " + file.getName() + "..." + Main.ANSI_RESET);
 			final Dictionary globalObject = ScriptExecutor.getDefaultGlobalObject();
 			addTestingMethods(globalObject);
 			final boolean succeeded = ScriptExecutor.executeFileWithHandling(file.toPath(), globalObject, false);
@@ -47,6 +45,22 @@ public class Testing {
 				received.dump(0);
 				throw new LanguageException("Assertion failed!");
 			}
+		}));
+
+		globalObject.set("bind", new NativeFunction((interpreter, arguments) -> {
+			final CallFrame current = interpreter.getCallFrame();
+			interpreter.exitCallFrame();
+			interpreter.enterCallFrame(new CallFrame(null, arguments[0]));
+			interpreter.enterCallFrame(current);
+			return new Undefined();
+		}));
+
+		globalObject.set("unbind", new NativeFunction((interpreter, arguments) -> {
+			final CallFrame current = interpreter.getCallFrame();
+			interpreter.exitCallFrame();
+			interpreter.exitCallFrame();
+			interpreter.enterCallFrame(current);
+			return new Undefined();
 		}));
 	}
 }

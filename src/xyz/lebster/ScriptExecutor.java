@@ -29,6 +29,7 @@ public class ScriptExecutor {
 			return new Undefined();
 		}));
 
+		globalObject.set("globalThis", globalObject);
 		return globalObject;
 	}
 

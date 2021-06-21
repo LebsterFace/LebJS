@@ -134,11 +134,9 @@ public class Interpreter {
 		callStack[++currentCallFrame] = frame;
 	}
 
-	public void exitCallFrame(CallFrame frame) throws LanguageException {
+	public void exitCallFrame() throws LanguageException {
 		if (currentCallFrame == 0) {
 			throw new LanguageException("Exiting CallFrame while at top level");
-		} else if (callStack[currentCallFrame] != frame) {
-			throw new LanguageException("Attempting to exit invalid CallFrame");
 		}
 
 		callStack[currentCallFrame--] = null;

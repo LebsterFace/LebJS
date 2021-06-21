@@ -44,7 +44,7 @@ public class CallExpression extends Expression {
 
 		interpreter.enterCallFrame(frame);
 		final Value<?> returnValue = executable.executeChildren(interpreter, args);
-		interpreter.exitCallFrame(frame);
+		interpreter.exitCallFrame();
 		return returnValue;
 	}
 }

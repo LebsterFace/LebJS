@@ -4,6 +4,8 @@ import xyz.lebster.core.node.Expression;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.prototype.ObjectPrototype;
 
+import java.util.Objects;
+
 abstract public class Value<JType> extends Expression {
 	public final Type type;
 	public final JType value;
@@ -40,5 +42,18 @@ abstract public class Value<JType> extends Expression {
 	@Override
 	public Value<JType> execute(Interpreter interpreter) {
 		return this;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Value)) return false;
+		Value<?> value1 = (Value<?>) o;
+		return type == value1.type && value.equals(value1.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, value);
 	}
 }

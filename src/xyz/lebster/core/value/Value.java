@@ -47,9 +47,12 @@ abstract public class Value<JType> extends Expression {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof Value)) return false;
-		Value<?> value1 = (Value<?>) o;
-		return type == value1.type && value.equals(value1.value);
+		if (!(o instanceof Value<?> other)) return false;
+
+		return type == other.type && (
+			value == other.value ||
+			(value != null && other.value != null && value.equals(other.value))
+		);
 	}
 
 	@Override

@@ -62,6 +62,10 @@ public class Parser {
 		return currentToken.type == t ? consume() : null;
 	}
 
+	private void consumeAll(TokenType t) {
+		while (currentToken.type == t) consume();
+	}
+
 	public Program parse() throws ParseException {
 		final Program program = new Program();
 		consume();

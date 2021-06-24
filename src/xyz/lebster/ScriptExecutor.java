@@ -73,7 +73,9 @@ public class ScriptExecutor {
 	}
 
 	private static void handleError(Throwable e) {
-		System.out.println(Main.ANSI_RED + e.getClass().getSimpleName() + ": " + e.getLocalizedMessage() + Main.ANSI_RESET);
+		System.out.println(Main.ANSI_RED + e.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
+		e.printStackTrace(System.out);
+		System.out.print(Main.ANSI_RESET);
 	}
 
 	public static Program parse(String source) throws ParseException {

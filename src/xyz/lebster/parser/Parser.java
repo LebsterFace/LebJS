@@ -53,17 +53,13 @@ public class Parser {
 		return oldToken;
 	}
 
-	private boolean match(TokenType t) {
-		return currentToken.type == t;
-	}
-
 	private Token require(TokenType t) throws ParseException {
-		if (!match(t)) expected(t);
+		if (currentToken.type != t) expected(t);
 		return consume();
 	}
 
 	private Token accept(TokenType t) {
-		return match(t) ? consume() : null;
+		return currentToken.type == t ? consume() : null;
 	}
 
 	public Program parse() throws ParseException {

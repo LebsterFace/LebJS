@@ -3,7 +3,6 @@ package xyz.lebster.parser;
 public class Token {
 	public final TokenType type;
 	public final String value;
-	public final String string;
 	public final int start;
 	public final int end;
 
@@ -12,7 +11,6 @@ public class Token {
 		this.value = value;
 		this.start = start;
 		this.end = end;
-		this.string = value == null ? String.valueOf(type) : type + ": \"" + StringEscapeUtils.escape(value) + '"';
 	}
 
 	public Token(TokenType type, int start, int end) {
@@ -21,6 +19,6 @@ public class Token {
 
 	@Override
 	public String toString() {
-		return string;
+		return value == null ? String.valueOf(type) : type + ": \"" + StringEscapeUtils.escape(value) + '"';
 	}
 }

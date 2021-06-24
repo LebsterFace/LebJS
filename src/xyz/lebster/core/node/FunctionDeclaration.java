@@ -5,7 +5,7 @@ import xyz.lebster.core.value.Function;
 
 import java.util.stream.Stream;
 
-public class FunctionDeclaration extends ScopeNode {
+public class FunctionDeclaration extends ScopeNode implements Declaration {
 	public final Identifier name;
 	public final Identifier[] arguments;
 

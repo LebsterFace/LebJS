@@ -7,6 +7,7 @@ import xyz.lebster.exception.ParseException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static xyz.lebster.parser.Associativity.Left;
 import static xyz.lebster.parser.Associativity.Right;
@@ -73,44 +74,113 @@ public class Parser {
 		while (index < tokens.length) {
 			if (currentToken.type == TokenType.EOF) {
 				break;
-			} else if (currentToken.type == TokenType.Terminator || currentToken.type == TokenType.Semicolon) {
-				consume();
-			} else if (matchDeclaration()) {
-				program.append(parseDeclaration());
-			} else if (matchExpression()) {
-				program.append(parseExpression(0, Left));
 			} else {
-				System.out.println("------- PARTIAL TREE -------");
-				program.dump(0);
-				System.out.println("------- ERROR -------");
-				throw new CannotParse("Token '" + currentToken.type + "'");
+				program.append(parseScopeStatement());
 			}
 		}
 
 		return program;
 	}
 
+	private ASTNode parseScopeStatement() throws ParseException {
+		consumeAll(TokenType.Terminator);
+
+		ASTNode result;
+		if (matchDeclaration()) {
+			result = parseDeclaration();
+		} else if (matchStatement()) {
+			result = parseStatement();
+		} else {
+			throw new CannotParse("Token '" + currentToken.type + "'");
+		}
+
+		consumeAll(TokenType.Semicolon);
+		consumeAll(TokenType.Terminator);
+		return result;
+	}
+
+	private List<ASTNode> parseScope() throws ParseException {
+		require(TokenType.LBrace);
+		final List<ASTNode> result = new ArrayList<>();
+
+		while (index < tokens.length && currentToken.type != TokenType.RBrace) {
+			if (currentToken.type == TokenType.EOF) {
+				break;
+			} else {
+				result.add(parseScopeStatement());
+			}
+		}
+
+		require(TokenType.RBrace);
+		return result;
+	}
+
+	private ASTNode parseStatement() throws ParseException {
+		ASTNode result;
+
+		if (matchExpression()) {
+			result = parseExpression(0, Left);
+		} else if (matchDeclaration()) {
+			result = parseDeclaration();
+		} else {
+			result = switch (currentToken.type) {
+				case Function -> parseFunctionDeclaration();
+//				case Semicolon -> new EmptyStatement();
+				case Return -> {
+					consume();
+					yield new ReturnStatement(parseExpression(0, Left));
+				}
+
+				default -> throw new CannotParse(currentToken.type, "Statement");
+			};
+		}
+
+		return result;
+	}
+
+	private Declaration parseDeclaration() throws ParseException {
+		return switch (currentToken.type) {
+			case Let, Var, Const -> parseVariableDeclaration();
+			case Function -> parseFunctionDeclaration();
+			default -> throw new CannotParse(currentToken.type, "Declaration");
+		};
+	}
+
+	private VariableDeclaration parseVariableDeclaration() throws ParseException {
+		consume();
+		final Token identifier = require(TokenType.Identifier);
+		require(TokenType.Equals);
+		final Expression value = parseExpression(0, Left);
+		return new VariableDeclaration(new VariableDeclarator(new Identifier(identifier.value), value));
+	}
+
+	private FunctionDeclaration parseFunctionDeclaration() throws ParseException {
+		require(TokenType.Function);
+		final Identifier name = new Identifier(require(TokenType.Identifier).value);
+		require(TokenType.LParen);
+		final ArrayList<Identifier> arguments = new ArrayList<>();
+
+		while (currentToken.type == TokenType.Identifier) {
+			arguments.add(new Identifier(consume().value));
+			if (accept(TokenType.Comma) == null) break;
+		}
+
+		require(TokenType.RParen);
+		final List<ASTNode> children = parseScope();
+		final FunctionDeclaration res = new FunctionDeclaration(name, arguments.toArray(new Identifier[0]));
+		res.append(children);
+		return res;
+	}
+
 	private CallExpression parseCallExpression(Expression left) throws ParseException {
 		final ArrayList<Expression> arguments = new ArrayList<>();
 		while (matchExpression()) {
 			arguments.add(parseExpression(0, Left));
-			if (accept(TokenType.Comma) == null) {
-				break;
-			}
+			if (accept(TokenType.Comma) == null) break;
 		}
 
 		require(TokenType.RParen);
 		return new CallExpression(left, arguments.toArray(new Expression[0]));
-	}
-
-	private VariableDeclaration parseDeclaration() throws ParseException {
-		require(TokenType.Let);
-		final Token identifier = require(TokenType.Identifier);
-		require(TokenType.Equals);
-		final Expression value = parseExpression(0, Left);
-		return new VariableDeclaration(
-			new VariableDeclarator(new Identifier(identifier.value), value)
-		);
 	}
 
 	private Expression parseExpression(int minPrecedence, Associativity assoc) throws ParseException {
@@ -218,31 +288,57 @@ public class Parser {
 
 	private boolean matchDeclaration() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.Let;
+		return t == TokenType.Function	||
+			   t == TokenType.Let		||
+			   t == TokenType.Var		||
+			   t == TokenType.Const;
+	}
+
+	private boolean matchStatement() {
+		final TokenType t = currentToken.type;
+		return matchExpression()		||
+			   t == TokenType.Return	||
+			   t == TokenType.Yield		||
+			   t == TokenType.Do		||
+			   t == TokenType.If		||
+			   t == TokenType.Throw		||
+			   t == TokenType.Try		||
+			   t == TokenType.While		||
+			   t == TokenType.With		||
+			   t == TokenType.For		||
+			   t == TokenType.RBrace	||
+			   t == TokenType.Switch	||
+			   t == TokenType.Break		||
+			   t == TokenType.Continue	||
+			   t == TokenType.Var		||
+			   t == TokenType.Debugger	||
+			   t == TokenType.Semicolon;
+
 	}
 
 	private boolean matchExpression() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.StringLiteral  ||
-			   t == TokenType.NumericLiteral ||
-			   t == TokenType.BooleanLiteral ||
-			   t == TokenType.Null			 ||
-			   t == TokenType.Infinity		 ||
-			   t == TokenType.Undefined		 ||
-			   t == TokenType.NaN			 ||
-			   t == TokenType.This			 ||
-			   t == TokenType.Identifier 	 ||
+		return t == TokenType.StringLiteral		||
+			   t == TokenType.NumericLiteral	||
+			   t == TokenType.BooleanLiteral	||
+			   t == TokenType.Null				||
+			   t == TokenType.Function			||
+			   t == TokenType.Infinity			||
+			   t == TokenType.Undefined			||
+			   t == TokenType.NaN				||
+			   t == TokenType.This				||
+			   t == TokenType.Identifier		||
 			   t == TokenType.LParen;
 	}
 
 	private boolean matchSecondaryExpression() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.Plus	   ||
-			   t == TokenType.Minus	   ||
-			   t == TokenType.Multiply ||
-			   t == TokenType.Divide   ||
-			   t == TokenType.Period   ||
-			   t == TokenType.LParen   ||
+		return t == TokenType.Plus 		||
+			   t == TokenType.Minus		||
+			   t == TokenType.Multiply	||
+			   t == TokenType.Divide	||
+			   t == TokenType.Period	||
+			   t == TokenType.LParen	||
 			   t == TokenType.Equals;
 	}
 }

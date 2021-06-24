@@ -1,12 +1,6 @@
 package xyz.lebster;
 
-import xyz.lebster.core.value.Dictionary;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Scanner;
 
 public class Main {
 	public static final String ANSI_RESET = "\u001B[0m";

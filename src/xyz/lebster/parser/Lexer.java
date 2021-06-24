@@ -70,6 +70,8 @@ public class Lexer {
 	private final StringBuilder builder = new StringBuilder();
 	private final int length;
 	private int index = -1;
+	private int row = 0;
+	private int col = 0;
 	private char currentChar = '\0';
 
 	public Lexer(String source) {
@@ -101,6 +103,8 @@ public class Lexer {
 		} else {
 			currentChar = source.charAt(index);
 		}
+
+		row++;
 		return old;
 	}
 
@@ -136,6 +140,8 @@ public class Lexer {
 
 		if (isTerminator(currentChar)) {
 			consume();
+			row = 0;
+			col++;
 			return new Token(TokenType.Terminator, start, index);
 		} else if (isIdentifierStart()) {
 			while (isIdentifierMiddle()) collect();
@@ -166,25 +172,8 @@ public class Lexer {
 
 			return new Token(TokenType.NumericLiteral, builder.toString(), start, index);
 		} else {
-			throw new ParseException(StringEscapeUtils.escape("Invalid character '" + currentChar + "' at " + getRow() + ":" + getColumn()));
+			throw new ParseException(StringEscapeUtils.escape("Invalid character '" + currentChar + "' at " + row + ":" + col));
 		}
-	}
-
-	private int getColumn() {
-		int i = index - 1;
-		while (i >= 0 && !isTerminator(source.charAt(i))) i--;
-		return index - i;
-	}
-
-	private int getRow() {
-		int result = 1;
-		for (int i = 0; i < index; i++) {
-			if (isTerminator(source.charAt(i))) {
-				result++;
-			}
-		}
-
-		return result;
 	}
 
 	public Token[] tokenize() throws ParseException {

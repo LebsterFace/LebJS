@@ -1,10 +1,9 @@
 package xyz.lebster.parser;
 
-import xyz.lebster.core.node.ThisKeyword;
+import xyz.lebster.core.node.*;
 import xyz.lebster.core.value.*;
 import xyz.lebster.exception.CannotParse;
 import xyz.lebster.exception.ParseException;
-import xyz.lebster.core.node.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

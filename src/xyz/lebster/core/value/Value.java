@@ -1,6 +1,7 @@
 package xyz.lebster.core.value;
 
 import xyz.lebster.core.node.Expression;
+import xyz.lebster.core.node.Identifier;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.prototype.ObjectPrototype;
 
@@ -26,6 +27,10 @@ abstract public class Value<JType> extends Expression {
 	public abstract Function toFunction();
 
 	public abstract Dictionary toDictionary();
+
+	public Identifier toIdentifier() {
+		return new Identifier(toStringLiteral().value);
+	}
 
 	public Dictionary getPrototype() {
 		return ObjectPrototype.instance;

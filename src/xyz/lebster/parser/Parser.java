@@ -18,13 +18,15 @@ public class Parser {
 
 	static {
 //		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table
+		precedence.put(TokenType.LParen, 21);
+		precedence.put(TokenType.RParen, 21);
+		precedence.put(TokenType.LBracket, 20);
+		precedence.put(TokenType.RBracket, 20);
+		precedence.put(TokenType.Period, 20);
 		precedence.put(TokenType.Multiply, 15);
 		precedence.put(TokenType.Divide, 15);
 		precedence.put(TokenType.Plus, 14);
 		precedence.put(TokenType.Minus, 14);
-		precedence.put(TokenType.Period, 20);
-		precedence.put(TokenType.LParen, 21);
-		precedence.put(TokenType.RParen, 21);
 		precedence.put(TokenType.Equals, 3);
 
 		associativity.put(TokenType.Multiply, Left);

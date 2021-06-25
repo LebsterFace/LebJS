@@ -6,14 +6,15 @@ import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 
-// FIXME: Support computed properties
 public final class MemberExpression extends Expression {
 	private final Expression object;
-	private final Identifier property;
+	private final Expression property;
+	private final boolean computed;
 
-	public MemberExpression(Expression object, Identifier property) {
+	public MemberExpression(Expression object, Expression property, boolean computed) {
 		this.object = object;
 		this.property = property;
+		this.computed = computed;
 	}
 
 	@Override
@@ -26,13 +27,16 @@ public final class MemberExpression extends Expression {
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+//		TODO: Copied from toCallFrame, can we remove?
 		final Dictionary obj = object.execute(interpreter).toDictionary();
-		return obj.get(property);
+		final Identifier prop = computed ? property.execute(interpreter).toIdentifier() : (Identifier) property;
+		return obj.get(prop);
 	}
 
 	@Override
 	public CallFrame toCallFrame(Interpreter interpreter) throws LanguageException {
 		final Dictionary obj = object.execute(interpreter).toDictionary();
-		return new CallFrame(obj.get(property), obj);
+		final Identifier prop = computed ? property.execute(interpreter).toIdentifier() : (Identifier) property;
+		return new CallFrame(obj.get(prop), obj);
 	}
 }

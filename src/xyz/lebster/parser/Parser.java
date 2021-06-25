@@ -227,7 +227,14 @@ public class Parser {
 			case Period: {
 				consume();
 				final String prop = require(TokenType.Identifier).value;
-				return new MemberExpression(left, new Identifier(prop));
+				return new MemberExpression(left, new Identifier(prop), false);
+			}
+
+			case LBracket: {
+				consume();
+				final Expression prop = parseExpression(0, Left);
+				require(TokenType.RBracket);
+				return new MemberExpression(left, prop, true);
 			}
 
 			case LParen: {
@@ -340,6 +347,7 @@ public class Parser {
 			   t == TokenType.Multiply	||
 			   t == TokenType.Divide	||
 			   t == TokenType.Period	||
+			   t == TokenType.LBracket	||
 			   t == TokenType.LParen	||
 			   t == TokenType.Equals;
 	}

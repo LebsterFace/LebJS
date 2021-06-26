@@ -132,6 +132,12 @@ public class Lexer {
 		return source.startsWith(compare, index);
 	}
 
+	private boolean accept(String s) {
+		final boolean result = peek(s);
+		if (result) consume(s.length());
+		return result;
+	}
+
 	private boolean isIdentifierStart() {
 		return isAlphabetical(currentChar) || currentChar == '_' || currentChar == '$';
 	}

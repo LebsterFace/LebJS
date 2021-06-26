@@ -1,13 +1,13 @@
-package xyz.lebster.core.node;
+package xyz.lebster.core.expression;
 
 import xyz.lebster.core.runtime.Interpreter;
 
-public enum AssignmentOp {
-	Equals;
+public enum BinaryOp {
+	Add, Subtract, Divide, Multiply;
 
 	public void dump(int indent) {
 		Interpreter.dumpIndent(indent);
-		System.out.print("AssignmentOp: ");
+		System.out.print("BinaryOp: ");
 		System.out.println(this);
 	}
 }

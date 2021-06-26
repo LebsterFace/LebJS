@@ -1,5 +1,6 @@
 package xyz.lebster.core.node;
 
+import xyz.lebster.core.expression.Expression;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;

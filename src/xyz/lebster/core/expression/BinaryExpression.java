@@ -1,5 +1,6 @@
-package xyz.lebster.core.node;
+package xyz.lebster.core.expression;
 
+import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.NumericLiteral;
 import xyz.lebster.core.value.StringLiteral;

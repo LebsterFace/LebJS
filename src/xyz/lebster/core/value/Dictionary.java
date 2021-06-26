@@ -1,6 +1,6 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.node.Identifier;
+import xyz.lebster.core.expression.Identifier;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.exception.NotImplemented;
 

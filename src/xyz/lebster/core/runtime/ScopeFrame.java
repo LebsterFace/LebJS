@@ -1,6 +1,6 @@
 package xyz.lebster.core.runtime;
 
-import xyz.lebster.core.node.Identifier;
+import xyz.lebster.core.expression.Identifier;
 import xyz.lebster.core.node.ScopeNode;
 import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;

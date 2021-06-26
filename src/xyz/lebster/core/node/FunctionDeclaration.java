@@ -1,5 +1,7 @@
 package xyz.lebster.core.node;
 
+import xyz.lebster.core.expression.CallExpression;
+import xyz.lebster.core.expression.Identifier;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Function;
 

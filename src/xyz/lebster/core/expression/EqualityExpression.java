@@ -4,7 +4,7 @@ import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.*;
 import xyz.lebster.exception.LanguageException;
 
-public class EqualityExpression extends Expression {
+public class EqualityExpression implements Expression {
 	private final Expression left;
 	private final Expression right;
 	private final EqualityOp op;

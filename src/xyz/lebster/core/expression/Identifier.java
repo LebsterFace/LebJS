@@ -6,7 +6,7 @@ import xyz.lebster.exception.LanguageException;
 
 import java.util.Objects;
 
-public class Identifier extends Expression {
+public class Identifier implements Expression {
 	public final String value;
 
 	public Identifier(String name) {

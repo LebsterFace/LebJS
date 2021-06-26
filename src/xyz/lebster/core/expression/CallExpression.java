@@ -8,7 +8,7 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.TypeError;
 
-public class CallExpression extends Expression {
+public class CallExpression implements Expression {
 	public final Expression callee;
 	public final Expression[] arguments;
 

@@ -5,7 +5,7 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.NotImplemented;
 
-public final class AssignmentExpression extends Expression {
+public final class AssignmentExpression implements Expression {
 	private final Expression left;
 	private final Expression right;
 	private final AssignmentOp op;

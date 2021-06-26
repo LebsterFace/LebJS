@@ -8,7 +8,7 @@ import xyz.lebster.core.value.Type;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 
-public final class BinaryExpression extends Expression implements ASTNode {
+public final class BinaryExpression implements ASTNode, Expression {
 	private final Expression left;
 	private final Expression right;
 	private final BinaryOp op;

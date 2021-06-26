@@ -7,7 +7,7 @@ import xyz.lebster.core.value.prototype.ObjectPrototype;
 
 import java.util.Objects;
 
-abstract public class Value<JType> extends Expression {
+abstract public class Value<JType> implements Expression {
 	public final Type type;
 	public final JType value;
 

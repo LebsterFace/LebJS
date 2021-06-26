@@ -6,7 +6,7 @@ import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 
-public final class MemberExpression extends Expression {
+public final class MemberExpression implements Expression {
 	private final Expression object;
 	private final Expression property;
 	private final boolean computed;

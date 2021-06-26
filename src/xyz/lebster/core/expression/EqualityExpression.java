@@ -43,8 +43,8 @@ public class EqualityExpression extends Expression {
 //		https://tc39.es/ecma262/#sec-samevaluenonnumeric
 		return switch (x.type) {
 			case Undefined, Null -> true;
-			case Number -> ((NumericLiteral) x).value.doubleValue() == ((NumericLiteral) y).value.doubleValue();
-			case Boolean -> ((BooleanLiteral) x).value.booleanValue() == ((BooleanLiteral) y).value.booleanValue();
+			case Number -> (double) x.value == (double) y.value;
+			case Boolean -> (boolean) x.value == (boolean) y.value;
 			case String, Dictionary -> x.value.equals(y.value);
 			default -> false;
 		};

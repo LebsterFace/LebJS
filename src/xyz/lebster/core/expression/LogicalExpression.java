@@ -5,17 +5,7 @@ import xyz.lebster.core.value.BooleanLiteral;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 
-public class LogicalExpression implements Expression {
-//	FIXME: implements BinaryExpression<LogicalOp>
-	public final Expression left;
-	public final Expression right;
-	public final LogicalOp op;
-
-	public LogicalExpression(Expression left, Expression right, LogicalOp op) {
-		this.left = left;
-		this.right = right;
-		this.op = op;
-	}
+public record LogicalExpression(Expression left, Expression right, LogicalOp op) implements Expression {
 
 	@Override
 	public void dump(int indent) {

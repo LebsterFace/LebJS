@@ -4,16 +4,7 @@ import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.*;
 import xyz.lebster.exception.LanguageException;
 
-public class EqualityExpression implements Expression {
-	private final Expression left;
-	private final Expression right;
-	private final EqualityOp op;
-
-	public EqualityExpression(Expression left, Expression right, EqualityOp op) {
-		this.left = left;
-		this.right = right;
-		this.op = op;
-	}
+public record EqualityExpression(Expression left, Expression right, EqualityOp op) implements Expression {
 
 	@Override
 	public void dump(int indent) {

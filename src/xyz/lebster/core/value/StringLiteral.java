@@ -1,6 +1,5 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.exception.NotImplemented;
 
 public class StringLiteral extends Value<String> {
@@ -14,7 +13,8 @@ public class StringLiteral extends Value<String> {
 
 	@Override
 	public String toString() {
-		return value;
+//		FIXME: Should we escape this?
+		return '"' + value + '"';
 	}
 
 	@Override

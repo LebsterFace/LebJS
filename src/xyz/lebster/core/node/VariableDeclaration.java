@@ -8,6 +8,7 @@ import xyz.lebster.exception.LanguageException;
 public record VariableDeclaration(VariableDeclarator... declarations) implements Declaration {
 	@Override
 	public void dump(int indent) {
+		Interpreter.dumpName(indent, "VariableDeclaration");
 		for (VariableDeclarator declarator : declarations) {
 			declarator.dump(indent + 1);
 		}

@@ -10,8 +10,7 @@ public class Undefined extends Value<Void> {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.println("undefined");
+		Interpreter.dumpValue(indent, "undefined");
 	}
 
 	@Override

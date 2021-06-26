@@ -73,8 +73,7 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.println("Dictionary:");
+		Interpreter.dumpName(indent, "Dictionary");
 		for (Map.Entry<Identifier, Value<?>> entry : this.value.entrySet()) {
 			System.out.print(entry.getKey());
 			System.out.print(": ");

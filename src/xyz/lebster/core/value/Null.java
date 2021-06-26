@@ -10,8 +10,7 @@ public class Null extends Value<Void> {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.println("null");
+		Interpreter.dumpValue(indent, "null");
 	}
 
 	@Override

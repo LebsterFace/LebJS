@@ -6,9 +6,6 @@ public abstract class StaticIdentifier extends Expression {
 	public abstract String getName();
 
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.print("Identifier: '");
-		System.out.print(getName());
-		System.out.println("'");
+		Interpreter.dumpValue(indent, "Identifier", getName());
 	}
 }

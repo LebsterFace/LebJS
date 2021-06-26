@@ -21,12 +21,9 @@ public final class BinaryExpression extends Expression implements ASTNode {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.println("BinaryExpression:");
+		Interpreter.dumpName(indent, "BinaryExpression");
 		left.dump(indent + 1);
-		Interpreter.dumpIndent(indent + 1);
-		System.out.print("(BinaryOp) ");
-		System.out.println(op);
+		Interpreter.dumpEnum(indent + 1, "BinaryOp", op.name());
 		right.dump(indent + 1);
 	}
 

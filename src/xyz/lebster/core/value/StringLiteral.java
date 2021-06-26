@@ -47,12 +47,4 @@ public class StringLiteral extends Value<String> {
 	public Dictionary toDictionary() {
 		return new StringWrapper(this);
 	}
-
-	@Override
-	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.print("StringLiteral: '");
-		System.out.print(value);
-		System.out.println("'");
-	}
 }

@@ -18,10 +18,9 @@ public final class AssignmentExpression extends Expression {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.println("AssignmentExpression:");
+		Interpreter.dumpName(indent, "AssignmentExpression");
 		left.dump(indent + 1);
-		op.dump(indent + 2);
+		Interpreter.dumpEnum(indent, "AssignmentOp", op.name());
 		right.dump(indent + 1);
 	}
 

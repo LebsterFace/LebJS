@@ -36,8 +36,7 @@ public class NativeFunction extends Executable<NativeCode> {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.println("NativeFunction");
+		Interpreter.dumpValue(indent, "NativeFunction");
 	}
 
 	@Override

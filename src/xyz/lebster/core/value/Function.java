@@ -39,8 +39,7 @@ public class Function extends Executable<FunctionDeclaration> {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.println("Function");
+		Interpreter.dumpValue(indent, "Function");
 	}
 
 	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws LanguageException {

@@ -22,17 +22,15 @@ public class FunctionDeclaration extends ScopeNode implements Declaration {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.print("FunctionDeclaration '");
-		System.out.print(name.value);
-
-		System.out.print("(");
-		System.out.print(arguments[0].value);
+		final StringBuilder builder = new StringBuilder(name.value);
+		builder.append("(");
+		builder.append(arguments[0].value);
 		for (int i = 1; i < arguments.length; i++) {
-			System.out.print(", ");
-			System.out.print(arguments[i].value);
+			builder.append(", ");
+			builder.append(arguments[i].value);
 		}
-		System.out.println(")':");
+		builder.append(")");
+		Interpreter.dumpParameterized(indent, "FunctionDeclaration", builder.toString());
 
 		for (ASTNode child : children) {
 			child.dump(indent + 1);

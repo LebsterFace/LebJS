@@ -19,8 +19,7 @@ public class ReturnStatement implements ASTNode {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.println("ReturnStatement:");
+		Interpreter.dumpName(indent, "ReturnStatement");
 		argument.dump(indent + 1);
 	}
 

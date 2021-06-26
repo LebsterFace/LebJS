@@ -6,8 +6,7 @@ import xyz.lebster.core.value.Value;
 public class EmptyStatement implements ASTNode {
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.println("EmptyStatement");
+		Interpreter.dumpSingle(indent, "EmptyStatement");
 	}
 
 	@Override

@@ -17,12 +17,9 @@ public class EqualityExpression extends Expression {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.println("EqualityExpression:");
+		Interpreter.dumpName(indent, "EqualityExpression");
 		left.dump(indent + 1);
-		Interpreter.dumpIndent(indent + 1);
-		System.out.print("(EqualityOp) ");
-		System.out.println(op);
+		Interpreter.dumpEnum(indent + 1, "EqualityOp", op.name());
 		right.dump(indent + 1);
 	}
 

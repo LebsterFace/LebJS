@@ -43,10 +43,7 @@ abstract public class Value<JType> extends Expression {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpIndent(indent);
-		System.out.print(type);
-		System.out.print(": ");
-		System.out.println(value);
+		Interpreter.dumpValue(indent, type.toString(), toString());
 	}
 
 	@Override

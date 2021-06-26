@@ -175,9 +175,7 @@ public class Parser {
 		return new VariableDeclaration(new VariableDeclarator(new Identifier(identifier.value), value));
 	}
 
-	private FunctionDeclaration parseFunctionDeclaration() throws ParseException {
-		require(TokenType.Function);
-		final Identifier name = new Identifier(require(TokenType.Identifier).value);
+	private List<Identifier> parseFunctionArguments() throws ParseException {
 		require(TokenType.LParen);
 		final List<Identifier> arguments = new ArrayList<>();
 
@@ -187,22 +185,23 @@ public class Parser {
 		}
 
 		require(TokenType.RParen);
+		return arguments;
+	}
+
+	private FunctionDeclaration parseFunctionDeclaration() throws ParseException {
+		require(TokenType.Function);
+		final Identifier name = new Identifier(require(TokenType.Identifier).value);
+		final List<Identifier> arguments = parseFunctionArguments();
 		return new FunctionDeclaration(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
 	}
 
 	private FunctionExpression parseFunctionExpression() throws ParseException {
 //		TODO: Generalize this with parseFunctionDeclaration()
 		require(TokenType.Function);
-		final Identifier name = new Identifier(require(TokenType.Identifier).value);
-		require(TokenType.LParen);
-		final List<Identifier> arguments = new ArrayList<>();
-
-		while (currentToken.type == TokenType.Identifier) {
-			arguments.add(new Identifier(consume().value));
-			if (accept(TokenType.Comma) == null) break;
-		}
-
-		require(TokenType.RParen);
+//		FIXME: Get name properly
+		final Token idToken = accept(TokenType.Identifier);
+		final Identifier name = idToken == null ? null : new Identifier(idToken.value);
+		final List<Identifier> arguments = parseFunctionArguments();
 		return new FunctionExpression(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
 	}
 

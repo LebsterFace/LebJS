@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime;
 
+import xyz.lebster.ANSI;
 import xyz.lebster.core.expression.Identifier;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.ScopeNode;
@@ -39,6 +40,36 @@ public class Interpreter {
 
 	public static void dumpIndent(int indent) {
 		System.out.print("  ".repeat(indent));
+	}
+
+	public static void dumpName(int indent, String name) {
+		dumpIndent(indent);
+		System.out.printf("%s%s%s:%n", ANSI.BRIGHT_GREEN, name, ANSI.RESET);
+	}
+
+	public static void dumpParameterized(int indent, String name, String param) {
+		dumpIndent(indent);
+		System.out.printf("%s%s{%s%s%s}%s:%n", ANSI.BRIGHT_GREEN, name, ANSI.BRIGHT_YELLOW, param, ANSI.BRIGHT_GREEN, ANSI.RESET);
+	}
+
+	public static void dumpValue(int indent, String name, String value) {
+		dumpIndent(indent);
+		System.out.printf("%s%s %s%s%s%n", ANSI.BRIGHT_BLUE, name, ANSI.BRIGHT_YELLOW, value, ANSI.RESET);
+	}
+
+	public static void dumpValue(int indent, String value) {
+		dumpIndent(indent);
+		System.out.printf("%s%s%s%n", ANSI.BRIGHT_BLUE, value, ANSI.RESET);
+	}
+
+	public static void dumpSingle(int indent, String value) {
+		dumpIndent(indent);
+		System.out.printf("%s%s%s;", ANSI.BRIGHT_GREEN, value, ANSI.RESET);
+	}
+
+	public static void dumpEnum(int indent, String type, String value) {
+		dumpIndent(indent);
+		System.out.printf("%s(%s) %s%n", ANSI.MAGENTA, type, value, ANSI.RESET);
 	}
 
 	public Value<?> declareVariable(Identifier name, Value<?> value) {

@@ -200,7 +200,23 @@ public class Lexer {
 
 	public Token[] tokenize() throws ParseException {
 		final List<Token> result = new ArrayList<>();
-		while (!isFinished()) result.add(next());
+		boolean lastWasTerminator = true;
+
+		while (!isFinished()) {
+			final Token token = next();
+			if (token.type == TokenType.Terminator) {
+				if (lastWasTerminator) {
+					continue;
+				} else {
+					lastWasTerminator = true;
+				}
+			} else {
+				lastWasTerminator = false;
+			}
+
+			result.add(token);
+		}
+
 		result.add(new Token(TokenType.EOF, "", length, length));
 		return result.toArray(new Token[0]);
 	}

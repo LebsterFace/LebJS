@@ -105,6 +105,19 @@ public class Lexer {
 		return old;
 	}
 
+	private char consume(int size) {
+		final char old = currentChar;
+		index += size;
+
+		if (index >= length) {
+			currentChar = '\0';
+		} else {
+			currentChar = source.charAt(index);
+		}
+
+		return old;
+	}
+
 	private void collect() {
 		builder.append(consume());
 	}

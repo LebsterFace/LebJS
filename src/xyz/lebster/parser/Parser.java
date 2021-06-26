@@ -132,6 +132,7 @@ public class Parser {
 		} else {
 			result = switch (currentToken.type) {
 				case Function -> parseFunctionDeclaration();
+				case If -> parseIfStatement();
 //				case Semicolon -> new EmptyStatement();
 				case Return -> {
 					consume();
@@ -142,6 +143,17 @@ public class Parser {
 			};
 		}
 
+		return result;
+	}
+
+	private IfStatement parseIfStatement() throws ParseException {
+		require(TokenType.If);
+		require(TokenType.LParen);
+		final Expression condition = parseExpression(0, Left);
+		require(TokenType.RParen);
+		final List<ASTNode> children = parseScope();
+		final IfStatement result = new IfStatement(condition);
+		result.append(children);
 		return result;
 	}
 

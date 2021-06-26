@@ -16,12 +16,12 @@ public class Testing {
 		for (final File file : files) {
 			if (!file.isFile()) continue;
 			totalTests++;
-			System.out.println(Main.ANSI_GREEN + "Testing " + file.getName() + "..." + Main.ANSI_RESET);
+			System.out.println(ANSI.GREEN + "Testing " + file.getName() + "..." + ANSI.RESET);
 			final Dictionary globalObject = ScriptExecutor.getDefaultGlobalObject();
 			addTestingMethods(globalObject);
 			final boolean succeeded = ScriptExecutor.executeFileWithHandling(file.toPath(), globalObject, showAST);
 			if (succeeded) {
-				System.out.println(Main.ANSI_GREEN + "Passed!" + Main.ANSI_RESET);
+				System.out.println(ANSI.GREEN + "Passed!" + ANSI.RESET);
 				successfulTests++;
 			}
 		}

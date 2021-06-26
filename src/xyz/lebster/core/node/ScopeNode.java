@@ -8,7 +8,7 @@ import xyz.lebster.exception.LanguageException;
 import java.util.ArrayList;
 import java.util.List;
 
-abstract public class ScopeNode implements ASTNode {
+abstract public class ScopeNode implements Statement {
 	public final ArrayList<ASTNode> children = new ArrayList<>();
 
 	public void append(ASTNode node) {
@@ -19,14 +19,10 @@ abstract public class ScopeNode implements ASTNode {
 		children.addAll(nodes);
 	}
 
-	public Value<?> executeChildren(Interpreter interpreter) throws LanguageException {
+	@Override
+	public Value<?> execute(Interpreter interpreter) throws LanguageException {
 		Value<?> lastValue = new Undefined();
 		for (ASTNode node : children) lastValue = node.execute(interpreter);
 		return lastValue;
-	}
-
-	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
-		return executeChildren(interpreter);
 	}
 }

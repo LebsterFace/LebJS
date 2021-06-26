@@ -44,13 +44,13 @@ public class Function extends Executable<FunctionDeclaration> {
 
 	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws LanguageException {
 		Value<?> result = new Undefined();
-		final ScopeFrame scope = interpreter.enterScope(value);
+		final ScopeFrame scope = interpreter.enterScope(value.body);
 
 		for (int i = 0; i < arguments.length; i++) {
 			interpreter.declareVariable(value.arguments[i], arguments[i]);
 		}
 
-		for (ASTNode child : value.children) {
+		for (ASTNode child : value.body.children) {
 			child.execute(interpreter);
 			if (scope.didExit) {
 				result = scope.getExitValue();

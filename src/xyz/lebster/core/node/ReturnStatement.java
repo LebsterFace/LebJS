@@ -6,7 +6,7 @@ import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 
-public class ReturnStatement implements ASTNode {
+public class ReturnStatement implements Statement {
 	public final Expression argument;
 
 	public ReturnStatement(Expression argument) {

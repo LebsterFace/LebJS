@@ -1,23 +1,22 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.core.expression.CallExpression;
 import xyz.lebster.core.expression.Identifier;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Function;
 
-import java.util.stream.Stream;
-
-public class FunctionDeclaration extends ScopeNode implements Declaration {
+public class FunctionDeclaration implements Declaration, Statement {
 	public final Identifier name;
 	public final Identifier[] arguments;
+	public final BlockStatement body;
 
-	public FunctionDeclaration(Identifier name, Identifier... arguments) {
+	public FunctionDeclaration(BlockStatement body, Identifier name, Identifier... arguments) {
 		this.name = name;
 		this.arguments = arguments;
+		this.body = body;
 	}
 
-	public FunctionDeclaration(String name, String... arguments) {
-		this(new Identifier(name), Stream.of(arguments).map(Identifier::new).toArray(Identifier[]::new));
+	public FunctionDeclaration(Identifier name, Identifier... arguments) {
+		this(new BlockStatement(), name, arguments);
 	}
 
 	@Override
@@ -32,7 +31,7 @@ public class FunctionDeclaration extends ScopeNode implements Declaration {
 		builder.append(")");
 		Interpreter.dumpParameterized(indent, "FunctionDeclaration", builder.toString());
 
-		for (ASTNode child : children) {
+		for (final ASTNode child : body.children) {
 			child.dump(indent + 1);
 		}
 	}
@@ -42,9 +41,5 @@ public class FunctionDeclaration extends ScopeNode implements Declaration {
 		final Function value = new Function(this);
 		interpreter.declareVariable(name, value);
 		return value;
-	}
-
-	public CallExpression getCall() {
-		return new CallExpression(name);
 	}
 }

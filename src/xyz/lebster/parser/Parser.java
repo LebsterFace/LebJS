@@ -82,21 +82,21 @@ public class Parser {
 			if (currentToken.type == TokenType.EOF) {
 				break;
 			} else {
-				program.append(parseScopeStatement());
+				program.append(parseLine());
 			}
 		}
 
 		return program;
 	}
 
-	private ASTNode parseScopeStatement() throws ParseException {
+	private Statement parseLine() throws ParseException {
 		consumeAll(TokenType.Terminator);
 
-		ASTNode result;
+		Statement result;
 		if (matchDeclaration()) {
 			result = parseDeclaration();
-		} else if (matchStatement()) {
-			result = parseStatement();
+		} else if (matchStatementOrExpression()) {
+			result = parseStatementOrExpression();
 		} else {
 			throw new CannotParse("Token '" + currentToken.type + "'");
 		}
@@ -106,15 +106,15 @@ public class Parser {
 		return result;
 	}
 
-	private List<ASTNode> parseScope() throws ParseException {
+	private BlockStatement parseBlockStatement() throws ParseException {
 		require(TokenType.LBrace);
-		final List<ASTNode> result = new ArrayList<>();
+		final BlockStatement result = new BlockStatement();
 
 		while (index < tokens.length && currentToken.type != TokenType.RBrace) {
 			if (currentToken.type == TokenType.EOF) {
 				break;
 			} else {
-				result.add(parseScopeStatement());
+				result.append(parseLine());
 			}
 		}
 
@@ -122,18 +122,16 @@ public class Parser {
 		return result;
 	}
 
-	private ASTNode parseStatement() throws ParseException {
-		ASTNode result;
-
+	private Statement parseStatementOrExpression() throws ParseException {
 		if (matchExpression()) {
-			result = parseExpression(0, Left);
-		} else if (matchDeclaration()) {
-			result = parseDeclaration();
+			return new ExpressionStatement(parseExpression(0, Left));
 		} else {
-			result = switch (currentToken.type) {
+			return switch (currentToken.type) {
 				case Function -> parseFunctionDeclaration();
 				case If -> parseIfStatement();
-//				case Semicolon -> new EmptyStatement();
+				case Semicolon -> new EmptyStatement();
+				case LBrace -> parseBlockStatement();
+
 				case Return -> {
 					consume();
 					yield new ReturnStatement(parseExpression(0, Left));
@@ -142,8 +140,6 @@ public class Parser {
 				default -> throw new CannotParse(currentToken.type, "Statement");
 			};
 		}
-
-		return result;
 	}
 
 	private IfStatement parseIfStatement() throws ParseException {
@@ -151,19 +147,14 @@ public class Parser {
 		require(TokenType.LParen);
 		final Expression condition = parseExpression(0, Left);
 		require(TokenType.RParen);
-		final List<ASTNode> children = parseScope();
-		final ElseStatement elseStatement = currentToken.type == TokenType.Else ? parseElseStatement() : null;
-		final IfStatement result = new IfStatement(condition, elseStatement);
-		result.append(children);
-		return result;
+		final Statement consequence = parseLine();
+		final Statement elseStatement = currentToken.type == TokenType.Else ? parseElseStatement() : null;
+		return new IfStatement(condition, consequence, elseStatement);
 	}
 
-	public ElseStatement parseElseStatement() throws ParseException {
+	public Statement parseElseStatement() throws ParseException {
 		require(TokenType.Else);
-		final List<ASTNode> children = parseScope();
-		final ElseStatement result = new ElseStatement();
-		result.append(children);
-		return result;
+		return parseLine();
 	}
 
 	private Declaration parseDeclaration() throws ParseException {
@@ -194,10 +185,7 @@ public class Parser {
 		}
 
 		require(TokenType.RParen);
-		final List<ASTNode> children = parseScope();
-		final FunctionDeclaration res = new FunctionDeclaration(name, arguments.toArray(new Identifier[0]));
-		res.append(children);
-		return res;
+		return new FunctionDeclaration(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
 	}
 
 	private CallExpression parseCallExpression(Expression left) throws ParseException {
@@ -339,7 +327,7 @@ public class Parser {
 			   t == TokenType.Const;
 	}
 
-	private boolean matchStatement() {
+	private boolean matchStatementOrExpression() {
 		final TokenType t = currentToken.type;
 		return matchExpression()		||
 			   t == TokenType.Return	||
@@ -351,7 +339,7 @@ public class Parser {
 			   t == TokenType.While		||
 			   t == TokenType.With		||
 			   t == TokenType.For		||
-			   t == TokenType.RBrace	||
+			   t == TokenType.LBrace	||
 			   t == TokenType.Switch	||
 			   t == TokenType.Break		||
 			   t == TokenType.Continue	||

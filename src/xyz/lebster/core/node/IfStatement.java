@@ -7,39 +7,24 @@ import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
 
-public class IfStatement extends ScopeNode {
-	public final Expression condition;
-	public final ElseStatement elseStatement;
-	public final boolean hasElseStatement;
-
-	public IfStatement(Expression condition, ElseStatement elseStatement) {
-		this.condition = condition;
-		this.elseStatement = elseStatement;
-		this.hasElseStatement = elseStatement != null;
-	}
-
-	public IfStatement(Expression condition) {
-		this(condition, null);
-	}
-
+public record IfStatement(Expression condition, Statement consequence, Statement elseStatement) implements Statement {
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpName(indent, "IfStatement");
 		condition.dump(indent + 1);
-		for (final ASTNode child : children) {
-			child.dump(indent + 1);
-		}
+		consequence.dump(indent + 1);
+		elseStatement.dump(indent + 1);
 	}
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws LanguageException {
 		final BooleanLiteral res = condition.execute(interpreter).toBooleanLiteral();
 		if (res.value) {
-			return executeChildren(interpreter);
-		} else if (hasElseStatement) {
-			return elseStatement.executeChildren(interpreter);
-		} else {
+			return consequence.execute(interpreter);
+		} else if (elseStatement == null) {
 			return new Undefined();
+		} else {
+			return elseStatement.execute(interpreter);
 		}
 	}
 }

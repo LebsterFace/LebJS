@@ -49,17 +49,17 @@ public class Interpreter {
 
 	public static void dumpParameterized(int indent, String name, String param) {
 		dumpIndent(indent);
-		System.out.printf("%s%s{%s%s%s}%s:%n", ANSI.BRIGHT_GREEN, name, ANSI.BRIGHT_YELLOW, param, ANSI.BRIGHT_GREEN, ANSI.RESET);
+		System.out.printf("%s%s %s%s%s:%n", ANSI.BRIGHT_GREEN, name, ANSI.BRIGHT_YELLOW, param, ANSI.RESET);
 	}
 
 	public static void dumpValue(int indent, String name, String value) {
 		dumpIndent(indent);
-		System.out.printf("%s%s %s%s%s%n", ANSI.BRIGHT_BLUE, name, ANSI.BRIGHT_YELLOW, value, ANSI.RESET);
+		System.out.printf("%s%s %s%s%s%n", ANSI.CYAN, name, ANSI.BRIGHT_YELLOW, value, ANSI.RESET);
 	}
 
 	public static void dumpValue(int indent, String value) {
 		dumpIndent(indent);
-		System.out.printf("%s%s%s%n", ANSI.BRIGHT_BLUE, value, ANSI.RESET);
+		System.out.printf("%s%s%s%n", ANSI.CYAN, value, ANSI.RESET);
 	}
 
 	public static void dumpSingle(int indent, String value) {
@@ -69,7 +69,7 @@ public class Interpreter {
 
 	public static void dumpEnum(int indent, String type, String value) {
 		dumpIndent(indent);
-		System.out.printf("%s(%s) %s%s%n", ANSI.MAGENTA, type, value, ANSI.RESET);
+		System.out.printf("%s(%s) %s%s%n", ANSI.BRIGHT_MAGENTA, type, value, ANSI.RESET);
 	}
 
 	public Value<?> declareVariable(Identifier name, Value<?> value) {

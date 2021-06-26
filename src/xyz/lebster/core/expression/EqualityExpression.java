@@ -1,0 +1,52 @@
+package xyz.lebster.core.expression;
+
+import xyz.lebster.core.runtime.Interpreter;
+import xyz.lebster.core.value.*;
+import xyz.lebster.exception.LanguageException;
+
+public class EqualityExpression extends Expression {
+	private final Expression left;
+	private final Expression right;
+	private final EqualityOp op;
+
+	public EqualityExpression(Expression left, Expression right, EqualityOp op) {
+		this.left = left;
+		this.right = right;
+		this.op = op;
+	}
+
+	@Override
+	public void dump(int indent) {
+		Interpreter.dumpIndent(indent);
+		System.out.println("EqualityExpression:");
+		left.dump(indent + 1);
+		Interpreter.dumpIndent(indent + 1);
+		System.out.print("(EqualityOp) ");
+		System.out.println(op);
+		right.dump(indent + 1);
+	}
+
+	@Override
+	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+		final Value<?> leftValue = left.execute(interpreter);
+		final Value<?> rightValue = right.execute(interpreter);
+
+		return new BooleanLiteral(switch (op) {
+			case StrictEquals -> isStrictlyEqual(leftValue, rightValue);
+			case StrictNotEquals -> !isStrictlyEqual(leftValue, rightValue);
+		});
+	}
+
+	private static boolean isStrictlyEqual(Value<?> x, Value<?> y) {
+//		https://tc39.es/ecma262/#sec-isstrictlyequal
+		if (x.type != y.type) return false;
+//		https://tc39.es/ecma262/#sec-samevaluenonnumeric
+		return switch (x.type) {
+			case Undefined, Null -> true;
+			case Number -> ((NumericLiteral) x).value.doubleValue() == ((NumericLiteral) y).value.doubleValue();
+			case Boolean -> ((BooleanLiteral) x).value.booleanValue() == ((BooleanLiteral) y).value.booleanValue();
+			case String, Dictionary -> x.value.equals(y.value);
+			default -> false;
+		};
+	}
+}

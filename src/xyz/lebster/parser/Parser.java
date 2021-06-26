@@ -28,6 +28,8 @@ public class Parser {
 		precedence.put(TokenType.Slash, 15);
 		precedence.put(TokenType.Plus, 14);
 		precedence.put(TokenType.Minus, 14);
+		precedence.put(TokenType.StrictEqual, 11);
+		precedence.put(TokenType.StrictNotEqual, 11);
 		precedence.put(TokenType.Equals, 3);
 
 		associativity.put(TokenType.Star, Left);
@@ -35,6 +37,8 @@ public class Parser {
 		associativity.put(TokenType.Plus, Left);
 		associativity.put(TokenType.Minus, Left);
 		associativity.put(TokenType.Period, Left);
+		associativity.put(TokenType.StrictEqual, Left);
+		associativity.put(TokenType.StrictNotEqual, Left);
 		associativity.put(TokenType.Equals, Right);
 	}
 
@@ -248,6 +252,16 @@ public class Parser {
 				return new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentOp.Equals);
 			}
 
+			case StrictEqual: {
+				consume();
+				return new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityOp.StrictEquals);
+			}
+
+			case StrictNotEqual: {
+				consume();
+				return new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityOp.StrictNotEquals);
+			}
+
 			default:
 				return left;
 		}
@@ -343,13 +357,15 @@ public class Parser {
 
 	private boolean matchSecondaryExpression() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.Plus 		||
-			   t == TokenType.Minus		||
-			   t == TokenType.Star 		||
-			   t == TokenType.Slash		||
-			   t == TokenType.Period	||
-			   t == TokenType.LBracket	||
-			   t == TokenType.LParen	||
+		return t == TokenType.Plus 			 ||
+			   t == TokenType.Minus			 ||
+			   t == TokenType.Star			 ||
+			   t == TokenType.Slash			 ||
+			   t == TokenType.StrictEqual	 ||
+			   t == TokenType.StrictNotEqual ||
+			   t == TokenType.Period		 ||
+			   t == TokenType.LBracket		 ||
+			   t == TokenType.LParen		 ||
 			   t == TokenType.Equals;
 	}
 }

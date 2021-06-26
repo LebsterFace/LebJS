@@ -7,7 +7,7 @@ import xyz.lebster.exception.LanguageException;
 import java.io.File;
 
 public class Testing {
-	public static void test() {
+	public static void test(boolean showAST) {
 		final File[] files = new File("tests/").listFiles();
 		if (files == null) throw new Error("Test directory not found!");
 		int successfulTests = 0;
@@ -19,7 +19,7 @@ public class Testing {
 			System.out.println(Main.ANSI_GREEN + "Testing " + file.getName() + "..." + Main.ANSI_RESET);
 			final Dictionary globalObject = ScriptExecutor.getDefaultGlobalObject();
 			addTestingMethods(globalObject);
-			final boolean succeeded = ScriptExecutor.executeFileWithHandling(file.toPath(), globalObject, false);
+			final boolean succeeded = ScriptExecutor.executeFileWithHandling(file.toPath(), globalObject, showAST);
 			if (succeeded) {
 				System.out.println(Main.ANSI_GREEN + "Passed!" + Main.ANSI_RESET);
 				successfulTests++;

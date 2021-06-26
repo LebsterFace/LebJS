@@ -106,8 +106,7 @@ public class Lexer {
 	}
 
 	private void collect() {
-		builder.append(currentChar);
-		consume();
+		builder.append(consume());
 	}
 
 	private void consumeWhitespace() {

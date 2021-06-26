@@ -76,14 +76,6 @@ public class Interpreter {
 		return scopeStack[currentScopeFrame].setVariable(name, value);
 	}
 
-	public void dumpVariables(int scope) {
-		scopeStack[scope].dumpVariables(0);
-	}
-
-	public void dumpVariables() {
-		dumpVariables(currentScopeFrame);
-	}
-
 	public Value<?> setVariable(Identifier name, Value<?> value) {
 		for (int i = currentScopeFrame; i >= 1; i--) {
 			if (scopeStack[i].containsVariable(name)) {
@@ -92,10 +84,6 @@ public class Interpreter {
 		}
 
 		return scopeStack[0].setVariable(name, value);
-	}
-
-	public Value<?> setVariable(String name, Value<?> value) throws ReferenceError {
-		return this.setVariable(new Identifier(name), value);
 	}
 
 	public Value<?> getVariable(Identifier name) throws ReferenceError {
@@ -108,24 +96,12 @@ public class Interpreter {
 		throw new ReferenceError(name.value + " is not defined");
 	}
 
-	public Value<?> getVariable(String name) throws ReferenceError {
-		return this.getVariable(new Identifier(name));
-	}
-
 	public Value<?> setGlobal(Identifier name, Value<?> value) {
 		return scopeStack[0].setVariable(name, value);
 	}
 
-	public Value<?> setGlobal(String name, Value<?> value) {
-		return this.setGlobal(new Identifier(name), value);
-	}
-
 	public Value<?> getGlobal(Identifier name) {
 		return scopeStack[0].getVariable(name);
-	}
-
-	public Value<?> getGlobal(String name) {
-		return this.getGlobal(new Identifier(name));
 	}
 
 	public ScopeFrame enterScope(ScopeNode node) throws LanguageException {

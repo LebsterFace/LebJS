@@ -149,6 +149,8 @@ public class Lexer {
 	public Token next() throws ParseException {
 		if (index == length) return null;
 		consumeWhitespace();
+		consumeComment();
+		consumeWhitespace();
 		int start = index;
 		builder.setLength(0);
 
@@ -185,6 +187,14 @@ public class Lexer {
 			return new Token(TokenType.NumericLiteral, builder.toString(), start, index);
 		} else {
 			throw new ParseException(StringEscapeUtils.escape("Invalid character '" + currentChar + "' at " + 0 + ":" + 0));
+		}
+	}
+
+	private void consumeComment() {
+		if (accept("//")) {
+			while (!isTerminator()) consume();
+		} else if (accept("/*")) {
+			while (!accept("*/")) consume();
 		}
 	}
 

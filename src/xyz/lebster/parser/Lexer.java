@@ -81,7 +81,7 @@ public class Lexer {
 	}
 
 	public boolean isFinished() {
-		return index == length;
+		return index >= length;
 	}
 
 	private boolean isDigit(char c) {
@@ -98,7 +98,7 @@ public class Lexer {
 
 	private char consume() {
 		final char old = currentChar;
-		if (++index == length) {
+		if (++index >= length) {
 			currentChar = '\0';
 		} else {
 			currentChar = source.charAt(index);

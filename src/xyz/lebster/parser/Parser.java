@@ -152,7 +152,16 @@ public class Parser {
 		final Expression condition = parseExpression(0, Left);
 		require(TokenType.RParen);
 		final List<ASTNode> children = parseScope();
-		final IfStatement result = new IfStatement(condition);
+		final ElseStatement elseStatement = currentToken.type == TokenType.Else ? parseElseStatement() : null;
+		final IfStatement result = new IfStatement(condition, elseStatement);
+		result.append(children);
+		return result;
+	}
+
+	public ElseStatement parseElseStatement() throws ParseException {
+		require(TokenType.Else);
+		final List<ASTNode> children = parseScope();
+		final ElseStatement result = new ElseStatement();
 		result.append(children);
 		return result;
 	}

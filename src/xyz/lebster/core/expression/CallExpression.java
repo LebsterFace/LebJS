@@ -22,10 +22,16 @@ public class CallExpression extends Expression {
 		Interpreter.dumpName(indent, "CallExpression");
 		Interpreter.dumpName(indent + 1, "Callee");
 		callee.dump(indent + 2);
-		Interpreter.dumpIndent(indent + 1);
-		System.out.print(ANSI.BRIGHT_GREEN);
-		System.out.print(arguments.length > 0 ? "Arguments:" : "[[NO ARGS]]");
-		System.out.println(ANSI.RESET);
+
+		if (arguments.length > 0) {
+			Interpreter.dumpName(indent + 1, "Arguments");
+		} else {
+			Interpreter.dumpIndent(indent + 1);
+			System.out.print(ANSI.RED);
+			System.out.print("[[NO ARGS]]");
+			System.out.println(ANSI.RESET);
+		}
+
 		for (Expression argument : arguments) {
 			argument.dump(indent + 2);
 		}

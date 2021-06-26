@@ -51,7 +51,8 @@ public class ScriptExecutor {
 	public static boolean executeFileWithHandling(Path path, Dictionary globalObject, boolean showAST) {
 		try {
 			final String source = Files.readString(path, Charset.defaultCharset());
-			return ScriptExecutor.executeWithHandling(source, globalObject, showAST, false);
+			return executeWithHandling(source, globalObject, showAST, false);
+
 		} catch (IOException e) {
 			handleError(e);
 			return false;
@@ -60,14 +61,32 @@ public class ScriptExecutor {
 
 	public static boolean executeWithHandling(String source, Dictionary globalObject, boolean showAST, boolean showLastValue) {
 		try {
+			if (source.startsWith("// @opt: ")) {
+				return handleOptions(source, globalObject, showAST, showLastValue);
+			}
+
 			final Value<?> lastValue = execute(parse(source), globalObject, showAST);
 			if (showLastValue) {
 				System.out.print("Last Value: ");
 				lastValue.dump(0);
 			}
+
 			return true;
 		} catch (ParseException | LanguageException e) {
 			handleError(e);
+			return false;
+		}
+	}
+
+	private static boolean handleOptions(String source, Dictionary globalObject, boolean showAST, boolean showLastValue) {
+		if (source.startsWith("// @opt: tokenize-only")) {
+			try {
+				new Lexer(source).tokenize();
+				return true;
+			} catch (ParseException e) {
+				return false;
+			}
+		} else {
 			return false;
 		}
 	}

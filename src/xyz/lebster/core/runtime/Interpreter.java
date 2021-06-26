@@ -69,7 +69,7 @@ public class Interpreter {
 
 	public static void dumpEnum(int indent, String type, String value) {
 		dumpIndent(indent);
-		System.out.printf("%s(%s) %s%n", ANSI.MAGENTA, type, value, ANSI.RESET);
+		System.out.printf("%s(%s) %s%s%n", ANSI.MAGENTA, type, value, ANSI.RESET);
 	}
 
 	public Value<?> declareVariable(Identifier name, Value<?> value) {

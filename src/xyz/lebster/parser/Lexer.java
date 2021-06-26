@@ -4,10 +4,11 @@ import xyz.lebster.exception.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Lexer {
 	private static final HashMap<String, TokenType> keywords = new HashMap<>();
-	private static final HashMap<Character, TokenType> symbols = new HashMap<>();
+	private static final List<HashMap<String, TokenType>> symbols = new ArrayList<>();
 
 	static {
 		keywords.put("let", TokenType.Let);
@@ -49,21 +50,73 @@ public class Lexer {
 		keywords.put("with", TokenType.With);
 		keywords.put("yield", TokenType.Yield);
 
-		symbols.put('=', TokenType.Equals);
-		symbols.put('(', TokenType.LParen);
-		symbols.put(')', TokenType.RParen);
-		symbols.put('{', TokenType.LBrace);
-		symbols.put('}', TokenType.RBrace);
-		symbols.put('[', TokenType.LBracket);
-		symbols.put(']', TokenType.RBracket);
-		symbols.put(';', TokenType.Semicolon);
-		symbols.put('+', TokenType.Plus);
-		symbols.put('-', TokenType.Minus);
-		symbols.put('*', TokenType.Multiply);
-		symbols.put('/', TokenType.Divide);
-		symbols.put('.', TokenType.Period);
-		symbols.put(',', TokenType.Comma);
-		symbols.put('!', TokenType.Bang);
+		final HashMap<String, TokenType> symbols_length_1 = new HashMap<>();
+		final HashMap<String, TokenType> symbols_length_2 = new HashMap<>();
+		final HashMap<String, TokenType> symbols_length_3 = new HashMap<>();
+		final HashMap<String, TokenType> symbols_length_4 = new HashMap<>();
+
+		symbols_length_4.put(">>>=", TokenType.UnsignedRightShiftAssign);
+
+		symbols_length_3.put("||=", TokenType.LogicalOrAssign);
+		symbols_length_3.put(">>>", TokenType.UnsignedRightShift);
+		symbols_length_3.put(">>=", TokenType.RightShiftAssign);
+		symbols_length_3.put("===", TokenType.StrictEqual);
+		symbols_length_3.put("<<=", TokenType.LeftShiftAssign);
+		symbols_length_3.put("&&=", TokenType.LogicalAndAssign);
+		symbols_length_3.put("**=", TokenType.ExponentAssign);
+		symbols_length_3.put("??=", TokenType.NullishCoalescingAssign);
+		symbols_length_3.put("!==", TokenType.StrictNotEqual);
+
+		symbols_length_2.put("||", TokenType.LogicalOr);
+		symbols_length_2.put("|=", TokenType.PipeAssign);
+		symbols_length_2.put(">>", TokenType.RightShift);
+		symbols_length_2.put(">=", TokenType.GreaterThanEqual);
+		symbols_length_2.put("=>", TokenType.Arrow);
+		symbols_length_2.put("==", TokenType.LooseEqual);
+		symbols_length_2.put("<=", TokenType.LessThanEqual);
+		symbols_length_2.put("<<", TokenType.LeftShift);
+		symbols_length_2.put("+=", TokenType.PlusAssign);
+		symbols_length_2.put("++", TokenType.Increment);
+		symbols_length_2.put("^=", TokenType.CaretAssign);
+		symbols_length_2.put("%=", TokenType.PercentAssign);
+		symbols_length_2.put("&=", TokenType.AmpersandAssign);
+		symbols_length_2.put("&&", TokenType.LogicalAnd);
+		symbols_length_2.put("/=", TokenType.DivideAssign);
+		symbols_length_2.put("*=", TokenType.MultiplyAssign);
+		symbols_length_2.put("**", TokenType.Exponent);
+		symbols_length_2.put("?.", TokenType.OptionalChain);
+		symbols_length_2.put("??", TokenType.NullishCoalescing);
+		symbols_length_2.put("!=", TokenType.NotEqual);
+		symbols_length_2.put("-=", TokenType.MinusAssign);
+		symbols_length_2.put("--", TokenType.Decrement);
+
+		symbols_length_1.put("~", TokenType.Tilde);
+		symbols_length_1.put("|", TokenType.Pipe);
+		symbols_length_1.put(">", TokenType.GreaterThan);
+		symbols_length_1.put("=", TokenType.Equals);
+		symbols_length_1.put("<", TokenType.LessThan);
+		symbols_length_1.put("+", TokenType.Plus);
+		symbols_length_1.put("^", TokenType.Caret);
+		symbols_length_1.put("%", TokenType.Percent);
+		symbols_length_1.put("&", TokenType.Ampersand);
+		symbols_length_1.put("/", TokenType.Divide);
+		symbols_length_1.put("*", TokenType.Multiply);
+		symbols_length_1.put("}", TokenType.RBrace);
+		symbols_length_1.put("{", TokenType.LBrace);
+		symbols_length_1.put("]", TokenType.RBracket);
+		symbols_length_1.put("[", TokenType.LBracket);
+		symbols_length_1.put(")", TokenType.RParen);
+		symbols_length_1.put("(", TokenType.LParen);
+		symbols_length_1.put(".", TokenType.Period);
+		symbols_length_1.put("!", TokenType.Bang);
+		symbols_length_1.put(";", TokenType.Semicolon);
+		symbols_length_1.put(",", TokenType.Comma);
+		symbols_length_1.put("-", TokenType.Minus);
+
+		symbols.add(symbols_length_4);
+		symbols.add(symbols_length_3);
+		symbols.add(symbols_length_2);
+		symbols.add(symbols_length_1);
 	}
 
 	private final String source;
@@ -154,9 +207,9 @@ public class Lexer {
 		int start = index;
 		builder.setLength(0);
 
-		if (isTerminator()) { 
-			while (isTerminator()) consume(); 
-			return new Token(TokenType.Terminator, start, index); 
+		if (isTerminator()) {
+			while (isTerminator()) consume();
+			return new Token(TokenType.Terminator, start, index);
 		} else if (isIdentifierStart()) {
 			while (isIdentifierMiddle()) collect();
 
@@ -168,8 +221,6 @@ public class Lexer {
 			} else {
 				return new Token(TokenType.Identifier, value, start, index);
 			}
-		} else if (symbols.containsKey(currentChar)) {
-			return new Token(symbols.get(consume()), start, index);
 		} else if (currentChar == '"' || currentChar == '\'') {
 			final char stringType = currentChar;
 			consume();
@@ -186,6 +237,15 @@ public class Lexer {
 
 			return new Token(TokenType.NumericLiteral, builder.toString(), start, index);
 		} else {
+			for (Map<String, TokenType> symbolSize : symbols) {
+				for (Map.Entry<String, TokenType> entry : symbolSize.entrySet()) {
+					final String key = entry.getKey();
+					if (accept(key)) {
+						return new Token(entry.getValue(), key, start, index);
+					}
+				}
+			}
+
 			throw new ParseException(StringEscapeUtils.escape("Invalid character '" + currentChar + "' at " + 0 + ":" + 0));
 		}
 	}

@@ -165,7 +165,7 @@ public class Parser {
 		require(TokenType.Function);
 		final Identifier name = new Identifier(require(TokenType.Identifier).value);
 		require(TokenType.LParen);
-		final ArrayList<Identifier> arguments = new ArrayList<>();
+		final List<Identifier> arguments = new ArrayList<>();
 
 		while (currentToken.type == TokenType.Identifier) {
 			arguments.add(new Identifier(consume().value));

@@ -17,7 +17,12 @@ abstract public class Value<JType> extends Expression {
 	}
 
 	public StringLiteral toStringLiteral() {
-		return new StringLiteral(String.valueOf(value));
+		return new StringLiteral(toString());
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(value);
 	}
 
 	public abstract BooleanLiteral toBooleanLiteral();

@@ -53,14 +53,14 @@ public class Interpreter {
 		dumpVariables(currentScopeFrame);
 	}
 
-	public Value<?> setVariable(Identifier name, Value<?> value) throws ReferenceError {
-		for (int i = currentScopeFrame; i >= 0; i--) {
+	public Value<?> setVariable(Identifier name, Value<?> value) {
+		for (int i = currentScopeFrame; i >= 1; i--) {
 			if (scopeStack[i].containsVariable(name)) {
 				return scopeStack[i].setVariable(name, value);
 			}
 		}
 
-		throw new ReferenceError("Unknown variable " + name);
+		return scopeStack[0].setVariable(name, value);
 	}
 
 	public Value<?> setVariable(String name, Value<?> value) throws ReferenceError {

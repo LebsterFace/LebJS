@@ -1,12 +1,12 @@
 package xyz.lebster.core.runtime;
 
-import xyz.lebster.exception.ReferenceError;
-import xyz.lebster.exception.LanguageException;
 import xyz.lebster.core.node.Identifier;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.ScopeNode;
 import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.exception.LanguageException;
+import xyz.lebster.exception.ReferenceError;
 
 public class Interpreter {
 	public final int maxScopeFrames;

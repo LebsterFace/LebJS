@@ -327,28 +327,28 @@ public class Parser {
 
 	private boolean matchExpression() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.StringLiteral		||
-			   t == TokenType.NumericLiteral	||
-			   t == TokenType.BooleanLiteral	||
-			   t == TokenType.Null				||
-			   t == TokenType.Function			||
-			   t == TokenType.Infinity			||
-			   t == TokenType.Undefined			||
-			   t == TokenType.NaN				||
-			   t == TokenType.This				||
-			   t == TokenType.Identifier		||
+		return t == TokenType.StringLiteral	 ||
+			   t == TokenType.NumericLiteral ||
+			   t == TokenType.BooleanLiteral ||
+			   t == TokenType.Null			 ||
+			   t == TokenType.Function		 ||
+			   t == TokenType.Infinity		 ||
+			   t == TokenType.Undefined		 ||
+			   t == TokenType.NaN			 ||
+			   t == TokenType.This			 ||
+			   t == TokenType.Identifier	 ||
 			   t == TokenType.LParen;
 	}
 
 	private boolean matchSecondaryExpression() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.Plus ||
-			   t == TokenType.Minus ||
-			   t == TokenType.Star ||
-			   t == TokenType.Slash ||
-			   t == TokenType.Period ||
-			   t == TokenType.LBracket ||
-			   t == TokenType.LParen ||
+		return t == TokenType.Plus 		||
+			   t == TokenType.Minus		||
+			   t == TokenType.Star 		||
+			   t == TokenType.Slash		||
+			   t == TokenType.Period	||
+			   t == TokenType.LBracket	||
+			   t == TokenType.LParen	||
 			   t == TokenType.Equals;
 	}
 }

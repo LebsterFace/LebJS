@@ -13,7 +13,7 @@ public class FunctionDeclaration extends ScopeNode implements Declaration {
 		this.name = name;
 		this.arguments = arguments;
 	}
-	
+
 	public FunctionDeclaration(String name, String... arguments) {
 		this(new Identifier(name), Stream.of(arguments).map(Identifier::new).toArray(Identifier[]::new));
 	}

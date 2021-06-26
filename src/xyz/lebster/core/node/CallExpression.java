@@ -1,10 +1,11 @@
 package xyz.lebster.core.node;
 
 import xyz.lebster.core.runtime.CallFrame;
-import xyz.lebster.exception.TypeError;
-import xyz.lebster.exception.LanguageException;
 import xyz.lebster.core.runtime.Interpreter;
-import xyz.lebster.core.value.*;
+import xyz.lebster.core.value.Executable;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.exception.LanguageException;
+import xyz.lebster.exception.TypeError;
 
 public class CallExpression extends Expression {
 	public final Expression callee;

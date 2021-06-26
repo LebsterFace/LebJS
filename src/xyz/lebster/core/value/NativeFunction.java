@@ -1,8 +1,8 @@
 package xyz.lebster.core.value;
 
+import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.NotImplemented;
-import xyz.lebster.core.runtime.Interpreter;
 
 public class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(NativeCode value) {

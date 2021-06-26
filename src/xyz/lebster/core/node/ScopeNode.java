@@ -9,6 +9,7 @@ abstract public class ScopeNode implements ASTNode {
 	public void append(ASTNode node) {
 		children.add(node);
 	}
+
 	public void append(List<ASTNode> nodes) {
 		children.addAll(nodes);
 	}

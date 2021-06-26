@@ -1,8 +1,8 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.node.Identifier;
 import xyz.lebster.core.runtime.Interpreter;
+import xyz.lebster.exception.NotImplemented;
 
 import java.util.HashMap;
 import java.util.Map;

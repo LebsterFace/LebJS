@@ -1,8 +1,8 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.exception.LanguageException;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.exception.LanguageException;
 
 import java.util.Objects;
 

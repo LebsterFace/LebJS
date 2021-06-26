@@ -1,7 +1,7 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.core.runtime.Interpreter;
+import xyz.lebster.exception.NotImplemented;
 
 public class StringLiteral extends Value<String> {
 	public StringLiteral() {

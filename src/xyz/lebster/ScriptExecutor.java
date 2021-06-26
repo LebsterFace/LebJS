@@ -10,6 +10,7 @@ import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.ParseException;
 import xyz.lebster.parser.Lexer;
 import xyz.lebster.parser.Parser;
+import xyz.lebster.parser.Token;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -82,6 +83,16 @@ public class ScriptExecutor {
 		if (source.startsWith("// @opt: tokenize-only")) {
 			try {
 				new Lexer(source).tokenize();
+				return true;
+			} catch (ParseException e) {
+				return false;
+			}
+		} else if (source.startsWith("// @opt: dump-tokens")) {
+			try {
+				final Token[] tokens = new Lexer(source).tokenize();
+				System.out.println("------- TOKENS -------");
+				for (final Token token : tokens) System.out.println(token);
+				System.out.println("------- END -------");
 				return true;
 			} catch (ParseException e) {
 				return false;

@@ -34,7 +34,7 @@ public class NumericLiteral extends Value<Double> {
 
 	public static String stringify(double x) {
 //		https://tc39.es/ecma262/#sec-numeric-types-number-tostring
-		if (x == Double.NaN) return "NaN";
+		if (Double.isNaN(x)) return "NaN";
 		else if (x == -0.0 || x == 0.0) return "0";
 		else if (x < 0) return "-" + stringify(-x);
 		else if (x == Double.POSITIVE_INFINITY) return "Infinity";

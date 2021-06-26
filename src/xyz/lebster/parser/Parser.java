@@ -30,6 +30,8 @@ public class Parser {
 		precedence.put(TokenType.Minus, 14);
 		precedence.put(TokenType.StrictEqual, 11);
 		precedence.put(TokenType.StrictNotEqual, 11);
+		precedence.put(TokenType.LogicalAnd, 8);
+		precedence.put(TokenType.LogicalOr, 6);
 		precedence.put(TokenType.Equals, 3);
 
 		associativity.put(TokenType.Star, Left);
@@ -39,6 +41,8 @@ public class Parser {
 		associativity.put(TokenType.Period, Left);
 		associativity.put(TokenType.StrictEqual, Left);
 		associativity.put(TokenType.StrictNotEqual, Left);
+		associativity.put(TokenType.LogicalOr, Left);
+		associativity.put(TokenType.LogicalAnd, Left);
 		associativity.put(TokenType.Equals, Right);
 	}
 
@@ -288,6 +292,16 @@ public class Parser {
 				return new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityOp.StrictNotEquals);
 			}
 
+			case LogicalOr: {
+				consume();
+				return new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.Or);
+			}
+
+			case LogicalAnd: {
+				consume();
+				return new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.And);
+			}
+
 			default:
 				return left;
 		}
@@ -390,6 +404,8 @@ public class Parser {
 			   t == TokenType.Slash			 ||
 			   t == TokenType.StrictEqual	 ||
 			   t == TokenType.StrictNotEqual ||
+			   t == TokenType.LogicalOr		 ||
+			   t == TokenType.LogicalAnd	 ||
 			   t == TokenType.Period		 ||
 			   t == TokenType.LBracket		 ||
 			   t == TokenType.LParen		 ||

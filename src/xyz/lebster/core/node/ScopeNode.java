@@ -19,10 +19,14 @@ abstract public class ScopeNode implements ASTNode {
 		children.addAll(nodes);
 	}
 
-	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+	public Value<?> executeChildren(Interpreter interpreter) throws LanguageException {
 		Value<?> lastValue = new Undefined();
 		for (ASTNode node : children) lastValue = node.execute(interpreter);
 		return lastValue;
+	}
+
+	@Override
+	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+		return executeChildren(interpreter);
 	}
 }

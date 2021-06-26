@@ -90,8 +90,8 @@ public class Lexer {
 		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 	}
 
-	private boolean isTerminator(char c) {
-		return c == '\n';
+	private boolean isTerminator() {
+		return peek("\r\n") || currentChar == '\n' || index == length;
 	}
 
 	private char consume() {
@@ -143,12 +143,12 @@ public class Lexer {
 	public Token next() throws ParseException {
 		if (index == length) return null;
 		consumeWhitespace();
-		if (currentChar == '\r') consume();
 		int start = index;
 		builder.setLength(0);
 
-		if (isTerminator(currentChar)) {
-			consume();
+		if (isTerminator()) { 
+			while (isTerminator()) consume(); 
+			return new Token(TokenType.Terminator, start, index); 
 		} else if (isIdentifierStart()) {
 			while (isIdentifierMiddle()) collect();
 

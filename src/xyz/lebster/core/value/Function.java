@@ -1,14 +1,14 @@
 package xyz.lebster.core.value;
 
 import xyz.lebster.core.node.ASTNode;
-import xyz.lebster.core.node.FunctionDeclaration;
+import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.runtime.ScopeFrame;
 import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.NotImplemented;
 
-public class Function extends Executable<FunctionDeclaration> {
-	public Function(FunctionDeclaration value) {
+public class Function extends Executable<FunctionNode> {
+	public Function(FunctionNode value) {
 		super(Type.Function, value);
 	}
 

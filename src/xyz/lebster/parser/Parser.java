@@ -188,6 +188,22 @@ public class Parser {
 		return new FunctionDeclaration(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
 	}
 
+	private FunctionExpression parseFunctionExpression() throws ParseException {
+//		TODO: Generalize this with parseFunctionDeclaration()
+		require(TokenType.Function);
+		final Identifier name = new Identifier(require(TokenType.Identifier).value);
+		require(TokenType.LParen);
+		final List<Identifier> arguments = new ArrayList<>();
+
+		while (currentToken.type == TokenType.Identifier) {
+			arguments.add(new Identifier(consume().value));
+			if (accept(TokenType.Comma) == null) break;
+		}
+
+		require(TokenType.RParen);
+		return new FunctionExpression(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
+	}
+
 	private CallExpression parseCallExpression(Expression left) throws ParseException {
 		final ArrayList<Expression> arguments = new ArrayList<>();
 		while (matchExpression()) {
@@ -289,6 +305,7 @@ public class Parser {
 			case NumericLiteral -> new NumericLiteral(Double.parseDouble(consume().value));
 			case BooleanLiteral -> new BooleanLiteral(consume().value.equals("true"));
 			case Identifier -> new Identifier(consume().value);
+			case Function -> parseFunctionExpression();
 
 			case This -> {
 				consume();

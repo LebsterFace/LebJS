@@ -1,6 +1,6 @@
-package xyz.lebster.core.node;
+package xyz.lebster.core.expression;
 
-import xyz.lebster.core.expression.Expression;
+import xyz.lebster.core.node.Statement;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;

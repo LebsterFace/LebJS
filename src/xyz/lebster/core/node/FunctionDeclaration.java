@@ -4,33 +4,18 @@ import xyz.lebster.core.expression.Identifier;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Function;
 
-public class FunctionDeclaration implements Declaration, Statement {
-	public final Identifier name;
-	public final Identifier[] arguments;
-	public final BlockStatement body;
-
+public class FunctionDeclaration extends FunctionNode implements Declaration, Statement {
 	public FunctionDeclaration(BlockStatement body, Identifier name, Identifier... arguments) {
-		this.name = name;
-		this.arguments = arguments;
-		this.body = body;
+		super(body, name, arguments);
 	}
 
 	public FunctionDeclaration(Identifier name, Identifier... arguments) {
-		this(new BlockStatement(), name, arguments);
+		super(name, arguments);
 	}
 
 	@Override
 	public void dump(int indent) {
-		final StringBuilder builder = new StringBuilder(name.value);
-		builder.append("(");
-		builder.append(arguments[0].value);
-		for (int i = 1; i < arguments.length; i++) {
-			builder.append(", ");
-			builder.append(arguments[i].value);
-		}
-		builder.append(")");
-		Interpreter.dumpParameterized(indent, "FunctionDeclaration", builder.toString());
-
+		Interpreter.dumpParameterized(indent, "FunctionDeclaration", getCallString());
 		for (final ASTNode child : body.children) {
 			child.dump(indent + 1);
 		}

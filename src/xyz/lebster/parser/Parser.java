@@ -23,14 +23,14 @@ public class Parser {
 		precedence.put(TokenType.LBracket, 20);
 		precedence.put(TokenType.RBracket, 20);
 		precedence.put(TokenType.Period, 20);
-		precedence.put(TokenType.Multiply, 15);
-		precedence.put(TokenType.Divide, 15);
+		precedence.put(TokenType.Star, 15);
+		precedence.put(TokenType.Slash, 15);
 		precedence.put(TokenType.Plus, 14);
 		precedence.put(TokenType.Minus, 14);
 		precedence.put(TokenType.Equals, 3);
 
-		associativity.put(TokenType.Multiply, Left);
-		associativity.put(TokenType.Divide, Left);
+		associativity.put(TokenType.Star, Left);
+		associativity.put(TokenType.Slash, Left);
 		associativity.put(TokenType.Plus, Left);
 		associativity.put(TokenType.Minus, Left);
 		associativity.put(TokenType.Period, Left);
@@ -214,12 +214,12 @@ public class Parser {
 				return new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Subtract);
 			}
 
-			case Multiply: {
+			case Star: {
 				consume();
 				return new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Multiply);
 			}
 
-			case Divide: {
+			case Slash: {
 				consume();
 				return new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Divide);
 			}
@@ -342,13 +342,13 @@ public class Parser {
 
 	private boolean matchSecondaryExpression() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.Plus 		||
-			   t == TokenType.Minus		||
-			   t == TokenType.Multiply	||
-			   t == TokenType.Divide	||
-			   t == TokenType.Period	||
-			   t == TokenType.LBracket	||
-			   t == TokenType.LParen	||
+		return t == TokenType.Plus ||
+			   t == TokenType.Minus ||
+			   t == TokenType.Star ||
+			   t == TokenType.Slash ||
+			   t == TokenType.Period ||
+			   t == TokenType.LBracket ||
+			   t == TokenType.LParen ||
 			   t == TokenType.Equals;
 	}
 }

@@ -99,8 +99,8 @@ public class Lexer {
 		symbols_length_1.put("^", TokenType.Caret);
 		symbols_length_1.put("%", TokenType.Percent);
 		symbols_length_1.put("&", TokenType.Ampersand);
-		symbols_length_1.put("/", TokenType.Divide);
-		symbols_length_1.put("*", TokenType.Multiply);
+		symbols_length_1.put("/", TokenType.Slash);
+		symbols_length_1.put("*", TokenType.Star);
 		symbols_length_1.put("}", TokenType.RBrace);
 		symbols_length_1.put("{", TokenType.LBrace);
 		symbols_length_1.put("]", TokenType.RBracket);

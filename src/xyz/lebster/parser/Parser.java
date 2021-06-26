@@ -134,7 +134,9 @@ public class Parser {
 
 				case Return -> {
 					consume();
-					yield new ReturnStatement(parseExpression(0, Left));
+//					FIXME: Proper automatic semicolon insertion
+					final Expression val = matchExpression() ? parseExpression(0, Left) : new Undefined();
+					yield new ReturnStatement(val);
 				}
 
 				default -> throw new CannotParse(currentToken.type, "Statement");

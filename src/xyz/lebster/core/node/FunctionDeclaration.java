@@ -34,7 +34,9 @@ public class FunctionDeclaration extends ScopeNode implements Declaration {
 		}
 		System.out.println(")':");
 
-		for (ASTNode child : children) child.dump(indent + 1);
+		for (ASTNode child : children) {
+			child.dump(indent + 1);
+		}
 	}
 
 	@Override

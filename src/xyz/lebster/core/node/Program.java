@@ -8,7 +8,9 @@ import xyz.lebster.exception.LanguageException;
 public class Program extends ScopeNode {
 	@Override
 	public void dump(int indent) {
-		for (ASTNode child : children) child.dump(indent);
+		for (ASTNode child : children) {
+			child.dump(indent);
+		}
 	}
 
 	@Override

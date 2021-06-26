@@ -19,7 +19,7 @@ public final class MemberExpression extends Expression {
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpName(indent, "MemberExpression");
+		Interpreter.dumpParameterized(indent, "MemberExpression", "[computed=" + computed + "]");
 		object.dump(indent + 1);
 		property.dump(indent + 1);
 	}

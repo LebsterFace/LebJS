@@ -46,7 +46,7 @@ public class Function extends Executable<FunctionNode> {
 		Value<?> result = new Undefined();
 		final ScopeFrame scope = interpreter.enterScope(value.body);
 
-		for (int i = 0; i < arguments.length; i++) {
+		for (int i = 0; i < arguments.length && i < value.arguments.length; i++) {
 			interpreter.declareVariable(value.arguments[i], arguments[i]);
 		}
 

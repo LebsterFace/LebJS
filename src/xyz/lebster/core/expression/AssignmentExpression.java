@@ -2,8 +2,9 @@ package xyz.lebster.core.expression;
 
 import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
+import xyz.lebster.core.runtime.Reference;
+import xyz.lebster.core.runtime.ReferenceError;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.exception.NotImplemented;
 
 public record AssignmentExpression(Expression left, Expression right, AssignmentOp op) implements Expression {
 
@@ -17,12 +18,14 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		if (left instanceof Identifier) {
+		if (left instanceof LeftHandSideExpression) {
+			var lhs = (LeftHandSideExpression) left;
+			final Reference ref = lhs.toReference(interpreter);
 			final Value<?> rhs = right.execute(interpreter);
-			interpreter.setVariable((Identifier) left, rhs);
+			interpreter.setVariable(ref, rhs);
 			return rhs;
 		} else {
-			throw new NotImplemented("AssignmentExpression with '" + left.getClass().getSimpleName() + "' as left-hand side");
+			return interpreter.throwValue(new ReferenceError("Invalid left-hand side in assignment: " + left.getClass().getSimpleName()));
 		}
 	}
 }

@@ -88,14 +88,8 @@ public class Interpreter {
 		return scopeStack[currentScopeFrame].setVariable(name, value);
 	}
 
-	public Value<?> setVariable(Identifier name, Value<?> value) {
-		for (int i = currentScopeFrame; i >= 1; i--) {
-			if (scopeStack[i].containsVariable(name)) {
-				return scopeStack[i].setVariable(name, value);
-			}
-		}
-
-		return scopeStack[0].setVariable(name, value);
+	public Value<?> setVariable(Reference reference, Value<?> value) {
+		return reference.baseObj().set(reference.referencedName(), value);
 	}
 
 	public Value<?> getVariable(Identifier name) throws AbruptCompletion {

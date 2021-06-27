@@ -19,14 +19,14 @@ public class ScopeFrame {
 	}
 
 	public Value<?> setVariable(Identifier name, Value<?> value) {
-		return variables.set(name, value);
+		return variables.set(name.stringValue(), value);
 	}
 
 	public Value<?> getVariable(Identifier name) {
-		return variables.get(name);
+		return variables.get(name.stringValue());
 	}
 
 	public boolean containsVariable(Identifier name) {
-		return variables.containsKey(name);
+		return variables.value.containsKey(name.stringValue());
 	}
 }

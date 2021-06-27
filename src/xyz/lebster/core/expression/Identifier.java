@@ -2,11 +2,13 @@ package xyz.lebster.core.expression;
 
 import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
+import xyz.lebster.core.runtime.Reference;
+import xyz.lebster.core.value.StringLiteral;
 import xyz.lebster.core.value.Value;
 
 import java.util.Objects;
 
-public class Identifier implements Expression {
+public class Identifier implements LeftHandSideExpression {
 	public final String value;
 
 	public Identifier(String name) {
@@ -39,5 +41,14 @@ public class Identifier implements Expression {
 	@Override
 	public String toString() {
 		return "'" + value + "'";
+	}
+
+	public StringLiteral stringValue() {
+		return new StringLiteral(value);
+	}
+
+	@Override
+	public Reference toReference(Interpreter interpreter) {
+		return new Reference(interpreter.thisValue().toDictionary(), stringValue());
 	}
 }

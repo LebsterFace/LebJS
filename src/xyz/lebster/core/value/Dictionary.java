@@ -1,34 +1,33 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.expression.Identifier;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.exception.NotImplemented;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
+public class Dictionary extends Value<HashMap<StringLiteral, Value<?>>> {
 	public Dictionary() {
 		super(Type.Dictionary, new HashMap<>());
 	}
 
-	public Value<?> set(Identifier name, Value<?> value) {
+	public Value<?> set(StringLiteral name, Value<?> value) {
 		return this.value.put(name, value);
 	}
 
 	@SuppressWarnings("UnusedReturnValue")
 	public Value<?> set(String name, Value<?> value) {
-		return set(new Identifier(name), value);
+		return set(new StringLiteral(name), value);
 	}
 
-	public Value<?> get(Identifier name) {
+	public Value<?> get(StringLiteral name) {
 		Dictionary object = this;
 
 		while (true) {
 			if (object == null) {
 				// End of prototype chain; property does not exist.
 				return new Undefined();
-			} else if (object.containsKey(name)) {
+			} else if (object.value.containsKey(name)) {
 				// Property was found
 				return object.value.get(name);
 			} else {
@@ -36,10 +35,6 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 				object = object.getPrototype();
 			}
 		}
-	}
-
-	public boolean containsKey(Identifier name) {
-		return this.value.containsKey(name);
 	}
 
 	@Override
@@ -70,8 +65,8 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpName(indent, "Dictionary");
-		for (Map.Entry<Identifier, Value<?>> entry : this.value.entrySet()) {
-			System.out.print(entry.getKey());
+		for (Map.Entry<StringLiteral, Value<?>> entry : this.value.entrySet()) {
+			System.out.print(entry.getKey().value);
 			System.out.print(": ");
 			final Value<?> value = entry.getValue();
 //			FIXME: Circular dependency

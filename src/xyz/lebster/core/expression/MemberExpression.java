@@ -3,11 +3,13 @@ package xyz.lebster.core.expression;
 import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.CallFrame;
 import xyz.lebster.core.runtime.Interpreter;
+import xyz.lebster.core.runtime.Reference;
 import xyz.lebster.core.value.Dictionary;
+import xyz.lebster.core.value.StringLiteral;
 import xyz.lebster.core.value.Value;
 
 
-public record MemberExpression(Expression object, Expression property, boolean computed) implements Expression {
+public record MemberExpression(Expression object, Expression property, boolean computed) implements LeftHandSideExpression {
 
 	@Override
 	public void dump(int indent) {
@@ -18,16 +20,20 @@ public record MemberExpression(Expression object, Expression property, boolean c
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-//		TODO: Copied from toCallFrame, can we remove?
-		final Dictionary obj = object.execute(interpreter).toDictionary();
-		final Identifier prop = computed ? property.execute(interpreter).toIdentifier() : (Identifier) property;
-		return obj.get(prop);
+		final Reference reference = toReference(interpreter);
+		return reference.getValue(interpreter);
 	}
 
 	@Override
 	public CallFrame toCallFrame(Interpreter interpreter) throws AbruptCompletion {
+		final Reference reference = toReference(interpreter);
+		return new CallFrame(reference.getValue(interpreter), reference.baseObj());
+	}
+
+	@Override
+	public Reference toReference(Interpreter interpreter) throws AbruptCompletion {
 		final Dictionary obj = object.execute(interpreter).toDictionary();
-		final Identifier prop = computed ? property.execute(interpreter).toIdentifier() : (Identifier) property;
-		return new CallFrame(obj.get(prop), obj);
+		final StringLiteral prop = computed ? property.execute(interpreter).toStringLiteral() : (StringLiteral) property;
+		return new Reference(obj, prop);
 	}
 }

@@ -320,7 +320,7 @@ public class Parser {
 			case Period -> {
 				consume();
 				final String prop = require(TokenType.Identifier).value;
-				yield new MemberExpression(left, new Identifier(prop), false);
+				yield new MemberExpression(left, new StringLiteral(prop), false);
 			}
 
 			case LBracket -> {

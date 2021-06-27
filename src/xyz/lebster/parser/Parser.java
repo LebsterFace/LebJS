@@ -254,7 +254,13 @@ public class Parser {
 	private Expression parseUnaryPrefixedExpression() throws ParseException {
 		// https://tc39.es/ecma262//#prod-UnaryExpression
 		final TokenType type = consume().type;
+//		TODO: Remove when all implemented
+		if (!associativity.containsKey(type))
+				throw new NotImplemented("Associativity for token '" + type + "'");
 		final Associativity assoc = associativity.get(type);
+//		TODO: Remove when all implemented
+		if (!precedence.containsKey(type))
+				throw new NotImplemented("Precedence for token '" + type + "'");
 		final int minPrecedence = precedence.get(type);
 
 		return new UnaryExpression(parseExpression(minPrecedence, assoc), switch (type) {
@@ -270,12 +276,18 @@ public class Parser {
 		Expression latestExpr = parsePrimaryExpression();
 
 		while (matchSecondaryExpression()) {
+//			TODO: Remove when all implemented
+			if (!precedence.containsKey(currentToken.type))
+				throw new NotImplemented("Precedence for token '" + currentToken.type + "'");
 			final int newPrecedence = precedence.get(currentToken.type);
 
 			if (newPrecedence < minPrecedence || newPrecedence == minPrecedence && assoc == Left) {
 				break;
 			}
 
+//			TODO: Remove when all implemented
+			if (!associativity.containsKey(currentToken.type))
+				throw new NotImplemented("Associativity for token '" + currentToken.type + "'");
 			final Associativity newAssoc = associativity.get(currentToken.type);
 			latestExpr = parseSecondaryExpression(latestExpr, newPrecedence, newAssoc);
 		}
@@ -358,7 +370,8 @@ public class Parser {
 				yield new UnaryExpression(left, UnaryOp.PostIncrement);
 			}
 
-			default -> left;
+			default -> throw new CannotParse(currentToken.type, "SecondaryExpression");
+//			default -> left;
 		};
 	}
 

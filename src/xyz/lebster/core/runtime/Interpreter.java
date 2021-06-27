@@ -94,14 +94,15 @@ public class Interpreter {
 		return scopeStack[0].setVariable(name, value);
 	}
 
-	public Value<?> getVariable(Identifier name) {
+	public Value<?> getVariable(Identifier name) throws AbruptCompletion {
 		for (int i = currentScopeFrame; i >= 0; i--) {
 			if (scopeStack[i].containsVariable(name)) {
 				return scopeStack[i].getVariable(name);
 			}
 		}
 
-		throw new LanguageException(name.value + " is not defined");
+		throwValue(new ReferenceError(name.value + " is not defined"));
+		return null;
 	}
 
 	public Value<?> setGlobal(Identifier name, Value<?> value) {

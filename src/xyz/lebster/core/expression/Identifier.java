@@ -1,5 +1,6 @@
 package xyz.lebster.core.expression;
 
+import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Value;
 
@@ -18,7 +19,7 @@ public class Identifier implements Expression {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) {
+	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return interpreter.getVariable(this);
 	}
 

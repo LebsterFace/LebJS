@@ -4,14 +4,14 @@ import xyz.lebster.core.expression.*;
 import xyz.lebster.core.node.*;
 import xyz.lebster.core.value.*;
 import xyz.lebster.exception.CannotParse;
+import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.exception.ParseException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static xyz.lebster.parser.Associativity.Left;
-import static xyz.lebster.parser.Associativity.Right;
+import static xyz.lebster.parser.Associativity.*;
 
 public class Parser {
 	private static final HashMap<TokenType, Integer> precedence = new HashMap<>();
@@ -24,6 +24,12 @@ public class Parser {
 		precedence.put(TokenType.LBracket, 20);
 		precedence.put(TokenType.RBracket, 20);
 		precedence.put(TokenType.Period, 20);
+		precedence.put(TokenType.Bang, 17);
+
+//		FIXME: Postfix should have higher precedence than prefix
+		precedence.put(TokenType.Increment, 17);
+		precedence.put(TokenType.Decrement, 17);
+
 		precedence.put(TokenType.Star, 15);
 		precedence.put(TokenType.Slash, 15);
 		precedence.put(TokenType.Plus, 14);
@@ -34,6 +40,11 @@ public class Parser {
 		precedence.put(TokenType.LogicalOr, 6);
 		precedence.put(TokenType.Equals, 3);
 
+//		FIXME: Switch statement method (when all operators are implemented)
+		associativity.put(TokenType.LParen, NA);
+		associativity.put(TokenType.RParen, NA);
+		associativity.put(TokenType.LBracket, Left);
+		associativity.put(TokenType.RBracket, Left);
 		associativity.put(TokenType.Star, Left);
 		associativity.put(TokenType.Slash, Left);
 		associativity.put(TokenType.Plus, Left);
@@ -43,6 +54,9 @@ public class Parser {
 		associativity.put(TokenType.StrictNotEqual, Left);
 		associativity.put(TokenType.LogicalOr, Left);
 		associativity.put(TokenType.LogicalAnd, Left);
+		associativity.put(TokenType.Bang, Right);
+		associativity.put(TokenType.Increment, Right);
+		associativity.put(TokenType.Decrement, Right);
 		associativity.put(TokenType.Equals, Right);
 	}
 
@@ -237,6 +251,21 @@ public class Parser {
 		return new CallExpression(left, arguments.toArray(new Expression[0]));
 	}
 
+	private Expression parseUnaryPrefixedExpression() throws ParseException {
+		// https://tc39.es/ecma262//#prod-UnaryExpression
+		final TokenType type = consume().type;
+		final Associativity assoc = associativity.get(type);
+		final int minPrecedence = precedence.get(type);
+
+		return new UnaryExpression(parseExpression(minPrecedence, assoc), switch (type) {
+			case Minus -> UnaryOp.Negate;
+			case Bang -> UnaryOp.LogicalNot;
+			case Decrement -> UnaryOp.PreDecrement;
+			case Increment -> UnaryOp.PreIncrement;
+			default -> throw new CannotParse("Expression type '" + type + "'");
+		});
+	}
+
 	private Expression parseExpression(int minPrecedence, Associativity assoc) throws ParseException {
 		Expression latestExpr = parsePrimaryExpression();
 
@@ -255,76 +284,89 @@ public class Parser {
 	}
 
 	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws ParseException {
-		switch (currentToken.type) {
-			case Plus: {
+		return switch (currentToken.type) {
+			case Plus -> {
 				consume();
-				return new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Add);
+				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Add);
 			}
 
-			case Minus: {
+			case Minus -> {
 				consume();
-				return new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Subtract);
+				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Subtract);
 			}
 
-			case Star: {
+			case Star -> {
 				consume();
-				return new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Multiply);
+				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Multiply);
 			}
 
-			case Slash: {
+			case Slash -> {
 				consume();
-				return new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Divide);
+				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Divide);
 			}
 
-			case Period: {
+			case Period -> {
 				consume();
 				final String prop = require(TokenType.Identifier).value;
-				return new MemberExpression(left, new Identifier(prop), false);
+				yield new MemberExpression(left, new Identifier(prop), false);
 			}
 
-			case LBracket: {
+			case LBracket -> {
 				consume();
 				final Expression prop = parseExpression(0, Left);
 				require(TokenType.RBracket);
-				return new MemberExpression(left, prop, true);
+				yield new MemberExpression(left, prop, true);
 			}
 
-			case LParen: {
+			case LParen -> {
 				consume();
-				return parseCallExpression(left);
+				yield parseCallExpression(left);
 			}
 
-			case Equals: {
+			case Equals -> {
 				consume();
-				return new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentOp.Equals);
+				yield new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentOp.Equals);
 			}
 
-			case StrictEqual: {
+			case StrictEqual -> {
 				consume();
-				return new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityOp.StrictEquals);
+				yield new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityOp.StrictEquals);
 			}
 
-			case StrictNotEqual: {
+			case StrictNotEqual -> {
 				consume();
-				return new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityOp.StrictNotEquals);
+				yield new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityOp.StrictNotEquals);
 			}
 
-			case LogicalOr: {
+			case LogicalOr -> {
 				consume();
-				return new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.Or);
+				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.Or);
 			}
 
-			case LogicalAnd: {
+			case LogicalAnd -> {
 				consume();
-				return new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.And);
+				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.And);
 			}
 
-			default:
-				return left;
-		}
+			case Decrement -> {
+				consume();
+				yield new UnaryExpression(left, UnaryOp.PostDecrement);
+			}
+
+			case Increment -> {
+				consume();
+				yield new UnaryExpression(left, UnaryOp.PostIncrement);
+			}
+
+			default -> left;
+		};
 	}
 
 	private Expression parsePrimaryExpression() throws ParseException {
+		if (matchUnaryPrefixedExpression()) {
+			return parseUnaryPrefixedExpression();
+		}
+
 		return switch (currentToken.type) {
 			case LParen -> {
 				consume();
@@ -427,7 +469,9 @@ public class Parser {
 			   t == TokenType.Period ||
 			   t == TokenType.LBracket ||
 			   t == TokenType.LParen ||
-			   t == TokenType.Equals;
+			   t == TokenType.Equals ||
+			   t == TokenType.Increment ||
+			   t == TokenType.Decrement;
 	}
 
 	private boolean matchUnaryPrefixedExpression() {

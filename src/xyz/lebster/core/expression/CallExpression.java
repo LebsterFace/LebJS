@@ -43,8 +43,7 @@ public class CallExpression implements Expression {
 		final CallFrame frame = callee.toCallFrame(interpreter);
 
 		if (!(frame.executedCallee() instanceof final Executable<?> executable)) {
-			interpreter.throwValue(new TypeError(frame.executedCallee().getClass().getCanonicalName() + " is not a function"));
-			return null;
+			return interpreter.throwValue(new TypeError(frame.executedCallee().getClass().getCanonicalName() + " is not a function"));
 		}
 
 		final Value<?>[] args = new Value<?>[arguments.length];

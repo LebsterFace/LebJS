@@ -101,8 +101,7 @@ public class Interpreter {
 			}
 		}
 
-		throwValue(new ReferenceError(name.value + " is not defined"));
-		return null;
+		return throwValue(new ReferenceError(name.value + " is not defined"));
 	}
 
 	public Value<?> setGlobal(Identifier name, Value<?> value) {
@@ -168,7 +167,8 @@ public class Interpreter {
 		throw completion;
 	}
 
-	public void throwValue(Value<?> value) throws AbruptCompletion {
+	public Value<?> throwValue(Value<?> value) throws AbruptCompletion {
 		setCompletion(new AbruptCompletion(AbruptCompletion.Type.Throw, value));
+		return null;
 	}
 }

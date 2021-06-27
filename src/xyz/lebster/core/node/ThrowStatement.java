@@ -15,7 +15,6 @@ public record ThrowStatement(Expression expression) implements Statement {
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		interpreter.throwValue(expression.execute(interpreter));
-		return null;
+		return interpreter.throwValue(expression.execute(interpreter));
 	}
 }

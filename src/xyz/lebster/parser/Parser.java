@@ -410,7 +410,8 @@ public class Parser {
 			   t == TokenType.NaN ||
 			   t == TokenType.This ||
 			   t == TokenType.Identifier ||
-			   t == TokenType.LParen;
+			   t == TokenType.LParen ||
+			   matchUnaryPrefixedExpression();
 	}
 
 	private boolean matchSecondaryExpression() {
@@ -427,5 +428,18 @@ public class Parser {
 			   t == TokenType.LBracket ||
 			   t == TokenType.LParen ||
 			   t == TokenType.Equals;
+	}
+
+	private boolean matchUnaryPrefixedExpression() {
+		final TokenType t = currentToken.type;
+		return t == TokenType.Increment ||
+			   t == TokenType.Decrement ||
+			   t == TokenType.Bang ||
+			   t == TokenType.Tilde ||
+			   t == TokenType.Plus ||
+			   t == TokenType.Minus ||
+			   t == TokenType.Typeof ||
+			   t == TokenType.Void ||
+			   t == TokenType.Delete;
 	}
 }

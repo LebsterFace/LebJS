@@ -66,7 +66,6 @@ public enum TokenType {
 	Percent,
 	Caret,
 	LessThan,
-	Equal,
 	GreaterThan,
 	Pipe,
 	Tilde,

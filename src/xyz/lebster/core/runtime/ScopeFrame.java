@@ -29,8 +29,4 @@ public class ScopeFrame {
 	public boolean containsVariable(Identifier name) {
 		return variables.containsKey(name);
 	}
-
-	public void dumpVariables(int indent) {
-		variables.dump(indent);
-	}
 }

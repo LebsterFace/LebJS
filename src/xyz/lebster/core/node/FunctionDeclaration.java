@@ -9,10 +9,6 @@ public class FunctionDeclaration extends FunctionNode implements Declaration, St
 		super(body, name, arguments);
 	}
 
-	public FunctionDeclaration(Identifier name, Identifier... arguments) {
-		super(name, arguments);
-	}
-
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpParameterized(indent, "FunctionDeclaration", getCallString());

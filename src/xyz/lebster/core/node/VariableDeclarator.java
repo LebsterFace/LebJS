@@ -4,7 +4,6 @@ import xyz.lebster.core.expression.Expression;
 import xyz.lebster.core.expression.Identifier;
 import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
-import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
 
 
@@ -15,11 +14,6 @@ public class VariableDeclarator implements ASTNode {
 	public VariableDeclarator(Identifier identifier, Expression init) {
 		this.identifier = identifier;
 		this.init = init;
-	}
-
-	public VariableDeclarator(Identifier identifier) {
-		this.identifier = identifier;
-		this.init = new Undefined();
 	}
 
 	@Override

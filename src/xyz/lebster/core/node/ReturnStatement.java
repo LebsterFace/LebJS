@@ -3,7 +3,6 @@ package xyz.lebster.core.node;
 import xyz.lebster.core.expression.Expression;
 import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
-import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
 
 
@@ -12,10 +11,6 @@ public class ReturnStatement implements Statement {
 
 	public ReturnStatement(Expression argument) {
 		this.argument = argument;
-	}
-
-	public ReturnStatement() {
-		this.argument = new Undefined();
 	}
 
 	@Override

@@ -12,10 +12,6 @@ public class Dictionary extends Value<HashMap<Identifier, Value<?>>> {
 		super(Type.Dictionary, new HashMap<>());
 	}
 
-	public Dictionary(HashMap<Identifier, Value<?>> value) {
-		super(Type.Dictionary, value);
-	}
-
 	public Value<?> set(Identifier name, Value<?> value) {
 		return this.value.put(name, value);
 	}

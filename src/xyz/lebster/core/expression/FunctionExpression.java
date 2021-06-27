@@ -13,10 +13,6 @@ public class FunctionExpression extends FunctionNode implements Expression {
 		super(body, name, arguments);
 	}
 
-	public FunctionExpression(Identifier name, Identifier... arguments) {
-		super(name, arguments);
-	}
-
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpParameterized(indent, "FunctionExpression", getCallString());

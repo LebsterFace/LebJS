@@ -1,6 +1,5 @@
 package xyz.lebster.core.expression;
 
-import xyz.lebster.ANSI;
 import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.CallFrame;
 import xyz.lebster.core.runtime.Interpreter;
@@ -21,21 +20,9 @@ public class CallExpression implements Expression {
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpName(indent, "CallExpression");
-		Interpreter.dumpName(indent + 1, "Callee");
-		callee.dump(indent + 2);
-
-		if (arguments.length > 0) {
-			Interpreter.dumpName(indent + 1, "Arguments");
-		} else {
-			Interpreter.dumpIndent(indent + 1);
-			System.out.print(ANSI.RED);
-			System.out.print("[[NO ARGS]]");
-			System.out.println(ANSI.RESET);
-		}
-
-		for (Expression argument : arguments) {
-			argument.dump(indent + 2);
-		}
+		Interpreter.dumpIndicated(indent + 1, "Callee", callee);
+		Interpreter.dumpIndicator(indent + 1, arguments.length > 0 ? "Arguments" : "No Arguments");
+		for (Expression argument : arguments) argument.dump(indent + 2);
 	}
 
 	@Override

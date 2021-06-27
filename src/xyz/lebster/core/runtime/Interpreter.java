@@ -75,9 +75,13 @@ public class Interpreter {
 	}
 
 	public static void dumpIndicated(int indent, String indicator, ASTNode node) {
+		dumpIndicator(indent, indicator);
+		node.dump(indent + 1);
+	}
+
+	public static void dumpIndicator(int indent, String indicator) {
 		dumpIndent(indent);
 		System.out.printf("%s(%s)%s%n", ANSI.BRIGHT_MAGENTA, indicator, ANSI.RESET);
-		node.dump(indent + 1);
 	}
 
 	public Value<?> declareVariable(Identifier name, Value<?> value) {

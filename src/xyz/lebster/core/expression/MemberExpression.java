@@ -11,9 +11,9 @@ public record MemberExpression(Expression object, Expression property, boolean c
 
 	@Override
 	public void dump(int indent) {
-		Interpreter.dumpParameterized(indent, "MemberExpression", "[computed=" + computed + "]");
-		object.dump(indent + 1);
-		property.dump(indent + 1);
+		Interpreter.dumpParameterized(indent, "MemberExpression", computed ? "Computed" : "NonComputed");
+		Interpreter.dumpIndicated(indent + 1, "BaseObject", object);
+		Interpreter.dumpIndicated(indent + 1, "ReferencedName", property);
 	}
 
 	@Override

@@ -7,7 +7,6 @@ import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.NativeFunction;
 import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.ParseException;
 import xyz.lebster.parser.Lexer;
 import xyz.lebster.parser.Parser;
@@ -74,7 +73,7 @@ public class ScriptExecutor {
 			}
 
 			return true;
-		} catch (ParseException | LanguageException | AbruptCompletion e) {
+		} catch (ParseException | AbruptCompletion e) {
 			handleError(e);
 			return false;
 		}

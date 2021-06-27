@@ -7,7 +7,7 @@ import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.ScopeNode;
 import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.exception.LanguageException;
+import xyz.lebster.exception.LanguageError;
 
 
 public class Interpreter {
@@ -113,9 +113,10 @@ public class Interpreter {
 		return scopeStack[0].getVariable(name);
 	}
 
-	public ScopeFrame enterScope(ScopeNode node) {
+	public ScopeFrame enterScope(ScopeNode node) throws AbruptCompletion {
 		if (currentScopeFrame + 1 == maxScopeFrames) {
-			throw new LanguageException("Maximum call stack size exceeded");
+			throwValue(new RangeError("Maximum call stack size exceeded"));
+			return null;
 		}
 
 		final ScopeFrame frame = new ScopeFrame(node);
@@ -125,17 +126,18 @@ public class Interpreter {
 
 	public void exitScope(ScopeFrame frame) {
 		if (currentScopeFrame == 0) {
-			throw new LanguageException("Exiting ScopeFrame while at top level");
+			throw new LanguageError("Exiting ScopeFrame while at top level");
 		} else if (scopeStack[currentScopeFrame] != frame) {
-			throw new LanguageException("Attempting to exit invalid ScopeFrame");
+			throw new LanguageError("Attempting to exit invalid ScopeFrame");
 		}
 
 		scopeStack[currentScopeFrame--] = null;
 	}
 
-	public void enterCallFrame(CallFrame frame) {
+	public void enterCallFrame(CallFrame frame) throws AbruptCompletion {
 		if (currentCallFrame + 1 == maxCallFrames) {
-			throw new LanguageException("Maximum call stack size exceeded");
+			throwValue(new RangeError("Maximum call stack size exceeded"));
+			return;
 		}
 
 		callStack[++currentCallFrame] = frame;
@@ -143,7 +145,7 @@ public class Interpreter {
 
 	public void exitCallFrame() {
 		if (currentCallFrame == 0) {
-			throw new LanguageException("Exiting CallFrame while at top level");
+			throw new LanguageError("Exiting CallFrame while at top level");
 		}
 
 		callStack[currentCallFrame--] = null;

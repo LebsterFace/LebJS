@@ -1,5 +1,6 @@
 package xyz.lebster.core.value;
 
+import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.exception.NotImplemented;
 
@@ -39,7 +40,7 @@ public class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) {
+	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		return value.execute(interpreter, arguments);
 	}
 }

@@ -4,9 +4,9 @@ import xyz.lebster.ANSI;
 import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.CallFrame;
 import xyz.lebster.core.runtime.Interpreter;
+import xyz.lebster.core.runtime.TypeError;
 import xyz.lebster.core.value.Executable;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.exception.LanguageException;
 
 
 public class CallExpression implements Expression {
@@ -43,7 +43,8 @@ public class CallExpression implements Expression {
 		final CallFrame frame = callee.toCallFrame(interpreter);
 
 		if (!(frame.executedCallee() instanceof final Executable<?> executable)) {
-			throw new LanguageException(frame.executedCallee().getClass().getCanonicalName() + " is not a function");
+			interpreter.throwValue(new TypeError(frame.executedCallee().getClass().getCanonicalName() + " is not a function"));
+			return null;
 		}
 
 		final Value<?>[] args = new Value<?>[arguments.length];

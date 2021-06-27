@@ -2,7 +2,7 @@ package xyz.lebster;
 
 import xyz.lebster.core.runtime.CallFrame;
 import xyz.lebster.core.value.*;
-import xyz.lebster.exception.LanguageException;
+import xyz.lebster.exception.LanguageError;
 
 import java.io.File;
 
@@ -43,7 +43,7 @@ public class Testing {
 				expected.dump(0);
 				System.out.print("Received: ");
 				received.dump(0);
-				throw new LanguageException("Assertion failed!");
+				throw new LanguageError("Assertion failed!");
 			}
 		}));
 

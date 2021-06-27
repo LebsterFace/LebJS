@@ -1,15 +1,17 @@
 package xyz.lebster;
 
-public record CommandLineArgs(boolean showAST, String fileName, ExecutionMode mode) {
+public record CommandLineArgs(boolean showAST, boolean showDebug, String fileName, ExecutionMode mode) {
 	static CommandLineArgs fromArgs(String[] args) {
 		boolean showAST = false;
+		boolean showDebug = true;
 		ExecutionMode mode = ExecutionMode.Default;
 		String fileName = null;
 
 		for (final String arg : args) {
 			if (arg.startsWith("-")) {
 				switch (arg.toLowerCase()) {
-					case "-a", "-ast" -> showAST = true;
+					case "-a", "-ast", "-tree" -> showAST = true;
+					case "-d", "-disp", "-display" -> showDebug = false;
 					case "-r", "-repl" -> mode = ExecutionMode.REPL;
 					case "-f", "-file" -> mode = ExecutionMode.File;
 					case "-t", "-tests", "-test" -> mode = ExecutionMode.Tests;
@@ -35,6 +37,6 @@ public record CommandLineArgs(boolean showAST, String fileName, ExecutionMode mo
 			throw new CommandLineArgumentException("Wait for the REPL to start before running a script.");
 		}
 
-		return new CommandLineArgs(showAST, fileName, mode);
+		return new CommandLineArgs(showAST, showDebug, fileName, mode);
 	}
 }

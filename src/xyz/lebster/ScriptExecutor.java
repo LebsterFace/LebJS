@@ -35,7 +35,7 @@ public class ScriptExecutor {
 	}
 
 
-	public static void repl(boolean showAST) {
+	public static void repl(boolean showAST, boolean showDebug) {
 		System.out.println("Starting REPL...");
 		final Dictionary globalObject = getDefaultGlobalObject();
 		final Scanner scanner = new Scanner(System.in);
@@ -45,22 +45,22 @@ public class ScriptExecutor {
 			final String next = scanner.nextLine();
 			if (next.isBlank()) continue;
 			else if (next.equals(".exit")) break;
-			executeWithHandling(next, globalObject, showAST, true);
+			executeWithHandling(next, globalObject, showAST, true, showDebug);
 		}
 	}
 
-	public static boolean executeFileWithHandling(Path path, Dictionary globalObject, boolean showAST) {
+	public static boolean executeFileWithHandling(Path path, Dictionary globalObject, boolean showAST, boolean showDebug) {
 		try {
 			final String source = Files.readString(path, Charset.defaultCharset());
-			return executeWithHandling(source, globalObject, showAST, false);
+			return executeWithHandling(source, globalObject, showAST, false, showDebug);
 
 		} catch (IOException e) {
-			handleError(e);
+			handleError(e, showDebug);
 			return false;
 		}
 	}
 
-	public static boolean executeWithHandling(String source, Dictionary globalObject, boolean showAST, boolean showLastValue) {
+	public static boolean executeWithHandling(String source, Dictionary globalObject, boolean showAST, boolean showLastValue, boolean showDebug) {
 		try {
 			if (source.startsWith("// @opt: ")) {
 				return handleOptions(source, globalObject, showAST, showLastValue);
@@ -74,7 +74,7 @@ public class ScriptExecutor {
 
 			return true;
 		} catch (ParseException | AbruptCompletion e) {
-			handleError(e);
+			handleError(e, showDebug);
 			return false;
 		}
 	}
@@ -102,9 +102,9 @@ public class ScriptExecutor {
 		}
 	}
 
-	private static void handleError(Throwable e) {
+	private static void handleError(Throwable e, boolean showDebug) {
 		System.out.println(ANSI.RED + e.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
-		e.printStackTrace(System.out);
+		if (showDebug) e.printStackTrace(System.out);
 		System.out.print(ANSI.RESET);
 	}
 

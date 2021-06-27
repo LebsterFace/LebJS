@@ -67,4 +67,9 @@ public class NumericLiteral extends Value<Double> {
 	public String toString() {
 		return stringify(value);
 	}
+
+	public NumericLiteral unaryMinus() {
+		if (value == Double.NaN) return this;
+		return new NumericLiteral(-value);
+	}
 }

@@ -26,4 +26,8 @@ public class BooleanLiteral extends Value<Boolean> {
 	public Dictionary toDictionary() throws NotImplemented {
 		throw new NotImplemented("BooleanLiteral -> toDictionary");
 	}
+
+	public BooleanLiteral not() {
+		return new BooleanLiteral(!value);
+	}
 }

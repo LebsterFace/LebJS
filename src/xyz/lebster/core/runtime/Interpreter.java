@@ -164,4 +164,8 @@ public class Interpreter {
 		this.completion = completion;
 		throw completion;
 	}
+
+	public void throwValue(Value<?> value) throws AbruptCompletion {
+		setCompletion(new AbruptCompletion(AbruptCompletion.Type.Throw, value));
+	}
 }

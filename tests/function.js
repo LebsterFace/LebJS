@@ -12,3 +12,10 @@ function doubleSquare(x) {
 }
 
 expect(256, doubleSquare(num));
+
+function noParams() {
+    return 123;
+}
+
+expect(123, noParams());
+expect(123, noParams(1,2,3,4));

@@ -21,10 +21,12 @@ public abstract class FunctionNode implements ASTNode {
 		final StringBuilder builder = new StringBuilder(name.value);
 
 		builder.append("(");
-		builder.append(arguments[0].value);
-		for (int i = 1; i < arguments.length; i++) {
-			builder.append(", ");
-			builder.append(arguments[i].value);
+		if (arguments.length > 0) {
+			builder.append(arguments[0].value);
+			for (int i = 1; i < arguments.length; i++) {
+				builder.append(", ");
+				builder.append(arguments[i].value);
+			}
 		}
 		builder.append(")");
 

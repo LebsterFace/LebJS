@@ -1,9 +1,10 @@
 package xyz.lebster.core.expression;
 
+import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.BooleanLiteral;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.exception.LanguageException;
+
 
 public record LogicalExpression(Expression left, Expression right, LogicalOp op) implements Expression {
 
@@ -16,7 +17,7 @@ public record LogicalExpression(Expression left, Expression right, LogicalOp op)
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> leftValue = left.execute(interpreter);
 		final BooleanLiteral lbool = leftValue.toBooleanLiteral();
 //		https://tc39.es/ecma262/#sec-binary-logical-operators-runtime-semantics-evaluation

@@ -6,7 +6,7 @@ import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Function;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.exception.LanguageException;
+
 
 public class FunctionExpression extends FunctionNode implements Expression {
 	public FunctionExpression(BlockStatement body, Identifier name, Identifier... arguments) {
@@ -26,7 +26,7 @@ public class FunctionExpression extends FunctionNode implements Expression {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+	public Value<?> execute(Interpreter interpreter) {
 		return new Function(this);
 	}
 }

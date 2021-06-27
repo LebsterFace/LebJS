@@ -1,6 +1,7 @@
 package xyz.lebster;
 
 import xyz.lebster.core.node.Program;
+import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.NativeFunction;
@@ -73,7 +74,7 @@ public class ScriptExecutor {
 			}
 
 			return true;
-		} catch (ParseException | LanguageException e) {
+		} catch (ParseException | LanguageException | AbruptCompletion e) {
 			handleError(e);
 			return false;
 		}
@@ -112,7 +113,7 @@ public class ScriptExecutor {
 		return new Parser(new Lexer(source).tokenize()).parse();
 	}
 
-	public static Value<?> execute(Program program, Dictionary globalObject, boolean showAST) throws LanguageException {
+	public static Value<?> execute(Program program, Dictionary globalObject, boolean showAST) throws AbruptCompletion {
 		if (showAST) {
 			System.out.println("------- AST -------");
 			program.dump(0);

@@ -2,9 +2,9 @@ package xyz.lebster.core.value;
 
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.FunctionNode;
+import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.runtime.ScopeFrame;
-import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.NotImplemented;
 
 public class Function extends Executable<FunctionNode> {
@@ -42,7 +42,7 @@ public class Function extends Executable<FunctionNode> {
 		Interpreter.dumpValue(indent, "Function");
 	}
 
-	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws LanguageException {
+	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		Value<?> result = new Undefined();
 		final ScopeFrame scope = interpreter.enterScope(value.body);
 
@@ -51,9 +51,11 @@ public class Function extends Executable<FunctionNode> {
 		}
 
 		for (ASTNode child : value.body.children) {
-			child.execute(interpreter);
-			if (scope.didExit) {
-				result = scope.getExitValue();
+			try {
+				child.execute(interpreter);
+			} catch (AbruptCompletion e) {
+				if (e.type != AbruptCompletion.Type.Return) throw e;
+				result = e.value;
 				break;
 			}
 		}

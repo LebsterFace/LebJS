@@ -2,10 +2,11 @@ package xyz.lebster.core.node;
 
 import xyz.lebster.core.expression.Expression;
 import xyz.lebster.core.expression.Identifier;
+import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.exception.LanguageException;
+
 
 public class VariableDeclarator implements ASTNode {
 	public final Identifier identifier;
@@ -28,7 +29,7 @@ public class VariableDeclarator implements ASTNode {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return interpreter.declareVariable(identifier, init.execute(interpreter));
 	}
 }

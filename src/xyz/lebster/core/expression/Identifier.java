@@ -2,7 +2,6 @@ package xyz.lebster.core.expression;
 
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.exception.LanguageException;
 
 import java.util.Objects;
 
@@ -19,7 +18,7 @@ public class Identifier implements Expression {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+	public Value<?> execute(Interpreter interpreter) {
 		return interpreter.getVariable(this);
 	}
 

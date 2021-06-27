@@ -7,31 +7,6 @@ public class NumericLiteral extends Value<Double> {
 		super(Type.Number, value);
 	}
 
-	@Override
-	public NumericLiteral toNumericLiteral() {
-		return this;
-	}
-
-	@Override
-	public BooleanLiteral toBooleanLiteral() {
-		return new BooleanLiteral(value != 0);
-	}
-
-	@Override
-	public Function toFunction() throws NotImplemented {
-		throw new NotImplemented("NumericLiteral -> Function ");
-	}
-
-	@Override
-	public Dictionary toDictionary() throws NotImplemented {
-		throw new NotImplemented("NumericLiteral -> Dictionary ");
-	}
-
-	@Override
-	public String toString() {
-		return stringify(value);
-	}
-
 	public static String stringify(double x) {
 //		https://tc39.es/ecma262/#sec-numeric-types-number-tostring
 		if (Double.isNaN(x)) return "NaN";
@@ -60,11 +35,36 @@ public class NumericLiteral extends Value<Double> {
 		if (decimalPosition == -1 || firstZeros == -1) {
 			return input;
 		} else {
-			if (decimalPosition + 1== firstZeros) {
+			if (decimalPosition + 1 == firstZeros) {
 				return input.substring(0, decimalPosition);
 			} else {
 				return input.substring(0, firstZeros);
 			}
 		}
+	}
+
+	@Override
+	public NumericLiteral toNumericLiteral() {
+		return this;
+	}
+
+	@Override
+	public BooleanLiteral toBooleanLiteral() {
+		return new BooleanLiteral(value != 0);
+	}
+
+	@Override
+	public Function toFunction() throws NotImplemented {
+		throw new NotImplemented("NumericLiteral -> Function ");
+	}
+
+	@Override
+	public Dictionary toDictionary() throws NotImplemented {
+		throw new NotImplemented("NumericLiteral -> Dictionary ");
+	}
+
+	@Override
+	public String toString() {
+		return stringify(value);
 	}
 }

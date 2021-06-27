@@ -1,29 +1,12 @@
 package xyz.lebster.core.expression;
 
+import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
-import xyz.lebster.core.value.*;
-import xyz.lebster.exception.LanguageException;
+import xyz.lebster.core.value.BooleanLiteral;
+import xyz.lebster.core.value.Value;
+
 
 public record EqualityExpression(Expression left, Expression right, EqualityOp op) implements Expression {
-
-	@Override
-	public void dump(int indent) {
-		Interpreter.dumpName(indent, "EqualityExpression");
-		left.dump(indent + 1);
-		Interpreter.dumpEnum(indent + 1, "EqualityOp", op.name());
-		right.dump(indent + 1);
-	}
-
-	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
-		final Value<?> leftValue = left.execute(interpreter);
-		final Value<?> rightValue = right.execute(interpreter);
-
-		return new BooleanLiteral(switch (op) {
-			case StrictEquals -> isStrictlyEqual(leftValue, rightValue);
-			case StrictNotEquals -> !isStrictlyEqual(leftValue, rightValue);
-		});
-	}
 
 	private static boolean isStrictlyEqual(Value<?> x, Value<?> y) {
 //		https://tc39.es/ecma262/#sec-isstrictlyequal
@@ -36,5 +19,24 @@ public record EqualityExpression(Expression left, Expression right, EqualityOp o
 			case String, Dictionary -> x.value.equals(y.value);
 			default -> false;
 		};
+	}
+
+	@Override
+	public void dump(int indent) {
+		Interpreter.dumpName(indent, "EqualityExpression");
+		left.dump(indent + 1);
+		Interpreter.dumpEnum(indent + 1, "EqualityOp", op.name());
+		right.dump(indent + 1);
+	}
+
+	@Override
+	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
+		final Value<?> leftValue = left.execute(interpreter);
+		final Value<?> rightValue = right.execute(interpreter);
+
+		return new BooleanLiteral(switch (op) {
+			case StrictEquals -> isStrictlyEqual(leftValue, rightValue);
+			case StrictNotEquals -> !isStrictlyEqual(leftValue, rightValue);
+		});
 	}
 }

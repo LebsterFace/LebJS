@@ -1,10 +1,11 @@
 package xyz.lebster.core.node;
 
 import xyz.lebster.core.expression.Expression;
+import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Undefined;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.exception.LanguageException;
+
 
 public class ReturnStatement implements Statement {
 	public final Expression argument;
@@ -24,7 +25,7 @@ public class ReturnStatement implements Statement {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
-		return interpreter.doExit(argument.execute(interpreter));
+	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
+		throw new AbruptCompletion(AbruptCompletion.Type.Return, argument.execute(interpreter));
 	}
 }

@@ -2,12 +2,13 @@ package xyz.lebster.core.runtime;
 
 import xyz.lebster.ANSI;
 import xyz.lebster.core.expression.Identifier;
+import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.ScopeNode;
 import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
-import xyz.lebster.exception.ReferenceError;
+
 
 public class Interpreter {
 	public final int maxScopeFrames;
@@ -16,6 +17,7 @@ public class Interpreter {
 	private final CallFrame[] callStack;
 	private int currentScopeFrame = 0;
 	private int currentCallFrame = 0;
+	private AbruptCompletion completion;
 
 	public Interpreter(Program program, Dictionary globalObject, int maxScopeFrames, int maxCallFrames) {
 		this.maxScopeFrames = maxScopeFrames;
@@ -92,14 +94,14 @@ public class Interpreter {
 		return scopeStack[0].setVariable(name, value);
 	}
 
-	public Value<?> getVariable(Identifier name) throws ReferenceError {
+	public Value<?> getVariable(Identifier name) {
 		for (int i = currentScopeFrame; i >= 0; i--) {
 			if (scopeStack[i].containsVariable(name)) {
 				return scopeStack[i].getVariable(name);
 			}
 		}
 
-		throw new ReferenceError(name.value + " is not defined");
+		throw new LanguageException(name.value + " is not defined");
 	}
 
 	public Value<?> setGlobal(Identifier name, Value<?> value) {
@@ -110,7 +112,7 @@ public class Interpreter {
 		return scopeStack[0].getVariable(name);
 	}
 
-	public ScopeFrame enterScope(ScopeNode node) throws LanguageException {
+	public ScopeFrame enterScope(ScopeNode node) {
 		if (currentScopeFrame + 1 == maxScopeFrames) {
 			throw new LanguageException("Maximum call stack size exceeded");
 		}
@@ -120,7 +122,7 @@ public class Interpreter {
 		return frame;
 	}
 
-	public void exitScope(ScopeFrame frame) throws LanguageException {
+	public void exitScope(ScopeFrame frame) {
 		if (currentScopeFrame == 0) {
 			throw new LanguageException("Exiting ScopeFrame while at top level");
 		} else if (scopeStack[currentScopeFrame] != frame) {
@@ -130,16 +132,7 @@ public class Interpreter {
 		scopeStack[currentScopeFrame--] = null;
 	}
 
-	public Value<?> doExit(Value<?> value) throws LanguageException {
-		if (currentScopeFrame == 0) {
-			throw new LanguageException("Invalid return statement");
-		}
-
-		scopeStack[currentScopeFrame].doExit(value);
-		return value;
-	}
-
-	public void enterCallFrame(CallFrame frame) throws LanguageException {
+	public void enterCallFrame(CallFrame frame) {
 		if (currentCallFrame + 1 == maxCallFrames) {
 			throw new LanguageException("Maximum call stack size exceeded");
 		}
@@ -147,7 +140,7 @@ public class Interpreter {
 		callStack[++currentCallFrame] = frame;
 	}
 
-	public void exitCallFrame() throws LanguageException {
+	public void exitCallFrame() {
 		if (currentCallFrame == 0) {
 			throw new LanguageException("Exiting CallFrame while at top level");
 		}
@@ -161,5 +154,14 @@ public class Interpreter {
 
 	public Value<?> thisValue() {
 		return getCallFrame().thisValue();
+	}
+
+	public AbruptCompletion getCompletion() {
+		return completion;
+	}
+
+	public void setCompletion(AbruptCompletion completion) throws AbruptCompletion {
+		this.completion = completion;
+		throw completion;
 	}
 }

@@ -1,7 +1,6 @@
 package xyz.lebster.core.value;
 
 import xyz.lebster.core.runtime.Interpreter;
-import xyz.lebster.exception.LanguageException;
 import xyz.lebster.exception.NotImplemented;
 
 public class NativeFunction extends Executable<NativeCode> {
@@ -40,7 +39,7 @@ public class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) throws LanguageException {
+	public Value<?> executeChildren(Interpreter interpreter, Value<?>[] arguments) {
 		return value.execute(interpreter, arguments);
 	}
 }

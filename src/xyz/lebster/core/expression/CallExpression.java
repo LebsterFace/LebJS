@@ -1,12 +1,13 @@
 package xyz.lebster.core.expression;
 
 import xyz.lebster.ANSI;
+import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.CallFrame;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Executable;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.exception.LanguageException;
-import xyz.lebster.exception.TypeError;
+
 
 public class CallExpression implements Expression {
 	public final Expression callee;
@@ -38,11 +39,11 @@ public class CallExpression implements Expression {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final CallFrame frame = callee.toCallFrame(interpreter);
 
 		if (!(frame.executedCallee() instanceof final Executable<?> executable)) {
-			throw new TypeError(frame.executedCallee().getClass().getCanonicalName() + " is not a function");
+			throw new LanguageException(frame.executedCallee().getClass().getCanonicalName() + " is not a function");
 		}
 
 		final Value<?>[] args = new Value<?>[arguments.length];

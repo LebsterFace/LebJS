@@ -1,10 +1,11 @@
 package xyz.lebster.core.expression;
 
+import xyz.lebster.core.runtime.AbruptCompletion;
 import xyz.lebster.core.runtime.CallFrame;
 import xyz.lebster.core.runtime.Interpreter;
 import xyz.lebster.core.value.Dictionary;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.exception.LanguageException;
+
 
 public record MemberExpression(Expression object, Expression property, boolean computed) implements Expression {
 
@@ -16,7 +17,7 @@ public record MemberExpression(Expression object, Expression property, boolean c
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws LanguageException {
+	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 //		TODO: Copied from toCallFrame, can we remove?
 		final Dictionary obj = object.execute(interpreter).toDictionary();
 		final Identifier prop = computed ? property.execute(interpreter).toIdentifier() : (Identifier) property;
@@ -24,7 +25,7 @@ public record MemberExpression(Expression object, Expression property, boolean c
 	}
 
 	@Override
-	public CallFrame toCallFrame(Interpreter interpreter) throws LanguageException {
+	public CallFrame toCallFrame(Interpreter interpreter) throws AbruptCompletion {
 		final Dictionary obj = object.execute(interpreter).toDictionary();
 		final Identifier prop = computed ? property.execute(interpreter).toIdentifier() : (Identifier) property;
 		return new CallFrame(obj.get(prop), obj);

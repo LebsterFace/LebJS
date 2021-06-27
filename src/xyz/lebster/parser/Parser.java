@@ -135,6 +135,7 @@ public class Parser {
 				case If -> parseIfStatement();
 				case Semicolon -> new EmptyStatement();
 				case LBrace -> parseBlockStatement();
+				case Try -> parseTryStatement();
 
 				case Return -> {
 					consume();
@@ -143,9 +144,25 @@ public class Parser {
 					yield new ReturnStatement(val);
 				}
 
+				case Throw -> {
+					consume();
+					yield new ThrowStatement(parseExpression(0, Left));
+				}
+
 				default -> throw new CannotParse(currentToken.type, "Statement");
 			};
 		}
+	}
+
+	private TryStatement parseTryStatement() throws ParseException {
+		require(TokenType.Try);
+		final BlockStatement body = parseBlockStatement();
+		require(TokenType.Catch);
+		require(TokenType.LParen);
+		final Identifier parameter = new Identifier(require(TokenType.Identifier).value);
+		require(TokenType.RParen);
+		final BlockStatement catchBody = parseBlockStatement();
+		return new TryStatement(body, new CatchClause(parameter, catchBody));
 	}
 
 	private IfStatement parseIfStatement() throws ParseException {
@@ -353,62 +370,62 @@ public class Parser {
 
 	private boolean matchDeclaration() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.Function	||
-			   t == TokenType.Let		||
-			   t == TokenType.Var		||
+		return t == TokenType.Function ||
+			   t == TokenType.Let ||
+			   t == TokenType.Var ||
 			   t == TokenType.Const;
 	}
 
 	private boolean matchStatementOrExpression() {
 		final TokenType t = currentToken.type;
-		return matchExpression()		||
-			   t == TokenType.Return	||
-			   t == TokenType.Yield		||
-			   t == TokenType.Do		||
-			   t == TokenType.If		||
-			   t == TokenType.Throw		||
-			   t == TokenType.Try		||
-			   t == TokenType.While		||
-			   t == TokenType.With		||
-			   t == TokenType.For		||
-			   t == TokenType.LBrace	||
-			   t == TokenType.Switch	||
-			   t == TokenType.Break		||
-			   t == TokenType.Continue	||
-			   t == TokenType.Var		||
-			   t == TokenType.Debugger	||
+		return matchExpression() ||
+			   t == TokenType.Return ||
+			   t == TokenType.Yield ||
+			   t == TokenType.Do ||
+			   t == TokenType.If ||
+			   t == TokenType.Throw ||
+			   t == TokenType.Try ||
+			   t == TokenType.While ||
+			   t == TokenType.With ||
+			   t == TokenType.For ||
+			   t == TokenType.LBrace ||
+			   t == TokenType.Switch ||
+			   t == TokenType.Break ||
+			   t == TokenType.Continue ||
+			   t == TokenType.Var ||
+			   t == TokenType.Debugger ||
 			   t == TokenType.Semicolon;
 
 	}
 
 	private boolean matchExpression() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.StringLiteral	 ||
+		return t == TokenType.StringLiteral ||
 			   t == TokenType.NumericLiteral ||
 			   t == TokenType.BooleanLiteral ||
-			   t == TokenType.Null			 ||
-			   t == TokenType.Function		 ||
-			   t == TokenType.Infinity		 ||
-			   t == TokenType.Undefined		 ||
-			   t == TokenType.NaN			 ||
-			   t == TokenType.This			 ||
-			   t == TokenType.Identifier	 ||
+			   t == TokenType.Null ||
+			   t == TokenType.Function ||
+			   t == TokenType.Infinity ||
+			   t == TokenType.Undefined ||
+			   t == TokenType.NaN ||
+			   t == TokenType.This ||
+			   t == TokenType.Identifier ||
 			   t == TokenType.LParen;
 	}
 
 	private boolean matchSecondaryExpression() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.Plus 			 ||
-			   t == TokenType.Minus			 ||
-			   t == TokenType.Star			 ||
-			   t == TokenType.Slash			 ||
-			   t == TokenType.StrictEqual	 ||
+		return t == TokenType.Plus ||
+			   t == TokenType.Minus ||
+			   t == TokenType.Star ||
+			   t == TokenType.Slash ||
+			   t == TokenType.StrictEqual ||
 			   t == TokenType.StrictNotEqual ||
-			   t == TokenType.LogicalOr		 ||
-			   t == TokenType.LogicalAnd	 ||
-			   t == TokenType.Period		 ||
-			   t == TokenType.LBracket		 ||
-			   t == TokenType.LParen		 ||
+			   t == TokenType.LogicalOr ||
+			   t == TokenType.LogicalAnd ||
+			   t == TokenType.Period ||
+			   t == TokenType.LBracket ||
+			   t == TokenType.LParen ||
 			   t == TokenType.Equals;
 	}
 }

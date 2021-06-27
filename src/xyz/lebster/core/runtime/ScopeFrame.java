@@ -8,8 +8,6 @@ import xyz.lebster.core.value.Value;
 public class ScopeFrame {
 	public final ScopeNode node;
 	private final Dictionary variables;
-	public boolean didExit = false;
-	protected Value<?> exitValue = null;
 
 	public ScopeFrame(ScopeNode node, Dictionary variables) {
 		this.node = node;
@@ -18,15 +16,6 @@ public class ScopeFrame {
 
 	public ScopeFrame(ScopeNode node) {
 		this(node, new Dictionary());
-	}
-
-	public void doExit(Value<?> value) {
-		this.exitValue = value;
-		this.didExit = true;
-	}
-
-	public Value<?> getExitValue() {
-		return exitValue;
 	}
 
 	public Value<?> setVariable(Identifier name, Value<?> value) {

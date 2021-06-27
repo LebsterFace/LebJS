@@ -11,9 +11,11 @@ public record IfStatement(Expression condition, Statement consequence, Statement
 	@Override
 	public void dump(int indent) {
 		Interpreter.dumpName(indent, "IfStatement");
-		condition.dump(indent + 1);
-		consequence.dump(indent + 1);
-		elseStatement.dump(indent + 1);
+		Interpreter.dumpIndicated(indent + 1, "Condition", condition);
+		Interpreter.dumpIndicated(indent + 1, "Consequence", consequence);
+		if (elseStatement != null) {
+			Interpreter.dumpIndicated(indent + 1, "ElseStatement", elseStatement);
+		}
 	}
 
 	@Override

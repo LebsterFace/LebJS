@@ -72,6 +72,12 @@ public class Interpreter {
 		System.out.printf("%s(%s) %s%s%n", ANSI.BRIGHT_MAGENTA, type, value, ANSI.RESET);
 	}
 
+	public static void dumpIndicated(int indent, String indicator, ASTNode node) {
+		dumpIndent(indent);
+		System.out.printf("%s(%s)%s%n", ANSI.BRIGHT_MAGENTA, indicator, ANSI.RESET);
+		node.dump(indent + 1);
+	}
+
 	public Value<?> declareVariable(Identifier name, Value<?> value) {
 		return scopeStack[currentScopeFrame].setVariable(name, value);
 	}

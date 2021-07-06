@@ -1,11 +1,11 @@
 package xyz.lebster.parser;
 
-import xyz.lebster.core.expression.*;
-import xyz.lebster.core.node.*;
-import xyz.lebster.core.value.*;
 import xyz.lebster.exception.CannotParse;
 import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.exception.ParseException;
+import xyz.lebster.node.*;
+import xyz.lebster.node.expression.*;
+import xyz.lebster.node.value.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +34,8 @@ public class Parser {
 		precedence.put(TokenType.Slash, 15);
 		precedence.put(TokenType.Plus, 14);
 		precedence.put(TokenType.Minus, 14);
+		precedence.put(TokenType.LessThan, 12);
+		precedence.put(TokenType.GreaterThan, 12);
 		precedence.put(TokenType.StrictEqual, 11);
 		precedence.put(TokenType.StrictNotEqual, 11);
 		precedence.put(TokenType.LogicalAnd, 8);
@@ -52,6 +54,8 @@ public class Parser {
 		associativity.put(TokenType.Period, Left);
 		associativity.put(TokenType.StrictEqual, Left);
 		associativity.put(TokenType.StrictNotEqual, Left);
+		associativity.put(TokenType.LessThan, Left);
+		associativity.put(TokenType.GreaterThan, Left);
 		associativity.put(TokenType.LogicalOr, Left);
 		associativity.put(TokenType.LogicalAnd, Left);
 		associativity.put(TokenType.Bang, Right);
@@ -100,7 +104,7 @@ public class Parser {
 			if (currentToken.type == TokenType.EOF) {
 				break;
 			} else {
-				program.append(parseLine());
+				program.body.append(parseLine());
 			}
 		}
 
@@ -146,10 +150,8 @@ public class Parser {
 		} else {
 			return switch (currentToken.type) {
 				case Function -> parseFunctionDeclaration();
-				case If -> parseIfStatement();
 				case Semicolon -> new EmptyStatement();
 				case LBrace -> parseBlockStatement();
-				case Try -> parseTryStatement();
 
 				case Return -> {
 					consume();
@@ -158,6 +160,8 @@ public class Parser {
 					yield new ReturnStatement(val);
 				}
 
+				case If -> parseIfStatement();
+				case Try -> parseTryStatement();
 				case Throw -> {
 					consume();
 					yield new ThrowStatement(parseExpression(0, Left));
@@ -230,16 +234,6 @@ public class Parser {
 		return new FunctionDeclaration(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
 	}
 
-	private FunctionExpression parseFunctionExpression() throws ParseException {
-//		TODO: Generalize this with parseFunctionDeclaration()
-		require(TokenType.Function);
-//		FIXME: Get name properly
-		final Token idToken = accept(TokenType.Identifier);
-		final Identifier name = idToken == null ? null : new Identifier(idToken.value);
-		final List<Identifier> arguments = parseFunctionArguments();
-		return new FunctionExpression(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
-	}
-
 	private CallExpression parseCallExpression(Expression left) throws ParseException {
 		final ArrayList<Expression> arguments = new ArrayList<>();
 		while (matchExpression()) {
@@ -251,24 +245,20 @@ public class Parser {
 		return new CallExpression(left, arguments.toArray(new Expression[0]));
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-UnaryExpression")
 	private Expression parseUnaryPrefixedExpression() throws ParseException {
-		// https://tc39.es/ecma262//#prod-UnaryExpression
 		final TokenType type = consume().type;
 //		TODO: Remove when all implemented
-		if (!associativity.containsKey(type))
-				throw new NotImplemented("Associativity for token '" + type + "'");
+		if (!associativity.containsKey(type)) throw new NotImplemented("Associativity for token '" + type + "'");
 		final Associativity assoc = associativity.get(type);
 //		TODO: Remove when all implemented
-		if (!precedence.containsKey(type))
-				throw new NotImplemented("Precedence for token '" + type + "'");
+		if (!precedence.containsKey(type)) throw new NotImplemented("Precedence for token '" + type + "'");
 		final int minPrecedence = precedence.get(type);
 
 		return new UnaryExpression(parseExpression(minPrecedence, assoc), switch (type) {
-			case Minus -> UnaryOp.Negate;
-			case Bang -> UnaryOp.LogicalNot;
-			case Decrement -> UnaryOp.PreDecrement;
-			case Increment -> UnaryOp.PreIncrement;
-			default -> throw new CannotParse("Expression type '" + type + "'");
+			case Minus -> UnaryExpression.UnaryOp.Negate;
+			case Bang -> UnaryExpression.UnaryOp.LogicalNot;
+			default -> throw new CannotParse(type, "Unary Operator");
 		});
 	}
 
@@ -299,22 +289,22 @@ public class Parser {
 		return switch (currentToken.type) {
 			case Plus -> {
 				consume();
-				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Add);
+				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Add);
 			}
 
 			case Minus -> {
 				consume();
-				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Subtract);
+				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Subtract);
 			}
 
 			case Star -> {
 				consume();
-				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Multiply);
+				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Multiply);
 			}
 
 			case Slash -> {
 				consume();
-				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryOp.Divide);
+				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Divide);
 			}
 
 			case Period -> {
@@ -337,41 +327,50 @@ public class Parser {
 
 			case Equals -> {
 				consume();
-				yield new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentOp.Equals);
+				yield new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
 			}
 
 			case StrictEqual -> {
 				consume();
-				yield new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityOp.StrictEquals);
+				yield new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictEquals);
 			}
 
 			case StrictNotEqual -> {
 				consume();
-				yield new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityOp.StrictNotEquals);
+				yield new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictNotEquals);
 			}
 
-			case LogicalOr -> {
-				consume();
-				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.Or);
-			}
+//			case LogicalOr -> {
+//				consume();
+//				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.Or);
+//			}
 
-			case LogicalAnd -> {
-				consume();
-				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.And);
-			}
+//			case LogicalAnd -> {
+//				consume();
+//				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.And);
+//			}
 
-			case Decrement -> {
-				consume();
-				yield new UnaryExpression(left, UnaryOp.PostDecrement);
-			}
+//			case Decrement -> {
+//				consume();
+//				yield new UnaryExpression(left, UnaryOp.PostDecrement);
+//			}
 
-			case Increment -> {
-				consume();
-				yield new UnaryExpression(left, UnaryOp.PostIncrement);
-			}
+//			case Increment -> {
+//				consume();
+//				yield new UnaryExpression(left, UnaryOp.PostIncrement);
+//			}
+
+//			case LessThan -> {
+//				consume();
+//				yield new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalOp.LessThan);
+//			}
+
+//			case GreaterThan -> {
+//				consume();
+//				yield new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalOp.GreaterThan);
+//			}
 
 			default -> throw new CannotParse(currentToken.type, "SecondaryExpression");
-//			default -> left;
 		};
 	}
 
@@ -392,7 +391,7 @@ public class Parser {
 			case NumericLiteral -> new NumericLiteral(Double.parseDouble(consume().value));
 			case BooleanLiteral -> new BooleanLiteral(consume().value.equals("true"));
 			case Identifier -> new Identifier(consume().value);
-			case Function -> parseFunctionExpression();
+//			case Function -> parseFunctionExpression();
 
 			case This -> {
 				consume();
@@ -419,7 +418,7 @@ public class Parser {
 				yield new Undefined();
 			}
 
-			default -> throw new CannotParse("Expression type '" + currentToken.type + "'");
+			default -> throw new CannotParse(currentToken.type, "PrimaryExpression");
 		};
 	}
 
@@ -480,6 +479,8 @@ public class Parser {
 			   t == TokenType.LogicalOr ||
 			   t == TokenType.LogicalAnd ||
 			   t == TokenType.Period ||
+			   t == TokenType.LessThan ||
+			   t == TokenType.GreaterThan ||
 			   t == TokenType.LBracket ||
 			   t == TokenType.LParen ||
 			   t == TokenType.Equals ||

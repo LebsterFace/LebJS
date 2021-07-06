@@ -1,2 +1,0 @@
-@echo off
-@C:\Users\PC\.jdks\openjdk-16.0.1\bin\java.exe "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2021.1.2\lib\idea_rt.jar=57151:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2021.1.2\bin" -Dfile.encoding=UTF-8 -classpath C:\Users\PC\Desktop\Code\Java\LebJS\out\production\LebJS xyz.lebster.Main %*

@@ -23,7 +23,7 @@ public record CommandLineArguments(String fileName, ExecutionMode mode, Executio
 					case "-s", "-silent", "-q" -> silent = true;
 					case "-a", "-ast", "-tree" -> showAST = true;
 					case "-e", "-exp", "-expect" -> testingMethods = true;
-					case "-l", "-last", "-showlast", "-show" -> showLastValue = true;
+					case "-l", "-last", "-showLast", "-show" -> showLastValue = true;
 					case "-p", "-prompt", "-noPrompt" -> showPrompt = false;
 				}
 			} else if (fileName == null){

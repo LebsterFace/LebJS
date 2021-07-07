@@ -5,5 +5,6 @@ public record ExecutionOptions (
 	boolean showLastValue,
 	boolean showDebug,
 	boolean silent,
-	boolean testingMethods
+	boolean testingMethods,
+	boolean showPrompt
 ) { }

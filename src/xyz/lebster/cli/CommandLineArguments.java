@@ -7,6 +7,8 @@ public record CommandLineArguments(String fileName, ExecutionMode mode, Executio
 		boolean showDebug = true;
 		boolean silent = false;
 		boolean testingMethods = false;
+		boolean showPrompt = true;
+
 		ExecutionMode mode = ExecutionMode.Default;
 		String fileName = null;
 
@@ -22,6 +24,7 @@ public record CommandLineArguments(String fileName, ExecutionMode mode, Executio
 					case "-a", "-ast", "-tree" -> showAST = true;
 					case "-e", "-exp", "-expect" -> testingMethods = true;
 					case "-l", "-last", "-showlast", "-show" -> showLastValue = true;
+					case "-p", "-prompt", "-noPrompt" -> showPrompt = false;
 				}
 			} else if (fileName == null){
 				fileName = arg;
@@ -52,7 +55,7 @@ public record CommandLineArguments(String fileName, ExecutionMode mode, Executio
 		}
 
 		return new CommandLineArguments(fileName, mode, new ExecutionOptions(
-			showAST, showLastValue, showDebug, silent, testingMethods
+			showAST, showLastValue, showDebug, silent, testingMethods, showPrompt
 		));
 	}
 }

@@ -126,15 +126,16 @@ public class ScriptExecutor {
 	}
 
 	public static void repl(Dictionary globalObject, ExecutionOptions options) {
-		System.out.println("Starting REPL...");
+		if (options.showPrompt()) System.out.println("Starting REPL...");
 		final Scanner scanner = new Scanner(System.in);
 
 		do {
-			System.out.print("> ");
+			if (options.showPrompt()) System.out.print("> ");
 			final String next = scanner.nextLine();
 			if (next.isBlank()) continue;
 			else if (next.equals(".exit")) break;
 			executeWithHandling(next, globalObject, options);
+			if (!options.showPrompt()) System.out.println("#END");
 		} while (true);
 	}
 }

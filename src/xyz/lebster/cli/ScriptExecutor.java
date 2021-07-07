@@ -14,6 +14,7 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class ScriptExecutor {
@@ -128,14 +129,17 @@ public class ScriptExecutor {
 	public static void repl(Dictionary globalObject, ExecutionOptions options) {
 		if (options.showPrompt()) System.out.println("Starting REPL...");
 		final Scanner scanner = new Scanner(System.in);
-
 		do {
-			if (options.showPrompt()) System.out.print("> ");
-			final String next = scanner.nextLine();
-			if (next.isBlank()) continue;
-			else if (next.equals(".exit")) break;
-			executeWithHandling(next, globalObject, options);
-			if (!options.showPrompt()) System.out.println("#END");
+			try {
+				if (options.showPrompt()) System.out.print("> ");
+				final String next = scanner.nextLine();
+				if (next.isBlank()) continue;
+				else if (next.equals(".exit")) break;
+				executeWithHandling(next, globalObject, options);
+				if (!options.showPrompt()) System.out.println("#END");
+			} catch (NoSuchElementException e) {
+				break;
+			}
 		} while (true);
 	}
 }

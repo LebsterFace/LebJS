@@ -340,15 +340,15 @@ public class Parser {
 				yield new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictNotEquals);
 			}
 
-//			case LogicalOr -> {
-//				consume();
-//				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.Or);
-//			}
+			case LogicalOr -> {
+				consume();
+				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Or);
+			}
 
-//			case LogicalAnd -> {
-//				consume();
-//				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalOp.And);
-//			}
+			case LogicalAnd -> {
+				consume();
+				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
+			}
 
 //			case Decrement -> {
 //				consume();

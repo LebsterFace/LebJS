@@ -20,9 +20,14 @@ public class Function extends Executable<FunctionNode> {
 			interpreter.declareVariable(code.arguments[i], arguments[i]);
 		}
 
-		final Value<?> result = code.body.execute(interpreter);
-		interpreter.exitScope(scope);
-		return result;
+		try {
+			return code.body.execute(interpreter);
+		} catch (AbruptCompletion e) {
+			if (e.type != AbruptCompletion.Type.Return) throw e;
+			return e.value;
+		} finally {
+			interpreter.exitScope(scope);
+		}
 	}
 
 	public StringLiteral toStringLiteral(Interpreter interpreter) {

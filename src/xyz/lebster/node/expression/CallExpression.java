@@ -20,9 +20,6 @@ public record CallExpression(Expression callee, Expression... arguments) impleme
 			interpreter.enterCallFrame(frame);
 			try {
 				return executable.call(interpreter, executedArguments);
-			} catch (AbruptCompletion completion) {
-				if (completion.type != AbruptCompletion.Type.Return) throw completion;
-				return completion.value;
 			} finally {
 				interpreter.exitCallFrame(frame);
 			}

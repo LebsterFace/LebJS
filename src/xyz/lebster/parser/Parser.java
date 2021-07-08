@@ -27,6 +27,7 @@ public class Parser {
 		precedence.put(TokenType.Period, 20);
 
 		precedence.put(TokenType.Bang, 17);
+		precedence.put(TokenType.Typeof, 17);
 //		FIXME: Postfix should have higher precedence than prefix
 		precedence.put(TokenType.Increment, 17);
 		precedence.put(TokenType.Decrement, 17);
@@ -70,6 +71,7 @@ public class Parser {
 		associativity.put(TokenType.LogicalAnd, Left);
 
 		associativity.put(TokenType.Bang, Right);
+		associativity.put(TokenType.Typeof, Right);
 		associativity.put(TokenType.Increment, Right);
 		associativity.put(TokenType.Decrement, Right);
 
@@ -295,8 +297,7 @@ public class Parser {
 		final UnaryExpression.UnaryOp op = switch (token.type) {
 			case Minus -> UnaryExpression.UnaryOp.Negate;
 			case Bang -> UnaryExpression.UnaryOp.LogicalNot;
-			default -> throw new CannotParse(type, "Unary Operator");
-		});
+			case Typeof -> UnaryExpression.UnaryOp.Typeof;
 			default -> throw new CannotParse(token, "Unary Operator");
 		};
 

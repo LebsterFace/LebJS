@@ -79,20 +79,8 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		return false;
 	}
 
-	public boolean hasProperty(String name) {
-		return hasProperty(new StringLiteral(name));
-	}
-
-	public Value<?> get(String key) {
-		return get(new StringLiteral(key));
-	}
-
 	public boolean hasOwnProperty(StringLiteral key) {
 		return this.value.containsKey(key);
-	}
-
-	public boolean hasOwnProperty(String key) {
-		return hasOwnProperty(new StringLiteral(key));
 	}
 
 	@Override

@@ -10,24 +10,11 @@ public record ScopeFrame(Dictionary variables, BlockStatement node) {
 		return variables.hasOwnProperty(name);
 	}
 
-	public boolean containsVariable(String name) {
-		return variables.hasOwnProperty(name);
-	}
-
 	public Value<?> getVariable(StringLiteral name) {
 		return variables.get(name);
 	}
 
-	public Value<?> getVariable(String name) {
-		return variables.get(name);
-	}
-
 	public ScopeFrame setVariable(StringLiteral name, Value<?> value) {
-		variables.set(name, value);
-		return this;
-	}
-
-	public ScopeFrame setVariable(String name, Value<?> value) {
 		variables.set(name, value);
 		return this;
 	}

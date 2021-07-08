@@ -40,9 +40,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 				}
 			}
 
-			case InstanceOf -> {
-				throw new NotImplemented("`instanceof` operator");
-			}
+			case InstanceOf -> throw new NotImplemented("`instanceof` operator");
 		});
 	}
 

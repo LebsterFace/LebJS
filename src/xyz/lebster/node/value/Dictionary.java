@@ -132,4 +132,9 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
+
+	@Override
+	public String typeOf() {
+		return "object";
+	}
 }

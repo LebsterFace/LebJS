@@ -73,4 +73,7 @@ public abstract class Value<JType> implements Expression {
 		result = 31 * result + (type != null ? type.hashCode() : 0);
 		return result;
 	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#table-typeof-operator-results")
+	public abstract String typeOf();
 }

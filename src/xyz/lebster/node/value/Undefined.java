@@ -33,4 +33,9 @@ public class Undefined extends Primitive<Void> {
 	public String toString() {
 		return "undefined";
 	}
+
+	@Override
+	public String typeOf() {
+		return toString();
+	}
 }

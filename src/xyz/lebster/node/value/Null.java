@@ -28,4 +28,9 @@ public class Null extends Primitive<Void> {
 	public void dump(int indent) {
 		Dumper.dumpValue(indent, "Null");
 	}
+
+	@Override
+	public String typeOf() {
+		return "object";
+	}
 }

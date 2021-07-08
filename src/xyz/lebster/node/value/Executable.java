@@ -27,4 +27,9 @@ public abstract class Executable<JType> extends Dictionary {
 	protected void dumpRecursive(int indent, List<Dictionary> parents) {
 		dump(indent);
 	}
+
+	@Override
+	public String typeOf() {
+		return "function";
+	}
 }

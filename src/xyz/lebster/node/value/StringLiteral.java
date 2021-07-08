@@ -32,4 +32,9 @@ public class StringLiteral extends Primitive<String> {
 	public Dictionary toDictionary(Interpreter interpreter) {
 		return new StringWrapper(this);
 	}
+
+	@Override
+	public String typeOf() {
+		return "string";
+	}
 }

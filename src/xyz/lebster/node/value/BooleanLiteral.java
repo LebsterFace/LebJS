@@ -26,4 +26,9 @@ public class BooleanLiteral extends Primitive<Boolean> {
 	public BooleanLiteral not() {
 		return new BooleanLiteral(!value);
 	}
+
+	@Override
+	public String typeOf() {
+		return "boolean";
+	}
 }

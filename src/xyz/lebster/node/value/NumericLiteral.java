@@ -24,6 +24,11 @@ public class NumericLiteral extends Primitive<Double> {
 		throw new NotImplemented("NumberWrapper");
 	}
 
+	@Override
+	public String typeOf() {
+		return "number";
+	}
+
 	public NumericLiteral unaryMinus() {
 		return new NumericLiteral(-value);
 	}

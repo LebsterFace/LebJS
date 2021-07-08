@@ -13,16 +13,16 @@ import xyz.lebster.runtime.RangeError;
 public class Interpreter {
 	public final int callStackSize;
 	private final ScopeFrame[] scopeStack;
-	private final CallFrame[] callStack;
+	private final ExecutionContext[] callStack;
 	private int currentScopeFrame = 0;
-	private int currentCallFrame = 0;
+	private int currentExecutionContext = 0;
 
 	public Interpreter(int callStackSize, Program program, Dictionary globalObject) {
 		this.callStackSize = callStackSize;
 		this.scopeStack = new ScopeFrame[callStackSize];
 		this.scopeStack[0] = new ScopeFrame(globalObject, program.body);
-		this.callStack = new CallFrame[callStackSize];
-		this.callStack[0] = new CallFrame(null, globalObject);
+		this.callStack = new ExecutionContext[callStackSize];
+		this.callStack[0] = new ExecutionContext(null, globalObject);
 	}
 
 	public Interpreter(Program program, Dictionary globalObject) {
@@ -67,27 +67,27 @@ public class Interpreter {
 		}
 	}
 
-	public void enterCallFrame(CallFrame frame) throws AbruptCompletion {
-		if (currentCallFrame + 1 == callStackSize) {
+	public void enterExecutionContext(ExecutionContext frame) throws AbruptCompletion {
+		if (currentExecutionContext + 1 == callStackSize) {
 			throw new AbruptCompletion(new RangeError("Maximum call stack size exceeded"), AbruptCompletion.Type.Throw);
 		}
 
-		callStack[++currentCallFrame] = frame;
+		callStack[++currentExecutionContext] = frame;
 	}
 
-	public void exitCallFrame(CallFrame frame) {
-		if (currentCallFrame == 0 || callStack[currentCallFrame] != frame) {
-			throw new ExecutionError("Attempting to exit from an invalid CallFrame");
+	public void exitExecutionContext(ExecutionContext frame) {
+		if (currentExecutionContext == 0 || callStack[currentExecutionContext] != frame) {
+			throw new ExecutionError("Attempting to exit from an invalid ExecutionContext");
 		}
 
-		callStack[currentCallFrame--] = null;
+		callStack[currentExecutionContext--] = null;
 	}
 
-	public CallFrame getCallFrame() {
-		return callStack[currentCallFrame];
+	public ExecutionContext getExecutionContext() {
+		return callStack[currentExecutionContext];
 	}
 
 	public Value<?> thisValue() {
-		return callStack[currentCallFrame].thisValue();
+		return callStack[currentExecutionContext].thisValue();
 	}
 }

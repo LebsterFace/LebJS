@@ -4,7 +4,7 @@ import xyz.lebster.ANSI;
 import xyz.lebster.Dumper;
 import xyz.lebster.Main;
 import xyz.lebster.interpreter.AbruptCompletion;
-import xyz.lebster.interpreter.CallFrame;
+import xyz.lebster.interpreter.ExecutionContext;
 import xyz.lebster.node.value.*;
 import xyz.lebster.runtime.ExecutionError;
 import xyz.lebster.runtime.LanguageError;
@@ -101,24 +101,24 @@ public class Testing {
 		}));
 
 		globalObject.set("bind", new NativeFunction((interpreter, arguments) -> {
-			// Exit the `bind()` CallFrame
-			final CallFrame current = interpreter.getCallFrame();
-			interpreter.exitCallFrame(current);
-			// Enter the new CallFrame
-			interpreter.enterCallFrame(new CallFrame(null, arguments[0]));
-			// Re-enter the `bind()` CallFrame
-			interpreter.enterCallFrame(current);
+			// Exit the `bind()` ExecutionContext
+			final ExecutionContext current = interpreter.getExecutionContext();
+			interpreter.exitExecutionContext(current);
+			// Enter the new ExecutionContext
+			interpreter.enterExecutionContext(new ExecutionContext(null, arguments[0]));
+			// Re-enter the `bind()` ExecutionContext
+			interpreter.enterExecutionContext(current);
 			return new Undefined();
 		}));
 
 		globalObject.set("unbind", new NativeFunction((interpreter, arguments) -> {
-			// Exit the `unbind()` CallFrame
-			final CallFrame current = interpreter.getCallFrame();
-			interpreter.exitCallFrame(current);
-			// Exit the bound CallFrame
-			interpreter.exitCallFrame(interpreter.getCallFrame());
-			// Re-enter the `unbind()` CallFrame
-			interpreter.enterCallFrame(current);
+			// Exit the `unbind()` ExecutionContext
+			final ExecutionContext current = interpreter.getExecutionContext();
+			interpreter.exitExecutionContext(current);
+			// Exit the bound ExecutionContext
+			interpreter.exitExecutionContext(interpreter.getExecutionContext());
+			// Re-enter the `unbind()` ExecutionContext
+			interpreter.enterExecutionContext(current);
 			return new Undefined();
 		}));
 

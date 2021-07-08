@@ -2,7 +2,7 @@ package xyz.lebster.node.expression;
 
 import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
-import xyz.lebster.interpreter.CallFrame;
+import xyz.lebster.interpreter.ExecutionContext;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.Reference;
 import xyz.lebster.node.value.Dictionary;
@@ -30,8 +30,8 @@ public record MemberExpression(Expression base, Expression property, boolean com
 	}
 
 	@Override
-	public CallFrame toCallFrame(Interpreter interpreter) throws AbruptCompletion {
+	public ExecutionContext toExecutionContext(Interpreter interpreter) throws AbruptCompletion {
 		final Reference reference = toReference(interpreter);
-		return new CallFrame(reference.getValue(interpreter), reference.base());
+		return new ExecutionContext(reference.getValue(interpreter), reference.base());
 	}
 }

@@ -327,98 +327,37 @@ public class Parser {
 	}
 
 	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws ParseException {
-		return switch (currentToken.type) {
-			case Plus -> {
-				consume();
-				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Add);
-			}
+		final Token token = consume();
 
-			case Minus -> {
-				consume();
-				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Subtract);
-			}
+		return switch (token.type) {
+			case Plus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Add);
+			case Minus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Subtract);
+			case Star -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Multiply);
+			case Slash -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Divide);
+			case LParen -> parseCallExpression(left);
+			case Equals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
+			case StrictEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictEquals);
+			case StrictNotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictNotEquals);
+			case LogicalOr -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Or);
+			case LogicalAnd -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
+			case PlusEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.PlusAssign);
+			case MinusEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
+//			case Decrement -> new UnaryExpression(left, UnaryOp.PostDecrement);
+//			case Increment -> new UnaryExpression(left, UnaryOp.PostIncrement);
+			case LessThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
+			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
 
-			case Star -> {
-				consume();
-				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Multiply);
-			}
 
-			case Slash -> {
-				consume();
-				yield new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Divide);
-			}
 
 			case Period -> {
-				consume();
 				final String prop = require(TokenType.Identifier).value;
 				yield new MemberExpression(left, new StringLiteral(prop), false);
 			}
 
 			case LBracket -> {
-				consume();
 				final Expression prop = parseExpression(0, Left);
 				require(TokenType.RBracket);
 				yield new MemberExpression(left, prop, true);
-			}
-
-			case LParen -> {
-				consume();
-				yield parseCallExpression(left);
-			}
-
-			case Equals -> {
-				consume();
-				yield new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
-			}
-
-			case StrictEqual -> {
-				consume();
-				yield new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictEquals);
-			}
-
-			case StrictNotEqual -> {
-				consume();
-				yield new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictNotEquals);
-			}
-
-			case LogicalOr -> {
-				consume();
-				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Or);
-			}
-
-			case LogicalAnd -> {
-				consume();
-				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
-			}
-
-			case PlusEquals -> {
-				consume();
-				yield new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.PlusAssign);
-			}
-
-			case MinusEquals -> {
-				consume();
-				yield new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
-			}
-
-//			case Decrement -> {
-//				consume();
-//				yield new UnaryExpression(left, UnaryOp.PostDecrement);
-//			}
-
-//			case Increment -> {
-//				consume();
-//				yield new UnaryExpression(left, UnaryOp.PostIncrement);
-//			}
-
-			case LessThan -> {
-				consume();
-				yield new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
-			}
-
-			case GreaterThan -> {
-				consume();
-				yield new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
 			}
 
 			default -> throw new CannotParse(currentToken, "SecondaryExpression");

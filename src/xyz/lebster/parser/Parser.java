@@ -387,6 +387,16 @@ public class Parser {
 				yield new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
 			}
 
+			case PlusEquals -> {
+				consume();
+				yield new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.PlusAssign);
+			}
+
+			case MinusEquals -> {
+				consume();
+				yield new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
+			}
+
 //			case Decrement -> {
 //				consume();
 //				yield new UnaryExpression(left, UnaryOp.PostDecrement);
@@ -518,6 +528,12 @@ public class Parser {
 			   t == TokenType.Period ||
 			   t == TokenType.LessThan ||
 			   t == TokenType.GreaterThan ||
+			   t == TokenType.PlusEquals ||
+			   t == TokenType.MinusEquals ||
+			   t == TokenType.DivideEquals ||
+			   t == TokenType.MultiplyEquals ||
+			   t == TokenType.LeftShiftEquals ||
+			   t == TokenType.RightShiftEquals ||
 			   t == TokenType.LBracket ||
 			   t == TokenType.LParen ||
 			   t == TokenType.Equals ||

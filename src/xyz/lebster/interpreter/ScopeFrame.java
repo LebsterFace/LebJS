@@ -7,11 +7,11 @@ import xyz.lebster.node.value.Value;
 
 public record ScopeFrame(Dictionary variables, BlockStatement node) {
 	public boolean containsVariable(StringLiteral name) {
-		return variables.containsKey(name);
+		return variables.hasOwnProperty(name);
 	}
 
 	public boolean containsVariable(String name) {
-		return variables.containsKey(name);
+		return variables.hasOwnProperty(name);
 	}
 
 	public Value<?> getVariable(StringLiteral name) {

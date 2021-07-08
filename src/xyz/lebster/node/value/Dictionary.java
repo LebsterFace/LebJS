@@ -67,12 +67,12 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		return get(new StringLiteral(key));
 	}
 
-	public boolean containsKey(StringLiteral key) {
+	public boolean hasOwnProperty(StringLiteral key) {
 		return this.value.containsKey(key);
 	}
 
-	public boolean containsKey(String key) {
-		return containsKey(new StringLiteral(key));
+	public boolean hasOwnProperty(String key) {
+		return hasOwnProperty(new StringLiteral(key));
 	}
 
 	@Override

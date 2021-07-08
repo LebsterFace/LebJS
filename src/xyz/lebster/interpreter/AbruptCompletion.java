@@ -13,7 +13,7 @@ public class AbruptCompletion extends Throwable {
 
 	@Override
 	public String getMessage() {
-		return "[" + type.name() + "] " + value.toString();
+		return "[" + type.name() + "] " + (value == null ? "" : value.toString());
 	}
 
 	public enum Type {Return, Throw, Break, Continue}

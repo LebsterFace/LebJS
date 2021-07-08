@@ -56,39 +56,39 @@ public class Lexer {
 		final HashMap<String, TokenType> symbols_length_3 = new HashMap<>();
 		final HashMap<String, TokenType> symbols_length_4 = new HashMap<>();
 
-		symbols_length_4.put(">>>=", TokenType.UnsignedRightShiftAssign);
+		symbols_length_4.put(">>>=", TokenType.UnsignedRightShiftEquals);
 
-		symbols_length_3.put("||=", TokenType.LogicalOrAssign);
+		symbols_length_3.put("||=", TokenType.LogicalOrEquals);
 		symbols_length_3.put(">>>", TokenType.UnsignedRightShift);
-		symbols_length_3.put(">>=", TokenType.RightShiftAssign);
+		symbols_length_3.put(">>=", TokenType.RightShiftEquals);
 		symbols_length_3.put("===", TokenType.StrictEqual);
-		symbols_length_3.put("<<=", TokenType.LeftShiftAssign);
-		symbols_length_3.put("&&=", TokenType.LogicalAndAssign);
-		symbols_length_3.put("**=", TokenType.ExponentAssign);
-		symbols_length_3.put("??=", TokenType.NullishCoalescingAssign);
+		symbols_length_3.put("<<=", TokenType.LeftShiftEquals);
+		symbols_length_3.put("&&=", TokenType.LogicalAndEquals);
+		symbols_length_3.put("**=", TokenType.ExponentEquals);
+		symbols_length_3.put("??=", TokenType.NullishCoalescingEquals);
 		symbols_length_3.put("!==", TokenType.StrictNotEqual);
 
 		symbols_length_2.put("||", TokenType.LogicalOr);
-		symbols_length_2.put("|=", TokenType.PipeAssign);
+		symbols_length_2.put("|=", TokenType.PipeEquals);
 		symbols_length_2.put(">>", TokenType.RightShift);
 		symbols_length_2.put(">=", TokenType.GreaterThanEqual);
 		symbols_length_2.put("=>", TokenType.Arrow);
 		symbols_length_2.put("==", TokenType.LooseEqual);
 		symbols_length_2.put("<=", TokenType.LessThanEqual);
 		symbols_length_2.put("<<", TokenType.LeftShift);
-		symbols_length_2.put("+=", TokenType.PlusAssign);
+		symbols_length_2.put("+=", TokenType.PlusEquals);
 		symbols_length_2.put("++", TokenType.Increment);
-		symbols_length_2.put("^=", TokenType.CaretAssign);
-		symbols_length_2.put("%=", TokenType.PercentAssign);
-		symbols_length_2.put("&=", TokenType.AmpersandAssign);
+		symbols_length_2.put("^=", TokenType.CaretEquals);
+		symbols_length_2.put("%=", TokenType.PercentEquals);
+		symbols_length_2.put("&=", TokenType.AmpersandEquals);
 		symbols_length_2.put("&&", TokenType.LogicalAnd);
-		symbols_length_2.put("/=", TokenType.DivideAssign);
-		symbols_length_2.put("*=", TokenType.MultiplyAssign);
+		symbols_length_2.put("/=", TokenType.DivideEquals);
+		symbols_length_2.put("*=", TokenType.MultiplyEquals);
 		symbols_length_2.put("**", TokenType.Exponent);
 		symbols_length_2.put("?.", TokenType.OptionalChain);
 		symbols_length_2.put("??", TokenType.NullishCoalescing);
 		symbols_length_2.put("!=", TokenType.NotEqual);
-		symbols_length_2.put("-=", TokenType.MinusAssign);
+		symbols_length_2.put("-=", TokenType.MinusEquals);
 		symbols_length_2.put("--", TokenType.Decrement);
 
 		symbols_length_1.put("~", TokenType.Tilde);

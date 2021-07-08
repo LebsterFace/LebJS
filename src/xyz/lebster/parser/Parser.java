@@ -26,6 +26,7 @@ public class Parser {
 		precedence.put(TokenType.RBracket, 20);
 		precedence.put(TokenType.Period, 20);
 
+//		Unary Expressions:
 		precedence.put(TokenType.Bang, 17);
 		precedence.put(TokenType.Typeof, 17);
 //		FIXME: Postfix should have higher precedence than prefix
@@ -328,7 +329,9 @@ public class Parser {
 	}
 
 	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws ParseException {
+		accept(TokenType.Terminator);
 		final Token token = consume();
+		accept(TokenType.Terminator);
 
 		return switch (token.type) {
 			case Plus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Add);

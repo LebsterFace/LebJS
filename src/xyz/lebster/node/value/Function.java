@@ -3,7 +3,6 @@ package xyz.lebster.node.value;
 import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
-import xyz.lebster.interpreter.ScopeFrame;
 import xyz.lebster.node.FunctionNode;
 
 public class Function extends Executable<FunctionNode> {
@@ -13,8 +12,6 @@ public class Function extends Executable<FunctionNode> {
 
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final ScopeFrame scope = interpreter.enterScope(code.body);
-
 //		Declare passed arguments as variables
 		for (int i = 0; i < arguments.length && i < code.arguments.length; i++) {
 			interpreter.declareVariable(code.arguments[i], arguments[i]);
@@ -25,8 +22,6 @@ public class Function extends Executable<FunctionNode> {
 		} catch (AbruptCompletion e) {
 			if (e.type != AbruptCompletion.Type.Return) throw e;
 			return e.value;
-		} finally {
-			interpreter.exitScope(scope);
 		}
 	}
 

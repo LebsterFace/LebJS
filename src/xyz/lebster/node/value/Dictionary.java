@@ -63,6 +63,26 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		}
 	}
 
+	public boolean hasProperty(StringLiteral name) {
+		Dictionary object = this;
+
+		while (object != null) {
+			if (object.value.containsKey(name)) {
+				// Property was found
+				return true;
+			} else {
+				// Property does not exist on current object. Move up prototype chain
+				object = object.getPrototype();
+			}
+		}
+
+		return false;
+	}
+
+	public boolean hasProperty(String name) {
+		return hasProperty(new StringLiteral(name));
+	}
+
 	public Value<?> get(String key) {
 		return get(new StringLiteral(key));
 	}

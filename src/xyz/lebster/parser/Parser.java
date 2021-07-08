@@ -360,15 +360,15 @@ public class Parser {
 //				yield new UnaryExpression(left, UnaryOp.PostIncrement);
 //			}
 
-//			case LessThan -> {
-//				consume();
-//				yield new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalOp.LessThan);
-//			}
+			case LessThan -> {
+				consume();
+				yield new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
+			}
 
-//			case GreaterThan -> {
-//				consume();
-//				yield new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalOp.GreaterThan);
-//			}
+			case GreaterThan -> {
+				consume();
+				yield new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
+			}
 
 			default -> throw new CannotParse(currentToken.type, "SecondaryExpression");
 		};

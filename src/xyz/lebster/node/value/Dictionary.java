@@ -49,11 +49,8 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	public Value<?> get(StringLiteral name) {
 		Dictionary object = this;
 
-		while (true) {
-			if (object == null) {
-				// End of prototype chain; property does not exist.
-				return new Undefined();
-			} else if (object.value.containsKey(name)) {
+		while (object != null) {
+			if (object.value.containsKey(name)) {
 				// Property was found
 				return object.value.get(name);
 			} else {
@@ -61,6 +58,9 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 				object = object.getPrototype();
 			}
 		}
+
+		// End of prototype chain; property does not exist.
+		return new Undefined();
 	}
 
 	public boolean hasProperty(StringLiteral name) {
@@ -76,6 +76,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 			}
 		}
 
+		// End of prototype chain; property does not exist.
 		return false;
 	}
 

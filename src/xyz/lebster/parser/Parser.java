@@ -21,30 +21,40 @@ public class Parser {
 //		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table
 		precedence.put(TokenType.LParen, 21);
 		precedence.put(TokenType.RParen, 21);
+
 		precedence.put(TokenType.LBracket, 20);
 		precedence.put(TokenType.RBracket, 20);
 		precedence.put(TokenType.Period, 20);
-		precedence.put(TokenType.Bang, 17);
 
+		precedence.put(TokenType.Bang, 17);
 //		FIXME: Postfix should have higher precedence than prefix
 		precedence.put(TokenType.Increment, 17);
 		precedence.put(TokenType.Decrement, 17);
 
 		precedence.put(TokenType.Star, 15);
 		precedence.put(TokenType.Slash, 15);
+
 		precedence.put(TokenType.Plus, 14);
 		precedence.put(TokenType.Minus, 14);
+
 		precedence.put(TokenType.LessThan, 12);
 		precedence.put(TokenType.GreaterThan, 12);
+
 		precedence.put(TokenType.StrictEqual, 11);
 		precedence.put(TokenType.StrictNotEqual, 11);
+
 		precedence.put(TokenType.LogicalAnd, 8);
+
 		precedence.put(TokenType.LogicalOr, 6);
+
+		precedence.put(TokenType.PlusEquals, 3);
+		precedence.put(TokenType.MinusEquals, 3);
 		precedence.put(TokenType.Equals, 3);
 
 //		FIXME: Switch statement method (when all operators are implemented)
 		associativity.put(TokenType.LParen, NA);
 		associativity.put(TokenType.RParen, NA);
+
 		associativity.put(TokenType.LBracket, Left);
 		associativity.put(TokenType.RBracket, Left);
 		associativity.put(TokenType.Star, Left);
@@ -58,10 +68,14 @@ public class Parser {
 		associativity.put(TokenType.GreaterThan, Left);
 		associativity.put(TokenType.LogicalOr, Left);
 		associativity.put(TokenType.LogicalAnd, Left);
+
 		associativity.put(TokenType.Bang, Right);
 		associativity.put(TokenType.Increment, Right);
 		associativity.put(TokenType.Decrement, Right);
+
 		associativity.put(TokenType.Equals, Right);
+		associativity.put(TokenType.PlusEquals, Right);
+		associativity.put(TokenType.MinusEquals, Right);
 	}
 
 	public final Token[] tokens;

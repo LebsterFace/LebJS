@@ -187,7 +187,7 @@ public class Parser {
 					yield new ThrowStatement(parseExpression(0, Left));
 				}
 
-				default -> throw new CannotParse(currentToken.type, "Statement");
+				default -> throw new CannotParse(currentToken, "Statement");
 			};
 		}
 	}
@@ -231,7 +231,7 @@ public class Parser {
 		return switch (currentToken.type) {
 			case Let, Var, Const -> parseVariableDeclaration();
 			case Function -> parseFunctionDeclaration();
-			default -> throw new CannotParse(currentToken.type, "Declaration");
+			default -> throw new CannotParse(currentToken, "Declaration");
 		};
 	}
 
@@ -284,19 +284,23 @@ public class Parser {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-UnaryExpression")
 	private Expression parseUnaryPrefixedExpression() throws ParseException {
-		final TokenType type = consume().type;
+		final Token token = consume();
 //		TODO: Remove when all implemented
-		if (!associativity.containsKey(type)) throw new NotImplemented("Associativity for token '" + type + "'");
-		final Associativity assoc = associativity.get(type);
+		if (!associativity.containsKey(token.type)) throw new NotImplemented("Associativity for token '" + token.type + "'");
+		final Associativity assoc = associativity.get(token.type);
 //		TODO: Remove when all implemented
-		if (!precedence.containsKey(type)) throw new NotImplemented("Precedence for token '" + type + "'");
-		final int minPrecedence = precedence.get(type);
+		if (!precedence.containsKey(token.type)) throw new NotImplemented("Precedence for token '" + token.type + "'");
+		final int minPrecedence = precedence.get(token.type);
 
-		return new UnaryExpression(parseExpression(minPrecedence, assoc), switch (type) {
+		final UnaryExpression.UnaryOp op = switch (token.type) {
 			case Minus -> UnaryExpression.UnaryOp.Negate;
 			case Bang -> UnaryExpression.UnaryOp.LogicalNot;
 			default -> throw new CannotParse(type, "Unary Operator");
 		});
+			default -> throw new CannotParse(token, "Unary Operator");
+		};
+
+		return new UnaryExpression(parseExpression(minPrecedence, assoc), op);
 	}
 
 	private Expression parseExpression(int minPrecedence, Associativity assoc) throws ParseException {
@@ -417,7 +421,7 @@ public class Parser {
 				yield new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
 			}
 
-			default -> throw new CannotParse(currentToken.type, "SecondaryExpression");
+			default -> throw new CannotParse(currentToken, "SecondaryExpression");
 		};
 	}
 
@@ -465,7 +469,7 @@ public class Parser {
 				yield new Undefined();
 			}
 
-			default -> throw new CannotParse(currentToken.type, "PrimaryExpression");
+			default -> throw new CannotParse(currentToken, "PrimaryExpression");
 		};
 	}
 

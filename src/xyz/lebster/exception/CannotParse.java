@@ -1,13 +1,13 @@
 package xyz.lebster.exception;
 
-import xyz.lebster.parser.TokenType;
+import xyz.lebster.parser.Token;
 
 public class CannotParse extends ParseException {
 	public CannotParse(String what) {
 		super(what + " cannot be parsed.");
 	}
 
-	public CannotParse(TokenType type, String what) {
-		super(type + " cannot be parsed as " + what);
+	public CannotParse(Token token, String what) {
+		super(token.type + " cannot be parsed as " + what + " (index " + token.start + ")");
 	}
 }

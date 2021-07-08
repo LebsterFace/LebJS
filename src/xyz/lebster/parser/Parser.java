@@ -160,6 +160,12 @@ public class Parser {
 					yield new ReturnStatement(val);
 				}
 
+				case While -> parseWhileStatement();
+				case Break -> {
+					consume();
+					yield new BreakStatement();
+				}
+
 				case If -> parseIfStatement();
 				case Try -> parseTryStatement();
 				case Throw -> {
@@ -170,6 +176,15 @@ public class Parser {
 				default -> throw new CannotParse(currentToken.type, "Statement");
 			};
 		}
+	}
+
+	private WhileStatement parseWhileStatement() throws ParseException {
+		require(TokenType.While);
+		require(TokenType.LParen);
+		final Expression condition = parseExpression(0, Left);
+		require(TokenType.RParen);
+		final Statement body = parseLine();
+		return new WhileStatement(condition, body);
 	}
 
 	private TryStatement parseTryStatement() throws ParseException {

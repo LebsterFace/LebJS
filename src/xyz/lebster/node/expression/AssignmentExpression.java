@@ -22,7 +22,7 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-assignment-operators-runtime-semantics-evaluation")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		if (!(left instanceof final LeftHandSideExpression lhs)) {
-			throw new AbruptCompletion(new LanguageError("Invalid left-hand side in expression"), AbruptCompletion.Type.Throw);
+			throw new AbruptCompletion(new LanguageError("Invalid left-hand side in assignment"), AbruptCompletion.Type.Throw);
 		}
 
 		final Reference lref = lhs.toReference(interpreter);

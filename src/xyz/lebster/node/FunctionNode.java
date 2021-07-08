@@ -14,10 +14,6 @@ public abstract class FunctionNode implements ASTNode {
 		this.body = body;
 	}
 
-	public FunctionNode(Identifier name, Identifier... arguments) {
-		this(new BlockStatement(), name, arguments);
-	}
-
 	public String getCallString() {
 		final StringBuilder builder = new StringBuilder(name.value());
 

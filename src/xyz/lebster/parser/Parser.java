@@ -249,6 +249,14 @@ public class Parser {
 		return new FunctionDeclaration(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
 	}
 
+	private FunctionExpression parseFunctionExpression() throws ParseException {
+		require(TokenType.Function);
+		final Token potentialName = accept(TokenType.Identifier);
+		final Identifier name = potentialName == null ? null : new Identifier(potentialName.value);
+		final List<Identifier> arguments = parseFunctionArguments();
+		return new FunctionExpression(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
+	}
+
 	private CallExpression parseCallExpression(Expression left) throws ParseException {
 		final ArrayList<Expression> arguments = new ArrayList<>();
 		while (matchExpression()) {
@@ -406,7 +414,7 @@ public class Parser {
 			case NumericLiteral -> new NumericLiteral(Double.parseDouble(consume().value));
 			case BooleanLiteral -> new BooleanLiteral(consume().value.equals("true"));
 			case Identifier -> new Identifier(consume().value);
-//			case Function -> parseFunctionExpression();
+			case Function -> parseFunctionExpression();
 
 			case This -> {
 				consume();

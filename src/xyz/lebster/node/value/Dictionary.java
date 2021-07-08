@@ -64,6 +64,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	}
 
 	public boolean hasProperty(StringLiteral name) {
+		if (hasOwnProperty(name)) return true;
 		Dictionary object = this;
 
 		while (object != null) {

@@ -43,6 +43,6 @@ public class Function extends Executable<FunctionNode> {
 	}
 
 	public Dictionary toDictionary(Interpreter interpreter) {
-		throw new NotImplemented("Function -> Dictionary");
+		return this;
 	}
 }

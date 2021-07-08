@@ -19,10 +19,15 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 	}
 
 	@Override
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-applystringornumericbinaryoperator")
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-evaluatestringornumericbinaryexpression")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		Value<?> lval = left.execute(interpreter);
-		Value<?> rval = right.execute(interpreter);
+		final Value<?> lval = left.execute(interpreter);
+		final Value<?> rval = right.execute(interpreter);
+		return applyOperator(interpreter, lval, op, rval);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-applystringornumericbinaryoperator")
+	public static Value<?> applyOperator(Interpreter interpreter, Value<?> lval, BinaryOp op, Value<?> rval) throws AbruptCompletion {
 		if (op == BinaryOp.Add) {
 			final Value<?> lprim = lval.toPrimitive(interpreter);
 			final Value<?> rprim = rval.toPrimitive(interpreter);

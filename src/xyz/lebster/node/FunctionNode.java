@@ -15,7 +15,7 @@ public abstract class FunctionNode implements ASTNode {
 	}
 
 	public String getCallString() {
-		final StringBuilder builder = new StringBuilder(name.value());
+		final StringBuilder builder = new StringBuilder(name == null ? "" : name.value());
 
 		builder.append("(");
 		if (arguments.length > 0) {

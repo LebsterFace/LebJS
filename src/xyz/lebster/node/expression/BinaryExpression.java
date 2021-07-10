@@ -27,7 +27,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-applystringornumericbinaryoperator")
-	public static Value<?> applyOperator(Interpreter interpreter, Value<?> lval, BinaryOp op, Value<?> rval) throws AbruptCompletion {
+	public static Value<?> applyOperator(Interpreter interpreter, Value<?> lval, BinaryOp op, Value<?> rval) {
 		if (op == BinaryOp.Add) {
 			final Value<?> lprim = lval.toPrimitive(interpreter);
 			final Value<?> rprim = rval.toPrimitive(interpreter);

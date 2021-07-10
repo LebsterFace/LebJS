@@ -111,13 +111,15 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 			System.out.print(entry.getKey().value);
 			System.out.print(": ");
 			final Value<?> value = entry.getValue();
-			if (parents.contains(value)) {
-				System.out.print(ANSI.RED);
-				System.out.print(this == value ? "[self]" : "[parent]");
-				System.out.println(ANSI.RESET);
-			} else if (value instanceof final Dictionary dictionary) {
-				System.out.println();
-				dictionary.dumpRecursive(indent + 2, parents);
+			if (value instanceof final Dictionary dictionary) {
+				if (parents.contains(dictionary)) {
+					System.out.print(ANSI.RED);
+					System.out.print(this == value ? "[self]" : "[parent]");
+					System.out.println(ANSI.RESET);
+				} else {
+					System.out.println();
+					dictionary.dumpRecursive(indent + 2, parents);
+				}
 			} else {
 				value.dump(0);
 			}

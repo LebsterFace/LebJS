@@ -1,7 +1,6 @@
 package xyz.lebster.node;
 
 import xyz.lebster.Dumper;
-import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.expression.Identifier;
 import xyz.lebster.node.value.Value;
@@ -15,7 +14,7 @@ public record CatchClause(Identifier parameter, BlockStatement body) implements 
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
+	public Value<?> execute(Interpreter interpreter) {
 		throw new ExecutionError("CatchClause execution is handled by TryStatement");
 	}
 }

@@ -3,7 +3,6 @@ package xyz.lebster.node;
 import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
-import xyz.lebster.interpreter.ScopeFrame;
 import xyz.lebster.node.value.Value;
 
 public record TryStatement(BlockStatement body, CatchClause handler) implements Statement {
@@ -21,14 +20,8 @@ public record TryStatement(BlockStatement body, CatchClause handler) implements 
 			return body.execute(interpreter);
 		} catch (AbruptCompletion completion) {
 			if (completion.type != AbruptCompletion.Type.Throw) throw completion;
-			final ScopeFrame scope = interpreter.enterScope(body);
 			interpreter.declareVariable(handler.parameter(), completion.value);
-
-			try {
-				return handler.body().execute(interpreter);
-			} finally {
-				interpreter.exitScope(scope);
-			}
+			return handler.body().execute(interpreter);
 		}
 	}
 }

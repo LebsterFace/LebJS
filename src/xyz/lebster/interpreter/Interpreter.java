@@ -1,7 +1,7 @@
 package xyz.lebster.interpreter;
 
-import xyz.lebster.node.BlockStatement;
 import xyz.lebster.node.Program;
+import xyz.lebster.node.SpecificationURL;
 import xyz.lebster.node.expression.Identifier;
 import xyz.lebster.node.value.Dictionary;
 import xyz.lebster.node.value.StringLiteral;
@@ -45,27 +45,8 @@ public class Interpreter {
 		return new Undefined();
 	}
 
-	public ScopeFrame enterScope(BlockStatement body) throws AbruptCompletion {
-		if (currentScopeFrame + 1 == callStackSize) {
-			throw new AbruptCompletion(new RangeError("Maximum call stack size exceeded"), AbruptCompletion.Type.Throw);
-		}
-
-//		FIXME: Hoisting happens here
-		final ScopeFrame frame = new ScopeFrame(new Dictionary(), body);
-		scopeStack[++currentScopeFrame] = frame;
-		return frame;
-	}
-
-	public void exitScope(ScopeFrame frame) {
-		if (currentScopeFrame == 0 || scopeStack[currentScopeFrame] != frame) {
-			throw new ExecutionError("Attempting to exit from an invalid ScopeFrame");
-		} else {
-			scopeStack[currentScopeFrame--] = null;
-		}
-	}
-
 	public void enterExecutionContext(ExecutionContext frame) throws AbruptCompletion {
-		if (currentExecutionContext + 1 == callStackSize) {
+		if (currentExecutionContext + 1 == stackSize) {
 			throw new AbruptCompletion(new RangeError("Maximum call stack size exceeded"), AbruptCompletion.Type.Throw);
 		}
 

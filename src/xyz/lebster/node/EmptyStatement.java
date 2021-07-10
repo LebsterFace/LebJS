@@ -1,7 +1,6 @@
 package xyz.lebster.node;
 
 import xyz.lebster.Dumper;
-import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.value.Undefined;
 import xyz.lebster.node.value.Value;

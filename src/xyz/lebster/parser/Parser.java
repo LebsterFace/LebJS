@@ -289,7 +289,8 @@ public class Parser {
 	private Expression parseUnaryPrefixedExpression() throws ParseException {
 		final Token token = consume();
 //		TODO: Remove when all implemented
-		if (!associativity.containsKey(token.type)) throw new NotImplemented("Associativity for token '" + token.type + "'");
+		if (!associativity.containsKey(token.type))
+			throw new NotImplemented("Associativity for token '" + token.type + "'");
 		final Associativity assoc = associativity.get(token.type);
 //		TODO: Remove when all implemented
 		if (!precedence.containsKey(token.type)) throw new NotImplemented("Precedence for token '" + token.type + "'");
@@ -350,7 +351,6 @@ public class Parser {
 //			case Increment -> new UnaryExpression(left, UnaryOp.PostIncrement);
 			case LessThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
 			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
-
 
 
 			case Period -> {

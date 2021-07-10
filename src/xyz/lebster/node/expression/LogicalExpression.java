@@ -20,7 +20,7 @@ public record LogicalExpression(Expression left, Expression right, LogicOp op) i
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> lval = left.execute(interpreter);
 
-		return switch(op) {
+		return switch (op) {
 			case And -> {
 				final boolean lbool = lval.toBooleanLiteral(interpreter).value;
 				yield lbool ? right.execute(interpreter) : lval;

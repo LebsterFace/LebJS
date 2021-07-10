@@ -18,8 +18,6 @@ import static xyz.lebster.cli.ScriptExecutor.defaultGlobalObject;
 import static xyz.lebster.cli.ScriptExecutor.executeFile;
 
 public class Testing {
-	private static record Test(boolean passed, Throwable error, String output) { }
-
 	public static void test(ExecutionOptions options) {
 		final File[] files = new File("tests/").listFiles();
 		if (files == null) throw new Error("Test directory not found!");
@@ -139,5 +137,8 @@ public class Testing {
 		}));
 
 		return globalObject;
+	}
+
+	private static record Test(boolean passed, Throwable error, String output) {
 	}
 }

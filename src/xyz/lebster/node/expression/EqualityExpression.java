@@ -5,7 +5,8 @@ import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.SpecificationURL;
-import xyz.lebster.node.value.*;
+import xyz.lebster.node.value.BooleanLiteral;
+import xyz.lebster.node.value.Value;
 
 public record EqualityExpression(Expression left, Expression right, EqualityOp op) implements Expression {
 	@Override

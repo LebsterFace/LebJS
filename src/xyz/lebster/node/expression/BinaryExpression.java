@@ -10,22 +10,6 @@ import xyz.lebster.node.value.Type;
 import xyz.lebster.node.value.Value;
 
 public record BinaryExpression(Expression left, Expression right, BinaryOp op) implements Expression {
-	@Override
-	public void dump(int indent) {
-		Dumper.dumpName(indent, "BinaryExpression");
-		Dumper.dumpIndicated(indent + 1, "Left", left);
-		Dumper.dumpEnum(indent + 1, "Operator", op);
-		Dumper.dumpIndicated(indent + 1, "Right", right);
-	}
-
-	@Override
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-evaluatestringornumericbinaryexpression")
-	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> lval = left.execute(interpreter);
-		final Value<?> rval = right.execute(interpreter);
-		return applyOperator(interpreter, lval, op, rval);
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-applystringornumericbinaryoperator")
 	public static Value<?> applyOperator(Interpreter interpreter, Value<?> lval, BinaryOp op, Value<?> rval) {
 		if (op == BinaryOp.Add) {
@@ -51,6 +35,22 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 		};
 
 		return new NumericLiteral(result);
+	}
+
+	@Override
+	public void dump(int indent) {
+		Dumper.dumpName(indent, "BinaryExpression");
+		Dumper.dumpIndicated(indent + 1, "Left", left);
+		Dumper.dumpEnum(indent + 1, "Operator", op);
+		Dumper.dumpIndicated(indent + 1, "Right", right);
+	}
+
+	@Override
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-evaluatestringornumericbinaryexpression")
+	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
+		final Value<?> lval = left.execute(interpreter);
+		final Value<?> rval = right.execute(interpreter);
+		return applyOperator(interpreter, lval, op, rval);
 	}
 
 	public enum BinaryOp {

@@ -3,7 +3,8 @@ package xyz.lebster;
 import xyz.lebster.node.ASTNode;
 
 final public class Dumper {
-	private Dumper() {}
+	private Dumper() {
+	}
 
 	public static void dumpIndent(int indent) {
 		System.out.print("  ".repeat(indent));

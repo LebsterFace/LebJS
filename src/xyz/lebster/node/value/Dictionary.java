@@ -6,7 +6,10 @@ import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.value.prototype.ObjectPrototype;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	public Dictionary(Map<StringLiteral, Value<?>> value) {

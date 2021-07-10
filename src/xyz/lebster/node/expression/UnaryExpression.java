@@ -27,7 +27,7 @@ public record UnaryExpression(Expression expression, xyz.lebster.node.expression
 				} else {
 					yield new StringLiteral("undefined");
 				}
- 			}
+			}
 		};
 	}
 

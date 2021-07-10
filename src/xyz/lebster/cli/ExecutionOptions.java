@@ -7,4 +7,4 @@ public record ExecutionOptions (
 	boolean silent,
 	boolean testingMethods,
 	boolean showPrompt
-) { }
+) {}

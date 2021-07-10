@@ -26,10 +26,10 @@ public record CommandLineArguments(String fileName, ExecutionMode mode, Executio
 					case "-l", "-last", "-showLast", "-show" -> showLastValue = true;
 					case "-p", "-prompt", "-noPrompt" -> showPrompt = false;
 				}
-			} else if (fileName == null){
+			} else if (fileName == null) {
 				fileName = arg;
 			} else {
-				throw new IllegalArgumentException("Please provide only one filename (remove '" + arg + "' or '"+ fileName +"')");
+				throw new IllegalArgumentException("Please provide only one filename (remove '" + arg + "' or '" + fileName + "')");
 			}
 		}
 

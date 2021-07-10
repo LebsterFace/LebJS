@@ -14,7 +14,10 @@ public record CallExpression(Expression callee, Expression... arguments) impleme
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function-calls-runtime-semantics-evaluation")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?>[] executedArguments = new Value[arguments.length];
-		for (int i = 0; i < arguments.length; i++) executedArguments[i] = arguments[i].execute(interpreter);
+		for (int i = 0; i < arguments.length; i++) {
+			executedArguments[i] = arguments[i].execute(interpreter);
+		}
+
 		final ExecutionContext frame = callee.toExecutionContext(interpreter);
 		if (frame.executedCallee() instanceof final Executable<?> executable) {
 			interpreter.enterExecutionContext(frame);

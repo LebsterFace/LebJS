@@ -2,6 +2,7 @@ package xyz.lebster.node;
 
 import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
+import xyz.lebster.interpreter.ExecutionContext;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.value.Undefined;
 import xyz.lebster.node.value.Value;
@@ -33,12 +34,14 @@ public record BlockStatement(List<ASTNode> children) implements Statement {
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		Value<?> lastValue = new Undefined();
-		for (ASTNode child : children) {
-			lastValue = child.execute(interpreter);
+		final ExecutionContext context = interpreter.pushExecutionContext(interpreter.thisValue());
+		try {
+			Value<?> lastValue = new Undefined();
+			for (ASTNode child : children) lastValue = child.execute(interpreter);
+			return lastValue;
+		} finally {
+			interpreter.exitExecutionContext(context);
 		}
-
-		return lastValue;
 	}
 
 	@Override

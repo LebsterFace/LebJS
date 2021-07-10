@@ -45,12 +45,12 @@ public class Interpreter {
 		return new Undefined();
 	}
 
-	public void enterExecutionContext(ExecutionContext frame) throws AbruptCompletion {
+	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {
 		if (currentExecutionContext + 1 == stackSize) {
 			throw new AbruptCompletion(new RangeError("Maximum call stack size exceeded"), AbruptCompletion.Type.Throw);
 		}
 
-		executionContextStack[++currentExecutionContext] = frame;
+		executionContextStack[++currentExecutionContext] = context;
 	}
 
 	public void exitExecutionContext(ExecutionContext frame) {
@@ -71,5 +71,12 @@ public class Interpreter {
 
 	public LexicalEnvironment lexicalEnvironment() {
 		return executionContextStack[currentExecutionContext].environment();
+	}
+
+	public ExecutionContext pushExecutionContext(Value<?> thisValue) throws AbruptCompletion {
+		final LexicalEnvironment env = new LexicalEnvironment(new Dictionary(), lexicalEnvironment());
+		final ExecutionContext context = new ExecutionContext(env, null, thisValue);
+		enterExecutionContext(context);
+		return context;
 	}
 }

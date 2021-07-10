@@ -12,6 +12,6 @@ public class FunctionDeclaration extends FunctionNode implements Declaration {
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) {
-		return interpreter.declareVariable(name, new Function(this, interpreter.lexicalEnvironment()));
+		return interpreter.declareVariable(name, new Function(this, interpreter.getExecutionContext()));
 	}
 }

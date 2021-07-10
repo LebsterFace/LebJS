@@ -4,10 +4,14 @@ import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.FunctionNode;
+import xyz.lebster.runtime.LexicalEnvironment;
 
 public class Function extends Executable<FunctionNode> {
-	public Function(FunctionNode code) {
+	public final LexicalEnvironment environment;
+
+	public Function(FunctionNode code, LexicalEnvironment environment) {
 		super(code);
+		this.environment = environment;
 	}
 
 	@Override

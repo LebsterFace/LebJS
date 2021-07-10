@@ -105,7 +105,7 @@ public class Testing {
 			final ExecutionContext current = interpreter.getExecutionContext();
 			interpreter.exitExecutionContext(current);
 			// Enter the new ExecutionContext
-			interpreter.enterExecutionContext(new ExecutionContext(null, arguments[0]));
+			interpreter.enterExecutionContext(new ExecutionContext(interpreter.lexicalEnvironment(), null, arguments[0]));
 			// Re-enter the `bind()` ExecutionContext
 			interpreter.enterExecutionContext(current);
 			return new Undefined();

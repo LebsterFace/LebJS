@@ -7,10 +7,10 @@ import xyz.lebster.node.value.Value;
 import xyz.lebster.runtime.ReferenceError;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-reference-record-specification-type")
-// FIXME: The `base` 'should' be possible to be a ScopeFrame as well as a dictionary
-// 		  Right now, when we need to use a ScopeFrame we just pass in the variables
+// FIXME: The `base` 'should' be possible to be a LexicalEnvironment as well as a dictionary
+// 		  Right now, when we need to use a LexicalEnvironment we just pass in the variables
 //		  of the frame (Interpreter#getReference resolvable case), but in the future
-//		  we may need to pass the entire ScopeFrame
+//		  we may need to pass the entire LexicalEnvironment
 public record Reference(Dictionary base, StringLiteral referencedName) {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getvalue")
 	public Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {

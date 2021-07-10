@@ -32,6 +32,6 @@ public record MemberExpression(Expression base, Expression property, boolean com
 	@Override
 	public ExecutionContext toExecutionContext(Interpreter interpreter) throws AbruptCompletion {
 		final Reference reference = toReference(interpreter);
-		return new ExecutionContext(reference.getValue(interpreter), reference.base());
+		return new ExecutionContext(interpreter.lexicalEnvironment(), reference.getValue(interpreter), reference.base());
 	}
 }

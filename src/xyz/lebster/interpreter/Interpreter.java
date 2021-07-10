@@ -8,42 +8,39 @@ import xyz.lebster.node.value.StringLiteral;
 import xyz.lebster.node.value.Undefined;
 import xyz.lebster.node.value.Value;
 import xyz.lebster.runtime.ExecutionError;
+import xyz.lebster.runtime.LexicalEnvironment;
 import xyz.lebster.runtime.RangeError;
 
 public class Interpreter {
-	public final int callStackSize;
-	private final ScopeFrame[] scopeStack;
-	private final ExecutionContext[] callStack;
-	private int currentScopeFrame = 0;
+	public final int stackSize;
+	private final ExecutionContext[] executionContextStack;
 	private int currentExecutionContext = 0;
 
-	public Interpreter(int callStackSize, Program program, Dictionary globalObject) {
-		this.callStackSize = callStackSize;
-		this.scopeStack = new ScopeFrame[callStackSize];
-		this.scopeStack[0] = new ScopeFrame(globalObject, program.body);
-		this.callStack = new ExecutionContext[callStackSize];
-		this.callStack[0] = new ExecutionContext(null, globalObject);
+	public Interpreter(int stackSize, Program program, Dictionary globalObject) {
+		this.stackSize = stackSize;
+		this.executionContextStack = new ExecutionContext[stackSize];
+		this.executionContextStack[0] = new ExecutionContext(new LexicalEnvironment(globalObject, null), null, globalObject);
 	}
 
 	public Interpreter(Program program, Dictionary globalObject) {
 		this(32, program, globalObject);
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-resolvebinding")
 	public Reference getReference(Identifier identifier) {
 		final StringLiteral name = identifier.stringValue();
-
-		for (int i = currentScopeFrame; i >= 0; i--) {
-			if (scopeStack[i].containsVariable(name)) {
-//				FIXME: See fixme in Reference.java
-				return new Reference(scopeStack[i].variables(), name);
+		for (LexicalEnvironment env = lexicalEnvironment(); env != null; env = env.parent()) {
+			if (env.hasBinding(name)) {
+				return new Reference(env.variables(), name);
 			}
 		}
 
-		return new Reference(null, identifier.stringValue()); // Unresolvable reference
+		// Unresolvable reference
+		return new Reference(null, name);
 	}
 
 	public Value<?> declareVariable(Identifier identifier, Value<?> value) {
-		scopeStack[currentScopeFrame].setVariable(identifier.stringValue(), value);
+		lexicalEnvironment().setVariable(identifier.stringValue(), value);
 //		FIXME: Errors can technically be thrown here, so don't always return a normal completion
 		return new Undefined();
 	}
@@ -72,22 +69,26 @@ public class Interpreter {
 			throw new AbruptCompletion(new RangeError("Maximum call stack size exceeded"), AbruptCompletion.Type.Throw);
 		}
 
-		callStack[++currentExecutionContext] = frame;
+		executionContextStack[++currentExecutionContext] = frame;
 	}
 
 	public void exitExecutionContext(ExecutionContext frame) {
-		if (currentExecutionContext == 0 || callStack[currentExecutionContext] != frame) {
+		if (currentExecutionContext == 0 || executionContextStack[currentExecutionContext] != frame) {
 			throw new ExecutionError("Attempting to exit from an invalid ExecutionContext");
 		}
 
-		callStack[currentExecutionContext--] = null;
+		executionContextStack[currentExecutionContext--] = null;
 	}
 
 	public ExecutionContext getExecutionContext() {
-		return callStack[currentExecutionContext];
+		return executionContextStack[currentExecutionContext];
 	}
 
 	public Value<?> thisValue() {
-		return callStack[currentExecutionContext].thisValue();
+		return executionContextStack[currentExecutionContext].thisValue();
+	}
+
+	public LexicalEnvironment lexicalEnvironment() {
+		return executionContextStack[currentExecutionContext].environment();
 	}
 }

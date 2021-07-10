@@ -1,6 +1,5 @@
 package xyz.lebster.node.expression;
 
-import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.BlockStatement;
 import xyz.lebster.node.FunctionNode;
@@ -13,7 +12,7 @@ public class FunctionExpression extends FunctionNode implements Expression {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		return new Function(this);
+	public Value<?> execute(Interpreter interpreter) {
+		return new Function(this, interpreter.lexicalEnvironment());
 	}
 }

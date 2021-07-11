@@ -332,9 +332,9 @@ public class Parser {
 	}
 
 	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws ParseException {
-		accept(TokenType.Terminator);
+		consumeAll(TokenType.Terminator);
 		final Token token = consume();
-		accept(TokenType.Terminator);
+		consumeAll(TokenType.Terminator);
 
 		return switch (token.type) {
 			case Plus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Add);

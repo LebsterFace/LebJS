@@ -18,7 +18,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	}
 
 	public Dictionary() {
-		super(new HashMap<>(), Type.Dictionary);
+		this(new HashMap<>());
 	}
 
 	@Override

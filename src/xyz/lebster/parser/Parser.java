@@ -179,6 +179,7 @@ public class Parser {
 				}
 
 				case While -> parseWhileStatement();
+				case For -> parseForStatement();
 				case Break -> {
 					consume();
 					yield new BreakStatement();
@@ -194,6 +195,24 @@ public class Parser {
 				default -> throw new CannotParse(currentToken, "Statement");
 			};
 		}
+	}
+
+	private ForStatement parseForStatement() throws ParseException {
+		require(TokenType.For);
+		require(TokenType.LParen);
+
+		Statement init = null;
+		if (matchExpression() || matchDeclaration()) init = parseAny();
+		require(TokenType.Semicolon);
+
+		final Expression test = matchExpression() ? parseExpression(0, Left) : null;
+		require(TokenType.Semicolon);
+
+		final Expression update = matchExpression() ? parseExpression(0, Left) : null;
+		require(TokenType.RParen);
+
+		final Statement body = parseLine();
+		return new ForStatement(init, test, update, body);
 	}
 
 	private WhileStatement parseWhileStatement() throws ParseException {

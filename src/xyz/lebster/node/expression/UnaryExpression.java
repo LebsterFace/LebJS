@@ -35,7 +35,6 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 			case PostIncrement, PostDecrement, PreIncrement, PreDecrement -> {
 				if (!(expression instanceof final LeftHandSideExpression lhs)) {
 					throw new AbruptCompletion(new LanguageError("Invalid left-hand side expression in postfix operation"), AbruptCompletion.Type.Throw);
-//					interpreter.throwError("Invalid left-hand side expression in postfix operation", LanguageError.class);
 				}
 
 				final Reference lref = lhs.toReference(interpreter);

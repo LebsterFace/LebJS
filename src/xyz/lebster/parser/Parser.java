@@ -130,19 +130,20 @@ public class Parser {
 
 	private Statement parseLine() throws ParseException {
 		consumeAll(TokenType.Terminator);
-
-		Statement result;
-		if (matchDeclaration()) {
-			result = parseDeclaration();
-		} else if (matchStatementOrExpression()) {
-			result = parseStatementOrExpression();
-		} else {
-			throw new CannotParse("Token '" + currentToken.type + "'");
-		}
-
+		final Statement result = parseAny();
 		consumeAll(TokenType.Semicolon);
 		consumeAll(TokenType.Terminator);
 		return result;
+	}
+
+	private Statement parseAny() throws ParseException {
+		if (matchDeclaration()) {
+			return parseDeclaration();
+		} else if (matchStatementOrExpression()) {
+			return parseStatementOrExpression();
+		} else {
+			throw new CannotParse("Token '" + currentToken.type + "'");
+		}
 	}
 
 	private BlockStatement parseBlockStatement() throws ParseException {

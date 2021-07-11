@@ -5,6 +5,7 @@ import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.Reference;
 import xyz.lebster.interpreter.StringRepresentation;
+import xyz.lebster.node.value.NumericLiteral;
 import xyz.lebster.node.value.StringLiteral;
 import xyz.lebster.node.value.Value;
 import xyz.lebster.runtime.LanguageError;
@@ -29,6 +30,29 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 					yield new StringLiteral("undefined");
 				}
 			}
+
+//			https://tc39.es/ecma262/multipage#sec-postfix-increment-operator
+			case PostIncrement, PostDecrement, PreIncrement, PreDecrement -> {
+				if (!(expression instanceof final LeftHandSideExpression lhs)) {
+					throw new AbruptCompletion(new LanguageError("Invalid left-hand side expression in postfix operation"), AbruptCompletion.Type.Throw);
+//					interpreter.throwError("Invalid left-hand side expression in postfix operation", LanguageError.class);
+				}
+
+				final Reference lref = lhs.toReference(interpreter);
+				final NumericLiteral oldValue = lhs.execute(interpreter).toNumericLiteral(interpreter);
+				final NumericLiteral newValue = new NumericLiteral(switch (op) {
+					case PostIncrement, PreIncrement -> oldValue.value + 1.0;
+					case PostDecrement, PreDecrement -> oldValue.value - 1.0;
+					default -> throw new IllegalStateException("Unexpected value: " + op);
+				});
+
+				lref.setValue(interpreter, newValue);
+				yield switch (op) {
+					case PostIncrement, PostDecrement -> oldValue;
+					case PreIncrement, PreDecrement -> newValue;
+					default -> throw new IllegalStateException("Unexpected value: " + op);
+				};
+			}
 		};
 	}
 
@@ -46,11 +70,22 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 			case LogicalNot -> '!';
 			case Add -> '+';
 			case Typeof -> "typeof ";
+			case PreDecrement -> "--";
+			case PreIncrement -> "++";
+			case PostIncrement, PostDecrement -> "";
 		});
+
 		expression.represent(representation);
+
+		switch (op) {
+			case PostDecrement -> representation.append("--");
+			case PostIncrement -> representation.append("++");
+		}
 	}
 
 	public enum UnaryOp {
-		Negate, LogicalNot, Add, Typeof
+		Negate, LogicalNot, Add, Typeof,
+		PostDecrement, PostIncrement,
+		PreDecrement, PreIncrement
 	}
 }

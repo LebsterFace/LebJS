@@ -300,6 +300,8 @@ public class Parser {
 			case Minus -> UnaryExpression.UnaryOp.Negate;
 			case Bang -> UnaryExpression.UnaryOp.LogicalNot;
 			case Typeof -> UnaryExpression.UnaryOp.Typeof;
+			case Increment -> UnaryExpression.UnaryOp.PreIncrement;
+			case Decrement -> UnaryExpression.UnaryOp.PreDecrement;
 			default -> throw new CannotParse(token, "Unary Operator");
 		};
 
@@ -347,8 +349,8 @@ public class Parser {
 			case LogicalAnd -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
 			case PlusEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.PlusAssign);
 			case MinusEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
-//			case Decrement -> new UnaryExpression(left, UnaryOp.PostDecrement);
-//			case Increment -> new UnaryExpression(left, UnaryOp.PostIncrement);
+			case Decrement -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostDecrement);
+			case Increment -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostIncrement);
 			case LessThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
 			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
 

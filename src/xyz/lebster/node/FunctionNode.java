@@ -1,6 +1,7 @@
 package xyz.lebster.node;
 
 import xyz.lebster.Dumper;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.expression.Identifier;
 
 public abstract class FunctionNode implements ASTNode {
@@ -17,7 +18,7 @@ public abstract class FunctionNode implements ASTNode {
 	public String getCallString() {
 		final StringBuilder builder = new StringBuilder(name == null ? "" : name.value());
 
-		builder.append("(");
+		builder.append('(');
 		if (arguments.length > 0) {
 			builder.append(arguments[0].value());
 			for (int i = 1; i < arguments.length; i++) {
@@ -25,7 +26,7 @@ public abstract class FunctionNode implements ASTNode {
 				builder.append(arguments[i].value());
 			}
 		}
-		builder.append(")");
+		builder.append(')');
 
 		return builder.toString();
 	}
@@ -37,4 +38,21 @@ public abstract class FunctionNode implements ASTNode {
 			child.dump(indent + 1);
 		}
 	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append("function ");
+		representation.append(name == null ? "" : name.value());
+		representation.append('(');
+		if (arguments.length > 0) {
+			representation.append(arguments[0].value());
+			for (int i = 1; i < arguments.length; i++) {
+				representation.append(", ");
+				representation.append(arguments[i].value());
+			}
+		}
+		representation.append(") ");
+		body.represent(representation);
+	}
+
 }

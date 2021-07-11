@@ -3,6 +3,7 @@ package xyz.lebster.node.expression;
 import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.SpecificationURL;
 import xyz.lebster.node.value.NumericLiteral;
 import xyz.lebster.node.value.StringLiteral;
@@ -43,6 +44,20 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 		Dumper.dumpIndicated(indent + 1, "Left", left);
 		Dumper.dumpEnum(indent + 1, "Operator", op);
 		Dumper.dumpIndicated(indent + 1, "Right", right);
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		left.represent(representation);
+		representation.append(' ');
+		representation.append(switch (op) {
+			case Add -> '+';
+			case Subtract -> '-';
+			case Multiply -> '*';
+			case Divide -> '/';
+		});
+		representation.append(' ');
+		right.represent(representation);
 	}
 
 	@Override

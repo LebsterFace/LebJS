@@ -3,6 +3,7 @@ package xyz.lebster.node;
 import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.expression.Expression;
 import xyz.lebster.node.value.BooleanLiteral;
 import xyz.lebster.node.value.Undefined;
@@ -28,6 +29,18 @@ public record IfStatement(Expression condition, Statement consequence, Statement
 			return new Undefined();
 		} else {
 			return elseStatement.execute(interpreter);
+		}
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append("if (");
+		condition.represent(representation);
+		representation.append(") ");
+		consequence.represent(representation);
+		if (elseStatement != null) {
+			representation.append(" else ");
+			elseStatement.represent(representation);
 		}
 	}
 }

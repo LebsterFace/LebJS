@@ -3,6 +3,7 @@ package xyz.lebster.node;
 import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.value.Value;
 
 public class BreakStatement implements Statement {
@@ -16,5 +17,10 @@ public class BreakStatement implements Statement {
 	@Override
 	public void dump(int indent) {
 		Dumper.dumpSingle(indent, "BreakStatement");
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.appendLine("break;");
 	}
 }

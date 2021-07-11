@@ -4,6 +4,7 @@ import xyz.lebster.ANSI;
 import xyz.lebster.Dumper;
 import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.value.prototype.ObjectPrototype;
 
 import java.util.HashMap;
@@ -64,6 +65,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 
 		// End of prototype chain; property does not exist.
 		return new Undefined();
+//		throw new ExecutionError("Property '" + name.value + "' does not exist on object!");
 	}
 
 	public boolean hasProperty(StringLiteral name) {
@@ -141,5 +143,15 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	@Override
 	public String typeOf() {
 		return "object";
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		if (value.isEmpty()) {
+			representation.append("{}");
+			return;
+		}
+
+		System.err.println(ANSI.BACKGROUND_BRIGHT_YELLOW + "WARNING" + ANSI.RESET + " Dictionary#represent for filled dictionary has not been implemented!");
 	}
 }

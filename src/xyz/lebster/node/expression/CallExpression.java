@@ -4,6 +4,7 @@ import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.ExecutionContext;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.SpecificationURL;
 import xyz.lebster.node.value.Executable;
 import xyz.lebster.node.value.Value;
@@ -37,5 +38,19 @@ public record CallExpression(Expression callee, Expression... arguments) impleme
 		Dumper.dumpIndicated(indent + 1, "Callee", callee);
 		Dumper.dumpIndicator(indent + 1, arguments.length > 0 ? "Arguments" : "No Arguments");
 		for (Expression argument : arguments) argument.dump(indent + 2);
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		callee.represent(representation);
+		representation.append('(');
+		if (arguments.length > 0) {
+			arguments[0].represent(representation);
+			for (int i = 1; i < arguments.length; i++) {
+				representation.append(", ");
+				arguments[i].represent(representation);
+			}
+		}
+		representation.append(')');
 	}
 }

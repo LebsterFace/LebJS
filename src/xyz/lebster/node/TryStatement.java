@@ -3,6 +3,7 @@ package xyz.lebster.node;
 import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.value.Value;
 
 public record TryStatement(BlockStatement body, CatchClause handler) implements Statement {
@@ -23,5 +24,13 @@ public record TryStatement(BlockStatement body, CatchClause handler) implements 
 			interpreter.declareVariable(handler.parameter(), completion.value);
 			return handler.body().execute(interpreter);
 		}
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append("try ");
+		body.represent(representation);
+		representation.append(' ');
+		handler.represent(representation);
 	}
 }

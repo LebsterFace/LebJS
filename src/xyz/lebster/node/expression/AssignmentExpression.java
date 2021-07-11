@@ -5,6 +5,7 @@ import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.Reference;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.SpecificationURL;
 import xyz.lebster.node.value.Value;
 import xyz.lebster.runtime.LanguageError;
@@ -42,6 +43,19 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 				yield result;
 			}
 		};
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		left.represent(representation);
+		representation.append(' ');
+		representation.append(switch (op) {
+			case Assign -> '=';
+			case MinusAssign -> "-=";
+			case PlusAssign -> "+=";
+		});
+		representation.append(' ');
+		right.represent(representation);
 	}
 
 	private BinaryExpression.BinaryOp lookupBinaryOp(AssignmentOp op) {

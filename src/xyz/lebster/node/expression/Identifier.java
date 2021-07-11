@@ -4,6 +4,7 @@ import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.Reference;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.value.StringLiteral;
 import xyz.lebster.node.value.Value;
 
@@ -30,5 +31,10 @@ public record Identifier(String value) implements LeftHandSideExpression {
 	@Override
 	public String toString() {
 		return value;
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append(value);
 	}
 }

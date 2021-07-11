@@ -3,6 +3,7 @@ package xyz.lebster.node;
 import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.value.Undefined;
 import xyz.lebster.node.value.Value;
 
@@ -20,5 +21,11 @@ public record VariableDeclaration(VariableDeclarator... declarations) implements
 		for (VariableDeclarator declarator : declarations) declarator.execute(interpreter);
 		return new Undefined();
 	}
-}
 
+	@Override
+	public void represent(StringRepresentation representation) {
+		for (VariableDeclarator declaration : declarations) {
+			declaration.represent(representation);
+		}
+	}
+}

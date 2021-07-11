@@ -3,6 +3,7 @@ package xyz.lebster.node.expression;
 import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.SpecificationURL;
 import xyz.lebster.node.value.Value;
 
@@ -31,6 +32,18 @@ public record LogicalExpression(Expression left, Expression right, LogicOp op) i
 				yield lbool ? lval : right.execute(interpreter);
 			}
 		};
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		left.represent(representation);
+		representation.append(' ');
+		representation.append(switch (op) {
+			case And -> "&&";
+			case Or -> "||";
+		});
+		representation.append(' ');
+		right.represent(representation);
 	}
 
 	public enum LogicOp {

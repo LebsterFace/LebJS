@@ -4,11 +4,12 @@ import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.Reference;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.value.StringLiteral;
 import xyz.lebster.node.value.Value;
 import xyz.lebster.runtime.LanguageError;
 
-public record UnaryExpression(Expression expression, xyz.lebster.node.expression.UnaryExpression.UnaryOp op) implements Expression {
+public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op) implements Expression {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return switch (op) {
@@ -36,6 +37,17 @@ public record UnaryExpression(Expression expression, xyz.lebster.node.expression
 		Dumper.dumpName(indent, "UnaryExpression");
 		Dumper.dumpIndicated(indent + 1, "Expression", expression);
 		Dumper.dumpEnum(indent + 1, "Operator", op);
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append(switch (op) {
+			case Negate -> '-';
+			case LogicalNot -> '!';
+			case Add -> '+';
+			case Typeof -> "typeof ";
+		});
+		expression.represent(representation);
 	}
 
 	public enum UnaryOp {

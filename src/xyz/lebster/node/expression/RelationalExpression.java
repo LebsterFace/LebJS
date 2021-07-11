@@ -4,6 +4,7 @@ import xyz.lebster.Dumper;
 import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.SpecificationURL;
 import xyz.lebster.node.value.BooleanLiteral;
 import xyz.lebster.node.value.Dictionary;
@@ -42,6 +43,22 @@ public record RelationalExpression(Expression left, Expression right, Relational
 
 			case InstanceOf -> throw new NotImplemented("`instanceof` operator");
 		});
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		left.represent(representation);
+		representation.append(' ');
+		representation.append(switch (op) {
+			case LessThan -> '<';
+			case GreaterThan -> '>';
+			case LessThanEquals -> "<=";
+			case GreaterThanEquals -> ">=";
+			case InstanceOf -> "instanceof";
+			case In -> "in";
+		});
+		representation.append(' ');
+		right.represent(representation);
 	}
 
 	public enum RelationalOp {

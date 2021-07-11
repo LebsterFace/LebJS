@@ -4,6 +4,7 @@ import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.ExecutionContext;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.value.Undefined;
 import xyz.lebster.node.value.Value;
 
@@ -42,6 +43,21 @@ public record BlockStatement(List<ASTNode> children) implements Statement {
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.indent();
+		representation.appendLine("{");
+
+		for (ASTNode child : children) {
+			representation.appendIndent();
+			child.represent(representation);
+		}
+
+		representation.unindent();
+		representation.appendIndent();
+		representation.appendLine("}");
 	}
 
 	@Override

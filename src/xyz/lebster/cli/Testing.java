@@ -136,6 +136,16 @@ public class Testing {
 			return result;
 		}));
 
+		globalObject.set("__proto__", new NativeFunction((interpreter, values) -> {
+			if (values.length == 0) {
+				throw new AbruptCompletion(new LanguageError("You must provide an object to get the prototype of"), AbruptCompletion.Type.Throw);
+			} else if (values.length > 1) {
+				throw new AbruptCompletion(new LanguageError("Multiple values were provided"), AbruptCompletion.Type.Throw);
+			} else {
+				return values[0].toDictionary(interpreter).getPrototype();
+			}
+		}));
+
 		return globalObject;
 	}
 

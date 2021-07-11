@@ -8,6 +8,39 @@ public class NumericLiteral extends Primitive<Double> {
 		super(value, Type.Number);
 	}
 
+	private static String stringValueOf(Double d) {
+		if (d.isNaN()) return "NaN";
+		else if (d == 0.0 || d == -0.0) return "0";
+		else if (d < 0.0) return "-" + stringValueOf(-d);
+		else if (d.isInfinite()) return "Infinity";
+		final String input = String.valueOf(d);
+		int decimalPosition = -1;
+		int firstZeros = -1;
+		for (int i = 0; i < input.length(); i++) {
+			if (input.charAt(i) == '.') {
+				decimalPosition = i;
+			} else if (decimalPosition != -1) {
+				if (input.charAt(i) == '0') {
+					if (firstZeros == -1) {
+						firstZeros = i;
+					}
+				} else {
+					firstZeros = -1;
+				}
+			}
+		}
+
+		if (decimalPosition == -1 || firstZeros == -1) {
+			return input;
+		} else {
+			if (decimalPosition + 1 == firstZeros) {
+				return input.substring(0, decimalPosition);
+			} else {
+				return input.substring(0, firstZeros);
+			}
+		}
+	}
+
 	@Override
 	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
 		return this;
@@ -31,5 +64,10 @@ public class NumericLiteral extends Primitive<Double> {
 
 	public NumericLiteral unaryMinus() {
 		return new NumericLiteral(-value);
+	}
+
+	@Override
+	public String toString() {
+		return stringValueOf(value);
 	}
 }

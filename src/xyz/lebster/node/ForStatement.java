@@ -14,7 +14,7 @@ public record ForStatement(Statement init, Expression test, Expression update, S
 		if (init != null) init.execute(interpreter);
 		final Value<?> result = new Undefined();
 
-		while (test.execute(interpreter).toBooleanLiteral(interpreter).value) {
+		while (test.execute(interpreter).isTruthy()) {
 			try {
 				body.execute(interpreter);
 				update.execute(interpreter);

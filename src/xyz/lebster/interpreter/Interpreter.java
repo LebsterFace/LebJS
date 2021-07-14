@@ -47,7 +47,7 @@ public class Interpreter {
 
 	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {
 		if (currentExecutionContext + 1 == stackSize) {
-			throw new AbruptCompletion(new RangeError("Maximum call stack size exceeded"), AbruptCompletion.Type.Throw);
+			throw AbruptCompletion.error(new RangeError("Maximum call stack size exceeded"));
 		}
 
 		executionContextStack[++currentExecutionContext] = context;

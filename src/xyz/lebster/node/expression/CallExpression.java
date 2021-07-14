@@ -31,7 +31,7 @@ public record CallExpression(Expression callee, Expression... arguments) impleme
 			final StringRepresentation representation = new StringRepresentation();
 			callee.represent(representation);
 			representation.append(" is not a function");
-			throw new AbruptCompletion(new TypeError(representation.toString()), AbruptCompletion.Type.Throw);
+			throw AbruptCompletion.error(new TypeError(representation.toString()));
 		}
 	}
 

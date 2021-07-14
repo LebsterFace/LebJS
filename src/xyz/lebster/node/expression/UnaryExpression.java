@@ -19,7 +19,7 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 			case Negate -> expression.execute(interpreter).toNumericLiteral().unaryMinus();
 			case Typeof -> {
 				if (!(expression instanceof final LeftHandSideExpression lhs)) {
-					throw new AbruptCompletion(new LanguageError("Invalid right-hand side in 'typeof' expression"), AbruptCompletion.Type.Throw);
+					throw AbruptCompletion.error(new LanguageError("Invalid right-hand side in 'typeof' expression"));
 				}
 
 //				https://tc39.es/ecma262/multipage#sec-typeof-operator-runtime-semantics-evaluation
@@ -34,7 +34,7 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 //			https://tc39.es/ecma262/multipage#sec-postfix-increment-operator
 			case PostIncrement, PostDecrement, PreIncrement, PreDecrement -> {
 				if (!(expression instanceof final LeftHandSideExpression lhs)) {
-					throw new AbruptCompletion(new LanguageError("Invalid left-hand side expression in postfix operation"), AbruptCompletion.Type.Throw);
+					throw AbruptCompletion.error(new LanguageError("Invalid left-hand side expression in postfix operation"));
 				}
 
 				final Reference lref = lhs.toReference(interpreter);

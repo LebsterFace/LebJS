@@ -1,6 +1,8 @@
 package xyz.lebster.interpreter;
 
 import xyz.lebster.node.value.Value;
+import xyz.lebster.runtime.LanguageError;
+import xyz.lebster.runtime.TypeError;
 
 public class AbruptCompletion extends Throwable {
 	public final Type type;
@@ -9,6 +11,10 @@ public class AbruptCompletion extends Throwable {
 	public AbruptCompletion(Value<?> value, Type type) {
 		this.type = type;
 		this.value = value;
+	}
+
+	public static AbruptCompletion error(Value<?> err) {
+		return new AbruptCompletion(err, Type.Throw);
 	}
 
 	@Override

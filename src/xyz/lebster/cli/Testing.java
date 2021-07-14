@@ -125,8 +125,7 @@ public class Testing {
 			for (int i = 0; i < arguments.length; i += 2) {
 				final StringLiteral key = arguments[i].execute(interpreter).toStringLiteral();
 				if (arguments.length - 1 == i) {
-					final var error = new LanguageError("Unmatched key '" + key.value + "' in createObject");
-					throw new AbruptCompletion(error, AbruptCompletion.Type.Throw);
+					throw AbruptCompletion.error(new LanguageError("Unmatched key '" + key.value + "' in createObject"));
 				}
 
 				final Value<?> value = arguments[i + 1].execute(interpreter);
@@ -138,9 +137,9 @@ public class Testing {
 
 		globalObject.set("__proto__", new NativeFunction((interpreter, values) -> {
 			if (values.length == 0) {
-				throw new AbruptCompletion(new LanguageError("You must provide an object to get the prototype of"), AbruptCompletion.Type.Throw);
+				throw AbruptCompletion.error(new LanguageError("You must provide an object to get the prototype of"));
 			} else if (values.length > 1) {
-				throw new AbruptCompletion(new LanguageError("Multiple values were provided"), AbruptCompletion.Type.Throw);
+				throw AbruptCompletion.error(new LanguageError("Multiple objects were provided"));
 			} else {
 				return values[0].toDictionary().getPrototype();
 			}

@@ -10,7 +10,7 @@ import xyz.lebster.node.value.Value;
 public record ThrowStatement(Expression value) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		throw new AbruptCompletion(value.execute(interpreter), AbruptCompletion.Type.Throw);
+		throw AbruptCompletion.error(value.execute(interpreter));
 	}
 
 	@Override

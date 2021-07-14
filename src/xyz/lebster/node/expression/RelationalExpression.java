@@ -37,7 +37,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 				if (rval instanceof final Dictionary dictionary) {
 					yield dictionary.hasOwnProperty(lval.toStringLiteral());
 				} else {
-					throw new AbruptCompletion(new TypeError("Can only use 'in' operator on an object!"), AbruptCompletion.Type.Throw);
+					throw AbruptCompletion.error(new TypeError("Can only use 'in' operator on an object!"));
 				}
 			}
 

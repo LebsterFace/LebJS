@@ -17,7 +17,7 @@ public record Reference(Dictionary base, StringLiteral referencedName) {
 		if (isResolvable()) {
 			return base.get(referencedName);
 		} else {
-			throw new AbruptCompletion(new ReferenceError(referencedName.value + " is not defined"), AbruptCompletion.Type.Throw);
+			throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
 		}
 	}
 
@@ -25,7 +25,7 @@ public record Reference(Dictionary base, StringLiteral referencedName) {
 		if (isResolvable()) {
 			return base.set(referencedName, newValue);
 		} else {
-			throw new AbruptCompletion(new ReferenceError(referencedName.value + " is not defined"), AbruptCompletion.Type.Throw);
+			throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
 		}
 	}
 

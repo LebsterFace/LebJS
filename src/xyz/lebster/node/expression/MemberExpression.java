@@ -22,7 +22,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 	@Override
 	public Reference toReference(Interpreter interpreter) throws AbruptCompletion {
 		final Dictionary executedBase = base.execute(interpreter).toDictionary();
-		final StringLiteral executedProp = (StringLiteral) (computed ? property.execute(interpreter) : property);
+		final StringLiteral executedProp = property.execute(interpreter).toStringLiteral();
 		return new Reference(executedBase, executedProp);
 	}
 

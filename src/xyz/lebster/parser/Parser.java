@@ -6,6 +6,7 @@ import xyz.lebster.exception.ParseException;
 import xyz.lebster.node.*;
 import xyz.lebster.node.expression.*;
 import xyz.lebster.node.value.*;
+import xyz.lebster.runtime.ArrayObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -415,6 +416,7 @@ public class Parser {
 			case BooleanLiteral -> new BooleanLiteral(consume().value.equals("true"));
 			case Identifier -> new Identifier(consume().value);
 			case Function -> parseFunctionExpression();
+			case LBracket -> parseArrayExpression();
 
 			case This -> {
 				consume();
@@ -443,6 +445,13 @@ public class Parser {
 
 			default -> throw new CannotParse(currentToken, "PrimaryExpression");
 		};
+	}
+
+	private ArrayExpression parseArrayExpression() throws ParseException {
+		require(TokenType.LBracket);
+		final List<Expression> elements = parseExpressionList();
+		require(TokenType.RBracket);
+		return new ArrayExpression(elements);
 	}
 
 	private boolean matchDeclaration() {
@@ -488,6 +497,7 @@ public class Parser {
 			   t == TokenType.This ||
 			   t == TokenType.Identifier ||
 			   t == TokenType.LParen ||
+			   t == TokenType.LBracket ||
 			   matchUnaryPrefixedExpression();
 	}
 

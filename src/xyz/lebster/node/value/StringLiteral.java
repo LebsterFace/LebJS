@@ -20,7 +20,8 @@ public class StringLiteral extends Primitive<String> {
 
 	@Override
 	public NumericLiteral toNumericLiteral() {
-		throw new NotImplemented("StringLiteral -> NumericLiteral");
+//		FIXME: Follow spec
+		return new NumericLiteral(Double.parseDouble(value));
 	}
 
 	@Override

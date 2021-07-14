@@ -28,7 +28,7 @@ public record CallExpression(Expression callee, Expression... arguments) impleme
 				interpreter.exitExecutionContext(frame);
 			}
 		} else {
-			return new TypeError(callee.getClass().getSimpleName() + " is not a function");
+			throw new AbruptCompletion(new TypeError(callee.getClass().getSimpleName() + " is not a function"), AbruptCompletion.Type.Throw);
 		}
 	}
 

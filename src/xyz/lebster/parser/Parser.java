@@ -295,13 +295,19 @@ public class Parser {
 		return new FunctionExpression(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
 	}
 
-	private CallExpression parseCallExpression(Expression left) throws ParseException {
-		final ArrayList<Expression> arguments = new ArrayList<>();
+	private List<Expression> parseExpressionList() throws ParseException {
+		final List<Expression> result = new ArrayList<>();
+
 		while (matchExpression()) {
-			arguments.add(parseExpression(0, Left));
+			result.add(parseExpression(0, Left));
 			if (accept(TokenType.Comma) == null) break;
 		}
 
+		return result;
+	}
+
+	private CallExpression parseCallExpression(Expression left) throws ParseException {
+		final List<Expression> arguments = parseExpressionList();
 		require(TokenType.RParen);
 		return new CallExpression(left, arguments.toArray(new Expression[0]));
 	}

@@ -4,8 +4,16 @@ import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.interpreter.Interpreter;
 
 public class NumericLiteral extends Primitive<Double> {
-	public NumericLiteral(double value) {
-		super(value, Type.Number);
+	public NumericLiteral(double num) {
+		super(num, Type.Number);
+	}
+
+	public NumericLiteral(Double num) {
+		super(num, Type.Number);
+	}
+
+	public NumericLiteral(int num) {
+		super((double) num, Type.Number);
 	}
 
 	private static String stringValueOf(Double d) {

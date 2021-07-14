@@ -80,4 +80,8 @@ public abstract class Value<JType> implements Expression {
 	public boolean isTruthy() {
 		return toBooleanLiteral().value;
 	}
+
+	public boolean isNullish() {
+		return type == Type.Undefined || type == Type.Null;
+	}
 }

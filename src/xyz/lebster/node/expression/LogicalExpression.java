@@ -5,6 +5,7 @@ import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.SpecificationURL;
+import xyz.lebster.node.value.Type;
 import xyz.lebster.node.value.Value;
 
 public record LogicalExpression(Expression left, Expression right, LogicOp op) implements Expression {
@@ -24,6 +25,7 @@ public record LogicalExpression(Expression left, Expression right, LogicOp op) i
 		return switch (op) {
 			case And -> lval.isTruthy() ? right.execute(interpreter) : lval;
 			case Or -> lval.isTruthy() ? lval : right.execute(interpreter);
+			case Coalesce -> lval.isNullish() ? right.execute(interpreter) : lval;
 		};
 	}
 
@@ -34,12 +36,13 @@ public record LogicalExpression(Expression left, Expression right, LogicOp op) i
 		representation.append(switch (op) {
 			case And -> "&&";
 			case Or -> "||";
+			case Coalesce -> "??";
 		});
 		representation.append(' ');
 		right.represent(representation);
 	}
 
 	public enum LogicOp {
-		And, Or
+		And, Or, Coalesce
 	}
 }

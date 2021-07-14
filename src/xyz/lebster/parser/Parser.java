@@ -45,9 +45,9 @@ public class Parser {
 		precedence.put(TokenType.StrictEqual, 11);
 		precedence.put(TokenType.StrictNotEqual, 11);
 
-		precedence.put(TokenType.LogicalAnd, 8);
-
+		precedence.put(TokenType.LogicalAnd, 7);
 		precedence.put(TokenType.LogicalOr, 6);
+		precedence.put(TokenType.NullishCoalescing, 5);
 
 		precedence.put(TokenType.PlusEquals, 3);
 		precedence.put(TokenType.MinusEquals, 3);
@@ -70,6 +70,7 @@ public class Parser {
 		associativity.put(TokenType.GreaterThan, Left);
 		associativity.put(TokenType.LogicalOr, Left);
 		associativity.put(TokenType.LogicalAnd, Left);
+		associativity.put(TokenType.NullishCoalescing, Left);
 
 		associativity.put(TokenType.Bang, Right);
 		associativity.put(TokenType.Typeof, Right);
@@ -367,13 +368,13 @@ public class Parser {
 			case StrictNotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictNotEquals);
 			case LogicalOr -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Or);
 			case LogicalAnd -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
+			case NullishCoalescing -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Coalesce);
 			case PlusEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.PlusAssign);
 			case MinusEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
 			case Decrement -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostDecrement);
 			case Increment -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostIncrement);
 			case LessThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
 			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
-
 
 			case Period -> {
 				final String prop = require(TokenType.Identifier).value;
@@ -503,6 +504,7 @@ public class Parser {
 			   t == TokenType.MultiplyEquals ||
 			   t == TokenType.LeftShiftEquals ||
 			   t == TokenType.RightShiftEquals ||
+			   t == TokenType.NullishCoalescing ||
 			   t == TokenType.LBracket ||
 			   t == TokenType.LParen ||
 			   t == TokenType.Equals ||

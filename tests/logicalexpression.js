@@ -22,3 +22,16 @@ expect(f, t && f);
 expect(f, f && t);
 expect(f, f && f);
 expect(t, t && t);
+
+let N = null;
+let U = undefined;
+let V = 500;
+let A = 1000;
+
+expect(V, N ?? V);
+expect(V, U ?? V);
+expect(V, V ?? N);
+expect(V, V ?? U);
+
+expect(A, A ?? V);
+expect(V, V ?? A);

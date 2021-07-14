@@ -5,8 +5,7 @@ import xyz.lebster.node.value.*;
 
 public class StringPrototype extends Dictionary {
 	public static final StringPrototype instance = new StringPrototype();
-
-	public StringPrototype() {
+	private StringPrototype() {
 		set("reverse", new NativeFunction((interpreter, arguments) -> {
 			final Value<?> value = interpreter.thisValue();
 			if (!(value instanceof final StringWrapper wrapper)) {

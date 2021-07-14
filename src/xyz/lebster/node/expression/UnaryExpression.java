@@ -14,9 +14,9 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return switch (op) {
-			case Add -> expression.execute(interpreter).toNumericLiteral(interpreter);
-			case LogicalNot -> expression.execute(interpreter).toBooleanLiteral(interpreter).not();
-			case Negate -> expression.execute(interpreter).toNumericLiteral(interpreter).unaryMinus();
+			case Add -> expression.execute(interpreter).toNumericLiteral();
+			case LogicalNot -> expression.execute(interpreter).toBooleanLiteral().not();
+			case Negate -> expression.execute(interpreter).toNumericLiteral().unaryMinus();
 			case Typeof -> {
 				if (!(expression instanceof final LeftHandSideExpression lhs)) {
 					throw new AbruptCompletion(new LanguageError("Invalid right-hand side in 'typeof' expression"), AbruptCompletion.Type.Throw);
@@ -38,7 +38,7 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 				}
 
 				final Reference lref = lhs.toReference(interpreter);
-				final NumericLiteral oldValue = lhs.execute(interpreter).toNumericLiteral(interpreter);
+				final NumericLiteral oldValue = lhs.execute(interpreter).toNumericLiteral();
 				final NumericLiteral newValue = new NumericLiteral(switch (op) {
 					case PostIncrement, PreIncrement -> oldValue.value + 1.0;
 					case PostDecrement, PreDecrement -> oldValue.value - 1.0;

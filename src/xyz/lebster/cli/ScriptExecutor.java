@@ -23,7 +23,7 @@ public class ScriptExecutor {
 
 		globalObject.set("print", new NativeFunction((interpreter, values) -> {
 			for (Value<?> value : values) {
-				final StringLiteral str = value.toStringLiteral(interpreter);
+				final StringLiteral str = value.toStringLiteral();
 				System.out.println(str.value);
 			}
 

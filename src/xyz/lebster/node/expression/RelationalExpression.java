@@ -29,13 +29,13 @@ public record RelationalExpression(Expression left, Expression right, Relational
 //		FIXME: Comply with spec
 		// https://tc39.es/ecma262/multipage#sec-relational-operators-runtime-semantics-evaluation
 		return new BooleanLiteral(switch (op) {
-			case LessThan -> lval.toNumericLiteral(interpreter).value < rval.toNumericLiteral(interpreter).value;
-			case GreaterThan -> lval.toNumericLiteral(interpreter).value > rval.toNumericLiteral(interpreter).value;
-			case LessThanEquals -> lval.toNumericLiteral(interpreter).value <= rval.toNumericLiteral(interpreter).value;
-			case GreaterThanEquals -> lval.toNumericLiteral(interpreter).value >= rval.toNumericLiteral(interpreter).value;
+			case LessThan -> lval.toNumericLiteral().value < rval.toNumericLiteral().value;
+			case GreaterThan -> lval.toNumericLiteral().value > rval.toNumericLiteral().value;
+			case LessThanEquals -> lval.toNumericLiteral().value <= rval.toNumericLiteral().value;
+			case GreaterThanEquals -> lval.toNumericLiteral().value >= rval.toNumericLiteral().value;
 			case In -> {
 				if (rval instanceof final Dictionary dictionary) {
-					yield dictionary.hasOwnProperty(lval.toStringLiteral(interpreter));
+					yield dictionary.hasOwnProperty(lval.toStringLiteral());
 				} else {
 					throw new AbruptCompletion(new TypeError("Can only use 'in' operator on an object!"), AbruptCompletion.Type.Throw);
 				}

@@ -10,17 +10,17 @@ public class Null extends Primitive<Void> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
+	public NumericLiteral toNumericLiteral() {
 		return new NumericLiteral(0.0);
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
+	public BooleanLiteral toBooleanLiteral() {
 		return new BooleanLiteral(false);
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public Dictionary toDictionary() {
 		return new TypeError("Cannot convert null to base!");
 	}
 

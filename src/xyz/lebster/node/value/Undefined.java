@@ -10,17 +10,17 @@ public class Undefined extends Primitive<Void> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
+	public NumericLiteral toNumericLiteral() {
 		return new NumericLiteral(Double.NaN);
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
+	public BooleanLiteral toBooleanLiteral() {
 		return new BooleanLiteral(false);
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public Dictionary toDictionary() {
 		return new TypeError("Cannot convert undefined to base!");
 	}
 

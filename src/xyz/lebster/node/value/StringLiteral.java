@@ -14,22 +14,22 @@ public class StringLiteral extends Primitive<String> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral(Interpreter interpreter) {
+	public StringLiteral toStringLiteral() {
 		return this;
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
+	public NumericLiteral toNumericLiteral() {
 		throw new NotImplemented("StringLiteral -> NumericLiteral");
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
+	public BooleanLiteral toBooleanLiteral() {
 		return new BooleanLiteral(value.length() > 0);
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public Dictionary toDictionary() {
 		return new StringWrapper(this);
 	}
 

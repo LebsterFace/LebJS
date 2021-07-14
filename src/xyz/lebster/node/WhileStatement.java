@@ -15,7 +15,7 @@ public record WhileStatement(Expression condition, Statement body) implements St
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> result = new Undefined();
 
-		while (condition.execute(interpreter).toBooleanLiteral(interpreter).value) {
+		while (condition.execute(interpreter).toBooleanLiteral().value) {
 			try {
 				body.execute(interpreter);
 			} catch (AbruptCompletion completion) {

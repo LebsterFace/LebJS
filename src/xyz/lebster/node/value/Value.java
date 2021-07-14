@@ -28,7 +28,7 @@ public abstract class Value<JType> implements Expression {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
-	public Primitive<?> toPrimitive(Interpreter interpreter, Type preferredType) {
+	public Primitive<?> toPrimitive(Type preferredType) {
 		if (this instanceof Primitive) {
 			return (Primitive<JType>) this;
 		} else {
@@ -36,8 +36,8 @@ public abstract class Value<JType> implements Expression {
 		}
 	}
 
-	public Primitive<?> toPrimitive(Interpreter interpreter) {
-		return toPrimitive(interpreter, null);
+	public Primitive<?> toPrimitive() {
+		return toPrimitive(null);
 	}
 
 	@Override
@@ -46,18 +46,18 @@ public abstract class Value<JType> implements Expression {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tostring")
-	public StringLiteral toStringLiteral(Interpreter interpreter) {
+	public StringLiteral toStringLiteral() {
 		return new StringLiteral(toString());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tonumber")
-	public abstract NumericLiteral toNumericLiteral(Interpreter interpreter);
+	public abstract NumericLiteral toNumericLiteral();
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toboolean")
-	public abstract BooleanLiteral toBooleanLiteral(Interpreter interpreter);
+	public abstract BooleanLiteral toBooleanLiteral();
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toobject")
-	public abstract Dictionary toDictionary(Interpreter interpreter);
+	public abstract Dictionary toDictionary();
 
 	@Override
 	public boolean equals(Object o) {

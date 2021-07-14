@@ -9,17 +9,17 @@ public class BooleanLiteral extends Primitive<Boolean> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
+	public NumericLiteral toNumericLiteral() {
 		return new NumericLiteral(value ? 1.0 : 0.0);
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
+	public BooleanLiteral toBooleanLiteral() {
 		return this;
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public Dictionary toDictionary() {
 		throw new NotImplemented("BooleanWrapper");
 	}
 

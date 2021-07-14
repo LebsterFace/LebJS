@@ -33,19 +33,19 @@ public class Function extends Executable<FunctionNode> {
 		}
 	}
 
-	public StringLiteral toStringLiteral(Interpreter interpreter) {
+	public StringLiteral toStringLiteral() {
 		throw new NotImplemented("Function -> StringLiteral");
 	}
 
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
+	public BooleanLiteral toBooleanLiteral() {
 		return new BooleanLiteral(true);
 	}
 
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
+	public NumericLiteral toNumericLiteral() {
 		return new NumericLiteral(Double.NaN);
 	}
 
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public Dictionary toDictionary() {
 		return this;
 	}
 }

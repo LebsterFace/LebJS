@@ -42,18 +42,18 @@ public class NumericLiteral extends Primitive<Double> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
+	public NumericLiteral toNumericLiteral() {
 		return this;
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
+	public BooleanLiteral toBooleanLiteral() {
 		final boolean shouldBeFalse = value.isNaN() || value == 0.0 || value == -0.0;
 		return new BooleanLiteral(!shouldBeFalse);
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public Dictionary toDictionary() {
 		throw new NotImplemented("NumberWrapper");
 	}
 

@@ -14,11 +14,11 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-applystringornumericbinaryoperator")
 	public static Value<?> applyOperator(Interpreter interpreter, Value<?> lval, BinaryOp op, Value<?> rval) {
 		if (op == BinaryOp.Add) {
-			final Value<?> lprim = lval.toPrimitive(interpreter);
-			final Value<?> rprim = rval.toPrimitive(interpreter);
+			final Value<?> lprim = lval.toPrimitive();
+			final Value<?> rprim = rval.toPrimitive();
 			if (lprim.type == Type.String || rprim.type == Type.String) {
-				final StringLiteral lstr = lprim.toStringLiteral(interpreter);
-				final StringLiteral rstr = rprim.toStringLiteral(interpreter);
+				final StringLiteral lstr = lprim.toStringLiteral();
+				final StringLiteral rstr = rprim.toStringLiteral();
 				return new StringLiteral(lstr.value + rstr.value);
 			} else {
 				lval = lprim;
@@ -26,8 +26,8 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 			}
 		}
 
-		final NumericLiteral lnum = lval.toNumericLiteral(interpreter);
-		final NumericLiteral rnum = rval.toNumericLiteral(interpreter);
+		final NumericLiteral lnum = lval.toNumericLiteral();
+		final NumericLiteral rnum = rval.toNumericLiteral();
 		final double result = switch (op) {
 			case Add -> lnum.value + rnum.value;
 			case Subtract -> lnum.value - rnum.value;

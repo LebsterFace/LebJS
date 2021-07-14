@@ -26,17 +26,17 @@ public class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
+	public NumericLiteral toNumericLiteral() {
 		throw new NotImplemented("NativeFunction -> NumericLiteral");
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
+	public BooleanLiteral toBooleanLiteral() {
 		throw new NotImplemented("NativeFunction -> BooleanLiteral");
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public Dictionary toDictionary() {
 		throw new NotImplemented("NativeFunction -> Dictionary");
 	}
 }

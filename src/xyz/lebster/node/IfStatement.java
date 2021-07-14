@@ -22,8 +22,7 @@ public record IfStatement(Expression condition, Statement consequence, Statement
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final BooleanLiteral res = condition.execute(interpreter).toBooleanLiteral(interpreter);
-		if (res.value) {
+		if (condition.execute(interpreter).toBooleanLiteral().value) {
 			return consequence.execute(interpreter);
 		} else if (elseStatement == null) {
 			return new Undefined();

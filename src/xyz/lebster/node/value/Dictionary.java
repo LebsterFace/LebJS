@@ -22,22 +22,22 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	}
 
 	@Override
-	public Primitive<?> toPrimitive(Interpreter interpreter, Type preferredType) {
+	public Primitive<?> toPrimitive(Type preferredType) {
 		throw new NotImplemented("Dictionary#toPrimitive");
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
-		return toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
+	public NumericLiteral toNumericLiteral() {
+		return toPrimitive(Type.Number).toNumericLiteral();
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
+	public BooleanLiteral toBooleanLiteral() {
 		return new BooleanLiteral(true);
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public Dictionary toDictionary() {
 		return this;
 	}
 

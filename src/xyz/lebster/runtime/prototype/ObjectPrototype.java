@@ -1,4 +1,4 @@
-package xyz.lebster.node.value.prototype;
+package xyz.lebster.runtime.prototype;
 
 import xyz.lebster.node.value.Dictionary;
 

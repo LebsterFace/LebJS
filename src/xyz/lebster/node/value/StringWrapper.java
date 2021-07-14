@@ -1,6 +1,6 @@
 package xyz.lebster.node.value;
 
-import xyz.lebster.node.value.prototype.StringPrototype;
+import xyz.lebster.runtime.prototype.StringPrototype;
 
 public class StringWrapper extends LiteralWrapper<StringLiteral> {
 	public StringWrapper(StringLiteral s) {

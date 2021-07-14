@@ -3,9 +3,8 @@ package xyz.lebster.node.value;
 import xyz.lebster.ANSI;
 import xyz.lebster.Dumper;
 import xyz.lebster.exception.NotImplemented;
-import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.StringRepresentation;
-import xyz.lebster.node.value.prototype.ObjectPrototype;
+import xyz.lebster.runtime.prototype.ObjectPrototype;
 
 import java.util.HashMap;
 import java.util.LinkedList;

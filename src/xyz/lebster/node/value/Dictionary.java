@@ -50,13 +50,13 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		return set(new StringLiteral(key), value);
 	}
 
-	public Value<?> get(StringLiteral name) {
+	public Value<?> get(StringLiteral key) {
 		Dictionary object = this;
 
 		while (object != null) {
-			if (object.value.containsKey(name)) {
+			if (object.value.containsKey(key)) {
 				// Property was found
-				return object.value.get(name);
+				return object.value.get(key);
 			} else {
 				// Property does not exist on current object. Move up prototype chain
 				object = object.getPrototype();
@@ -65,7 +65,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 
 		// End of prototype chain; property does not exist.
 		return new Undefined();
-//		throw new ExecutionError("Property '" + name.value + "' does not exist on object!");
+//		throw new ExecutionError("Property '" + key.value + "' does not exist on object!");
 	}
 
 	public boolean hasProperty(StringLiteral name) {

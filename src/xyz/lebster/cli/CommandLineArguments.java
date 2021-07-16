@@ -18,7 +18,6 @@ public record CommandLineArguments(String fileName, ExecutionMode mode, Executio
 					case "-r", "-repl" -> mode = ExecutionMode.REPL;
 					case "-f", "-file" -> mode = ExecutionMode.File;
 					case "-t", "-tests", "-test" -> mode = ExecutionMode.Tests;
-					case "-d", "-demo", "-g", "-gif" -> mode = ExecutionMode.Demo;
 					case "-h", "-hide", "-display" -> showDebug = false;
 					case "-s", "-silent", "-q" -> silent = true;
 					case "-a", "-ast", "-tree" -> showAST = true;
@@ -41,17 +40,13 @@ public record CommandLineArguments(String fileName, ExecutionMode mode, Executio
 			if (mode == ExecutionMode.File) {
 				throw new IllegalArgumentException("You must provide a filename");
 			}
-		} else if (mode == ExecutionMode.REPL || mode == ExecutionMode.Demo || mode == ExecutionMode.Tests) {
+		} else if (mode == ExecutionMode.REPL || mode == ExecutionMode.Tests) {
 			throw new IllegalArgumentException("Filename was not expected given mode " + mode.name());
 		}
 
-		switch (mode) {
-			case REPL -> {
-				showLastValue = true;
-				silent = false;
-			}
-
-			case Demo -> showDebug = false;
+		if (mode == ExecutionMode.REPL) {
+			showLastValue = true;
+			silent = false;
 		}
 
 		return new CommandLineArguments(fileName, mode, new ExecutionOptions(

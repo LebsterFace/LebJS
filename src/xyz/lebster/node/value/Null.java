@@ -1,7 +1,6 @@
 package xyz.lebster.node.value;
 
 import xyz.lebster.Dumper;
-import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.runtime.TypeError;
 
 public class Null extends Primitive<Void> {

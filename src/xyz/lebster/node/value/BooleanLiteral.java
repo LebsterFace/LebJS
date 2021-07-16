@@ -1,7 +1,6 @@
 package xyz.lebster.node.value;
 
 import xyz.lebster.exception.NotImplemented;
-import xyz.lebster.interpreter.Interpreter;
 
 public class BooleanLiteral extends Primitive<Boolean> {
 	public BooleanLiteral(boolean value) {

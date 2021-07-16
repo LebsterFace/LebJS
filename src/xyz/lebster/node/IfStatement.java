@@ -5,7 +5,6 @@ import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.expression.Expression;
-import xyz.lebster.node.value.BooleanLiteral;
 import xyz.lebster.node.value.Undefined;
 import xyz.lebster.node.value.Value;
 

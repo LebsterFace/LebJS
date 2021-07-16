@@ -14,8 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import static xyz.lebster.cli.ScriptExecutor.getInterpreter;
 import static xyz.lebster.cli.ScriptExecutor.executeFile;
+import static xyz.lebster.cli.ScriptExecutor.getInterpreter;
 
 public class Testing {
 	public static void test(ExecutionOptions options) {
@@ -68,7 +68,7 @@ public class Testing {
 		System.setOut(tempStream);
 
 		try {
-			return new Test(executeFile(file.toPath(), getInterpreter(32,true), options), null, tempOutput.toString());
+			return new Test(executeFile(file.toPath(), getInterpreter(32, true), options), null, tempOutput.toString());
 		} catch (Throwable throwable) {
 			return new Test(false, throwable, tempOutput.toString());
 		} finally {

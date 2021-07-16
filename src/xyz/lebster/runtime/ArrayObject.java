@@ -10,6 +10,16 @@ import java.util.Map;
 public class ArrayObject extends Dictionary {
 	private int length = 0;
 
+	public ArrayObject(List<Value<?>> expressionList) {
+		super(getMapFromExpressionList(expressionList));
+		this.initialize();
+	}
+
+	public ArrayObject() {
+		super();
+		this.initialize();
+	}
+
 	private static Map<StringLiteral, Value<?>> getMapFromExpressionList(List<Value<?>> expressionList) {
 		final Map<StringLiteral, Value<?>> result = new HashMap<>(expressionList.size());
 		for (int i = 0; i < expressionList.size(); i++)
@@ -23,16 +33,6 @@ public class ArrayObject extends Dictionary {
 		this.set("length", new NativeFunction(((interpreter, arguments) ->
 			new NumericLiteral(length)
 		)));
-	}
-
-	public ArrayObject(List<Value<?>> expressionList) {
-		super(getMapFromExpressionList(expressionList));
-		this.initialize();
-	}
-
-	public ArrayObject() {
-		super();
-		this.initialize();
 	}
 
 	public NumericLiteral push(Value<?>... elements) {

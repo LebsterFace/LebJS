@@ -5,7 +5,6 @@ import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.SpecificationURL;
-import xyz.lebster.node.value.Type;
 import xyz.lebster.node.value.Value;
 
 public record LogicalExpression(Expression left, Expression right, LogicOp op) implements Expression {

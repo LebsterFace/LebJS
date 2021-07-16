@@ -1,8 +1,5 @@
 package xyz.lebster.node.value;
 
-import xyz.lebster.exception.NotImplemented;
-import xyz.lebster.interpreter.Interpreter;
-
 public class StringLiteral extends Primitive<String> {
 	public StringLiteral(String value) {
 		super(value, Type.String);

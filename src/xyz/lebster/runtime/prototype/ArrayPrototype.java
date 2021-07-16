@@ -1,7 +1,8 @@
 package xyz.lebster.runtime.prototype;
 
 import xyz.lebster.exception.NotImplemented;
-import xyz.lebster.node.value.*;
+import xyz.lebster.node.value.Dictionary;
+import xyz.lebster.node.value.NativeFunction;
 import xyz.lebster.runtime.ArrayObject;
 
 public class ArrayPrototype extends Dictionary {

@@ -122,7 +122,7 @@ public class Parser {
 			if (currentToken.type == TokenType.EOF) {
 				break;
 			} else {
-				program.body.append(parseLine());
+				program.append(parseLine());
 			}
 		}
 

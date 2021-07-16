@@ -13,22 +13,22 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public record BlockStatement(List<ASTNode> children) implements Statement {
+public record BlockStatement(List<Statement> children) implements Statement {
 	public BlockStatement() {
 		this(new ArrayList<>());
 	}
 
-	public BlockStatement append(ASTNode node) {
+	public BlockStatement append(Statement node) {
 		this.children.add(node);
 		return this;
 	}
 
-	public BlockStatement append(ASTNode... nodes) {
+	public BlockStatement append(Statement... nodes) {
 		this.children.addAll(Arrays.asList(nodes));
 		return this;
 	}
 
-	public BlockStatement append(Collection<ASTNode> nodes) {
+	public BlockStatement append(Collection<Statement> nodes) {
 		this.children.addAll(nodes);
 		return this;
 	}

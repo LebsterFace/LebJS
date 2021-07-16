@@ -51,6 +51,8 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 		representation.append(' ');
 		representation.append(switch (op) {
 			case Assign -> '=';
+			case MultiplyAssign -> "*=";
+			case DivideAssign -> "/=";
 			case MinusAssign -> "-=";
 			case PlusAssign -> "+=";
 		});
@@ -62,11 +64,13 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 		return switch (op) {
 			case PlusAssign -> BinaryExpression.BinaryOp.Add;
 			case MinusAssign -> BinaryExpression.BinaryOp.Subtract;
-			default -> throw new NotImplemented("BinaryOp for AssignmentOp: " + op);
+			case MultiplyAssign -> BinaryExpression.BinaryOp.Multiply;
+			case DivideAssign -> BinaryExpression.BinaryOp.Divide;
+			case Assign -> throw new NotImplemented("BinaryOp for AssignmentOp.Assign");
 		};
 	}
 
 	public enum AssignmentOp {
-		Assign, PlusAssign, MinusAssign
+		Assign, PlusAssign, MultiplyAssign, DivideAssign, MinusAssign
 	}
 }

@@ -3,6 +3,7 @@ package xyz.lebster.cli;
 import xyz.lebster.ANSI;
 import xyz.lebster.exception.CannotParse;
 import xyz.lebster.exception.SyntaxError;
+import xyz.lebster.interpreter.GlobalObject;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.Program;
 import xyz.lebster.node.value.*;
@@ -19,8 +20,12 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class ScriptExecutor {
-	public static Dictionary defaultGlobalObject(boolean testingMethods) {
-		final Dictionary globalObject = new Dictionary();
+	public static Interpreter getInterpreter(boolean testingMethods) {
+		return getInterpreter(32, testingMethods);
+	}
+
+	public static Interpreter getInterpreter(int stackSize, boolean testingMethods) {
+		final GlobalObject globalObject = new GlobalObject();
 
 		globalObject.set("print", new NativeFunction((interpreter, values) -> {
 			for (Value<?> value : values) {
@@ -34,7 +39,7 @@ public class ScriptExecutor {
 		globalObject.set("globalThis", globalObject);
 		if (testingMethods) Testing.addTestingMethods(globalObject);
 
-		return globalObject;
+		return new Interpreter(stackSize, globalObject);
 	}
 
 	public static void handleError(boolean showDebug, Throwable e, PrintStream stream) {
@@ -73,7 +78,7 @@ public class ScriptExecutor {
 		}
 	}
 
-	public static boolean execute(String source, Dictionary globalObject, ExecutionOptions options) throws Throwable {
+	public static boolean execute(String source, Interpreter interpreter, ExecutionOptions options) throws Throwable {
 		if (source.startsWith("// @opt: ")) {
 			return handleOptions(source, options);
 		}
@@ -86,7 +91,7 @@ public class ScriptExecutor {
 			System.out.println("------- END -------");
 		}
 
-		final Value<?> lastValue = program.execute(new Interpreter(program, globalObject));
+		final Value<?> lastValue = program.execute(interpreter);
 
 		if (options.showLastValue()) {
 			System.out.print("Last Value: ");
@@ -96,7 +101,7 @@ public class ScriptExecutor {
 		return true;
 	}
 
-	public static boolean executeFile(Path path, Dictionary globalObject, ExecutionOptions options) throws Throwable {
+	public static boolean executeFile(Path path, Interpreter interpreter, ExecutionOptions options) throws Throwable {
 		String source;
 
 		try {
@@ -106,28 +111,28 @@ public class ScriptExecutor {
 			return false;
 		}
 
-		return execute(source, globalObject, options);
+		return execute(source, interpreter, options);
 	}
 
-	public static boolean executeWithHandling(String source, Dictionary globalObject, ExecutionOptions options) {
+	public static boolean executeWithHandling(String source, Interpreter interpreter, ExecutionOptions options) {
 		try {
-			return execute(source, globalObject, options);
+			return execute(source, interpreter, options);
 		} catch (Throwable throwable) {
 			handleError(options.showDebug(), throwable, System.out);
 			return false;
 		}
 	}
 
-	public static boolean executeFileWithHandling(Path path, Dictionary globalObject, ExecutionOptions options) {
+	public static boolean executeFileWithHandling(Path path, Interpreter interpreter, ExecutionOptions options) {
 		try {
-			return executeFile(path, globalObject, options);
+			return executeFile(path, interpreter, options);
 		} catch (Throwable throwable) {
 			handleError(options.showDebug(), throwable, System.out);
 			return false;
 		}
 	}
 
-	public static void repl(Dictionary globalObject, ExecutionOptions options) {
+	public static void repl(Interpreter interpreter, ExecutionOptions options) {
 		if (options.showPrompt()) System.out.println("Starting REPL...");
 		final Scanner scanner = new Scanner(System.in);
 		do {
@@ -136,7 +141,7 @@ public class ScriptExecutor {
 				final String next = scanner.nextLine();
 				if (next.isBlank()) continue;
 				else if (next.equals(".exit")) break;
-				executeWithHandling(next, globalObject, options);
+				executeWithHandling(next, interpreter, options);
 				if (!options.showPrompt()) System.out.println("#END");
 			} catch (NoSuchElementException e) {
 				break;

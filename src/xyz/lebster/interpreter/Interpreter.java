@@ -1,6 +1,5 @@
 package xyz.lebster.interpreter;
 
-import xyz.lebster.node.Program;
 import xyz.lebster.node.SpecificationURL;
 import xyz.lebster.node.expression.Identifier;
 import xyz.lebster.node.value.Dictionary;
@@ -12,18 +11,16 @@ import xyz.lebster.runtime.LexicalEnvironment;
 import xyz.lebster.runtime.RangeError;
 
 public class Interpreter {
+	public final GlobalObject globalObject;
 	public final int stackSize;
 	private final ExecutionContext[] executionContextStack;
 	private int currentExecutionContext = 0;
 
-	public Interpreter(int stackSize, Program program, Dictionary globalObject) {
+	public Interpreter(int stackSize, GlobalObject globalObject) {
+		this.globalObject = globalObject;
 		this.stackSize = stackSize;
 		this.executionContextStack = new ExecutionContext[stackSize];
 		this.executionContextStack[0] = new ExecutionContext(new LexicalEnvironment(globalObject, null), null, globalObject);
-	}
-
-	public Interpreter(Program program, Dictionary globalObject) {
-		this(32, program, globalObject);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-resolvebinding")

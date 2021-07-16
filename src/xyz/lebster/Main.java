@@ -1,6 +1,7 @@
 package xyz.lebster;
 
 import xyz.lebster.cli.CommandLineArguments;
+import xyz.lebster.cli.ExecutionOptions;
 import xyz.lebster.cli.ScriptExecutor;
 import xyz.lebster.cli.Testing;
 
@@ -22,10 +23,14 @@ public class Main {
 			return;
 		}
 
+		final ExecutionOptions opts = arguments.options();
+		final boolean testing = opts.testingMethods();
+
+
 		switch (arguments.mode()) {
 			case Tests -> Testing.test(arguments.options());
-			case REPL -> repl(defaultGlobalObject(arguments.options().testingMethods()), arguments.options());
-			case File -> executeFileWithHandling(Path.of(arguments.fileName()), defaultGlobalObject(arguments.options().testingMethods()), arguments.options());
+			case REPL -> repl(getInterpreter(testing), opts);
+			case File -> executeFileWithHandling(Path.of(arguments.fileName()), getInterpreter(testing), opts);
 			default -> throw new Error("Mode could not be inferred");
 		}
 	}

@@ -2,11 +2,10 @@ package xyz.lebster.parser;
 
 import xyz.lebster.exception.CannotParse;
 import xyz.lebster.exception.NotImplemented;
-import xyz.lebster.exception.ParseException;
+import xyz.lebster.exception.SyntaxError;
 import xyz.lebster.node.*;
 import xyz.lebster.node.expression.*;
 import xyz.lebster.node.value.*;
-import xyz.lebster.runtime.ArrayObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,8 +90,8 @@ public class Parser {
 		this.tokens = tokens;
 	}
 
-	private void expected(TokenType t) throws ParseException {
-		throw new ParseException("Unexpected token " + currentToken.type + ". Expected " + t);
+	private void expected(TokenType t) throws SyntaxError {
+		throw new SyntaxError("Unexpected token " + currentToken.type + ". Expected " + t);
 	}
 
 	private Token consume() {
@@ -102,7 +101,7 @@ public class Parser {
 		return oldToken;
 	}
 
-	private Token require(TokenType t) throws ParseException {
+	private Token require(TokenType t) throws SyntaxError {
 		if (currentToken.type != t) expected(t);
 		return consume();
 	}
@@ -115,7 +114,7 @@ public class Parser {
 		while (currentToken.type == t) consume();
 	}
 
-	public Program parse() throws ParseException {
+	public Program parse() throws SyntaxError, CannotParse {
 		final Program program = new Program();
 		consume();
 
@@ -130,7 +129,7 @@ public class Parser {
 		return program;
 	}
 
-	private Statement parseLine() throws ParseException {
+	private Statement parseLine() throws SyntaxError, CannotParse {
 		consumeAll(TokenType.Terminator);
 		final Statement result = parseAny();
 		consumeAll(TokenType.Semicolon);
@@ -138,7 +137,7 @@ public class Parser {
 		return result;
 	}
 
-	private Statement parseAny() throws ParseException {
+	private Statement parseAny() throws SyntaxError, CannotParse {
 		if (matchDeclaration()) {
 			return parseDeclaration();
 		} else if (matchStatementOrExpression()) {
@@ -148,7 +147,7 @@ public class Parser {
 		}
 	}
 
-	private BlockStatement parseBlockStatement() throws ParseException {
+	private BlockStatement parseBlockStatement() throws SyntaxError, CannotParse {
 		require(TokenType.LBrace);
 		final BlockStatement result = new BlockStatement();
 
@@ -164,7 +163,7 @@ public class Parser {
 		return result;
 	}
 
-	private Statement parseStatementOrExpression() throws ParseException {
+	private Statement parseStatementOrExpression() throws SyntaxError, CannotParse {
 		if (matchExpression()) {
 			return new ExpressionStatement(parseExpression(0, Left));
 		} else {
@@ -199,7 +198,7 @@ public class Parser {
 		}
 	}
 
-	private ForStatement parseForStatement() throws ParseException {
+	private ForStatement parseForStatement() throws SyntaxError, CannotParse {
 		require(TokenType.For);
 		require(TokenType.LParen);
 
@@ -217,7 +216,7 @@ public class Parser {
 		return new ForStatement(init, test, update, body);
 	}
 
-	private WhileStatement parseWhileStatement() throws ParseException {
+	private WhileStatement parseWhileStatement() throws SyntaxError, CannotParse {
 		require(TokenType.While);
 		require(TokenType.LParen);
 		final Expression condition = parseExpression(0, Left);
@@ -226,7 +225,7 @@ public class Parser {
 		return new WhileStatement(condition, body);
 	}
 
-	private TryStatement parseTryStatement() throws ParseException {
+	private TryStatement parseTryStatement() throws SyntaxError, CannotParse {
 		require(TokenType.Try);
 		final BlockStatement body = parseBlockStatement();
 		require(TokenType.Catch);
@@ -237,7 +236,7 @@ public class Parser {
 		return new TryStatement(body, new CatchClause(parameter, catchBody));
 	}
 
-	private IfStatement parseIfStatement() throws ParseException {
+	private IfStatement parseIfStatement() throws SyntaxError, CannotParse {
 		require(TokenType.If);
 		require(TokenType.LParen);
 		final Expression condition = parseExpression(0, Left);
@@ -247,12 +246,12 @@ public class Parser {
 		return new IfStatement(condition, consequence, elseStatement);
 	}
 
-	public Statement parseElseStatement() throws ParseException {
+	public Statement parseElseStatement() throws SyntaxError, CannotParse {
 		require(TokenType.Else);
 		return parseLine();
 	}
 
-	private Declaration parseDeclaration() throws ParseException {
+	private Declaration parseDeclaration() throws SyntaxError, CannotParse {
 		return switch (currentToken.type) {
 			case Let, Var, Const -> parseVariableDeclaration();
 			case Function -> parseFunctionDeclaration();
@@ -260,7 +259,7 @@ public class Parser {
 		};
 	}
 
-	private VariableDeclaration parseVariableDeclaration() throws ParseException {
+	private VariableDeclaration parseVariableDeclaration() throws SyntaxError, CannotParse {
 		consume();
 		final Token identifier = require(TokenType.Identifier);
 		require(TokenType.Equals);
@@ -268,7 +267,7 @@ public class Parser {
 		return new VariableDeclaration(new VariableDeclarator(new Identifier(identifier.value), value));
 	}
 
-	private List<Identifier> parseFunctionArguments() throws ParseException {
+	private List<Identifier> parseFunctionArguments() throws SyntaxError {
 		require(TokenType.LParen);
 		final List<Identifier> arguments = new ArrayList<>();
 
@@ -281,14 +280,14 @@ public class Parser {
 		return arguments;
 	}
 
-	private FunctionDeclaration parseFunctionDeclaration() throws ParseException {
+	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
 		require(TokenType.Function);
 		final Identifier name = new Identifier(require(TokenType.Identifier).value);
 		final List<Identifier> arguments = parseFunctionArguments();
 		return new FunctionDeclaration(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
 	}
 
-	private FunctionExpression parseFunctionExpression() throws ParseException {
+	private FunctionExpression parseFunctionExpression() throws SyntaxError, CannotParse {
 		require(TokenType.Function);
 		final Token potentialName = accept(TokenType.Identifier);
 		final Identifier name = potentialName == null ? null : new Identifier(potentialName.value);
@@ -296,7 +295,7 @@ public class Parser {
 		return new FunctionExpression(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
 	}
 
-	private List<Expression> parseExpressionList() throws ParseException {
+	private List<Expression> parseExpressionList() throws SyntaxError, CannotParse {
 		final List<Expression> result = new ArrayList<>();
 
 		while (matchExpression()) {
@@ -307,14 +306,14 @@ public class Parser {
 		return result;
 	}
 
-	private CallExpression parseCallExpression(Expression left) throws ParseException {
+	private CallExpression parseCallExpression(Expression left) throws SyntaxError, CannotParse {
 		final List<Expression> arguments = parseExpressionList();
 		require(TokenType.RParen);
 		return new CallExpression(left, arguments.toArray(new Expression[0]));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-UnaryExpression")
-	private Expression parseUnaryPrefixedExpression() throws ParseException {
+	private Expression parseUnaryPrefixedExpression() throws SyntaxError, CannotParse {
 		final Token token = consume();
 //		TODO: Remove when all implemented
 		if (!associativity.containsKey(token.type))
@@ -336,7 +335,7 @@ public class Parser {
 		return new UnaryExpression(parseExpression(minPrecedence, assoc), op);
 	}
 
-	private Expression parseExpression(int minPrecedence, Associativity assoc) throws ParseException {
+	private Expression parseExpression(int minPrecedence, Associativity assoc) throws SyntaxError, CannotParse {
 		Expression latestExpr = parsePrimaryExpression();
 
 		while (matchSecondaryExpression()) {
@@ -359,7 +358,7 @@ public class Parser {
 		return latestExpr;
 	}
 
-	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws ParseException {
+	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws SyntaxError, CannotParse {
 		consumeAll(TokenType.Terminator);
 		final Token token = consume();
 		consumeAll(TokenType.Terminator);
@@ -398,7 +397,7 @@ public class Parser {
 		};
 	}
 
-	private Expression parsePrimaryExpression() throws ParseException {
+	private Expression parsePrimaryExpression() throws SyntaxError, CannotParse {
 		if (matchUnaryPrefixedExpression()) {
 			return parseUnaryPrefixedExpression();
 		}
@@ -447,7 +446,7 @@ public class Parser {
 		};
 	}
 
-	private ArrayExpression parseArrayExpression() throws ParseException {
+	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {
 		require(TokenType.LBracket);
 		final List<Expression> elements = parseExpressionList();
 		require(TokenType.RBracket);

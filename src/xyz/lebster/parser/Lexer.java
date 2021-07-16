@@ -1,6 +1,6 @@
 package xyz.lebster.parser;
 
-import xyz.lebster.exception.ParseException;
+import xyz.lebster.exception.SyntaxError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -200,7 +200,7 @@ public class Lexer {
 		return isIdentifierStart() || isDigit(currentChar);
 	}
 
-	public Token next() throws ParseException {
+	public Token next() throws SyntaxError {
 		if (index == length) return null;
 		consumeWhitespace();
 		consumeComment();
@@ -247,7 +247,7 @@ public class Lexer {
 				}
 			}
 
-			throw new ParseException(StringEscapeUtils.escape("Invalid character '" + currentChar + "' at " + 0 + ":" + 0));
+			throw new SyntaxError(StringEscapeUtils.escape("Invalid character '" + currentChar + "' at " + 0 + ":" + 0));
 		}
 	}
 
@@ -259,7 +259,7 @@ public class Lexer {
 		}
 	}
 
-	public Token[] tokenize() throws ParseException {
+	public Token[] tokenize() throws SyntaxError {
 		final List<Token> result = new ArrayList<>();
 		boolean lastWasTerminator = true;
 

@@ -1,7 +1,8 @@
 package xyz.lebster.cli;
 
 import xyz.lebster.ANSI;
-import xyz.lebster.exception.ParseException;
+import xyz.lebster.exception.CannotParse;
+import xyz.lebster.exception.SyntaxError;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.Program;
 import xyz.lebster.node.value.*;
@@ -45,7 +46,7 @@ public class ScriptExecutor {
 		stream.print(ANSI.RESET);
 	}
 
-	public static Program parse(String source) throws ParseException {
+	public static Program parse(String source) throws SyntaxError, CannotParse {
 		return new Parser(new Lexer(source).tokenize()).parse();
 	}
 
@@ -54,7 +55,7 @@ public class ScriptExecutor {
 			try {
 				new Lexer(source).tokenize();
 				return true;
-			} catch (ParseException e) {
+			} catch (SyntaxError e) {
 				return false;
 			}
 		} else if (source.startsWith("// @opt: dump-tokens")) {
@@ -64,7 +65,7 @@ public class ScriptExecutor {
 				for (final Token token : tokens) System.out.println(token);
 				System.out.println("------- END -------");
 				return true;
-			} catch (ParseException e) {
+			} catch (SyntaxError e) {
 				return false;
 			}
 		} else {

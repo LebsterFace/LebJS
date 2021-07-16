@@ -171,6 +171,11 @@ public class Parser {
 				case Function -> parseFunctionDeclaration();
 				case Semicolon -> new EmptyStatement();
 				case LBrace -> parseBlockStatement();
+				case While -> parseWhileStatement();
+				case Do -> parseDoWhileStatement();
+				case For -> parseForStatement();
+				case If -> parseIfStatement();
+				case Try -> parseTryStatement();
 
 				case Return -> {
 					consume();
@@ -179,15 +184,11 @@ public class Parser {
 					yield new ReturnStatement(val);
 				}
 
-				case While -> parseWhileStatement();
-				case For -> parseForStatement();
 				case Break -> {
 					consume();
 					yield new BreakStatement();
 				}
 
-				case If -> parseIfStatement();
-				case Try -> parseTryStatement();
 				case Throw -> {
 					consume();
 					yield new ThrowStatement(parseExpression(0, Left));
@@ -223,6 +224,16 @@ public class Parser {
 		require(TokenType.RParen);
 		final Statement body = parseLine();
 		return new WhileStatement(condition, body);
+	}
+
+	private DoWhileStatement parseDoWhileStatement() throws SyntaxError, CannotParse {
+		require(TokenType.Do);
+		final Statement body = parseLine();
+		require(TokenType.While);
+		require(TokenType.LParen);
+		final Expression condition = parseExpression(0, Left);
+		require(TokenType.RParen);
+		return new DoWhileStatement(body, condition);
 	}
 
 	private TryStatement parseTryStatement() throws SyntaxError, CannotParse {

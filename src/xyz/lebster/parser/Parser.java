@@ -49,8 +49,21 @@ public class Parser {
 		precedence.put(TokenType.LogicalOr, 6);
 		precedence.put(TokenType.NullishCoalescing, 5);
 
-		precedence.put(TokenType.PlusEquals, 3);
+		precedence.put(TokenType.UnsignedRightShiftEquals, 3);
+		precedence.put(TokenType.LeftShiftEquals, 3);
 		precedence.put(TokenType.MinusEquals, 3);
+		precedence.put(TokenType.MultiplyEquals, 3);
+		precedence.put(TokenType.DivideEquals, 3);
+		precedence.put(TokenType.AmpersandEquals, 3);
+		precedence.put(TokenType.PercentEquals, 3);
+		precedence.put(TokenType.CaretEquals, 3);
+		precedence.put(TokenType.PlusEquals, 3);
+		precedence.put(TokenType.PipeEquals, 3);
+		precedence.put(TokenType.NullishCoalescingEquals, 3);
+		precedence.put(TokenType.ExponentEquals, 3);
+		precedence.put(TokenType.LogicalAndEquals, 3);
+		precedence.put(TokenType.RightShiftEquals, 3);
+		precedence.put(TokenType.LogicalOrEquals, 3);
 		precedence.put(TokenType.Equals, 3);
 
 //		FIXME: Switch statement method (when all operators are implemented)
@@ -77,9 +90,22 @@ public class Parser {
 		associativity.put(TokenType.Increment, Right);
 		associativity.put(TokenType.Decrement, Right);
 
-		associativity.put(TokenType.Equals, Right);
-		associativity.put(TokenType.PlusEquals, Right);
+		associativity.put(TokenType.UnsignedRightShiftEquals, Right);
+		associativity.put(TokenType.LeftShiftEquals, Right);
 		associativity.put(TokenType.MinusEquals, Right);
+		associativity.put(TokenType.MultiplyEquals, Right);
+		associativity.put(TokenType.DivideEquals, Right);
+		associativity.put(TokenType.AmpersandEquals, Right);
+		associativity.put(TokenType.PercentEquals, Right);
+		associativity.put(TokenType.CaretEquals, Right);
+		associativity.put(TokenType.PlusEquals, Right);
+		associativity.put(TokenType.PipeEquals, Right);
+		associativity.put(TokenType.NullishCoalescingEquals, Right);
+		associativity.put(TokenType.ExponentEquals, Right);
+		associativity.put(TokenType.LogicalAndEquals, Right);
+		associativity.put(TokenType.RightShiftEquals, Right);
+		associativity.put(TokenType.LogicalOrEquals, Right);
+		associativity.put(TokenType.Equals, Right);
 	}
 
 	public final Token[] tokens;

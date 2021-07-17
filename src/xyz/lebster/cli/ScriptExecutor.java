@@ -5,6 +5,7 @@ import xyz.lebster.exception.CannotParse;
 import xyz.lebster.exception.SyntaxError;
 import xyz.lebster.interpreter.GlobalObject;
 import xyz.lebster.interpreter.Interpreter;
+import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.Program;
 import xyz.lebster.node.value.Value;
 import xyz.lebster.parser.Lexer;
@@ -87,7 +88,9 @@ public class ScriptExecutor {
 
 		if (options.showLastValue()) {
 			System.out.print("Last Value: ");
-			lastValue.dump(0);
+			final StringRepresentation representation = new StringRepresentation();
+			lastValue.represent(representation);
+			System.out.println(representation);
 		}
 
 		return true;

@@ -6,13 +6,11 @@ import xyz.lebster.exception.SyntaxError;
 import xyz.lebster.interpreter.GlobalObject;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.Program;
-import xyz.lebster.node.value.NativeFunction;
-import xyz.lebster.node.value.StringLiteral;
-import xyz.lebster.node.value.Undefined;
 import xyz.lebster.node.value.Value;
 import xyz.lebster.parser.Lexer;
 import xyz.lebster.parser.Parser;
 import xyz.lebster.parser.Token;
+import xyz.lebster.runtime.ConsoleObject;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -29,16 +27,7 @@ public class ScriptExecutor {
 
 	public static Interpreter getInterpreter(int stackSize, boolean testingMethods) {
 		final GlobalObject globalObject = new GlobalObject();
-
-		globalObject.set("print", new NativeFunction((interpreter, values) -> {
-			for (Value<?> value : values) {
-				final StringLiteral str = value.toStringLiteral();
-				System.out.println(str.value);
-			}
-
-			return new Undefined();
-		}));
-
+		globalObject.set("console", ConsoleObject.instance);
 		globalObject.set("globalThis", globalObject);
 		if (testingMethods) Testing.addTestingMethods(globalObject);
 

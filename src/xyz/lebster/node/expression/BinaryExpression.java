@@ -50,12 +50,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 	public void represent(StringRepresentation representation) {
 		left.represent(representation);
 		representation.append(' ');
-		representation.append(switch (op) {
-			case Add -> '+';
-			case Subtract -> '-';
-			case Multiply -> '*';
-			case Divide -> '/';
-		});
+		representation.append(op.str);
 		representation.append(' ');
 		right.represent(representation);
 	}
@@ -69,6 +64,14 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 	}
 
 	public enum BinaryOp {
-		Add, Subtract, Multiply, Divide
+		Add("+"),
+		Subtract("-"),
+		Multiply("*"),
+		Divide("/");
+
+		public final String str;
+		BinaryOp(String str) {
+			this.str = str;
+		}
 	}
 }

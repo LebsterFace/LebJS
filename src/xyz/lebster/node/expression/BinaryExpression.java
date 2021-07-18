@@ -33,6 +33,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 			case Subtract -> lnum.value - rnum.value;
 			case Multiply -> lnum.value * rnum.value;
 			case Divide -> lnum.value / rnum.value;
+			case Exponent -> Math.pow(lnum.value, rnum.value);
 		};
 
 		return new NumericLiteral(result);
@@ -67,7 +68,8 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 		Add("+"),
 		Subtract("-"),
 		Multiply("*"),
-		Divide("/");
+		Divide("/"),
+		Exponent("**");
 
 		public final String str;
 		BinaryOp(String str) {

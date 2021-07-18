@@ -33,8 +33,11 @@ public class Parser {
 		precedence.put(TokenType.Increment, 17);
 		precedence.put(TokenType.Decrement, 17);
 
+		precedence.put(TokenType.Exponent, 16);
+
 		precedence.put(TokenType.Star, 15);
 		precedence.put(TokenType.Slash, 15);
+		precedence.put(TokenType.Percent, 15);
 
 		precedence.put(TokenType.Plus, 14);
 		precedence.put(TokenType.Minus, 14);
@@ -84,6 +87,8 @@ public class Parser {
 		associativity.put(TokenType.LogicalOr, Left);
 		associativity.put(TokenType.LogicalAnd, Left);
 		associativity.put(TokenType.NullishCoalescing, Left);
+
+		associativity.put(TokenType.Exponent, Right);
 
 		associativity.put(TokenType.Bang, Right);
 		associativity.put(TokenType.Typeof, Right);
@@ -405,6 +410,7 @@ public class Parser {
 			case Minus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Subtract);
 			case Star -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Multiply);
 			case Slash -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Divide);
+			case Exponent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Exponent);
 			case LParen -> parseCallExpression(left);
 
 			case StrictEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictEquals);
@@ -418,6 +424,7 @@ public class Parser {
 			case MinusEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
 			case MultiplyEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MultiplyAssign);
 			case DivideEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.DivideAssign);
+			case ExponentEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.ExponentAssign);
 			case Equals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
 
 			case Decrement -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostDecrement);
@@ -550,6 +557,7 @@ public class Parser {
 			   t == TokenType.Minus ||
 			   t == TokenType.Star ||
 			   t == TokenType.Slash ||
+			   t == TokenType.Exponent ||
 			   t == TokenType.StrictEqual ||
 			   t == TokenType.StrictNotEqual ||
 			   t == TokenType.LogicalOr ||

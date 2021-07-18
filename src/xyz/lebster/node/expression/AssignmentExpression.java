@@ -73,6 +73,7 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 		PlusAssign,
 		MultiplyAssign,
 		DivideAssign,
-		MinusAssign;
+		MinusAssign,
+		ExponentAssign;
 	}
 }

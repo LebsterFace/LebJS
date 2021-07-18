@@ -7,7 +7,7 @@ public class StringLiteral extends Primitive<String> {
 
 	@Override
 	public String toString() {
-		return '"' + value + '"';
+		return value;
 	}
 
 	@Override

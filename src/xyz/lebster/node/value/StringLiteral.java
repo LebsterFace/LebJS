@@ -5,6 +5,10 @@ public class StringLiteral extends Primitive<String> {
 		super(value, Type.String);
 	}
 
+	public StringLiteral(Object value) {
+		super(String.valueOf(value), Type.String);
+	}
+
 	@Override
 	public String toString() {
 		return value;

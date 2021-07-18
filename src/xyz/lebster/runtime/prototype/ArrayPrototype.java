@@ -1,20 +1,28 @@
 package xyz.lebster.runtime.prototype;
 
-import xyz.lebster.exception.NotImplemented;
-import xyz.lebster.node.value.Dictionary;
-import xyz.lebster.node.value.NativeFunction;
+import xyz.lebster.interpreter.AbruptCompletion;
+import xyz.lebster.node.value.*;
 import xyz.lebster.runtime.ArrayObject;
+import xyz.lebster.runtime.TypeError;
 
 public class ArrayPrototype extends Dictionary {
 	public static final ArrayPrototype instance = new ArrayPrototype();
+	public static final long MAX_LENGTH = 9007199254740991L;
 
 	private ArrayPrototype() {
-		set("push", new NativeFunction((interpreter, arguments) -> {
-			if (!(interpreter.thisValue() instanceof final ArrayObject arr)) {
-				throw new NotImplemented("ArrayObject.length for non-ArrayObject Value");
+//		https://tc39.es/ecma262/multipage#sec-array.prototype.push
+		set("push", new NativeFunction((interpreter, elements) -> {
+			final Dictionary O = interpreter.thisValue().toDictionary();
+			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.length).toNumericLiteral().value.longValue());
+
+			if ((len + elements.length) > MAX_LENGTH) {
+				throw AbruptCompletion.error(new TypeError("Pushing " + elements.length + " elements on an array-like of length " + len + " is disallowed, as the total surpasses 2**53-1"));
 			}
 
-			return arr.push(arguments);
+			for (final Value<?> E : elements) O.set(new StringLiteral(len), E);
+			final NumericLiteral newLength = new NumericLiteral(len + elements.length);
+			O.set(ArrayObject.length, newLength);
+			return newLength;
 		}));
 	}
 }

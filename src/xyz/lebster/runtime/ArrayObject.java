@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ArrayObject extends Dictionary {
-	private int length = 0;
+	public final static StringLiteral length = new StringLiteral("length");
 
 	public ArrayObject(List<Value<?>> expressionList) {
 		super(getMapFromExpressionList(expressionList));
@@ -29,21 +29,7 @@ public class ArrayObject extends Dictionary {
 	}
 
 	private void initialize() {
-		this.length = this.value.size();
-		this.set("length", new NativeFunction(((interpreter, arguments) ->
-			new NumericLiteral(length)
-		)));
-	}
-
-	public NumericLiteral push(Value<?>... elements) {
-		for (Value<?> argument : elements)
-			set(String.valueOf(length++), argument);
-
-		return getLength();
-	}
-
-	public NumericLiteral getLength() {
-		return new NumericLiteral(length);
+		this.set(length, new NumericLiteral(value.size()));
 	}
 
 	@Override

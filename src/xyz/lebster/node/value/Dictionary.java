@@ -91,7 +91,8 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 
 	@Override
 	public String toString() {
-		return "[object Object]";
+		final Primitive<?> primValue = toPrimitive(Type.String);
+		return primValue.toString();
 	}
 
 	@Override

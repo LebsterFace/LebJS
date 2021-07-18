@@ -14,3 +14,6 @@ arr.push(5);
 expect(5, arr.length);
 expect(5, arr[4])
 expect(5, arr[arr.length - 1])
+
+expect("1,2,3,4,5", arr.join())
+expect("1|2|3|4|5", arr.join("|"))

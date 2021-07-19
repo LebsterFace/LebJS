@@ -1,7 +1,12 @@
 package xyz.lebster.runtime;
 
 import xyz.lebster.ANSI;
+import xyz.lebster.Main;
 import xyz.lebster.node.value.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 
 public final class ConsoleObject extends Dictionary {
 	public static final ConsoleObject instance = new ConsoleObject();
@@ -25,6 +30,21 @@ public final class ConsoleObject extends Dictionary {
 		set("info", new NativeFunction(((interpreter, data) -> {
 			logger(LogLevel.Info, data);
 			return new Undefined();
+		})));
+
+		set("dump", new NativeFunction(((interpreter, data) -> {
+			final var tempOutput = new ByteArrayOutputStream();
+			final var tempStream = new PrintStream(tempOutput);
+			System.setOut(tempStream);
+			for (final Value<?> val : data) val.dump(0);
+			System.setOut(Main.stdout);
+			try {
+				tempOutput.writeTo(System.out);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			return new StringLiteral(tempOutput.toString());
 		})));
 	}
 

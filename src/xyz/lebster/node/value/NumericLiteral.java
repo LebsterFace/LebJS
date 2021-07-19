@@ -2,7 +2,7 @@ package xyz.lebster.node.value;
 
 import xyz.lebster.exception.NotImplemented;
 
-public class NumericLiteral extends Primitive<Double> {
+public final class NumericLiteral extends Primitive<Double> {
 	public NumericLiteral(double num) {
 		super(num, Type.Number);
 	}

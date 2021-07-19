@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 import static xyz.lebster.cli.ScriptExecutor.*;
 
-public class Main {
+public final class Main {
 	public static final PrintStream stdout = System.out;
 
 	public static void main(String[] args) {

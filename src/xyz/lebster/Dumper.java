@@ -2,7 +2,7 @@ package xyz.lebster;
 
 import xyz.lebster.node.ASTNode;
 
-final public class Dumper {
+public final class Dumper {
 	private Dumper() {
 	}
 

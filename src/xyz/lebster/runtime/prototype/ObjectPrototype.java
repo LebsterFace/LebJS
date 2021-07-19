@@ -2,7 +2,7 @@ package xyz.lebster.runtime.prototype;
 
 import xyz.lebster.node.value.Dictionary;
 
-public class ObjectPrototype extends Dictionary {
+public final class ObjectPrototype extends Dictionary {
 	public static final ObjectPrototype instance = new ObjectPrototype();
 	private ObjectPrototype() {}
 

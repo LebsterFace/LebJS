@@ -2,7 +2,7 @@ package xyz.lebster.interpreter;
 
 import xyz.lebster.node.value.Value;
 
-public class AbruptCompletion extends Throwable {
+public final class AbruptCompletion extends Throwable {
 	public final Type type;
 	public final Value<?> value;
 

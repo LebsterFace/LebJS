@@ -13,7 +13,7 @@ import java.util.List;
 
 import static xyz.lebster.parser.Associativity.*;
 
-public class Parser {
+public final class Parser {
 	private static final HashMap<TokenType, Integer> precedence = new HashMap<>();
 	private static final HashMap<TokenType, Associativity> associativity = new HashMap<>();
 

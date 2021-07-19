@@ -1,6 +1,6 @@
 package xyz.lebster.interpreter;
 
-public class StringRepresentation {
+public final class StringRepresentation {
 	private final StringBuilder builder = new StringBuilder();
 	private int currentIndent = 0;
 

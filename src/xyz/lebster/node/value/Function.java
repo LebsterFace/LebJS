@@ -6,7 +6,7 @@ import xyz.lebster.interpreter.ExecutionContext;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.node.FunctionNode;
 
-public class Function extends Executable<FunctionNode> {
+public final class Function extends Executable<FunctionNode> {
 	public final ExecutionContext context;
 
 	public Function(FunctionNode code, ExecutionContext context) {

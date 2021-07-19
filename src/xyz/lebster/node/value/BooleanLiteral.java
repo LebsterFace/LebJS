@@ -2,7 +2,7 @@ package xyz.lebster.node.value;
 
 import xyz.lebster.exception.NotImplemented;
 
-public class BooleanLiteral extends Primitive<Boolean> {
+public final class BooleanLiteral extends Primitive<Boolean> {
 	public BooleanLiteral(boolean value) {
 		super(value, Type.Boolean);
 	}

@@ -1,6 +1,6 @@
 package xyz.lebster.parser;
 
-public class Token {
+public final class Token {
 	public final TokenType type;
 	public final String value;
 	public final int start;

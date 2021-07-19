@@ -1,6 +1,6 @@
 package xyz.lebster.parser;
 
-public class StringEscapeUtils {
+public final class StringEscapeUtils {
 	private static String hex(char character) {
 		return Integer.toHexString(character).toUpperCase();
 	}

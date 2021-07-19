@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Lexer {
+public final class Lexer {
 	private static final HashMap<String, TokenType> keywords = new HashMap<>();
 	private static final List<HashMap<String, TokenType>> symbols = new ArrayList<>();
 

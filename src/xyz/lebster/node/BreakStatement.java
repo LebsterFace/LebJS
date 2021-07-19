@@ -6,7 +6,7 @@ import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.StringRepresentation;
 import xyz.lebster.node.value.Value;
 
-public class BreakStatement implements Statement {
+public final class BreakStatement implements Statement {
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-break-statement-runtime-semantics-evaluation")
 //	FIXME: Follow spec (labels)

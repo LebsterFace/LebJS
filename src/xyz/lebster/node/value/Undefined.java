@@ -3,7 +3,7 @@ package xyz.lebster.node.value;
 import xyz.lebster.Dumper;
 import xyz.lebster.runtime.TypeError;
 
-public class Undefined extends Primitive<Void> {
+public final class Undefined extends Primitive<Void> {
 	public Undefined() {
 		super(null, Type.Undefined);
 	}

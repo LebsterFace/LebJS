@@ -10,7 +10,7 @@ import xyz.lebster.runtime.ExecutionError;
 import xyz.lebster.runtime.LexicalEnvironment;
 import xyz.lebster.runtime.RangeError;
 
-public class Interpreter {
+public final class Interpreter {
 	public final GlobalObject globalObject;
 	public final int stackSize;
 	private final ExecutionContext[] executionContextStack;

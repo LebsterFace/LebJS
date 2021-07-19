@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ArrayObject extends Dictionary {
+public final class ArrayObject extends Dictionary {
 	public final static StringLiteral length = new StringLiteral("length");
 
 	public ArrayObject(List<Value<?>> expressionList) {

@@ -21,7 +21,7 @@ import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-public class ScriptExecutor {
+public final class ScriptExecutor {
 	public static Interpreter getInterpreter(boolean testingMethods) {
 		return getInterpreter(32, testingMethods);
 	}

@@ -5,7 +5,7 @@ import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 
-public class NativeFunction extends Executable<NativeCode> {
+public final class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(NativeCode code) {
 		super(code);
 	}

@@ -17,7 +17,7 @@ import java.io.PrintStream;
 import static xyz.lebster.cli.ScriptExecutor.executeFile;
 import static xyz.lebster.cli.ScriptExecutor.getInterpreter;
 
-public class Testing {
+public final class Testing {
 	public static void test(ExecutionOptions options) {
 		final File[] files = new File("tests/").listFiles();
 		if (files == null) throw new Error("Test directory not found!");

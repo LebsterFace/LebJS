@@ -2,7 +2,7 @@ package xyz.lebster.exception;
 
 import xyz.lebster.parser.Token;
 
-public class CannotParse extends ParseException {
+public final class CannotParse extends ParseException {
 	public CannotParse(String what) {
 		super(what + " cannot be parsed.");
 	}

@@ -6,7 +6,7 @@ import xyz.lebster.node.FunctionNode;
 import xyz.lebster.node.value.Function;
 import xyz.lebster.node.value.Value;
 
-public class FunctionExpression extends FunctionNode implements Expression {
+public final class FunctionExpression extends FunctionNode implements Expression {
 	public FunctionExpression(BlockStatement body, Identifier name, Identifier... arguments) {
 		super(body, name, arguments);
 	}

@@ -5,7 +5,7 @@ import xyz.lebster.node.value.*;
 import xyz.lebster.runtime.ArrayObject;
 import xyz.lebster.runtime.TypeError;
 
-public class ArrayPrototype extends Dictionary {
+public final class ArrayPrototype extends Dictionary {
 	public static final ArrayPrototype instance = new ArrayPrototype();
 	public static final long MAX_LENGTH = 9007199254740991L;
 

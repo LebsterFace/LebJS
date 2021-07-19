@@ -3,7 +3,7 @@ package xyz.lebster.runtime.prototype;
 import xyz.lebster.exception.NotImplemented;
 import xyz.lebster.node.value.*;
 
-public class StringPrototype extends Dictionary {
+public final class StringPrototype extends Dictionary {
 	public static final StringPrototype instance = new StringPrototype();
 
 	private StringPrototype() {

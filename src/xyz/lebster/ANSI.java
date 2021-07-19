@@ -1,6 +1,6 @@
 package xyz.lebster;
 
-public class ANSI {
+public final class ANSI {
 	public static final String BLACK = "\u001b[30m";
 	public static final String RED = "\u001b[31m";
 	public static final String GREEN = "\u001b[32m";

@@ -1,6 +1,7 @@
 package xyz.lebster.node.expression;
 
 import xyz.lebster.ANSI;
+import xyz.lebster.Dumper;
 import xyz.lebster.interpreter.AbruptCompletion;
 import xyz.lebster.interpreter.Interpreter;
 import xyz.lebster.interpreter.StringRepresentation;
@@ -27,6 +28,9 @@ public record ArrayExpression(List<Expression> elements) implements Expression {
 
 	@Override
 	public void dump(int indent) {
-
+		Dumper.dumpName(indent, "ArrayExpression");
+		for (int i = 0; i < elements.size(); i++) {
+			Dumper.dumpIndicated(indent + 1, "i", elements.get(i));
+		}
 	}
 }

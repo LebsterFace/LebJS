@@ -196,7 +196,7 @@ public final class Parser {
 
 	private Statement parseStatementOrExpression() throws SyntaxError, CannotParse {
 		if (matchExpression()) {
-			return new ExpressionStatement(parseExpression(0, Left));
+			return new ExpressionStatement(parseExpression());
 		} else {
 			return switch (currentToken.type) {
 				case Function -> parseFunctionDeclaration();
@@ -211,7 +211,7 @@ public final class Parser {
 				case Return -> {
 					consume();
 //					FIXME: Proper automatic semicolon insertion
-					final Expression val = matchExpression() ? parseExpression(0, Left) : new Undefined();
+					final Expression val = matchExpression() ? parseExpression() : new Undefined();
 					yield new ReturnStatement(val);
 				}
 
@@ -222,7 +222,7 @@ public final class Parser {
 
 				case Throw -> {
 					consume();
-					yield new ThrowStatement(parseExpression(0, Left));
+					yield new ThrowStatement(parseExpression());
 				}
 
 				default -> throw new CannotParse(currentToken, "Statement");
@@ -238,10 +238,10 @@ public final class Parser {
 		if (matchExpression() || matchDeclaration()) init = parseAny();
 		require(TokenType.Semicolon);
 
-		final Expression test = matchExpression() ? parseExpression(0, Left) : null;
+		final Expression test = matchExpression() ? parseExpression() : null;
 		require(TokenType.Semicolon);
 
-		final Expression update = matchExpression() ? parseExpression(0, Left) : null;
+		final Expression update = matchExpression() ? parseExpression() : null;
 		require(TokenType.RParen);
 
 		final Statement body = parseLine();
@@ -251,7 +251,7 @@ public final class Parser {
 	private WhileStatement parseWhileStatement() throws SyntaxError, CannotParse {
 		require(TokenType.While);
 		require(TokenType.LParen);
-		final Expression condition = parseExpression(0, Left);
+		final Expression condition = parseExpression();
 		require(TokenType.RParen);
 		final Statement body = parseLine();
 		return new WhileStatement(condition, body);
@@ -262,7 +262,7 @@ public final class Parser {
 		final Statement body = parseLine();
 		require(TokenType.While);
 		require(TokenType.LParen);
-		final Expression condition = parseExpression(0, Left);
+		final Expression condition = parseExpression();
 		require(TokenType.RParen);
 		return new DoWhileStatement(body, condition);
 	}
@@ -281,7 +281,7 @@ public final class Parser {
 	private IfStatement parseIfStatement() throws SyntaxError, CannotParse {
 		require(TokenType.If);
 		require(TokenType.LParen);
-		final Expression condition = parseExpression(0, Left);
+		final Expression condition = parseExpression();
 		require(TokenType.RParen);
 		final Statement consequence = parseLine();
 		final Statement elseStatement = currentToken.type == TokenType.Else ? parseElseStatement() : null;
@@ -305,7 +305,7 @@ public final class Parser {
 		consume();
 		final Token identifier = require(TokenType.Identifier);
 		require(TokenType.Equals);
-		final Expression value = parseExpression(0, Left);
+		final Expression value = parseExpression();
 		return new VariableDeclaration(new VariableDeclarator(new Identifier(identifier.value), value));
 	}
 
@@ -341,7 +341,7 @@ public final class Parser {
 		final List<Expression> result = new ArrayList<>();
 
 		while (matchExpression()) {
-			result.add(parseExpression(0, Left));
+			result.add(parseExpression());
 			if (accept(TokenType.Comma) == null) break;
 		}
 
@@ -375,6 +375,10 @@ public final class Parser {
 		};
 
 		return new UnaryExpression(parseExpression(minPrecedence, assoc), op);
+	}
+
+	private Expression parseExpression() throws SyntaxError, CannotParse {
+		return parseExpression(0, Left);
 	}
 
 	private Expression parseExpression(int minPrecedence, Associativity assoc) throws SyntaxError, CannotParse {
@@ -439,7 +443,7 @@ public final class Parser {
 			}
 
 			case LBracket -> {
-				final Expression prop = parseExpression(0, Left);
+				final Expression prop = parseExpression();
 				require(TokenType.RBracket);
 				yield new MemberExpression(left, prop, true);
 			}
@@ -456,7 +460,7 @@ public final class Parser {
 		return switch (currentToken.type) {
 			case LParen -> {
 				consume();
-				final Expression expression = parseExpression(0, Left);
+				final Expression expression = parseExpression();
 				require(TokenType.RParen);
 				yield expression;
 			}

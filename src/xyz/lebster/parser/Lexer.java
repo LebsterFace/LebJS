@@ -113,6 +113,7 @@ public final class Lexer {
 		symbols_length_1.put(";", TokenType.Semicolon);
 		symbols_length_1.put(",", TokenType.Comma);
 		symbols_length_1.put("-", TokenType.Minus);
+		symbols_length_1.put(":", TokenType.Colon);
 
 		symbols.add(symbols_length_4);
 		symbols.add(symbols_length_3);

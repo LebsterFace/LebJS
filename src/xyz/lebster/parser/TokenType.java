@@ -98,5 +98,6 @@ public enum TokenType {
 	RightShiftEquals,
 	UnsignedRightShift,
 	LogicalOrEquals,
-	Infinity
+	Infinity,
+	Colon
 }

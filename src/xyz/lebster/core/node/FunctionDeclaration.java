@@ -1,0 +1,17 @@
+package xyz.lebster.core.node;
+
+import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.node.expression.Identifier;
+import xyz.lebster.core.node.value.Function;
+import xyz.lebster.core.node.value.Value;
+
+public final class FunctionDeclaration extends FunctionNode implements Declaration {
+	public FunctionDeclaration(BlockStatement body, Identifier name, Identifier... arguments) {
+		super(body, name, arguments);
+	}
+
+	@Override
+	public Value<?> execute(Interpreter interpreter) {
+		return interpreter.declareVariable(name, new Function(this, interpreter.getExecutionContext()));
+	}
+}

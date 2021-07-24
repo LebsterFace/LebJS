@@ -1,0 +1,87 @@
+package xyz.lebster.core.node.value;
+
+import xyz.lebster.core.Dumper;
+import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.node.SpecificationURL;
+import xyz.lebster.core.node.expression.Expression;
+
+import java.util.Objects;
+
+public abstract class Value<JType> implements Expression {
+	public final JType value;
+	public final Type type;
+
+	public Value(JType value, Type type) {
+		this.value = value;
+		this.type = type;
+	}
+
+	@Override
+	public Value<?> execute(Interpreter interpreter) {
+		return this;
+	}
+
+	@Override
+	public void dump(int indent) {
+		Dumper.dumpValue(indent, type.name(), toString());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
+	public Primitive<?> toPrimitive(Type preferredType) {
+		if (this instanceof Primitive) {
+			return (Primitive<JType>) this;
+		} else {
+			throw new NotImplemented("A non-primitive value's toPrimitive method");
+		}
+	}
+
+	public Primitive<?> toPrimitive() {
+		return toPrimitive(null);
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(value);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tostring")
+	public StringLiteral toStringLiteral() {
+		return new StringLiteral(toString());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tonumber")
+	public abstract NumericLiteral toNumericLiteral();
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toboolean")
+	public abstract BooleanLiteral toBooleanLiteral();
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toobject")
+	public abstract Dictionary toDictionary();
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Value<?> value1)) return false;
+		if (!Objects.equals(value, value1.value)) return false;
+		return type == value1.type;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = value != null ? value.hashCode() : 0;
+		result = 31 * result + (type != null ? type.hashCode() : 0);
+		return result;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#table-typeof-operator-results")
+	public abstract String typeOf();
+
+	public boolean isTruthy() {
+		return toBooleanLiteral().value;
+	}
+
+	public boolean isNullish() {
+		return type == Type.Undefined || type == Type.Null;
+	}
+}

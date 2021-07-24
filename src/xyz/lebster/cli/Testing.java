@@ -1,13 +1,13 @@
 package xyz.lebster.cli;
 
-import xyz.lebster.ANSI;
-import xyz.lebster.Dumper;
+import xyz.lebster.core.ANSI;
+import xyz.lebster.core.Dumper;
 import xyz.lebster.Main;
-import xyz.lebster.interpreter.AbruptCompletion;
-import xyz.lebster.interpreter.ExecutionContext;
-import xyz.lebster.node.value.*;
-import xyz.lebster.runtime.ExecutionError;
-import xyz.lebster.runtime.LanguageError;
+import xyz.lebster.core.interpreter.AbruptCompletion;
+import xyz.lebster.core.interpreter.ExecutionContext;
+import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.runtime.ExecutionError;
+import xyz.lebster.core.runtime.LanguageError;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

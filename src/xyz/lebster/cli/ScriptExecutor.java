@@ -1,17 +1,17 @@
 package xyz.lebster.cli;
 
-import xyz.lebster.ANSI;
-import xyz.lebster.exception.CannotParse;
-import xyz.lebster.exception.SyntaxError;
-import xyz.lebster.interpreter.GlobalObject;
-import xyz.lebster.interpreter.Interpreter;
-import xyz.lebster.interpreter.StringRepresentation;
-import xyz.lebster.node.Program;
-import xyz.lebster.node.value.Value;
-import xyz.lebster.parser.Lexer;
-import xyz.lebster.parser.Parser;
-import xyz.lebster.parser.Token;
-import xyz.lebster.runtime.ConsoleObject;
+import xyz.lebster.core.ANSI;
+import xyz.lebster.core.exception.CannotParse;
+import xyz.lebster.core.exception.SyntaxError;
+import xyz.lebster.core.interpreter.GlobalObject;
+import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.Program;
+import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.parser.Lexer;
+import xyz.lebster.core.parser.Parser;
+import xyz.lebster.core.parser.Token;
+import xyz.lebster.core.runtime.ConsoleObject;
 
 import java.io.IOException;
 import java.io.PrintStream;

@@ -49,10 +49,7 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 	public void represent(StringRepresentation representation) {
 		left.represent(representation);
 		representation.append(' ');
-		representation.append(switch (op) {
-			case Assign -> "";
-			default -> lookupBinaryOp(op).str;
-		});
+		representation.append(op == AssignmentOp.Assign ? "" : lookupBinaryOp(op).str);
 		representation.append("= ");
 		right.represent(representation);
 	}
@@ -74,6 +71,6 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 		MultiplyAssign,
 		DivideAssign,
 		MinusAssign,
-		ExponentAssign;
+		ExponentAssign
 	}
 }

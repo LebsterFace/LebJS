@@ -1,4 +1,4 @@
-let arr = [1,2,3,4];
+let arr = [1,2,1+2,4];
 expect(4, arr.length);
 
 expect(1, arr[0])

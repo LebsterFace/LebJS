@@ -21,7 +21,7 @@ public record ArrayExpression(List<Expression> elements) implements Expression {
 	public void dump(int indent) {
 		Dumper.dumpName(indent, "ArrayExpression");
 		for (int i = 0; i < elements.size(); i++) {
-			Dumper.dumpIndicated(indent + 1, "i", elements.get(i));
+			Dumper.dumpIndicated(indent + 1, String.valueOf(i), elements.get(i));
 		}
 	}
 }

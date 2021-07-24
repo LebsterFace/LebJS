@@ -471,6 +471,7 @@ public final class Parser {
 			case Identifier -> new Identifier(consume().value);
 			case Function -> parseFunctionExpression();
 			case LBracket -> parseArrayExpression();
+			case LBrace -> parseObjectExpression();
 
 			case This -> {
 				consume();
@@ -499,6 +500,28 @@ public final class Parser {
 
 			default -> throw new CannotParse(currentToken, "PrimaryExpression");
 		};
+	}
+
+	private ObjectExpression parseObjectExpression() throws SyntaxError, CannotParse {
+		require(TokenType.LBrace);
+		consumeAll(TokenType.Terminator);
+		final ObjectExpression result = new ObjectExpression();
+
+		while (currentToken.type == TokenType.StringLiteral || currentToken.type == TokenType.Identifier) {
+			consumeAll(TokenType.Terminator);
+			final StringLiteral key = new StringLiteral(consume().value);
+			consumeAll(TokenType.Terminator);
+			require(TokenType.Colon);
+			consumeAll(TokenType.Terminator);
+			result.entries().put(key, parseExpression());
+			consumeAll(TokenType.Terminator);
+			if (accept(TokenType.Comma) == null) break;
+			consumeAll(TokenType.Terminator);
+		}
+
+		consumeAll(TokenType.Terminator);
+		require(TokenType.RBrace);
+		return result;
 	}
 
 	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {

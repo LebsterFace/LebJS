@@ -445,12 +445,20 @@ public final class Parser {
 		return switch (state.currentToken.type) {
 			case LParen -> {
 				state.consume();
+				if (state.currentToken.type == TokenType.RParen || state.currentToken.type == TokenType.Identifier) {
+					final FunctionExpression result = tryParseArrowFunctionExpression(true);
+					if (result != null) yield result;
+				}
+
 				final Expression expression = parseExpression();
 				state.require(TokenType.RParen);
 				yield expression;
 			}
 
-			case Identifier -> new Identifier(state.consume().value);
+			case Identifier -> {
+				final FunctionExpression result = tryParseArrowFunctionExpression(false);
+				yield result != null ? result : new Identifier(state.consume().value);
+			}
 
 			case StringLiteral -> new StringLiteral(state.consume().value);
 			case NumericLiteral -> new NumericLiteral(Double.parseDouble(state.consume().value));
@@ -486,6 +494,58 @@ public final class Parser {
 
 			default -> throw new CannotParse(state.currentToken, "PrimaryExpression");
 		};
+	}
+
+	private FunctionExpression tryParseArrowFunctionExpression(boolean expectParens) throws SyntaxError, CannotParse {
+		save();
+
+		final Identifier[] arguments = parseArrowFunctionArguments(expectParens);
+		if (arguments == null) {
+			load();
+			return null;
+		}
+
+		if (state.accept(TokenType.Arrow) == null) {
+			load();
+			return null;
+		}
+
+		final BlockStatement body = parseArrowFunctionBody();
+		if (body == null) {
+			load();
+			return null;
+		}
+
+		return new FunctionExpression(body, null, arguments);
+	}
+
+	private BlockStatement parseArrowFunctionBody() throws CannotParse, SyntaxError {
+		if (state.currentToken.type == TokenType.LBrace) {
+			return parseBlockStatement();
+		} else if (matchExpression()) {
+			final BlockStatement body = new BlockStatement();
+			body.append(new ReturnStatement(parseExpression()));
+			return body;
+		} else {
+			return null;
+		}
+	}
+
+	private Identifier[] parseArrowFunctionArguments(boolean expectParens) {
+		if (expectParens) {
+			final List<Identifier> result = new ArrayList<>();
+			while (state.currentToken.type == TokenType.Identifier) {
+				result.add(new Identifier(state.consume().value));
+				if (state.accept(TokenType.Comma) == null) break;
+			}
+
+			if (state.accept(TokenType.RParen) == null) return null;
+			return result.toArray(new Identifier[0]);
+		} else {
+			final Token t = state.accept(TokenType.Identifier);
+			if (t == null) return null;
+			return new Identifier[] { new Identifier(t.value) };
+		}
 	}
 
 	private ObjectExpression parseObjectExpression() throws SyntaxError, CannotParse {

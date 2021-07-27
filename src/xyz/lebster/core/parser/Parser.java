@@ -114,9 +114,20 @@ public final class Parser {
 	}
 
 	private ParserState state;
+	private ParserState saved = null;
 
 	public Parser(Token[] tokens) {
 		this.state = new ParserState(tokens);
+	}
+
+	private void save() {
+		this.saved = state.clone();
+	}
+
+	private void load() {
+		if (this.saved == null) throw new IllegalStateException("Attempting to load invalid ParseState");
+		this.state = saved;
+		this.saved = null;
 	}
 
 	public Program parse() throws SyntaxError, CannotParse {

@@ -18,16 +18,16 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 			case LogicalNot -> expression.execute(interpreter).toBooleanLiteral().not();
 			case Negate -> expression.execute(interpreter).toNumericLiteral().unaryMinus();
 			case Typeof -> {
-				if (!(expression instanceof final LeftHandSideExpression lhs)) {
-					throw AbruptCompletion.error(new LanguageError("Invalid right-hand side in 'typeof' expression"));
-				}
-
 //				https://tc39.es/ecma262/multipage#sec-typeof-operator-runtime-semantics-evaluation
-				final Reference reference = lhs.toReference(interpreter);
-				if (reference.isResolvable()) {
-					yield new StringLiteral(reference.getValue(interpreter).typeOf());
+				if (expression instanceof final LeftHandSideExpression lhs) {
+					final Reference reference = lhs.toReference(interpreter);
+					if (reference.isResolvable()) {
+						yield new StringLiteral(reference.getValue(interpreter).typeOf());
+					} else {
+						yield new StringLiteral("undefined");
+					}
 				} else {
-					yield new StringLiteral("undefined");
+					yield new StringLiteral(expression.execute(interpreter).typeOf());
 				}
 			}
 

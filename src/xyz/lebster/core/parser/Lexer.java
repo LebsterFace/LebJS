@@ -77,7 +77,7 @@ public final class Lexer {
 		symbols_length_2.put("<=", TokenType.LessThanEqual);
 		symbols_length_2.put("<<", TokenType.LeftShift);
 		symbols_length_2.put("+=", TokenType.PlusEquals);
-		symbols_length_2.put("++", TokenType.Increment);
+		symbols_length_2.put("++", TokenType.PlusPlus);
 		symbols_length_2.put("^=", TokenType.CaretEquals);
 		symbols_length_2.put("%=", TokenType.PercentEquals);
 		symbols_length_2.put("&=", TokenType.AmpersandEquals);
@@ -89,7 +89,7 @@ public final class Lexer {
 		symbols_length_2.put("??", TokenType.NullishCoalescing);
 		symbols_length_2.put("!=", TokenType.NotEqual);
 		symbols_length_2.put("-=", TokenType.MinusEquals);
-		symbols_length_2.put("--", TokenType.Decrement);
+		symbols_length_2.put("--", TokenType.MinusMinus);
 
 		symbols_length_1.put("~", TokenType.Tilde);
 		symbols_length_1.put("|", TokenType.Pipe);

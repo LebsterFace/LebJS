@@ -27,11 +27,11 @@ public final class Parser {
 		precedence.put(TokenType.Period, 20);
 
 //		Unary Expressions:
+		precedence.put(TokenType.PlusPlus, 18);
+		precedence.put(TokenType.MinusMinus, 18);
+
 		precedence.put(TokenType.Bang, 17);
 		precedence.put(TokenType.Typeof, 17);
-//		FIXME: Postfix should have higher precedence than prefix
-		precedence.put(TokenType.Increment, 17);
-		precedence.put(TokenType.Decrement, 17);
 
 		precedence.put(TokenType.Exponent, 16);
 
@@ -92,8 +92,8 @@ public final class Parser {
 
 		associativity.put(TokenType.Bang, Right);
 		associativity.put(TokenType.Typeof, Right);
-		associativity.put(TokenType.Increment, Right);
-		associativity.put(TokenType.Decrement, Right);
+		associativity.put(TokenType.PlusPlus, Right);
+		associativity.put(TokenType.MinusMinus, Right);
 
 		associativity.put(TokenType.UnsignedRightShiftEquals, Right);
 		associativity.put(TokenType.LeftShiftEquals, Right);
@@ -369,8 +369,8 @@ public final class Parser {
 			case Minus -> UnaryExpression.UnaryOp.Negate;
 			case Bang -> UnaryExpression.UnaryOp.LogicalNot;
 			case Typeof -> UnaryExpression.UnaryOp.Typeof;
-			case Increment -> UnaryExpression.UnaryOp.PreIncrement;
-			case Decrement -> UnaryExpression.UnaryOp.PreDecrement;
+			case PlusPlus -> UnaryExpression.UnaryOp.PreIncrement;
+			case MinusMinus -> UnaryExpression.UnaryOp.PreDecrement;
 			default -> throw new CannotParse(token, "Unary Operator");
 		};
 
@@ -431,9 +431,9 @@ public final class Parser {
 			case ExponentEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.ExponentAssign);
 			case Equals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
 
-			case Decrement -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostDecrement);
+			case MinusMinus -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostDecrement);
 
-			case Increment -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostIncrement);
+			case PlusPlus -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostIncrement);
 			case LessThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
 			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
 
@@ -602,14 +602,14 @@ public final class Parser {
 			   t == TokenType.LBracket ||
 			   t == TokenType.LParen ||
 			   t == TokenType.Equals ||
-			   t == TokenType.Increment ||
-			   t == TokenType.Decrement;
+			   t == TokenType.PlusPlus ||
+			   t == TokenType.MinusMinus;
 	}
 
 	private boolean matchUnaryPrefixedExpression() {
 		final TokenType t = currentToken.type;
-		return t == TokenType.Increment ||
-			   t == TokenType.Decrement ||
+		return t == TokenType.PlusPlus ||
+			   t == TokenType.MinusMinus ||
 			   t == TokenType.Bang ||
 			   t == TokenType.Tilde ||
 			   t == TokenType.Plus ||

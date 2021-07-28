@@ -1,6 +1,7 @@
 package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.interpreter.Interpreter;
 
 public final class BooleanLiteral extends Primitive<Boolean> {
 	public BooleanLiteral(boolean value) {
@@ -8,17 +9,17 @@ public final class BooleanLiteral extends Primitive<Boolean> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral() {
+	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
 		return new NumericLiteral(value ? 1.0 : 0.0);
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral() {
+	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
 		return this;
 	}
 
 	@Override
-	public Dictionary toDictionary() {
+	public Dictionary toDictionary(Interpreter interpreter) {
 		throw new NotImplemented("BooleanWrapper");
 	}
 

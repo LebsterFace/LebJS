@@ -2,6 +2,7 @@ package xyz.lebster.core.runtime;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.Main;
+import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
 
 import java.io.ByteArrayOutputStream;
@@ -75,7 +76,7 @@ public final class ConsoleObject extends Dictionary {
 		});
 
 		final String[] strings = new String[args.length];
-		for (int i = 0; i < args.length; i++) strings[i] = args[i].toStringLiteral().value;
+		for (int i = 0; i < args.length; i++) strings[i] = args[i].toStringWithoutSideEffects();
 		System.out.print(String.join(", ", strings));
 
 		System.out.println(ANSI.RESET);

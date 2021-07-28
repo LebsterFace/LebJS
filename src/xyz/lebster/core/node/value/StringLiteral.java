@@ -1,5 +1,7 @@
 package xyz.lebster.core.node.value;
 
+import xyz.lebster.core.interpreter.Interpreter;
+
 public final class StringLiteral extends Primitive<String> {
 	public StringLiteral(String value) {
 		super(value, Type.String);
@@ -15,23 +17,23 @@ public final class StringLiteral extends Primitive<String> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral() {
+	public StringLiteral toStringLiteral(Interpreter interpreter) {
 		return this;
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral() {
+	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
 //		FIXME: Follow spec
 		return new NumericLiteral(Double.parseDouble(value));
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral() {
+	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
 		return new BooleanLiteral(value.length() > 0);
 	}
 
 	@Override
-	public Dictionary toDictionary() {
+	public Dictionary toDictionary(Interpreter interpreter) {
 		return new StringWrapper(this);
 	}
 

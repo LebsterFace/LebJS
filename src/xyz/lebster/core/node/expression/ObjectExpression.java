@@ -17,7 +17,7 @@ public record ObjectExpression(Map<Expression, Expression> entries) implements E
 	public Dictionary execute(Interpreter interpreter) throws AbruptCompletion {
 		final Dictionary dictionary = new Dictionary();
 		for (final Map.Entry<Expression, Expression> entry : entries.entrySet()) {
-			dictionary.set(entry.getKey().execute(interpreter).toStringLiteral(), entry.getValue().execute(interpreter));
+			dictionary.set(entry.getKey().execute(interpreter).toStringLiteral(interpreter), entry.getValue().execute(interpreter));
 		}
 
 		return dictionary;

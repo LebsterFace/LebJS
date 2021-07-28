@@ -1,6 +1,7 @@
 package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.Dumper;
+import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.TypeError;
 
 public final class Undefined extends Primitive<Void> {
@@ -9,17 +10,17 @@ public final class Undefined extends Primitive<Void> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral() {
+	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
 		return new NumericLiteral(Double.NaN);
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral() {
+	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
 		return new BooleanLiteral(false);
 	}
 
 	@Override
-	public Dictionary toDictionary() {
+	public Dictionary toDictionary(Interpreter interpreter) {
 		return new TypeError("Cannot convert undefined to base!");
 	}
 

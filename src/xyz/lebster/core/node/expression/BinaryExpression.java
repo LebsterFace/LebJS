@@ -12,13 +12,13 @@ import xyz.lebster.core.node.value.Value;
 
 public record BinaryExpression(Expression left, Expression right, BinaryOp op) implements Expression {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-applystringornumericbinaryoperator")
-	public static Value<?> applyOperator(Interpreter interpreter, Value<?> lval, BinaryOp op, Value<?> rval) {
+	public static Value<?> applyOperator(Interpreter interpreter, Value<?> lval, BinaryOp op, Value<?> rval) throws AbruptCompletion {
 		if (op == BinaryOp.Add) {
-			final Value<?> lprim = lval.toPrimitive();
-			final Value<?> rprim = rval.toPrimitive();
+			final Value<?> lprim = lval.toPrimitive(interpreter);
+			final Value<?> rprim = rval.toPrimitive(interpreter);
 			if (lprim.type == Type.String || rprim.type == Type.String) {
-				final StringLiteral lstr = lprim.toStringLiteral();
-				final StringLiteral rstr = rprim.toStringLiteral();
+				final StringLiteral lstr = lprim.toStringLiteral(interpreter);
+				final StringLiteral rstr = rprim.toStringLiteral(interpreter);
 				return new StringLiteral(lstr.value + rstr.value);
 			} else {
 				lval = lprim;
@@ -26,8 +26,8 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 			}
 		}
 
-		final NumericLiteral lnum = lval.toNumericLiteral();
-		final NumericLiteral rnum = rval.toNumericLiteral();
+		final NumericLiteral lnum = lval.toNumericLiteral(interpreter);
+		final NumericLiteral rnum = rval.toNumericLiteral(interpreter);
 		final double result = switch (op) {
 			case Add -> lnum.value + rnum.value;
 			case Subtract -> lnum.value - rnum.value;

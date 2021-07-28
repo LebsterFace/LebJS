@@ -2,8 +2,10 @@ package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.Dumper;
-import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.interpreter.AbruptCompletion;
+import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.TypeError;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
 import java.util.HashMap;
@@ -21,22 +23,22 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	}
 
 	@Override
-	public Primitive<?> toPrimitive(Type preferredType) {
+	public Primitive<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
 		throw new NotImplemented("Dictionary#toPrimitive");
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral() {
-		return toPrimitive(Type.Number).toNumericLiteral();
+	public NumericLiteral toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
+		return toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral() {
+	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
 		return new BooleanLiteral(true);
 	}
 
 	@Override
-	public Dictionary toDictionary() {
+	public Dictionary toDictionary(Interpreter interpreter) {
 		return this;
 	}
 
@@ -90,8 +92,8 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	}
 
 	@Override
-	public String toString() {
-		final Primitive<?> primValue = toPrimitive(Type.String);
+	public String toString(Interpreter interpreter) throws AbruptCompletion {
+		final Primitive<?> primValue = toPrimitive(interpreter, Type.String);
 		return primValue.toString();
 	}
 

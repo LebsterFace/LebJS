@@ -21,8 +21,8 @@ public record MemberExpression(Expression base, Expression property, boolean com
 
 	@Override
 	public Reference toReference(Interpreter interpreter) throws AbruptCompletion {
-		final Dictionary executedBase = base.execute(interpreter).toDictionary();
-		final StringLiteral executedProp = property.execute(interpreter).toStringLiteral();
+		final Dictionary executedBase = base.execute(interpreter).toDictionary(interpreter);
+		final StringLiteral executedProp = property.execute(interpreter).toStringLiteral(interpreter);
 		return new Reference(executedBase, executedProp);
 	}
 

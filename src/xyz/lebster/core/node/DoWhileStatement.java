@@ -23,7 +23,7 @@ public record DoWhileStatement(Statement body, Expression condition) implements 
 				else if (completion.type == AbruptCompletion.Type.Break) break;
 				else throw completion;
 			}
-		} while (condition.execute(interpreter).isTruthy());
+		} while (condition.execute(interpreter).isTruthy(interpreter));
 
 		return result;
 	}

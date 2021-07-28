@@ -123,7 +123,7 @@ public final class Testing {
 		globalObject.set("createObject", new NativeFunction((interpreter, arguments) -> {
 			final Dictionary result = new Dictionary();
 			for (int i = 0; i < arguments.length; i += 2) {
-				final StringLiteral key = arguments[i].execute(interpreter).toStringLiteral();
+				final StringLiteral key = arguments[i].execute(interpreter).toStringLiteral(interpreter);
 				if (arguments.length - 1 == i) {
 					throw AbruptCompletion.error(new LanguageError("Unmatched key '" + key.value + "' in createObject"));
 				}
@@ -141,7 +141,7 @@ public final class Testing {
 			} else if (values.length > 1) {
 				throw AbruptCompletion.error(new LanguageError("Multiple objects were provided"));
 			} else {
-				return values[0].toDictionary().getPrototype();
+				return values[0].toDictionary(interpreter).getPrototype();
 			}
 		}));
 

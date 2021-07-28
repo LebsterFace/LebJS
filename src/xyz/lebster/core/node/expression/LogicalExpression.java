@@ -22,8 +22,8 @@ public record LogicalExpression(Expression left, Expression right, LogicOp op) i
 		final Value<?> lval = left.execute(interpreter);
 
 		return switch (op) {
-			case And -> lval.isTruthy() ? right.execute(interpreter) : lval;
-			case Or -> lval.isTruthy() ? lval : right.execute(interpreter);
+			case And -> lval.isTruthy(interpreter) ? right.execute(interpreter) : lval;
+			case Or -> lval.isTruthy(interpreter) ? lval : right.execute(interpreter);
 			case Coalesce -> lval.isNullish() ? right.execute(interpreter) : lval;
 		};
 	}

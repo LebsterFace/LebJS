@@ -1,6 +1,7 @@
 package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.interpreter.Interpreter;
 
 public final class NumericLiteral extends Primitive<Double> {
 	public NumericLiteral(double num) {
@@ -13,6 +14,11 @@ public final class NumericLiteral extends Primitive<Double> {
 
 	public NumericLiteral(int num) {
 		super((double) num, Type.Number);
+	}
+
+	@Override
+	public String toString(Interpreter interpreter) {
+		return stringValueOf(value);
 	}
 
 	private static String stringValueOf(Double d) {
@@ -49,18 +55,18 @@ public final class NumericLiteral extends Primitive<Double> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral() {
+	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
 		return this;
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral() {
+	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
 		final boolean shouldBeFalse = value.isNaN() || value == 0.0 || value == -0.0;
 		return new BooleanLiteral(!shouldBeFalse);
 	}
 
 	@Override
-	public Dictionary toDictionary() {
+	public Dictionary toDictionary(Interpreter interpreter) {
 		throw new NotImplemented("NumberWrapper");
 	}
 
@@ -71,10 +77,5 @@ public final class NumericLiteral extends Primitive<Double> {
 
 	public NumericLiteral unaryMinus() {
 		return new NumericLiteral(-value);
-	}
-
-	@Override
-	public String toString() {
-		return stringValueOf(value);
 	}
 }

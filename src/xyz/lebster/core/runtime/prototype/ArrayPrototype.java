@@ -12,8 +12,8 @@ public final class ArrayPrototype extends Dictionary {
 	private ArrayPrototype() {
 //		https://tc39.es/ecma262/multipage#sec-array.prototype.push
 		set("push", new NativeFunction((interpreter, elements) -> {
-			final Dictionary O = interpreter.thisValue().toDictionary();
-			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.length).toNumericLiteral().value.longValue());
+			final Dictionary O = interpreter.thisValue().toDictionary(interpreter);
+			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.length).toNumericLiteral(interpreter).value.longValue());
 
 			if ((len + elements.length) > MAX_LENGTH) {
 				throw AbruptCompletion.error(new TypeError("Pushing " + elements.length + " elements on an array-like of length " + len + " is disallowed, as the total surpasses 2**53-1"));
@@ -27,15 +27,15 @@ public final class ArrayPrototype extends Dictionary {
 
 //		https://tc39.es/ecma262/multipage#sec-array.prototype.join
 		set("join", new NativeFunction((interpreter, elements) -> {
-			final Dictionary O = interpreter.thisValue().toDictionary();
-			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.length).toNumericLiteral().value.longValue());
-			final String sep = elements.length == 0 || elements[0].type == Type.Undefined ? "," : elements[0].toString();
+			final Dictionary O = interpreter.thisValue().toDictionary(interpreter);
+			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.length).toNumericLiteral(interpreter).value.longValue());
+			final String sep = elements.length == 0 || elements[0].type == Type.Undefined ? "," : elements[0].toString(interpreter);
 
 			final StringBuilder R = new StringBuilder();
 			for (int k = 0; k < len; k++) {
 				if (k > 0) R.append(sep);
 				final Value<?> element = O.get(new StringLiteral(k));
-				R.append(element.isNullish() ? "" : element.toString());
+				R.append(element.isNullish() ? "" : element.toString(interpreter));
 			}
 
 			return new StringLiteral(R.toString());

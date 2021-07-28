@@ -220,13 +220,13 @@ public final class Parser {
 		state.require(TokenType.LParen);
 
 		Statement init = null;
-		if (matchExpression() || matchDeclaration()) init = parseAny();
+		if (matchPrimaryExpression() || matchDeclaration()) init = parseAny();
 		state.require(TokenType.Semicolon);
 
-		final Expression test = matchExpression() ? parseExpression() : null;
+		final Expression test = matchPrimaryExpression() ? parseExpression() : null;
 		state.require(TokenType.Semicolon);
 
-		final Expression update = matchExpression() ? parseExpression() : null;
+		final Expression update = matchPrimaryExpression() ? parseExpression() : null;
 		state.require(TokenType.RParen);
 
 		final Statement body = parseLine();
@@ -325,7 +325,7 @@ public final class Parser {
 	private List<Expression> parseExpressionList() throws SyntaxError, CannotParse {
 		final List<Expression> result = new ArrayList<>();
 
-		while (matchExpression()) {
+		while (matchPrimaryExpression()) {
 			result.add(parseExpression());
 			if (state.accept(TokenType.Comma) == null) break;
 		}
@@ -522,7 +522,7 @@ public final class Parser {
 	private BlockStatement parseArrowFunctionBody() throws CannotParse, SyntaxError {
 		if (state.currentToken.type == TokenType.LBrace) {
 			return parseBlockStatement();
-		} else if (matchExpression()) {
+		} else if (matchPrimaryExpression()) {
 			final BlockStatement body = new BlockStatement();
 			body.append(new ReturnStatement(parseExpression()));
 			return body;
@@ -587,7 +587,7 @@ public final class Parser {
 
 	private boolean matchStatementOrExpression() {
 		final TokenType t = state.currentToken.type;
-		return matchExpression() ||
+		return matchPrimaryExpression() ||
 			   t == TokenType.Return ||
 			   t == TokenType.Yield ||
 			   t == TokenType.Do ||
@@ -607,20 +607,21 @@ public final class Parser {
 
 	}
 
-	private boolean matchExpression() {
+	private boolean matchPrimaryExpression() {
 		final TokenType t = state.currentToken.type;
-		return t == TokenType.StringLiteral ||
+		return t == TokenType.LParen ||
+			   t == TokenType.Identifier ||
+			   t == TokenType.StringLiteral ||
 			   t == TokenType.NumericLiteral ||
 			   t == TokenType.BooleanLiteral ||
-			   t == TokenType.Null ||
 			   t == TokenType.Function ||
-			   t == TokenType.Infinity ||
-			   t == TokenType.Undefined ||
-			   t == TokenType.NaN ||
-			   t == TokenType.This ||
-			   t == TokenType.Identifier ||
-			   t == TokenType.LParen ||
 			   t == TokenType.LBracket ||
+			   t == TokenType.LBrace ||
+			   t == TokenType.This ||
+			   t == TokenType.Null ||
+			   t == TokenType.Infinity ||
+			   t == TokenType.NaN ||
+			   t == TokenType.Undefined ||
 			   matchUnaryPrefixedExpression();
 	}
 

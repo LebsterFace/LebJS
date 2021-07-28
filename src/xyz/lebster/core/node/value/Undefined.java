@@ -1,6 +1,7 @@
 package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.Dumper;
+import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.TypeError;
 
@@ -20,8 +21,8 @@ public final class Undefined extends Primitive<Void> {
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
-		return new TypeError("Cannot convert undefined to base!");
+	public Dictionary toDictionary(Interpreter interpreter) throws AbruptCompletion {
+		throw AbruptCompletion.error(new TypeError("Cannot convert undefined or null to object"));
 	}
 
 	@Override

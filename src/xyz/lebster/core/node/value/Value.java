@@ -66,7 +66,7 @@ public abstract class Value<JType> implements Expression {
 	public abstract BooleanLiteral toBooleanLiteral(Interpreter interpreter);
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toobject")
-	public abstract Dictionary toDictionary(Interpreter interpreter);
+	public abstract Dictionary toDictionary(Interpreter interpreter) throws AbruptCompletion;
 
 	@Override
 	public boolean equals(Object o) {

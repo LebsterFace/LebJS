@@ -16,11 +16,6 @@ public final class NumericLiteral extends Primitive<Double> {
 		super((double) num, Type.Number);
 	}
 
-	@Override
-	public String toString(Interpreter interpreter) {
-		return stringValueOf(value);
-	}
-
 	private static String stringValueOf(Double d) {
 		if (d.isNaN()) return "NaN";
 		else if (d == 0.0 || d == -0.0) return "0";
@@ -52,6 +47,11 @@ public final class NumericLiteral extends Primitive<Double> {
 				return input.substring(0, firstZeros);
 			}
 		}
+	}
+
+	@Override
+	public String toString(Interpreter interpreter) {
+		return stringValueOf(value);
 	}
 
 	@Override

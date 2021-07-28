@@ -1,8 +1,8 @@
 package xyz.lebster.cli;
 
+import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.Dumper;
-import xyz.lebster.Main;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.node.value.*;

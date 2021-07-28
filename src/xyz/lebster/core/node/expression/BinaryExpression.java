@@ -72,6 +72,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 		Exponent("**");
 
 		public final String str;
+
 		BinaryOp(String str) {
 			this.str = str;
 		}

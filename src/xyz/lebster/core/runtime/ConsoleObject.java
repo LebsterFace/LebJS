@@ -1,8 +1,7 @@
 package xyz.lebster.core.runtime;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.Main;
-import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.node.value.*;
 
 import java.io.ByteArrayOutputStream;

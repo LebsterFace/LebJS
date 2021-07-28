@@ -16,7 +16,7 @@ public abstract class Executable<JType> extends Dictionary {
 		this.code = code;
 	}
 
-	public abstract Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion;
+	public abstract Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion;
 
 	@Override
 	public void dump(int indent) {

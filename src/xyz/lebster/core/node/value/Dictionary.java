@@ -22,9 +22,70 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		this(new HashMap<>());
 	}
 
+	private static String getHint(Type preferredType) {
+		// i. If preferredType is not present, let hint be "default".
+		if (preferredType == null) return "default";
+		// ii. Else if preferredType is string, let hint be "string".
+		if (preferredType == Type.String) return "string";
+			// iii. Else,
+		else {
+			// 1. Assert: preferredType is number.
+			assert preferredType == Type.Number;
+			// 2. Let hint be "number".
+			return "number";
+		}
+	}
+
 	@Override
 	public Primitive<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
-		throw new NotImplemented("Dictionary#toPrimitive");
+//		a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
+		final Value<?> exoticToPrim = get(new StringLiteral("toPrimitive")); // FIXME: Symbol.toPrimitive
+
+//		b. If exoticToPrim is not undefined, then
+		if (exoticToPrim instanceof final Executable<?> executable) {
+//			i - iii. Get hint
+			final StringLiteral hint = new StringLiteral(getHint(preferredType));
+//			iv. Let result be ? Call(exoticToPrim, input, hint).
+			final Value<?> result = executable.call(interpreter, hint);
+//			v. If Type(result) is not Object, return result.
+			if (result.type != Type.Dictionary) return (Primitive<?>) result;
+//			vi. Throw a TypeError exception.
+			throw AbruptCompletion.error(new TypeError("Cannot convert object to primitive value"));
+		}
+
+//		c. If preferredType is not present, let preferredType be number.
+//		d. Return ? OrdinaryToPrimitive(input, preferredType).
+		return ordinaryToPrimitive(interpreter, preferredType == null ? Type.Number : preferredType);
+	}
+
+	private Primitive<?> ordinaryToPrimitive(Interpreter interpreter, Type hint) throws AbruptCompletion {
+//		1. Assert: Type(O) is Object.
+//		2. Assert: hint is either string or number.
+		assert hint == Type.String || hint == Type.Number;
+
+//		3. If hint is string, then
+//			a. Let methodNames be "toString", "valueOf".
+//		4. Else,
+//			a. Let methodNames be "valueOf", "toString".
+		final String[] methodNames = hint == Type.String ?
+			new String[] {"toString", "valueOf"} :
+			new String[] {"valueOf", "toString"};
+
+//		5. For each element name of methodNames, do
+		for (final String name : methodNames) {
+//			a. Let method be ? Get(O, name).
+			final Value<?> method = get(new StringLiteral(name));
+//			b. If IsCallable(method) is true, then
+			if (method instanceof final Executable<?> executable) {
+//				i. Let result be ? Call(method, O).
+				final Value<?> result = executable.call(interpreter);
+//				ii. If Type(result) is not Object, return result.
+				if (result.type != Type.Dictionary) return (Primitive<?>) result;
+			}
+		}
+
+//		6. Throw a TypeError exception.
+		throw AbruptCompletion.error(new TypeError("Cannot convert object to primitive value"));
 	}
 
 	@Override

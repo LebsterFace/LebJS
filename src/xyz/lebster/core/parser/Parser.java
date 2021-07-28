@@ -180,39 +180,42 @@ public final class Parser {
 	}
 
 	private Statement parseStatementOrExpression() throws SyntaxError, CannotParse {
-		if (matchExpression()) {
-			return new ExpressionStatement(parseExpression());
-		} else {
-			return switch (state.currentToken.type) {
-				case Function -> parseFunctionDeclaration();
-				case Semicolon -> new EmptyStatement();
-				case LBrace -> parseBlockStatement();
-				case While -> parseWhileStatement();
-				case Do -> parseDoWhileStatement();
-				case For -> parseForStatement();
-				case If -> parseIfStatement();
-				case Try -> parseTryStatement();
+		return switch (state.currentToken.type) {
+			case Function -> parseFunctionDeclaration();
+			case Semicolon -> new EmptyStatement();
+			case LBrace -> parseBlockStatement();
+			case While -> parseWhileStatement();
+			case Do -> parseDoWhileStatement();
+			case For -> parseForStatement();
+			case If -> parseIfStatement();
+			case Try -> parseTryStatement();
 
-				case Return -> {
-					state.consume();
+			case Return -> {
+				state.consume();
 //					FIXME: Proper automatic semicolon insertion
-					final Expression val = matchExpression() ? parseExpression() : new Undefined();
-					yield new ReturnStatement(val);
-				}
+				final Expression val = matchPrimaryExpression() ? parseExpression() : new Undefined();
+				yield new ReturnStatement(val);
+			}
 
-				case Break -> {
-					state.consume();
-					yield new BreakStatement();
-				}
+			case Break -> {
+				state.consume();
+				yield new BreakStatement();
+			}
 
-				case Throw -> {
-					state.consume();
-					yield new ThrowStatement(parseExpression());
-				}
+			case Throw -> {
+				state.consume();
+				yield new ThrowStatement(parseExpression());
+			}
 
-				default -> throw new CannotParse(state.currentToken, "Statement");
-			};
-		}
+			default -> {
+				if (matchPrimaryExpression()) {
+					yield new ExpressionStatement(parseExpression());
+				} else {
+					throw new CannotParse(state.currentToken, "Statement");
+				}
+			}
+		};
+
 	}
 
 	private ForStatement parseForStatement() throws SyntaxError, CannotParse {

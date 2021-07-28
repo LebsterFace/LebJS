@@ -154,10 +154,10 @@ public final class Parser {
 	}
 
 	private Statement parseAny() throws SyntaxError, CannotParse {
-		if (matchDeclaration()) {
-			return parseDeclaration();
-		} else if (matchStatementOrExpression()) {
+		if (matchStatementOrExpression()) {
 			return parseStatementOrExpression();
+		} else if (matchDeclaration()) {
+			return parseDeclaration();
 		} else {
 			throw new CannotParse("Token '" + state.currentToken.type + "'");
 		}

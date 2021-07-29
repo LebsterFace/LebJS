@@ -46,7 +46,6 @@ public abstract class Value<JType> implements Expression {
 	}
 
 	public String toString() {
-		System.out.println("Warning: Usage of toString(). Did you mean toString(Interpreter interpreter)?");
 		return toStringWithoutSideEffects();
 	}
 

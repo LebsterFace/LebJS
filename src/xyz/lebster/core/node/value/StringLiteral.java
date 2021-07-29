@@ -24,7 +24,11 @@ public final class StringLiteral extends Primitive<String> {
 	@Override
 	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
 //		FIXME: Follow spec
-		return new NumericLiteral(Double.parseDouble(value));
+		try {
+			return new NumericLiteral(Double.parseDouble(value));
+		} catch (NumberFormatException e) {
+			return new NumericLiteral(Double.NaN);
+		}
 	}
 
 	@Override

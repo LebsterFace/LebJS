@@ -15,7 +15,7 @@ public final class Function extends Executable<FunctionNode> {
 	}
 
 	@Override
-	public Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	protected Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		interpreter.enterExecutionContext(context);
 
 //		Declare passed arguments as variables

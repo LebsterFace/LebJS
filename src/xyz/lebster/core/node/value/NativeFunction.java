@@ -21,8 +21,19 @@ public final class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public String toString() {
+	public String toStringWithoutSideEffects() {
+//		TODO: Function name
 		return "function() { [native code] }";
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append(toStringWithoutSideEffects());
+	}
+
+	@Override
+	protected void representRecursive(StringRepresentation representation, List<Dictionary> parents) {
+		this.represent(representation);
 	}
 
 	@Override

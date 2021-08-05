@@ -7,9 +7,7 @@ import xyz.lebster.core.node.*;
 import xyz.lebster.core.node.expression.*;
 import xyz.lebster.core.node.value.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static xyz.lebster.core.parser.Associativity.*;
 
@@ -25,6 +23,8 @@ public final class Parser {
 		precedence.put(TokenType.LBracket, 20);
 		precedence.put(TokenType.RBracket, 20);
 		precedence.put(TokenType.Period, 20);
+
+		precedence.put(TokenType.New, 20);
 
 //		Unary Expressions:
 		precedence.put(TokenType.PlusPlus, 18);
@@ -72,6 +72,7 @@ public final class Parser {
 //		FIXME: Switch statement method (when all operators are implemented)
 		associativity.put(TokenType.LParen, NA);
 		associativity.put(TokenType.RParen, NA);
+		associativity.put(TokenType.New, NA);
 
 		associativity.put(TokenType.LBracket, Left);
 		associativity.put(TokenType.RBracket, Left);
@@ -368,13 +369,17 @@ public final class Parser {
 	}
 
 	private Expression parseExpression() throws SyntaxError, CannotParse {
-		return parseExpression(0, Left);
+		return parseExpression(0, Left, new HashSet<>());
 	}
 
 	private Expression parseExpression(int minPrecedence, Associativity assoc) throws SyntaxError, CannotParse {
+		return parseExpression(minPrecedence, assoc, new HashSet<>());
+	}
+
+	private Expression parseExpression(int minPrecedence, Associativity assoc, Set<TokenType> forbidden) throws SyntaxError, CannotParse {
 		Expression latestExpr = parsePrimaryExpression();
 
-		while (matchSecondaryExpression()) {
+		while (matchSecondaryExpression(forbidden)) {
 //			TODO: Remove when all implemented
 			if (!precedence.containsKey(state.currentToken.type))
 				throw new NotImplemented("Precedence for token '" + state.currentToken.type + "'");
@@ -404,6 +409,7 @@ public final class Parser {
 			case Minus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Subtract);
 			case Star -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Multiply);
 			case Slash -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Divide);
+
 			case Exponent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Exponent);
 			case LParen -> parseCallExpression(left);
 
@@ -492,6 +498,14 @@ public final class Parser {
 				yield new NumericLiteral(Double.NaN);
 			}
 
+			case New -> {
+				final TokenType n = state.consume().type;
+//				https://tc39.es/ecma262/multipage#sec-new-operator
+				final Expression constructExpr = parseExpression(precedence.get(n), associativity.get(n), Collections.singleton(TokenType.LParen));
+				final List<Expression> arguments = state.currentToken.type == TokenType.LParen ? parseExpressionList(true) : Collections.emptyList();
+				yield new NewExpression(constructExpr, arguments.toArray(new Expression[0]));
+			}
+
 			case Undefined -> {
 				state.consume();
 				yield new Undefined();
@@ -577,7 +591,7 @@ public final class Parser {
 
 	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {
 		state.require(TokenType.LBracket);
-		final List<Expression> elements = parseExpressionList();
+		final List<Expression> elements = parseExpressionList(false);
 		state.require(TokenType.RBracket);
 		return new ArrayExpression(elements);
 	}
@@ -630,8 +644,9 @@ public final class Parser {
 			   matchUnaryPrefixedExpression();
 	}
 
-	private boolean matchSecondaryExpression() {
+	private boolean matchSecondaryExpression(Set<TokenType> forbidden) {
 		final TokenType t = state.currentToken.type;
+		if (forbidden.contains(t)) return false;
 		return t == TokenType.Plus ||
 			   t == TokenType.Minus ||
 			   t == TokenType.Star ||

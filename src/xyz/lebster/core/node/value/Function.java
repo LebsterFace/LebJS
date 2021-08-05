@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.FunctionNode;
 
-public final class Function extends Executable<FunctionNode> {
+public final class Function extends Constructor<FunctionNode> {
 	public final ExecutionContext context;
 
 	public Function(FunctionNode code, ExecutionContext context) {
@@ -47,5 +47,12 @@ public final class Function extends Executable<FunctionNode> {
 
 	public Dictionary toDictionary() {
 		return this;
+	}
+
+	@Override
+	public Dictionary construct(Value<?>[] executedArguments) {
+		final Dictionary dictionary = new Dictionary();
+		dictionary.set("isThisFake", new BooleanLiteral(true));
+		return dictionary;
 	}
 }

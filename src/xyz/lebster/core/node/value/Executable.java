@@ -4,12 +4,11 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.expression.Identifier;
 
 import java.util.List;
 
 public abstract class Executable<JType> extends Dictionary {
-	public static Identifier name = new Identifier("name");
+	// public static Identifier name = new Identifier("name");
 	public final JType code;
 
 	public Executable(JType code) {

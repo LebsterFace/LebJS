@@ -325,19 +325,21 @@ public final class Parser {
 		return new FunctionExpression(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
 	}
 
-	private List<Expression> parseExpressionList() throws SyntaxError, CannotParse {
+	private List<Expression> parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {
 		final List<Expression> result = new ArrayList<>();
+		if (expectParens) state.require(TokenType.LParen);
 
 		while (matchPrimaryExpression()) {
 			result.add(parseExpression());
 			if (state.accept(TokenType.Comma) == null) break;
 		}
 
+		if (expectParens) state.require(TokenType.RParen);
 		return result;
 	}
 
 	private CallExpression parseCallExpression(Expression left) throws SyntaxError, CannotParse {
-		final List<Expression> arguments = parseExpressionList();
+		final List<Expression> arguments = parseExpressionList(false);
 		state.require(TokenType.RParen);
 		return new CallExpression(left, arguments.toArray(new Expression[0]));
 	}

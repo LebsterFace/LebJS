@@ -34,7 +34,7 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 //			https://tc39.es/ecma262/multipage#sec-postfix-increment-operator
 			case PostIncrement, PostDecrement, PreIncrement, PreDecrement -> {
 				if (!(expression instanceof final LeftHandSideExpression lhs)) {
-					throw AbruptCompletion.error(new LanguageError("Invalid left-hand side expression in postfix operation"));
+					throw AbruptCompletion.error(new LanguageError("Invalid left-hand side expression in postfix/prefix operation"));
 				}
 
 				final Reference lref = lhs.toReference(interpreter);

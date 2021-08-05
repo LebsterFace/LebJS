@@ -42,15 +42,15 @@ public abstract class Value<JType> implements Expression {
 	}
 
 	public String toStringWithoutSideEffects() {
-		return type.name() + "{ " + value + " }";
-	}
-
-	public String toString() {
-		return toStringWithoutSideEffects();
+		return String.valueOf(value);
 	}
 
 	public String toString(Interpreter interpreter) throws AbruptCompletion {
 		return String.valueOf(value);
+	}
+
+	public String toString() {
+		return toStringWithoutSideEffects();
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tostring")

@@ -9,6 +9,6 @@ public abstract class Primitive<JType> extends Value<JType> {
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		representation.append(toString());
+		representation.append(toStringWithoutSideEffects());
 	}
 }

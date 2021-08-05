@@ -2,6 +2,7 @@ package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 
 public final class NumericLiteral extends Primitive<Double> {
 	public NumericLiteral(double num) {
@@ -52,6 +53,16 @@ public final class NumericLiteral extends Primitive<Double> {
 	@Override
 	public String toString(Interpreter interpreter) {
 		return stringValueOf(value);
+	}
+
+	@Override
+	public String toStringWithoutSideEffects() {
+		return stringValueOf(value);
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append(stringValueOf(value));
 	}
 
 	@Override

@@ -4,6 +4,9 @@ package xyz.lebster.core.node.value;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
+
+import java.util.List;
 
 public final class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(NativeCode code) {
@@ -24,6 +27,12 @@ public final class NativeFunction extends Executable<NativeCode> {
 	public String toStringWithoutSideEffects() {
 //		TODO: Function name
 		return "function() { [native code] }";
+	}
+
+	@Override
+	public String toStringForLogging() {
+//		TODO: Function name
+		return "ƒ () { [native code] }";
 	}
 
 	@Override

@@ -75,7 +75,7 @@ public final class ConsoleObject extends Dictionary {
 		});
 
 		final String[] strings = new String[args.length];
-		for (int i = 0; i < args.length; i++) strings[i] = args[i].toStringWithoutSideEffects();
+		for (int i = 0; i < args.length; i++) strings[i] = args[i].toStringForLogging();
 		System.out.print(String.join(", ", strings));
 
 		System.out.println(ANSI.RESET);

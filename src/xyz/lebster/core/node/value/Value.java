@@ -92,4 +92,8 @@ public abstract class Value<JType> implements Expression {
 	public boolean isNullish() {
 		return type == Type.Undefined || type == Type.Null;
 	}
+
+	public String toStringForLogging() {
+		return toStringWithoutSideEffects();
+	}
 }

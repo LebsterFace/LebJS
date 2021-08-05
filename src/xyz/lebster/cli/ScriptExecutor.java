@@ -87,7 +87,6 @@ public final class ScriptExecutor {
 		final Value<?> lastValue = program.execute(interpreter);
 
 		if (options.showLastValue()) {
-			System.out.print("Last Value: ");
 			final StringRepresentation representation = new StringRepresentation();
 			lastValue.represent(representation);
 			System.out.println(representation);

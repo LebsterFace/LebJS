@@ -9,10 +9,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.TypeError;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	public Dictionary(Map<StringLiteral, Value<?>> value) {
@@ -35,6 +32,12 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 			// 2. Let hint be "number".
 			return "number";
 		}
+	}
+
+	public String toStringWithoutSideEffects() {
+		final StringRepresentation representation = new StringRepresentation();
+		this.represent(representation);
+		return representation.toString();
 	}
 
 	@Override
@@ -70,8 +73,8 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 //		4. Else,
 //			a. Let methodNames be "valueOf", "toString".
 		final String[] methodNames = hint == Type.String ?
-			new String[] {"toString", "valueOf"} :
-			new String[] {"valueOf", "toString"};
+			new String[] { "toString", "valueOf" } :
+			new String[] { "valueOf", "toString" };
 
 //		5. For each element name of methodNames, do
 		for (final String name : methodNames) {
@@ -213,11 +216,47 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 
 	@Override
 	public void represent(StringRepresentation representation) {
+		this.representRecursive(representation, new LinkedList<>());
+	}
+
+	protected void representRecursive(StringRepresentation representation, List<Dictionary> parents) {
+		representation.append('{');
 		if (value.isEmpty()) {
-			representation.append("{}");
+			representation.append(" }");
 			return;
 		}
 
-		System.err.println(ANSI.BACKGROUND_BRIGHT_YELLOW + "WARNING" + ANSI.RESET + " Dictionary#represent for filled dictionary has not been implemented!");
+		parents.add(this);
+
+		representation.appendLine();
+		representation.indent();
+
+		final Set<Map.Entry<StringLiteral, Value<?>>> entrySet = this.value.entrySet();
+
+		for (Iterator<Map.Entry<StringLiteral, Value<?>>> iterator = entrySet.iterator(); iterator.hasNext(); ) {
+			final Map.Entry<StringLiteral, Value<?>> entry = iterator.next();
+			representation.appendIndent();
+			representation.append(entry.getKey().value);
+			representation.append(": ");
+			final Value<?> value = entry.getValue();
+			if (value instanceof final Dictionary dictionary) {
+				if (parents.contains(dictionary)) {
+					representation.append(ANSI.RED);
+					representation.append(this == value ? "[self]" : "[parent]");
+					representation.append(ANSI.RESET);
+				} else {
+					dictionary.representRecursive(representation, parents);
+				}
+			} else {
+				value.represent(representation);
+			}
+
+			if (iterator.hasNext()) representation.append(',');
+			representation.appendLine();
+		}
+
+		representation.unindent();
+		representation.appendIndent();
+		representation.append('}');
 	}
 }

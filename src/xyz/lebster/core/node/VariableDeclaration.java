@@ -19,7 +19,7 @@ public record VariableDeclaration(VariableDeclarator... declarations) implements
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		for (VariableDeclarator declarator : declarations) declarator.execute(interpreter);
-		return new Undefined();
+		return Undefined.instance;
 	}
 
 	@Override

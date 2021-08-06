@@ -13,7 +13,7 @@ public record DoWhileStatement(Statement body, Expression condition) implements 
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-do-while-statement")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> result = new Undefined();
+		final Value<?> result = Undefined.instance;
 
 		do {
 			try {

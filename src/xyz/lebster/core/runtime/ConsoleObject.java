@@ -14,22 +14,22 @@ public final class ConsoleObject extends Dictionary {
 	private ConsoleObject() {
 		set("log", new NativeFunction(((interpreter, data) -> {
 			logger(LogLevel.Log, data);
-			return new Undefined();
+			return Undefined.instance;
 		})));
 
 		set("warn", new NativeFunction(((interpreter, data) -> {
 			logger(LogLevel.Warn, data);
-			return new Undefined();
+			return Undefined.instance;
 		})));
 
 		set("error", new NativeFunction(((interpreter, data) -> {
 			logger(LogLevel.Error, data);
-			return new Undefined();
+			return Undefined.instance;
 		})));
 
 		set("info", new NativeFunction(((interpreter, data) -> {
 			logger(LogLevel.Info, data);
-			return new Undefined();
+			return Undefined.instance;
 		})));
 
 		set("dump", new NativeFunction(((interpreter, data) -> {

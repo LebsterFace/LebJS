@@ -95,7 +95,7 @@ public final class Testing {
 				throw new ExecutionError("Assertion failed!");
 			}
 
-			return new Undefined();
+			return Undefined.instance;
 		}));
 
 		globalObject.set("bind", new NativeFunction((interpreter, arguments) -> {
@@ -106,7 +106,7 @@ public final class Testing {
 			interpreter.enterExecutionContext(new ExecutionContext(interpreter.lexicalEnvironment(), null, arguments[0]));
 			// Re-enter the `bind()` ExecutionContext
 			interpreter.enterExecutionContext(current);
-			return new Undefined();
+			return Undefined.instance;
 		}));
 
 		globalObject.set("unbind", new NativeFunction((interpreter, arguments) -> {
@@ -117,7 +117,7 @@ public final class Testing {
 			interpreter.exitExecutionContext(interpreter.getExecutionContext());
 			// Re-enter the `unbind()` ExecutionContext
 			interpreter.enterExecutionContext(current);
-			return new Undefined();
+			return Undefined.instance;
 		}));
 
 		globalObject.set("createObject", new NativeFunction((interpreter, arguments) -> {

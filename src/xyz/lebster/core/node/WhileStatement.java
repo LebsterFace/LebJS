@@ -13,7 +13,7 @@ public record WhileStatement(Expression condition, Statement body) implements St
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-WhileStatement")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> result = new Undefined();
+		final Value<?> result = Undefined.instance;
 
 		while (condition.execute(interpreter).isTruthy(interpreter)) {
 			try {

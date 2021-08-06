@@ -27,7 +27,7 @@ public record Program(List<Statement> children) implements ASTNode {
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		Value<?> lastValue = new Undefined();
+		Value<?> lastValue = Undefined.instance;
 		for (ASTNode child : children) lastValue = child.execute(interpreter);
 		return lastValue;
 	}

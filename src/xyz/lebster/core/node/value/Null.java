@@ -6,9 +6,11 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.TypeError;
 
 public final class Null extends Primitive<Void> {
-	public Null() {
+	private Null() {
 		super(null, Type.Null);
 	}
+
+	public static final Null instance = new Null();
 
 	@Override
 	public NumericLiteral toNumericLiteral(Interpreter interpreter) {

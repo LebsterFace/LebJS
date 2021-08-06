@@ -7,9 +7,11 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.TypeError;
 
 public final class Undefined extends Primitive<Void> {
-	public Undefined() {
+	private Undefined() {
 		super(null, Type.Undefined);
 	}
+
+	public static final Undefined instance = new Undefined();
 
 	@Override
 	public NumericLiteral toNumericLiteral(Interpreter interpreter) {

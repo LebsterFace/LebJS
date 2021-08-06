@@ -9,7 +9,7 @@ import xyz.lebster.core.node.value.Value;
 public final class EmptyStatement implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) {
-		return new Undefined();
+		return Undefined.instance;
 	}
 
 	@Override

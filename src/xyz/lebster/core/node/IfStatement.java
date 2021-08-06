@@ -24,7 +24,7 @@ public record IfStatement(Expression condition, Statement consequence, Statement
 		if (condition.execute(interpreter).isTruthy(interpreter)) {
 			return consequence.execute(interpreter);
 		} else if (elseStatement == null) {
-			return new Undefined();
+			return Undefined.instance;
 		} else {
 			return elseStatement.execute(interpreter);
 		}

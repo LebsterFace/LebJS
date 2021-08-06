@@ -12,7 +12,7 @@ public record ForStatement(Statement init, Expression test, Expression update, S
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		if (init != null) init.execute(interpreter);
-		final Value<?> result = new Undefined();
+		final Value<?> result = Undefined.instance;
 
 		while (test.execute(interpreter).isTruthy(interpreter)) {
 			try {

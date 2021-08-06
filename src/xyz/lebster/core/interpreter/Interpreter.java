@@ -39,7 +39,7 @@ public final class Interpreter {
 	public Value<?> declareVariable(Identifier identifier, Value<?> value) {
 		lexicalEnvironment().setVariable(identifier.stringValue(), value);
 //		FIXME: Errors can technically be thrown here, so don't always return a normal completion
-		return new Undefined();
+		return Undefined.instance;
 	}
 
 	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {

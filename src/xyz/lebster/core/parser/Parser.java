@@ -194,7 +194,7 @@ public final class Parser {
 			case Return -> {
 				state.consume();
 //					FIXME: Proper automatic semicolon insertion
-				final Expression val = matchPrimaryExpression() ? parseExpression() : new Undefined();
+				final Expression val = matchPrimaryExpression() ? parseExpression() : Undefined.instance;
 				yield new ReturnStatement(val);
 			}
 
@@ -485,7 +485,7 @@ public final class Parser {
 
 			case Null -> {
 				state.consume();
-				yield new Null();
+				yield Null.instance;
 			}
 
 			case Infinity -> {
@@ -508,7 +508,7 @@ public final class Parser {
 
 			case Undefined -> {
 				state.consume();
-				yield new Undefined();
+				yield Undefined.instance;
 			}
 
 			default -> throw new CannotParse(state.currentToken, "PrimaryExpression");

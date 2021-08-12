@@ -4,7 +4,9 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.*;
 import xyz.lebster.core.node.value.Dictionary;
 import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.Type;
 import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.runtime.TypeError;
 
 public record MemberExpression(Expression base, Expression property, boolean computed) implements LeftHandSideExpression {
 	@Override
@@ -21,9 +23,19 @@ public record MemberExpression(Expression base, Expression property, boolean com
 
 	@Override
 	public Reference toReference(Interpreter interpreter) throws AbruptCompletion {
-		final Dictionary executedBase = base.execute(interpreter).toDictionary(interpreter);
+		final Value<?> executedBase = base.execute(interpreter);
 		final StringLiteral executedProp = property.execute(interpreter).toStringLiteral(interpreter);
-		return new Reference(executedBase, executedProp);
+
+		if (executedBase.type == Type.Undefined || executedBase.type == Type.Null) {
+			final String msg = "Cannot read property '" +
+							   executedProp.value + "' of " +
+							   (executedBase.type == Type.Undefined ?
+								   "undefined" : "null");
+
+			throw AbruptCompletion.error(new TypeError(msg));
+		}
+
+		return new Reference(executedBase.toDictionary(interpreter), executedProp);
 	}
 
 	@Override

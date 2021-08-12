@@ -4,6 +4,7 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.FunctionNode;
 
 public final class Function extends Constructor<FunctionNode> {
@@ -12,6 +13,11 @@ public final class Function extends Constructor<FunctionNode> {
 	public Function(FunctionNode code, ExecutionContext context) {
 		super(code);
 		this.context = context;
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append(code.getCallString());
 	}
 
 	@Override

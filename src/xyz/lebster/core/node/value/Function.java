@@ -6,6 +6,7 @@ import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.FunctionNode;
+import xyz.lebster.core.runtime.prototype.FunctionPrototype;
 
 public final class Function extends Constructor<FunctionNode> {
 	public final ExecutionContext context;
@@ -13,6 +14,7 @@ public final class Function extends Constructor<FunctionNode> {
 	public Function(FunctionNode code, ExecutionContext context) {
 		super(code);
 		this.context = context;
+		this.set("prototype", FunctionPrototype.instance);
 	}
 
 	@Override
@@ -72,5 +74,10 @@ public final class Function extends Constructor<FunctionNode> {
 		} else {
 			return newInstance;
 		}
+	}
+
+	@Override
+	public Dictionary getPrototype() {
+		return FunctionPrototype.instance;
 	}
 }

@@ -1,10 +1,11 @@
-package xyz.lebster.core.node;
+package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
 

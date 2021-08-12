@@ -1,4 +1,4 @@
-package xyz.lebster.core.node;
+package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.Interpreter;

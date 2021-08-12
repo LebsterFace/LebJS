@@ -1,4 +1,4 @@
-package xyz.lebster.core.node;
+package xyz.lebster.core.node.declaration;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;

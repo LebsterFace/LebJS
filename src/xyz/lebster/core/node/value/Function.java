@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.FunctionNode;
+import xyz.lebster.core.node.declaration.FunctionNode;
 import xyz.lebster.core.runtime.prototype.FunctionPrototype;
 
 public final class Function extends Constructor<FunctionNode> {

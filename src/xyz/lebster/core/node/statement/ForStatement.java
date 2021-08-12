@@ -1,4 +1,4 @@
-package xyz.lebster.core.node;
+package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -8,16 +8,16 @@ import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
 
-
-public record WhileStatement(Expression condition, Statement body) implements Statement {
+public record ForStatement(Statement init, Expression test, Expression update, Statement body) implements Statement {
 	@Override
-	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-WhileStatement")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
+		if (init != null) init.execute(interpreter);
 		final Value<?> result = Undefined.instance;
 
-		while (condition.execute(interpreter).isTruthy(interpreter)) {
+		while (test.execute(interpreter).isTruthy(interpreter)) {
 			try {
 				body.execute(interpreter);
+				update.execute(interpreter);
 			} catch (AbruptCompletion completion) {
 				if (completion.type == AbruptCompletion.Type.Continue) continue;
 				else if (completion.type == AbruptCompletion.Type.Break) break;
@@ -29,17 +29,23 @@ public record WhileStatement(Expression condition, Statement body) implements St
 	}
 
 	@Override
-	public void dump(int indent) {
-		Dumper.dumpName(indent, "WhileStatement");
-		Dumper.dumpIndicated(indent, "Condition", condition);
-		Dumper.dumpIndicated(indent, "Body", body);
+	public void represent(StringRepresentation representation) {
+		representation.append("for (");
+		init.represent(representation);
+		representation.append(" ");
+		test.represent(representation);
+		representation.append("; ");
+		update.represent(representation);
+		representation.append(") ");
+		body.represent(representation);
 	}
 
 	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append("while (");
-		condition.represent(representation);
-		representation.append(") ");
-		body.represent(representation);
+	public void dump(int indent) {
+		Dumper.dumpName(indent, "ForStatement");
+		Dumper.dumpIndicated(indent, "Init", init);
+		Dumper.dumpIndicated(indent, "Test", test);
+		Dumper.dumpIndicated(indent, "Update", update);
+		Dumper.dumpIndicated(indent, "Body", body);
 	}
 }

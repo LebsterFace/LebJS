@@ -1,8 +1,10 @@
-package xyz.lebster.core.node;
+package xyz.lebster.core.node.declaration;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.expression.Identifier;
+import xyz.lebster.core.node.statement.BlockStatement;
 
 public abstract class FunctionNode implements ASTNode {
 	public final Identifier name;

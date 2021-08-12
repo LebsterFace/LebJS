@@ -49,10 +49,22 @@ public final class Function extends Constructor<FunctionNode> {
 		return this;
 	}
 
+	public Function boundTo(Value<?> value) {
+		return new Function(code, this.context.boundTo(value));
+	}
+
 	@Override
-	public Dictionary construct(Value<?>[] executedArguments) {
-		final Dictionary dictionary = new Dictionary();
-		dictionary.set("isThisFake", new BooleanLiteral(true));
-		return dictionary;
+	public Dictionary construct(Interpreter i, Value<?>[] args) throws AbruptCompletion {
+		final Dictionary newInstance = new Dictionary();
+		newInstance.set("constructor", this);
+
+		final Function boundSelf = this.boundTo(newInstance);
+		final Value<?> returnValue = boundSelf.call(i, args);
+
+		if (returnValue instanceof final Dictionary dictionary) {
+			return dictionary;
+		} else {
+			return newInstance;
+		}
 	}
 }

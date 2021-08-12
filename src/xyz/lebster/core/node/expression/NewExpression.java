@@ -18,8 +18,7 @@ public record NewExpression(Expression constructExpr, Expression... arguments) i
 		final Value<?> exprValue = constructExpr.execute(interpreter);
 		final Constructor<?> constructor = getConstructor(exprValue);
 
-
-		return constructor.construct(executedArguments);
+		return constructor.construct(interpreter, executedArguments);
 	}
 
 	private Constructor<?> getConstructor(Value<?> exprValue) throws AbruptCompletion {

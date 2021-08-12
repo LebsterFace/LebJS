@@ -25,7 +25,7 @@ public final class Undefined extends Primitive<Void> {
 
 	@Override
 	public Dictionary toDictionary(Interpreter interpreter) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError("Cannot convert undefined or null to object"));
+		throw AbruptCompletion.error(new TypeError("Cannot convert undefined to object"));
 	}
 
 	@Override

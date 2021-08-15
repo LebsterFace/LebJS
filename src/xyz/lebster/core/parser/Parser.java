@@ -643,6 +643,7 @@ public final class Parser {
 			   t == TokenType.LBrace ||
 			   t == TokenType.This ||
 			   t == TokenType.Null ||
+			   t == TokenType.New ||
 			   t == TokenType.Infinity ||
 			   t == TokenType.NaN ||
 			   t == TokenType.Undefined ||

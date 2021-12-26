@@ -145,6 +145,8 @@ public final class Testing {
 			}
 		}));
 
+		globalObject.set("isNaN", new NativeFunction((interpreter, values) -> new BooleanLiteral(values[0].toNumericLiteral(interpreter).value.isNaN())));
+
 		return globalObject;
 	}
 

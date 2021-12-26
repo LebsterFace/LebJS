@@ -24,6 +24,9 @@ public final class StringLiteral extends Primitive<String> {
 	@Override
 	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
 //		FIXME: Follow spec
+		if (value.isBlank())
+			return new NumericLiteral(0);
+
 		try {
 			return new NumericLiteral(Double.parseDouble(value));
 		} catch (NumberFormatException e) {

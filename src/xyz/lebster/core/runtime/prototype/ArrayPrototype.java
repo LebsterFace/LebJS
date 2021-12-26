@@ -26,7 +26,7 @@ public final class ArrayPrototype extends Dictionary {
 		}));
 
 //		https://tc39.es/ecma262/multipage#sec-array.prototype.join
-		set("join", new NativeFunction((interpreter, elements) -> {
+		final NativeFunction join = new NativeFunction((interpreter, elements) -> {
 			final Dictionary O = interpreter.thisValue().toDictionary(interpreter);
 			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.length).toNumericLiteral(interpreter).value.longValue());
 			final String sep = elements.length == 0 || elements[0].type == Type.Undefined ? "," : elements[0].toString(interpreter);
@@ -39,6 +39,12 @@ public final class ArrayPrototype extends Dictionary {
 			}
 
 			return new StringLiteral(R.toString());
-		}));
+		});
+
+		set("join", join);
+
+		// FIXME: Follow spec
+		// https://tc39.es/ecma262/multipage#sec-array.prototype.tostring
+		set("toString", join);
 	}
 }

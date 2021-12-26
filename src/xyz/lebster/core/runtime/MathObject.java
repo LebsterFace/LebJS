@@ -221,7 +221,6 @@ public final class MathObject extends Dictionary {
 	private void addWrapper(String methodName, DoubleUnaryOperator unaryOperator) {
 		set(methodName, new NativeFunction(((interpreter, args) -> {
 			final var number = getArgument(0, args, interpreter);
-			//System.out.println("number = " + number);
 			return new NumericLiteral(unaryOperator.applyAsDouble(number));
 		})));
 	}

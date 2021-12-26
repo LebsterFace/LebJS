@@ -237,7 +237,9 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		for (var iterator = this.value.entrySet().iterator(); iterator.hasNext(); ) {
 			final Map.Entry<StringLiteral, Value<?>> entry = iterator.next();
 			representation.appendIndent();
+			representation.append(ANSI.CYAN);
 			representation.append(entry.getKey().value);
+			representation.append(ANSI.RESET);
 			representation.append(": ");
 			final Value<?> value = entry.getValue();
 			if (value instanceof final Dictionary dictionary) {

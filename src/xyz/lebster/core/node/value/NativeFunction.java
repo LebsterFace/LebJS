@@ -1,6 +1,7 @@
 package xyz.lebster.core.node.value;
 
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -37,7 +38,14 @@ public final class NativeFunction extends Executable<NativeCode> {
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		representation.append(toStringWithoutSideEffects());
+		representation.append(ANSI.MAGENTA);
+		representation.append("function");
+		representation.append(ANSI.RESET);
+		representation.append("() { ");
+		representation.append(ANSI.YELLOW);
+		representation.append("[native code]");
+		representation.append(ANSI.RESET);
+		representation.append(" }");
 	}
 
 	@Override

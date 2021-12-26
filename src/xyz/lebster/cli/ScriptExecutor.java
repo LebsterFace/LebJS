@@ -12,6 +12,7 @@ import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.parser.Token;
 import xyz.lebster.core.runtime.ConsoleObject;
+import xyz.lebster.core.runtime.MathObject;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -29,6 +30,7 @@ public final class ScriptExecutor {
 	public static Interpreter getInterpreter(int stackSize, boolean testingMethods) {
 		final GlobalObject globalObject = new GlobalObject();
 		globalObject.set("console", ConsoleObject.instance);
+		globalObject.set("Math", MathObject.instance);
 		globalObject.set("globalThis", globalObject);
 		if (testingMethods) Testing.addTestingMethods(globalObject);
 

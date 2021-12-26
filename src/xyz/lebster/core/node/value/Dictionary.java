@@ -9,7 +9,10 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.TypeError;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	public Dictionary(Map<StringLiteral, Value<?>> value) {
@@ -231,9 +234,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		representation.appendLine();
 		representation.indent();
 
-		final Set<Map.Entry<StringLiteral, Value<?>>> entrySet = this.value.entrySet();
-
-		for (Iterator<Map.Entry<StringLiteral, Value<?>>> iterator = entrySet.iterator(); iterator.hasNext(); ) {
+		for (var iterator = this.value.entrySet().iterator(); iterator.hasNext(); ) {
 			final Map.Entry<StringLiteral, Value<?>> entry = iterator.next();
 			representation.appendIndent();
 			representation.append(entry.getKey().value);

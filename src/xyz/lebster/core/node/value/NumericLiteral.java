@@ -5,6 +5,17 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 
 public final class NumericLiteral extends Primitive<Double> {
+	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;
+	public static final long POSITIVE_ZERO_BITS = 0;
+
+	public static boolean isNegativeZero(double d) { return Double.doubleToRawLongBits(d) == NEGATIVE_ZERO_BITS; }
+	public static boolean isNegativeZero(Double d) { return Double.doubleToRawLongBits(d) == NEGATIVE_ZERO_BITS; }
+	public static boolean isNegativeZero(NumericLiteral n) { return isNegativeZero(n.value); }
+
+	public static boolean isPositiveZero(double d) { return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS; }
+	public static boolean isPositiveZero(Double d) { return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS; }
+	public static boolean isPositiveZero(NumericLiteral n) { return isPositiveZero(n.value); }
+
 	public NumericLiteral(double num) {
 		super(num, Type.Number);
 	}
@@ -19,7 +30,7 @@ public final class NumericLiteral extends Primitive<Double> {
 
 	private static String stringValueOf(Double d) {
 		if (d.isNaN()) return "NaN";
-		else if (d == 0.0 || d == -0.0) return "0";
+		else if (d == 0.0) return "0";
 		else if (d < 0.0) return "-" + stringValueOf(-d);
 		else if (d.isInfinite()) return "Infinity";
 		final String input = String.valueOf(d);
@@ -72,7 +83,7 @@ public final class NumericLiteral extends Primitive<Double> {
 
 	@Override
 	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
-		final boolean shouldBeFalse = value.isNaN() || value == 0.0 || value == -0.0;
+		final boolean shouldBeFalse = value.isNaN() || value == 0.0;
 		return new BooleanLiteral(!shouldBeFalse);
 	}
 

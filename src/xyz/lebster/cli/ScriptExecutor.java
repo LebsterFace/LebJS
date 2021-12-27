@@ -136,9 +136,15 @@ public final class ScriptExecutor {
 				if (options.showPrompt()) System.out.print("> ");
 				final String next = scanner.nextLine();
 				if (next.isBlank()) continue;
-				else if (next.equals(".exit")) break;
-				executeWithHandling(next, interpreter, options);
-				if (!options.showPrompt()) System.out.println("#END");
+
+				if (next.equals(".exit")) {
+					break;
+				} else if (next.equals(".clear")) {
+					System.out.print("\033[H\033[2J");
+					System.out.flush();
+				} else {
+					executeWithHandling(next, interpreter, options);
+				}
 			} catch (NoSuchElementException e) {
 				break;
 			}

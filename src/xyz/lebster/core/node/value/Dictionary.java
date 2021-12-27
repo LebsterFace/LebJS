@@ -37,12 +37,6 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		}
 	}
 
-	public String toStringWithoutSideEffects() {
-		final StringRepresentation representation = new StringRepresentation();
-		this.represent(representation);
-		return representation.toString();
-	}
-
 	@Override
 	public Primitive<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
 //		a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
@@ -95,6 +89,11 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 
 //		6. Throw a TypeError exception.
 		throw AbruptCompletion.error(new TypeError("Cannot convert object to primitive value"));
+	}
+
+	@Override
+	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+		return toPrimitive(interpreter, Type.String).toStringLiteral(interpreter);
 	}
 
 	@Override
@@ -159,12 +158,6 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 
 	public boolean hasOwnProperty(StringLiteral key) {
 		return this.value.containsKey(key);
-	}
-
-	@Override
-	public String toString(Interpreter interpreter) throws AbruptCompletion {
-		final Primitive<?> primValue = toPrimitive(interpreter, Type.String);
-		return primValue.toString(interpreter);
 	}
 
 	@Override
@@ -237,7 +230,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		for (var iterator = this.value.entrySet().iterator(); iterator.hasNext(); ) {
 			final Map.Entry<StringLiteral, Value<?>> entry = iterator.next();
 			representation.appendIndent();
-			representation.append(ANSI.CYAN);
+			representation.append(ANSI.YELLOW);
 			representation.append(entry.getKey().value);
 			representation.append(ANSI.RESET);
 			representation.append(": ");

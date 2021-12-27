@@ -4,6 +4,7 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.SpecificationURL;
 import xyz.lebster.core.node.expression.Expression;
 
@@ -41,21 +42,15 @@ public abstract class Value<JType> implements Expression {
 		return toPrimitive(interpreter, null);
 	}
 
-	public String toStringWithoutSideEffects() {
-		return String.valueOf(value);
-	}
-
-	public String toString(Interpreter interpreter) throws AbruptCompletion {
-		return String.valueOf(value);
-	}
-
-	public String toString() {
-		return toStringWithoutSideEffects();
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tostring")
 	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return new StringLiteral(toString(interpreter));
+		return new StringLiteral(toString());
+	}
+
+	public String toStringForLogging() {
+		final var representation = new StringRepresentation();
+		this.represent(representation);
+		return representation.toString();
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tonumber")
@@ -91,9 +86,5 @@ public abstract class Value<JType> implements Expression {
 
 	public boolean isNullish() {
 		return type == Type.Undefined || type == Type.Null;
-	}
-
-	public String toStringForLogging() {
-		return toStringWithoutSideEffects();
 	}
 }

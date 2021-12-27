@@ -29,13 +29,14 @@ public final class ArrayPrototype extends Dictionary {
 		final NativeFunction join = new NativeFunction((interpreter, elements) -> {
 			final Dictionary O = interpreter.thisValue().toDictionary(interpreter);
 			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.length).toNumericLiteral(interpreter).value.longValue());
-			final String sep = elements.length == 0 || elements[0].type == Type.Undefined ? "," : elements[0].toString(interpreter);
+			final boolean noSeparator = elements.length == 0 || elements[0].type == Type.Undefined;
+			final String sep = noSeparator ? "," : elements[0].toStringLiteral(interpreter).value;
 
 			final StringBuilder R = new StringBuilder();
 			for (int k = 0; k < len; k++) {
 				if (k > 0) R.append(sep);
 				final Value<?> element = O.get(new StringLiteral(k));
-				R.append(element.isNullish() ? "" : element.toString(interpreter));
+				R.append(element.isNullish() ? "" : element.toStringLiteral(interpreter).value);
 			}
 
 			return new StringLiteral(R.toString());

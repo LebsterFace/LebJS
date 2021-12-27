@@ -12,6 +12,11 @@ import java.util.List;
 public final class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(NativeCode code) {
 		super(code);
+		set("toString", new NativeFunction(new StringLiteral("function () { [native code] }")));
+	}
+
+	public NativeFunction(Value<?> value) {
+		super((interpreter, arguments) -> value);
 	}
 
 	@Override
@@ -20,27 +25,10 @@ public final class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public String toStringWithoutSideEffects() {
-//		TODO: Function name
-		return "function() { [native code] }";
-	}
-
-	@Override
-	public String toStringForLogging() {
-//		TODO: Function name
-		return "ƒ () { [native code] }";
-	}
-
-	@Override
 	public void represent(StringRepresentation representation) {
-		representation.append(ANSI.MAGENTA);
-		representation.append("function");
+		representation.append(ANSI.BRIGHT_MAGENTA);
+		representation.append("[Native Function]");
 		representation.append(ANSI.RESET);
-		representation.append("() { ");
-		representation.append(ANSI.YELLOW);
-		representation.append("[native code]");
-		representation.append(ANSI.RESET);
-		representation.append(" }");
 	}
 
 	@Override

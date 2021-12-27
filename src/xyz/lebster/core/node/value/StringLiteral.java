@@ -1,6 +1,8 @@
 package xyz.lebster.core.node.value;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 
 public final class StringLiteral extends Primitive<String> {
 	public StringLiteral(String value) {
@@ -12,13 +14,23 @@ public final class StringLiteral extends Primitive<String> {
 	}
 
 	@Override
-	public String toString() {
+	public String toStringForLogging() {
 		return value;
 	}
 
 	@Override
 	public StringLiteral toStringLiteral(Interpreter interpreter) {
 		return this;
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		final char quoteType = this.value.contains("'") ? '"' : '\'';
+		representation.append(ANSI.GREEN);
+		representation.append(quoteType);
+		representation.append(value);
+		representation.append(quoteType);
+		representation.append(ANSI.RESET);
 	}
 
 	@Override

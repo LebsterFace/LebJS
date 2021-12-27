@@ -1,11 +1,20 @@
 package xyz.lebster.core.node.value;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 
 public final class BooleanLiteral extends Primitive<Boolean> {
 	public BooleanLiteral(boolean value) {
 		super(value, Type.Boolean);
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_YELLOW);
+		representation.append(value);
+		representation.append(ANSI.RESET);
 	}
 
 	@Override

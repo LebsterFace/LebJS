@@ -1,5 +1,6 @@
 package xyz.lebster.core.node.value;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
@@ -8,6 +9,8 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.FunctionNode;
 import xyz.lebster.core.runtime.prototype.FunctionPrototype;
 
+import java.util.List;
+
 public final class Function extends Constructor<FunctionNode> {
 	public final ExecutionContext context;
 
@@ -15,11 +18,23 @@ public final class Function extends Constructor<FunctionNode> {
 		super(code);
 		this.context = context;
 		this.set("prototype", FunctionPrototype.instance);
+		final var representation = new StringRepresentation();
+		code.represent(representation);
+		this.set("toString", new NativeFunction(new StringLiteral(representation.toString())));
 	}
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		representation.append(code.getCallString());
+		representation.append(ANSI.BRIGHT_MAGENTA);
+		representation.append("[Function: ");
+		representation.append(code.name);
+		representation.append("]");
+		representation.append(ANSI.RESET);
+	}
+
+	@Override
+	protected void representRecursive(StringRepresentation representation, List<Dictionary> parents) {
+		this.represent(representation);
 	}
 
 	@Override

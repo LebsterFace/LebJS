@@ -141,7 +141,8 @@ public final class Testing {
 			} else if (values.length > 1) {
 				throw AbruptCompletion.error(new LanguageError("Multiple objects were provided"));
 			} else {
-				return values[0].toDictionary(interpreter).getPrototype();
+				final var prototype = values[0].toDictionary(interpreter).getPrototype();
+				return prototype == null ? Null.instance : prototype;
 			}
 		}));
 

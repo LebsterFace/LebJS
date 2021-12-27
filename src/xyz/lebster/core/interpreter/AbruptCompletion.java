@@ -20,5 +20,5 @@ public final class AbruptCompletion extends Throwable {
 		return "[" + type.name() + "] " + (value == null ? "" : value.toString());
 	}
 
-	public enum Type {Return, Throw, Break, Continue}
+	public enum Type { Throw, Break, Continue }
 }

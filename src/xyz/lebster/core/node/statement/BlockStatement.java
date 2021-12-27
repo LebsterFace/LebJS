@@ -38,12 +38,20 @@ public record BlockStatement(List<Statement> children) implements Statement {
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final ExecutionContext context = interpreter.pushExecutionContext(interpreter.thisValue());
 		try {
-			Value<?> lastValue = Undefined.instance;
-			for (ASTNode child : children) lastValue = child.execute(interpreter);
-			return lastValue;
+			return this.executeChildren(interpreter);
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}
+	}
+
+	private Value<?> executeChildren(Interpreter interpreter) throws AbruptCompletion {
+		Value<?> lastValue = Undefined.instance;
+		for (ASTNode child : children) {
+			lastValue = child.execute(interpreter);
+			if (interpreter.didReturn()) break;
+		}
+
+		return lastValue;
 	}
 
 	@Override

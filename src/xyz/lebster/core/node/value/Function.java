@@ -26,16 +26,13 @@ public final class Function extends Constructor<FunctionNode> {
 	protected Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		interpreter.enterExecutionContext(context);
 
-//		Declare passed arguments as variables
+		// Declare passed arguments as variables
 		for (int i = 0; i < arguments.length && i < code.arguments.length; i++) {
 			interpreter.declareVariable(code.arguments[i], arguments[i]);
 		}
 
 		try {
 			return code.body.execute(interpreter);
-		} catch (AbruptCompletion e) {
-			if (e.type != AbruptCompletion.Type.Return) throw e;
-			return e.value;
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}
@@ -77,7 +74,7 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	public Dictionary getPrototype() {
+	public FunctionPrototype getPrototype() {
 		return FunctionPrototype.instance;
 	}
 }

@@ -38,7 +38,7 @@ public final class Interpreter {
 
 	public Value<?> declareVariable(Identifier identifier, Value<?> value) {
 		lexicalEnvironment().setVariable(identifier.stringValue(), value);
-//		FIXME: Errors can technically be thrown here, so don't always return a normal completion
+		// FIXME: Errors can technically be thrown here, so don't always return a normal completion
 		return Undefined.instance;
 	}
 
@@ -75,5 +75,21 @@ public final class Interpreter {
 		final ExecutionContext context = new ExecutionContext(env, null, thisValue);
 		enterExecutionContext(context);
 		return context;
+	}
+
+	private boolean returned = false;
+
+	public Value<?> returnFromContext(Value<?> valueToReturn) {
+		returned = true;
+		return valueToReturn;
+	}
+
+	public boolean didReturn() {
+		if (returned) {
+			returned = false;
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

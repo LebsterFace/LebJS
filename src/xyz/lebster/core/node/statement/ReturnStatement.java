@@ -10,7 +10,7 @@ import xyz.lebster.core.node.value.Value;
 public record ReturnStatement(Expression value) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		throw new AbruptCompletion(value.execute(interpreter), AbruptCompletion.Type.Return);
+		return interpreter.returnFromContext(this.value.execute(interpreter));
 	}
 
 	@Override

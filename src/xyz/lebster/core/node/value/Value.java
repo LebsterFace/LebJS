@@ -26,7 +26,7 @@ public abstract class Value<JType> implements Expression {
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpValue(indent, type.name(), toString());
+		Dumper.dumpValue(indent, type.name(), String.valueOf(value));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")

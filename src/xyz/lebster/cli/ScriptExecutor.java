@@ -3,6 +3,7 @@ package xyz.lebster.cli;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
+import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.GlobalObject;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -38,11 +39,27 @@ public final class ScriptExecutor {
 	}
 
 	public static void handleError(boolean showDebug, Throwable e, PrintStream stream) {
-		stream.print(ANSI.RED);
-		stream.print(e.getClass().getSimpleName());
-		stream.print(": ");
-		stream.println(e.getLocalizedMessage());
-		if (showDebug) e.printStackTrace(stream);
+		stream.print(ANSI.BRIGHT_RED);
+		if (showDebug) {
+			e.printStackTrace(stream);
+			stream.print(ANSI.RESET);
+			return;
+		}
+
+		if (
+			e instanceof final AbruptCompletion abruptCompletion &&
+			abruptCompletion.type == AbruptCompletion.Type.Throw
+		) {
+			stream.print("Uncaught ");
+			stream.println(abruptCompletion.getValue());
+		} else if (e instanceof CannotParse) {
+			stream.println(e.getLocalizedMessage());
+		} else {
+			stream.print(e.getClass().getSimpleName());
+			stream.print(": ");
+			stream.println(e.getLocalizedMessage());
+		}
+
 		stream.print(ANSI.RESET);
 	}
 

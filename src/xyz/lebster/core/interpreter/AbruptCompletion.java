@@ -15,9 +15,13 @@ public final class AbruptCompletion extends Throwable {
 		return new AbruptCompletion(err, Type.Throw);
 	}
 
+	public String getValue() {
+		return value == null ? "" : value.toString();
+	}
+
 	@Override
 	public String getMessage() {
-		return "[" + type.name() + "] " + (value == null ? "" : value.toString());
+		return "[" + type.name() + "] " + getValue();
 	}
 
 	public enum Type { Throw, Break, Continue }

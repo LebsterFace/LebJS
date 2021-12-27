@@ -73,14 +73,14 @@ public final class ScriptExecutor {
 		}
 	}
 
-	public static boolean execute(String source, Interpreter interpreter, ExecutionOptions options) throws Throwable {
+	public static boolean execute(String source, Interpreter interpreter, ExecutionOptions options) throws AbruptCompletion, CannotParse, SyntaxError {
 		if (source.startsWith("// @opt: ")) {
 			return handleOptions(source, options);
 		}
 
 		final Program program = parse(source);
 		if (options.showAST()) {
-//			FIXME: options.stream()?
+			// FIXME: options.stream()?
 			System.out.println("------- AST -------");
 			program.dump(0);
 			System.out.println("------- END -------");
@@ -97,7 +97,7 @@ public final class ScriptExecutor {
 		return true;
 	}
 
-	public static boolean executeFile(Path path, Interpreter interpreter, ExecutionOptions options) throws Throwable {
+	public static boolean executeFile(Path path, Interpreter interpreter, ExecutionOptions options) throws AbruptCompletion, CannotParse, SyntaxError {
 		String source;
 
 		try {
@@ -113,7 +113,7 @@ public final class ScriptExecutor {
 	public static boolean executeWithHandling(String source, Interpreter interpreter, ExecutionOptions options) {
 		try {
 			return execute(source, interpreter, options);
-		} catch (Throwable throwable) {
+		} catch (AbruptCompletion | CannotParse | SyntaxError throwable) {
 			handleError(options.showDebug(), throwable, System.out);
 			return false;
 		}
@@ -122,7 +122,7 @@ public final class ScriptExecutor {
 	public static boolean executeFileWithHandling(Path path, Interpreter interpreter, ExecutionOptions options) {
 		try {
 			return executeFile(path, interpreter, options);
-		} catch (Throwable throwable) {
+		} catch (AbruptCompletion | CannotParse | SyntaxError throwable) {
 			handleError(options.showDebug(), throwable, System.out);
 			return false;
 		}

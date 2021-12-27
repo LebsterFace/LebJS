@@ -26,7 +26,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 		final Value<?> lval = left.execute(interpreter);
 		final Value<?> rval = right.execute(interpreter);
 
-//		FIXME: Comply with spec
+		// FIXME: Comply with spec
 		// https://tc39.es/ecma262/multipage#sec-relational-operators-runtime-semantics-evaluation
 		return new BooleanLiteral(switch (op) {
 			case LessThan -> lval.toNumericLiteral(interpreter).value < rval.toNumericLiteral(interpreter).value;

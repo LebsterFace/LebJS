@@ -136,7 +136,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 
 		// End of prototype chain; property does not exist.
 		return Undefined.instance;
-//		throw new ExecutionError("Property '" + key.value + "' does not exist on object!");
+		// throw new ExecutionError("Property '" + key.value + "' does not exist on object!");
 	}
 
 	public boolean hasProperty(StringLiteral name) {

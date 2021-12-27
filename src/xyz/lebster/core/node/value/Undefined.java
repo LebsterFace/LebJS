@@ -48,6 +48,6 @@ public final class Undefined extends Primitive<Void> {
 
 	@Override
 	public String typeOf() {
-		return toString();
+		return "undefined";
 	}
 }

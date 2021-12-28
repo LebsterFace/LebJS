@@ -161,6 +161,8 @@ public final class ScriptExecutor {
 					System.out.flush();
 				} else {
 					executeWithHandling(next, interpreter, options);
+					if (!options.showPrompt())
+						System.out.print("#[END-OF-OUTPUT]#");
 				}
 			} catch (NoSuchElementException e) {
 				break;

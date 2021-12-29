@@ -10,10 +10,10 @@ public final class ArrayPrototype extends Dictionary {
 	public static final long MAX_LENGTH = 9007199254740991L;
 
 	private ArrayPrototype() {
-//		https://tc39.es/ecma262/multipage#sec-array.prototype.push
+		// https://tc39.es/ecma262/multipage#sec-array.prototype.push
 		set("push", new NativeFunction((interpreter, elements) -> {
 			final Dictionary O = interpreter.thisValue().toDictionary(interpreter);
-			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.length).toNumericLiteral(interpreter).value.longValue());
+			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value.longValue());
 
 			if ((len + elements.length) > MAX_LENGTH) {
 				throw AbruptCompletion.error(new TypeError("Pushing " + elements.length + " elements on an array-like of length " + len + " is disallowed, as the total surpasses 2**53-1"));
@@ -21,25 +21,25 @@ public final class ArrayPrototype extends Dictionary {
 
 			for (final Value<?> E : elements) O.set(new StringLiteral(len), E);
 			final NumericLiteral newLength = new NumericLiteral(len + elements.length);
-			O.set(ArrayObject.length, newLength);
+			O.set(ArrayObject.LENGTH_KEY, newLength);
 			return newLength;
 		}));
 
-//		https://tc39.es/ecma262/multipage#sec-array.prototype.join
+		// https://tc39.es/ecma262/multipage#sec-array.prototype.join
 		final NativeFunction join = new NativeFunction((interpreter, elements) -> {
 			final Dictionary O = interpreter.thisValue().toDictionary(interpreter);
-			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.length).toNumericLiteral(interpreter).value.longValue());
+			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value.longValue());
 			final boolean noSeparator = elements.length == 0 || elements[0].type == Type.Undefined;
 			final String sep = noSeparator ? "," : elements[0].toStringLiteral(interpreter).value;
 
-			final StringBuilder R = new StringBuilder();
+			final StringBuilder result = new StringBuilder();
 			for (int k = 0; k < len; k++) {
-				if (k > 0) R.append(sep);
+				if (k > 0) result.append(sep);
 				final Value<?> element = O.get(new StringLiteral(k));
-				R.append(element.isNullish() ? "" : element.toStringLiteral(interpreter).value);
+				result.append(element.isNullish() ? "" : element.toStringLiteral(interpreter).value);
 			}
 
-			return new StringLiteral(R.toString());
+			return new StringLiteral(result.toString());
 		});
 
 		set("join", join);

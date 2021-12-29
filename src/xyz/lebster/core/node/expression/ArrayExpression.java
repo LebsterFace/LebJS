@@ -12,8 +12,10 @@ import java.util.List;
 public record ArrayExpression(List<Expression> elements) implements Expression {
 	@Override
 	public ArrayObject execute(Interpreter interpreter) throws AbruptCompletion {
-		final List<Value<?>> results = new ArrayList<>(elements.size());
-		for (Expression element : elements) results.add(element.execute(interpreter));
+		final Value<?>[] results = new Value[elements.size()];
+		for (int i = 0; i < elements.size(); i++)
+			results[i] = elements.get(i).execute(interpreter);
+
 		return new ArrayObject(results);
 	}
 

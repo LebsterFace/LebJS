@@ -18,11 +18,6 @@ public final class ArrayObject extends Dictionary {
 		this.initialize();
 	}
 
-	public ArrayObject() {
-		super();
-		this.initialize();
-	}
-
 	private static Map<StringLiteral, Value<?>> getMapFromExpressionList(List<Value<?>> expressionList) {
 		final Map<StringLiteral, Value<?>> result = new HashMap<>(expressionList.size());
 		for (int i = 0; i < expressionList.size(); i++)

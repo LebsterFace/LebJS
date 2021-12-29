@@ -2,6 +2,7 @@ package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.node.SpecificationURL;
 import xyz.lebster.core.node.value.Dictionary;
+import xyz.lebster.core.node.value.NativeProperty;
 import xyz.lebster.core.node.value.StringLiteral;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.ReferenceError;
@@ -15,7 +16,7 @@ public record Reference(Dictionary base, StringLiteral referencedName) {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getvalue")
 	public Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {
 		if (isResolvable()) {
-			return base.get(referencedName);
+			return base.get(referencedName).execute(interpreter);
 		} else {
 			throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
 		}
@@ -23,7 +24,11 @@ public record Reference(Dictionary base, StringLiteral referencedName) {
 
 	public void setValue(Interpreter interpreter, Value<?> newValue) throws AbruptCompletion {
 		if (isResolvable()) {
-			this.base.set(referencedName, newValue);
+			if (this.base.get(referencedName) instanceof final NativeProperty property) {
+				property.value.set(interpreter, newValue);
+			} else {
+				this.base.set(referencedName, newValue);
+			}
 		} else {
 			throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
 		}

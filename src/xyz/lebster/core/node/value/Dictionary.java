@@ -119,6 +119,10 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		this.value.put(new StringLiteral(key), value);
 	}
 
+	public void setMethod(String name, NativeCode code) {
+		this.value.put(new StringLiteral(name), new NativeFunction(code));
+	}
+
 	public Value<?> get(StringLiteral key) {
 		Dictionary object = this;
 

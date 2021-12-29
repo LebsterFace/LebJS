@@ -85,7 +85,7 @@ public final class Testing {
 	}
 
 	public static void addTestingMethods(Dictionary globalObject) {
-		globalObject.set("expect", new NativeFunction((interpreter, arguments) -> {
+		globalObject.setMethod("expect", (interpreter, arguments) -> {
 			final Value<?> expected = arguments[0];
 			final Value<?> received = arguments[1];
 
@@ -96,9 +96,9 @@ public final class Testing {
 			}
 
 			return Undefined.instance;
-		}));
+		});
 
-		globalObject.set("bind", new NativeFunction((interpreter, arguments) -> {
+		globalObject.setMethod("bind", (interpreter, arguments) -> {
 			// Exit the `bind()` ExecutionContext
 			final ExecutionContext current = interpreter.getExecutionContext();
 			interpreter.exitExecutionContext(current);
@@ -107,9 +107,9 @@ public final class Testing {
 			// Re-enter the `bind()` ExecutionContext
 			interpreter.enterExecutionContext(current);
 			return Undefined.instance;
-		}));
+		});
 
-		globalObject.set("unbind", new NativeFunction((interpreter, arguments) -> {
+		globalObject.setMethod("unbind", (interpreter, arguments) -> {
 			// Exit the `unbind()` ExecutionContext
 			final ExecutionContext current = interpreter.getExecutionContext();
 			interpreter.exitExecutionContext(current);
@@ -118,9 +118,9 @@ public final class Testing {
 			// Re-enter the `unbind()` ExecutionContext
 			interpreter.enterExecutionContext(current);
 			return Undefined.instance;
-		}));
+		});
 
-		globalObject.set("createObject", new NativeFunction((interpreter, arguments) -> {
+		globalObject.setMethod("createObject", (interpreter, arguments) -> {
 			final Dictionary result = new Dictionary();
 			for (int i = 0; i < arguments.length; i += 2) {
 				final StringLiteral key = arguments[i].execute(interpreter).toStringLiteral(interpreter);
@@ -133,9 +133,9 @@ public final class Testing {
 			}
 
 			return result;
-		}));
+		});
 
-		globalObject.set("__proto__", new NativeFunction((interpreter, values) -> {
+		globalObject.setMethod("__proto__", (interpreter, values) -> {
 			if (values.length == 0) {
 				throw AbruptCompletion.error(new LanguageError("You must provide an object to get the prototype of"));
 			} else if (values.length > 1) {
@@ -144,9 +144,11 @@ public final class Testing {
 				final var prototype = values[0].toDictionary(interpreter).getPrototype();
 				return prototype == null ? Null.instance : prototype;
 			}
-		}));
+		});
 
-		globalObject.set("isNaN", new NativeFunction((interpreter, values) -> new BooleanLiteral(values[0].toNumericLiteral(interpreter).value.isNaN())));
+		globalObject.setMethod("isNaN", ($, args) ->
+			new BooleanLiteral(args.length > 0 && args[0].toNumericLiteral($).value.isNaN())
+		);
 	}
 
 	private static record Test(boolean passed, Throwable error, String output) {

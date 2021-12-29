@@ -6,7 +6,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
 
 import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
 
 import static xyz.lebster.core.node.value.NumericLiteral.isNegativeZero;
@@ -33,10 +32,8 @@ public final class MathObject extends Dictionary {
 	private static final double SQRT2 = 1.4142135623730951D;
 
 	private MathObject() {
-		set("toString", new NativeFunction((interpreter, arguments) -> {
-			// FIXME: Remove when spec is followed
-			return new StringLiteral("[object Math]");
-		}));
+		// FIXME: Remove when spec is followed
+		this.set("toString", new NativeFunction(new StringLiteral("[object Math]")));
 
 		set("E",		new NumericLiteral(E));
 		set("LN2",		new NumericLiteral(LN2));
@@ -130,7 +127,7 @@ public final class MathObject extends Dictionary {
 		});
 
 		// () -> double
-		addWrapper("random", Math::random);
+		this.setMethod("random", (interpreter, args) -> new NumericLiteral(Math.random()));
 
 		// https://tc39.es/ecma262/multipage#sec-math.trunc
 		addWrapper("trunc", (double n) -> {
@@ -192,9 +189,9 @@ public final class MathObject extends Dictionary {
 	}
 
 	private void notImplemented(String methodName) {
-		set(methodName, new NativeFunction((interpreter, args) -> {
+		this.setMethod(methodName, (interpreter, args) -> {
 			throw new NotImplemented(methodName);
-		}));
+		});
 	}
 
 	@FunctionalInterface
@@ -204,32 +201,28 @@ public final class MathObject extends Dictionary {
 
 	// https://tc39.es/ecma262/multipage#sec-math.hypot + sec-math.min + sec-math.max
 	private void addWrapper(String methodName, DoubleRestArgs restArgs) {
-		set(methodName, new NativeFunction((interpreter, args) -> {
+		this.setMethod(methodName, (interpreter, args) -> {
 			final double[] coerced = new double[args.length];
 			for (int i = 0; i < args.length; i++) {
 				coerced[i] = args[i].toNumericLiteral(interpreter).value;
 			}
 
 			return new NumericLiteral(restArgs.applyAsDouble(coerced));
-		}));
-	}
-
-	private void addWrapper(String methodName, DoubleSupplier supplier) {
-		set(methodName, new NativeFunction((interpreter, args) -> new NumericLiteral(supplier.getAsDouble())));
+		});
 	}
 
 	private void addWrapper(String methodName, DoubleUnaryOperator unaryOperator) {
-		set(methodName, new NativeFunction(((interpreter, args) -> {
+		this.setMethod(methodName, (interpreter, args) -> {
 			final var number = getArgument(0, args, interpreter);
 			return new NumericLiteral(unaryOperator.applyAsDouble(number));
-		})));
+		});
 	}
 
 	private void addWrapper(String methodName, DoubleBinaryOperator binaryOperator) {
-		set(methodName, new NativeFunction(((interpreter, args) -> {
+		this.setMethod(methodName, (interpreter, args) -> {
 			final var a = getArgument(0, args, interpreter);
 			final var b = getArgument(1, args, interpreter);
 			return new NumericLiteral(binaryOperator.applyAsDouble(a, b));
-		})));
+		});
 	}
 }

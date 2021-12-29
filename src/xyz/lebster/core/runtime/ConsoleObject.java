@@ -12,27 +12,27 @@ public final class ConsoleObject extends Dictionary {
 	public static final ConsoleObject instance = new ConsoleObject();
 
 	private ConsoleObject() {
-		set("log", new NativeFunction(((interpreter, data) -> {
+		setMethod("log", (interpreter, data) -> {
 			logger(LogLevel.Log, data);
 			return Undefined.instance;
-		})));
+		});
 
-		set("warn", new NativeFunction(((interpreter, data) -> {
+		setMethod("warn", (interpreter, data) -> {
 			logger(LogLevel.Warn, data);
 			return Undefined.instance;
-		})));
+		});
 
-		set("error", new NativeFunction(((interpreter, data) -> {
+		setMethod("error", (interpreter, data) -> {
 			logger(LogLevel.Error, data);
 			return Undefined.instance;
-		})));
+		});
 
-		set("info", new NativeFunction(((interpreter, data) -> {
+		setMethod("info", (interpreter, data) -> {
 			logger(LogLevel.Info, data);
 			return Undefined.instance;
-		})));
+		});
 
-		set("dump", new NativeFunction(((interpreter, data) -> {
+		setMethod("dump", (interpreter, data) -> {
 			final var tempOutput = new ByteArrayOutputStream();
 			final var tempStream = new PrintStream(tempOutput);
 			System.setOut(tempStream);
@@ -45,7 +45,7 @@ public final class ConsoleObject extends Dictionary {
 			}
 
 			return new StringLiteral(tempOutput.toString());
-		})));
+		});
 	}
 
 	private void logger(LogLevel logLevel, Value<?>[] args) {

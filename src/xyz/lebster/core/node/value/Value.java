@@ -78,7 +78,7 @@ public abstract class Value<JType> implements Expression {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#table-typeof-operator-results")
-	public abstract String typeOf();
+	public abstract String typeOf(Interpreter interpreter) throws AbruptCompletion;
 
 	public boolean isTruthy(Interpreter interpreter) {
 		return toBooleanLiteral(interpreter).value;

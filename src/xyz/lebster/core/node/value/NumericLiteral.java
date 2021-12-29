@@ -92,7 +92,7 @@ public final class NumericLiteral extends Primitive<Double> {
 	}
 
 	@Override
-	public String typeOf() {
+	public String typeOf(Interpreter interpreter) {
 		return "number";
 	}
 

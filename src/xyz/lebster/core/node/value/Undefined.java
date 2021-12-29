@@ -47,7 +47,7 @@ public final class Undefined extends Primitive<Void> {
 	}
 
 	@Override
-	public String typeOf() {
+	public String typeOf(Interpreter interpreter) {
 		return "undefined";
 	}
 }

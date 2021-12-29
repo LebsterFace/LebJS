@@ -209,7 +209,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	}
 
 	@Override
-	public String typeOf() {
+	public String typeOf(Interpreter interpreter) {
 		return "object";
 	}
 

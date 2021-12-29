@@ -18,20 +18,20 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 			case LogicalNot -> expression.execute(interpreter).toBooleanLiteral(interpreter).not();
 			case Negate -> expression.execute(interpreter).toNumericLiteral(interpreter).unaryMinus();
 			case Typeof -> {
-//				https://tc39.es/ecma262/multipage#sec-typeof-operator-runtime-semantics-evaluation
+				// https://tc39.es/ecma262/multipage#sec-typeof-operator-runtime-semantics-evaluation
 				if (expression instanceof final LeftHandSideExpression lhs) {
 					final Reference reference = lhs.toReference(interpreter);
 					if (reference.isResolvable()) {
-						yield new StringLiteral(reference.getValue(interpreter).typeOf());
+						yield new StringLiteral(reference.getValue(interpreter).typeOf(interpreter));
 					} else {
 						yield new StringLiteral("undefined");
 					}
 				} else {
-					yield new StringLiteral(expression.execute(interpreter).typeOf());
+					yield new StringLiteral(expression.execute(interpreter).typeOf(interpreter));
 				}
 			}
 
-//			https://tc39.es/ecma262/multipage#sec-postfix-increment-operator
+			// https://tc39.es/ecma262/multipage#sec-postfix-increment-operator
 			case PostIncrement, PostDecrement, PreIncrement, PreDecrement -> {
 				if (!(expression instanceof final LeftHandSideExpression lhs)) {
 					throw AbruptCompletion.error(new LanguageError("Invalid left-hand side expression in postfix/prefix operation"));

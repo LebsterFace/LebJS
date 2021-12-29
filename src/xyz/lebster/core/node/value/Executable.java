@@ -38,7 +38,7 @@ public abstract class Executable<JType> extends Dictionary {
 	}
 
 	@Override
-	public String typeOf() {
+	public String typeOf(Interpreter interpreter) {
 		return "function";
 	}
 }

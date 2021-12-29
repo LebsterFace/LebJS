@@ -37,7 +37,7 @@ public final class BooleanLiteral extends Primitive<Boolean> {
 	}
 
 	@Override
-	public String typeOf() {
+	public String typeOf(Interpreter interpreter) {
 		return "boolean";
 	}
 }

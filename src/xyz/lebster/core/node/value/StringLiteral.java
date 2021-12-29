@@ -57,7 +57,7 @@ public final class StringLiteral extends Primitive<String> {
 	}
 
 	@Override
-	public String typeOf() {
+	public String typeOf(Interpreter interpreter) {
 		return "string";
 	}
 }

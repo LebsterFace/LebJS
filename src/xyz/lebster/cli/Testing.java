@@ -84,7 +84,7 @@ public final class Testing {
 		if (!silent && !output.isBlank()) stream.println(output);
 	}
 
-	public static Dictionary addTestingMethods(Dictionary globalObject) {
+	public static void addTestingMethods(Dictionary globalObject) {
 		globalObject.set("expect", new NativeFunction((interpreter, arguments) -> {
 			final Value<?> expected = arguments[0];
 			final Value<?> received = arguments[1];
@@ -147,8 +147,6 @@ public final class Testing {
 		}));
 
 		globalObject.set("isNaN", new NativeFunction((interpreter, values) -> new BooleanLiteral(values[0].toNumericLiteral(interpreter).value.isNaN())));
-
-		return globalObject;
 	}
 
 	private static record Test(boolean passed, Throwable error, String output) {

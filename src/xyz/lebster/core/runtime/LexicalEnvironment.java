@@ -13,7 +13,7 @@ public record LexicalEnvironment(Dictionary variables, LexicalEnvironment parent
 		return variables.get(name);
 	}
 
-	public Value<?> setVariable(StringLiteral name, Value<?> value) {
-		return variables.set(name, value);
+	public void setVariable(StringLiteral name, Value<?> value) {
+		variables.set(name, value);
 	}
 }

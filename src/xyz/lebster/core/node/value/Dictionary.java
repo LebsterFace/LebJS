@@ -111,13 +111,12 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		return this;
 	}
 
-	public Dictionary set(StringLiteral key, Value<?> value) {
+	public void set(StringLiteral key, Value<?> value) {
 		this.value.put(key, value);
-		return this;
 	}
 
-	public Dictionary set(String key, Value<?> value) {
-		return set(new StringLiteral(key), value);
+	public void set(String key, Value<?> value) {
+		this.value.put(new StringLiteral(key), value);
 	}
 
 	public Value<?> get(StringLiteral key) {

@@ -21,15 +21,15 @@ public record Reference(Dictionary base, StringLiteral referencedName) {
 		}
 	}
 
-	public Value<?> setValue(Interpreter interpreter, Value<?> newValue) throws AbruptCompletion {
+	public void setValue(Interpreter interpreter, Value<?> newValue) throws AbruptCompletion {
 		if (isResolvable()) {
-			return base.set(referencedName, newValue);
+			this.base.set(referencedName, newValue);
 		} else {
 			throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
 		}
 	}
 
 	public boolean isResolvable() {
-		return base != null;
+		return this.base != null;
 	}
 }

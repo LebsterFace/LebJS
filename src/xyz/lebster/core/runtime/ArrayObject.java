@@ -1,19 +1,35 @@
 package xyz.lebster.core.runtime;
 
-import xyz.lebster.core.node.value.Dictionary;
-import xyz.lebster.core.node.value.NumericLiteral;
-import xyz.lebster.core.node.value.StringLiteral;
-import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.interpreter.AbruptCompletion;
+import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.node.SpecificationURL;
+import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.runtime.prototype.ArrayPrototype;
 
 
 public final class ArrayObject extends Dictionary {
 	public final static StringLiteral LENGTH_KEY = new StringLiteral("length");
+
+	public final NativeProperty LENGTH_GETTER_SETTER = new NativeProperty(new NativeGetterSetter() {
+		@Override
+		public Value<?> get(Interpreter interpreter) {
+			return new NumericLiteral(length);
+		}
+
+		@Override
+		@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-arraysetlength")
+		// FIXME: Follow spec
+		public void set(Interpreter interpreter, Value<?> value) {
+			throw new NotImplemented("Setter for <Array>.length");
+		}
+	});
+
 	private int length;
 
 	public ArrayObject(Value<?>[] values) {
-		this.set(LENGTH_KEY, new NumericLiteral(values.length));
 		this.length = values.length;
+		this.set(LENGTH_KEY, LENGTH_GETTER_SETTER);
 
 		for (int i = 0; i < values.length; i++) {
 			this.set(String.valueOf(i), values[i]);

@@ -57,7 +57,7 @@ public abstract class Value<JType> implements Expression {
 	public abstract NumericLiteral toNumericLiteral(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toboolean")
-	public abstract BooleanLiteral toBooleanLiteral(Interpreter interpreter);
+	public abstract BooleanLiteral toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toobject")
 	public abstract Dictionary toDictionary(Interpreter interpreter) throws AbruptCompletion;
@@ -80,8 +80,8 @@ public abstract class Value<JType> implements Expression {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#table-typeof-operator-results")
 	public abstract String typeOf(Interpreter interpreter) throws AbruptCompletion;
 
-	public boolean isTruthy(Interpreter interpreter) {
-		return toBooleanLiteral(interpreter).value;
+	public boolean isTruthy(Interpreter interpreter) throws AbruptCompletion {
+		return this.toBooleanLiteral(interpreter).value;
 	}
 
 	public boolean isNullish() {

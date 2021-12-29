@@ -20,7 +20,7 @@ public abstract class Value<JType> implements Expression {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) {
+	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return this;
 	}
 

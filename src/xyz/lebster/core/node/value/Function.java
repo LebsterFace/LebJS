@@ -9,7 +9,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.FunctionNode;
 import xyz.lebster.core.runtime.prototype.FunctionPrototype;
 
-import java.util.List;
+import java.util.Set;
 
 public final class Function extends Constructor<FunctionNode> {
 	public final ExecutionContext context;
@@ -33,7 +33,7 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	protected void representRecursive(StringRepresentation representation, List<Dictionary> parents) {
+	public void representRecursive(StringRepresentation representation, Set<Dictionary> parents) {
 		this.represent(representation);
 	}
 

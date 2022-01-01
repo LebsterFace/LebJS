@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 
-import java.util.List;
+import java.util.Set;
 
 public abstract class Executable<JType> extends Dictionary {
 	// public static Identifier name = new Identifier("name");
@@ -33,7 +33,7 @@ public abstract class Executable<JType> extends Dictionary {
 	}
 
 	@Override
-	protected void dumpRecursive(int indent, List<Dictionary> parents) {
+	protected void dumpRecursive(int indent, Set<Dictionary> parents) {
 		dump(indent);
 	}
 

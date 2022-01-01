@@ -10,9 +10,9 @@ import xyz.lebster.core.runtime.TypeError;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
@@ -174,10 +174,10 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 
 	@Override
 	public void dump(int indent) {
-		dumpRecursive(indent, new LinkedList<>());
+		dumpRecursive(indent, new HashSet<>());
 	}
 
-	protected void dumpRecursive(int indent, List<Dictionary> parents) {
+	protected void dumpRecursive(int indent, Set<Dictionary> parents) {
 		Dumper.dumpName(indent, "Dictionary");
 		if (value.isEmpty()) {
 			Dumper.dumpIndent(indent + 1);
@@ -224,10 +224,10 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		this.representRecursive(representation, new LinkedList<>());
+		this.representRecursive(representation, new HashSet<>());
 	}
 
-	protected void representRecursive(StringRepresentation representation, List<Dictionary> parents) {
+	public void representRecursive(StringRepresentation representation, Set<Dictionary> parents) {
 		representation.append('{');
 		if (value.isEmpty()) {
 			representation.append(" }");

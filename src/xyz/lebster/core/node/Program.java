@@ -8,7 +8,6 @@ import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public record Program(List<Statement> children) implements ASTNode {
@@ -18,11 +17,6 @@ public record Program(List<Statement> children) implements ASTNode {
 
 	public void append(Statement node) {
 		this.children.add(node);
-	}
-
-	public Program append(Statement... nodes) {
-		this.children.addAll(Arrays.asList(nodes));
-		return this;
 	}
 
 	@Override

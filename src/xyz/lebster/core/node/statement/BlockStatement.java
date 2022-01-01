@@ -10,8 +10,6 @@ import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public record BlockStatement(List<Statement> children) implements Statement {
@@ -21,16 +19,6 @@ public record BlockStatement(List<Statement> children) implements Statement {
 
 	public void append(Statement node) {
 		this.children.add(node);
-	}
-
-	public BlockStatement append(Statement... nodes) {
-		this.children.addAll(Arrays.asList(nodes));
-		return this;
-	}
-
-	public BlockStatement append(Collection<Statement> nodes) {
-		this.children.addAll(nodes);
-		return this;
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package xyz.lebster.core;
 
+@SuppressWarnings("unused")
 public final class ANSI {
 	public static final String BLACK = "\u001b[30m";
 	public static final String RED = "\u001b[31m";

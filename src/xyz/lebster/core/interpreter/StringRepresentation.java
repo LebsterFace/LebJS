@@ -8,10 +8,6 @@ public final class StringRepresentation {
 		builder.append(o);
 	}
 
-	public int getCurrentIndent() {
-		return currentIndent;
-	}
-
 	public void appendLine(Object o) {
 		append(o);
 		appendLine();

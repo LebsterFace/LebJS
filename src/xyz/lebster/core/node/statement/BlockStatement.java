@@ -19,9 +19,8 @@ public record BlockStatement(List<Statement> children) implements Statement {
 		this(new ArrayList<>());
 	}
 
-	public BlockStatement append(Statement node) {
+	public void append(Statement node) {
 		this.children.add(node);
-		return this;
 	}
 
 	public BlockStatement append(Statement... nodes) {

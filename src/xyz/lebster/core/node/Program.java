@@ -16,9 +16,8 @@ public record Program(List<Statement> children) implements ASTNode {
 		this(new ArrayList<>());
 	}
 
-	public Program append(Statement node) {
+	public void append(Statement node) {
 		this.children.add(node);
-		return this;
 	}
 
 	public Program append(Statement... nodes) {

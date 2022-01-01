@@ -1,13 +1,14 @@
 package xyz.lebster.core.runtime;
 
-import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.NonStandard;
+import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.node.value.Dictionary;
+import xyz.lebster.core.node.value.Undefined;
+import xyz.lebster.core.node.value.Value;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-
+@SpecificationURL("https://console.spec.whatwg.org/")
 public final class ConsoleObject extends Dictionary {
 	public static final ConsoleObject instance = new ConsoleObject();
 
@@ -32,33 +33,35 @@ public final class ConsoleObject extends Dictionary {
 			return Undefined.instance;
 		});
 
-		setMethod("dump", (interpreter, data) -> {
-			final var tempOutput = new ByteArrayOutputStream();
-			final var tempStream = new PrintStream(tempOutput);
-			System.setOut(tempStream);
-			for (final Value<?> val : data) val.dump(0);
-			System.setOut(Main.stdout);
-			try {
-				tempOutput.writeTo(System.out);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		setMethod("dump", ConsoleObject::dump);
+	}
 
-			return new StringLiteral(tempOutput.toString());
-		});
+	@NonStandard
+	private static Undefined dump(Interpreter interpreter, Value<?>[] data) {
+		for (final Value<?> val : data)
+			val.dump(0);
+		return Undefined.instance;
 	}
 
 	private void logger(LogLevel logLevel, Value<?>[] args) {
+		// If args is empty, return.
 		if (args.length == 0) return;
-
+		// Let first be args[0].
+		// Let rest be all elements following first in args.
+		// If rest is empty
 		if (args.length == 1) {
+			// perform Printer(logLevel, « first ») and return.
 			printer(logLevel, args[0]);
+		} else if (doesNotContainFormatSpecifiers(args[0])) {
+			// If first does not contain any format specifiers, perform Printer(logLevel, args).
+			printer(logLevel, args);
 		} else {
-			printer(logLevel, hasNoFormatters(args[0]) ? args : formatter(args));
+			// Otherwise, perform Printer(logLevel, Formatter(args)).
+			printer(logLevel, formatter(args));
 		}
 	}
 
-	private boolean hasNoFormatters(Value<?> arg) {
+	private boolean doesNotContainFormatSpecifiers(Value<?> arg) {
 		return true;
 	}
 

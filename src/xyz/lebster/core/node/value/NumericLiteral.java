@@ -2,7 +2,6 @@ package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.NotImplemented;
-import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 
@@ -64,7 +63,7 @@ public final class NumericLiteral extends Primitive<Double> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public StringLiteral toStringLiteral(Interpreter interpreter) {
 		return new StringLiteral(stringValueOf(value));
 	}
 

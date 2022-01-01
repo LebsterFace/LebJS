@@ -1,6 +1,5 @@
 package xyz.lebster.core.runtime.prototype;
 
-import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
 
@@ -14,7 +13,7 @@ public class FunctionPrototype extends Executable<Void> {
 	}
 
 	@Override
-	protected Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+	protected Value<?> call(Interpreter interpreter, Value<?>... arguments) {
 		return Undefined.instance;
 	}
 }

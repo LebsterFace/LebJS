@@ -15,7 +15,7 @@ public final class Undefined extends Primitive<Void> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public StringLiteral toStringLiteral(Interpreter interpreter) {
 		return new StringLiteral("undefined");
 	}
 

@@ -4,7 +4,6 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.node.expression.Identifier;
 import xyz.lebster.core.node.value.Dictionary;
 import xyz.lebster.core.node.value.StringLiteral;
-import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.ExecutionError;
 import xyz.lebster.core.runtime.LexicalEnvironment;
@@ -37,9 +36,8 @@ public final class Interpreter {
 		return new Reference(null, name);
 	}
 
-	public Value<?> declareVariable(Identifier identifier, Value<?> value) throws AbruptCompletion {
+	public void declareVariable(Identifier identifier, Value<?> value) throws AbruptCompletion {
 		lexicalEnvironment().setVariable(this, identifier.stringValue(), value);
-		return Undefined.instance;
 	}
 
 	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {

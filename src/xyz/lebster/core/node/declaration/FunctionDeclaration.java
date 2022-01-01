@@ -5,6 +5,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.expression.Identifier;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.node.value.Function;
+import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
 
 public final class FunctionDeclaration extends FunctionNode implements Declaration {
@@ -14,6 +15,7 @@ public final class FunctionDeclaration extends FunctionNode implements Declarati
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		return interpreter.declareVariable(name, new Function(this, interpreter.getExecutionContext()));
+		interpreter.declareVariable(name, new Function(this, interpreter.getExecutionContext()));
+		return Undefined.instance;
 	}
 }

@@ -7,6 +7,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.expression.Identifier;
+import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
 
 public record VariableDeclarator(Identifier identifier, Expression init) implements ASTNode {
@@ -18,7 +19,8 @@ public record VariableDeclarator(Identifier identifier, Expression init) impleme
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		return interpreter.declareVariable(identifier, init.execute(interpreter));
+		interpreter.declareVariable(identifier, init.execute(interpreter));
+		return Undefined.instance;
 	}
 
 	@Override

@@ -43,9 +43,21 @@ public record ForStatement(Statement init, Expression test, Expression update, S
 	@Override
 	public void dump(int indent) {
 		Dumper.dumpName(indent, "ForStatement");
-		Dumper.dumpIndicated(indent, "Init", init);
-		Dumper.dumpIndicated(indent, "Test", test);
-		Dumper.dumpIndicated(indent, "Update", update);
+		if (init != null)
+			Dumper.dumpIndicated(indent, "Init", init);
+		else
+			Dumper.dumpIndicator(indent, "NullInit");
+
+		if (test != null)
+			Dumper.dumpIndicated(indent, "Test", test);
+		else
+			Dumper.dumpIndicator(indent, "NullTest");
+
+		if (update != null)
+			Dumper.dumpIndicated(indent, "Update", update);
+		else
+			Dumper.dumpIndicator(indent, "NullUpdate");
+
 		Dumper.dumpIndicated(indent, "Body", body);
 	}
 }

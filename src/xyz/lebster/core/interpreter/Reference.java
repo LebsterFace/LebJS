@@ -2,7 +2,6 @@ package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.node.value.Dictionary;
-import xyz.lebster.core.node.value.NativeProperty;
 import xyz.lebster.core.node.value.StringLiteral;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.ReferenceError;

@@ -35,7 +35,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 			case GreaterThanEquals -> left_value.toNumericLiteral(interpreter).value >= right_value.toNumericLiteral(interpreter).value;
 			case In -> {
 				if (right_value instanceof final Dictionary dictionary) {
-					yield dictionary.hasOwnProperty(left_value.toStringLiteral(interpreter));
+					yield dictionary.hasProperty(left_value.toStringLiteral(interpreter));
 				} else {
 					throw AbruptCompletion.error(new TypeError("Can only use 'in' operator on an object!"));
 				}

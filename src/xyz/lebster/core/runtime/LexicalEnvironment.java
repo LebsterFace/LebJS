@@ -11,10 +11,6 @@ public record LexicalEnvironment(Dictionary variables, LexicalEnvironment parent
 		return variables.hasOwnProperty(name);
 	}
 
-	public Value<?> getVariable(StringLiteral name) {
-		return variables.get(name);
-	}
-
 	public void setVariable(Interpreter interpreter, StringLiteral name, Value<?> value) throws AbruptCompletion {
 		variables.set(interpreter, name, value);
 	}

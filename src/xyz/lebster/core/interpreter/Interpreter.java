@@ -37,9 +37,8 @@ public final class Interpreter {
 		return new Reference(null, name);
 	}
 
-	public Value<?> declareVariable(Identifier identifier, Value<?> value) {
-		lexicalEnvironment().setVariable(identifier.stringValue(), value);
-		// FIXME: Errors can technically be thrown here, so don't always return a normal completion
+	public Value<?> declareVariable(Identifier identifier, Value<?> value) throws AbruptCompletion {
+		lexicalEnvironment().setVariable(this, identifier.stringValue(), value);
 		return Undefined.instance;
 	}
 

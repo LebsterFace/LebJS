@@ -12,7 +12,7 @@ import java.util.List;
 public final class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(NativeCode code) {
 		super(code);
-		set("toString", new NativeFunction(new StringLiteral("function () { [native code] }")));
+		put("toString", new NativeFunction(new StringLiteral("function () { [native code] }")));
 	}
 
 	public NativeFunction(Value<?> value) {

@@ -27,10 +27,10 @@ public final class ArrayObject extends Dictionary {
 
 	public ArrayObject(Value<?>[] values) {
 		this.length = values.length;
-		this.set(LENGTH_KEY, LENGTH_GETTER_SETTER);
+		this.put(LENGTH_KEY, LENGTH_GETTER_SETTER);
 
 		for (int i = 0; i < values.length; i++) {
-			this.set(String.valueOf(i), values[i]);
+			this.put(String.valueOf(i), values[i]);
 		}
 	}
 

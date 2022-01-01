@@ -9,8 +9,8 @@ public class LanguageError extends Dictionary {
 
 	public LanguageError(String message) {
 		this.message = message;
-		set("message", new StringLiteral(message));
-		set("name", new StringLiteral(getClass().getSimpleName()));
+		put("message", new StringLiteral(message));
+		put("name", new StringLiteral(getClass().getSimpleName()));
 	}
 
 	@Override

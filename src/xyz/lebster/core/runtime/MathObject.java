@@ -34,16 +34,16 @@ public final class MathObject extends Dictionary {
 	@SuppressWarnings("SpellCheckingInspection")
 	private MathObject() {
 		// FIXME: Remove when spec is followed
-		this.set("toString", new NativeFunction(new StringLiteral("[object Math]")));
+		this.put("toString", new NativeFunction(new StringLiteral("[object Math]")));
 
-		set("E",		new NumericLiteral(E));
-		set("LN2",		new NumericLiteral(LN2));
-		set("LN10",		new NumericLiteral(LN10));
-		set("LOG2E",	new NumericLiteral(LOG2E));
-		set("LOG10E",	new NumericLiteral(LOG10E));
-		set("PI",		new NumericLiteral(PI));
-		set("SQRT1_2",	new NumericLiteral(SQRT1_2));
-		set("SQRT2",	new NumericLiteral(SQRT2));
+		put("E",		new NumericLiteral(E));
+		put("LN2",		new NumericLiteral(LN2));
+		put("LN10",		new NumericLiteral(LN10));
+		put("LOG2E",	new NumericLiteral(LOG2E));
+		put("LOG10E",	new NumericLiteral(LOG10E));
+		put("PI",		new NumericLiteral(PI));
+		put("SQRT1_2",	new NumericLiteral(SQRT1_2));
+		put("SQRT2",	new NumericLiteral(SQRT2));
 
 		// (double) -> double
 		addWrapper("abs",	(DoubleUnaryOperator) Math::abs);

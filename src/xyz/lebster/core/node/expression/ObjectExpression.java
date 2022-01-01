@@ -4,6 +4,8 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.Dictionary;
+import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.Value;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,12 +17,15 @@ public record ObjectExpression(Map<Expression, Expression> entries) implements E
 
 	@Override
 	public Dictionary execute(Interpreter interpreter) throws AbruptCompletion {
-		final Dictionary dictionary = new Dictionary();
+		final Map<StringLiteral, Value<?>> map = new HashMap<>();
+
 		for (final Map.Entry<Expression, Expression> entry : entries.entrySet()) {
-			dictionary.set(entry.getKey().execute(interpreter).toStringLiteral(interpreter), entry.getValue().execute(interpreter));
+			final StringLiteral key = entry.getKey().execute(interpreter).toStringLiteral(interpreter);
+			final Value<?> value = entry.getValue().execute(interpreter);
+			map.put(key, value);
 		}
 
-		return dictionary;
+		return new Dictionary(map);
 	}
 
 	@Override

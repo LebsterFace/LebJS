@@ -17,10 +17,10 @@ public final class Function extends Constructor<FunctionNode> {
 	public Function(FunctionNode code, ExecutionContext context) {
 		super(code);
 		this.context = context;
-		this.set("prototype", FunctionPrototype.instance);
+		this.put("prototype", FunctionPrototype.instance);
 		final var representation = new StringRepresentation();
 		code.represent(representation);
-		this.set("toString", new NativeFunction(new StringLiteral(representation.toString())));
+		this.put("toString", new NativeFunction(new StringLiteral(representation.toString())));
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public final class Function extends Constructor<FunctionNode> {
 	@Override
 	public Dictionary construct(Interpreter i, Value<?>[] args) throws AbruptCompletion {
 		final Dictionary newInstance = new Dictionary();
-		newInstance.set("constructor", this);
+		newInstance.put("constructor", this);
 
 		final Function boundSelf = this.boundTo(newInstance);
 		final Value<?> returnValue = boundSelf.call(i, args);

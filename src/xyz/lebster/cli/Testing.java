@@ -129,7 +129,7 @@ public final class Testing {
 				}
 
 				final Value<?> value = arguments[i + 1].execute(interpreter);
-				result.set(key, value);
+				result.put(key, value);
 			}
 
 			return result;

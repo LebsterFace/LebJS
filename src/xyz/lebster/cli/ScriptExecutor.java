@@ -30,9 +30,9 @@ public final class ScriptExecutor {
 
 	public static Interpreter getInterpreter(int stackSize, boolean testingMethods) {
 		final GlobalObject globalObject = new GlobalObject();
-		globalObject.set("console", ConsoleObject.instance);
-		globalObject.set("Math", MathObject.instance);
-		globalObject.set("globalThis", globalObject);
+		globalObject.put("console", ConsoleObject.instance);
+		globalObject.put("Math", MathObject.instance);
+		globalObject.put("globalThis", globalObject);
 		if (testingMethods) Testing.addTestingMethods(globalObject);
 
 		return new Interpreter(stackSize, globalObject);

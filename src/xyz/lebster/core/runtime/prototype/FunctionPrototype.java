@@ -9,8 +9,8 @@ public class FunctionPrototype extends Executable<Void> {
 
 	private FunctionPrototype() {
 		super(null);
-		this.set("length", new NumericLiteral(0));
-		this.set("name", new StringLiteral(""));
+		this.put("length", new NumericLiteral(0));
+		this.put("name", new StringLiteral(""));
 	}
 
 	@Override

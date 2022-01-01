@@ -16,12 +16,15 @@ public final class ArrayPrototype extends Dictionary {
 			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value.longValue());
 
 			if ((len + elements.length) > MAX_LENGTH) {
-				throw AbruptCompletion.error(new TypeError("Pushing " + elements.length + " elements on an array-like of length " + len + " is disallowed, as the total surpasses 2**53-1"));
+				throw AbruptCompletion.error(new TypeError("Pushing " + elements.length + " elements on an array-like of length "
+														   + len + " is disallowed, as the total surpasses 2**53-1"));
 			}
 
-			for (final Value<?> E : elements) O.set(new StringLiteral(len), E);
+			for (final Value<?> E : elements)
+				O.set(interpreter, new StringLiteral(len), E);
+
 			final NumericLiteral newLength = new NumericLiteral(len + elements.length);
-			O.set(ArrayObject.LENGTH_KEY, newLength);
+			O.set(interpreter, ArrayObject.LENGTH_KEY, newLength);
 			return newLength;
 		});
 
@@ -42,10 +45,10 @@ public final class ArrayPrototype extends Dictionary {
 			return new StringLiteral(result.toString());
 		});
 
-		set("join", join);
+		put("join", join);
 
 		// FIXME: Follow spec
 		// https://tc39.es/ecma262/multipage#sec-array.prototype.tostring
-		set("toString", join);
+		put("toString", join);
 	}
 }

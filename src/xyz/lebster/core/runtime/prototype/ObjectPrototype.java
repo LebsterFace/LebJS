@@ -10,7 +10,7 @@ public final class ObjectPrototype extends Dictionary {
 	private ObjectPrototype() {
 		// https://tc39.es/ecma262/multipage#sec-object.prototype.tostring
 		// FIXME: Follow spec
-		this.set("toString", new NativeFunction(new StringLiteral("[object Object]")));
+		this.put("toString", new NativeFunction(new StringLiteral("[object Object]")));
 
 		// https://tc39.es/ecma262/multipage#sec-object.prototype.valueof
 		this.setMethod("valueOf", (interpreter, arguments) -> {

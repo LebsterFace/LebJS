@@ -109,12 +109,20 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		return this;
 	}
 
-	public void set(StringLiteral key, Value<?> value) {
-		this.value.put(key, value);
+	public void set(Interpreter interpreter, StringLiteral key, Value<?> value) throws AbruptCompletion {
+		if (this.value.get(key) instanceof final NativeProperty property) {
+			property.value.set(interpreter, value);
+		} else {
+			this.value.put(key, value);
+		}
 	}
 
-	public void set(String key, Value<?> value) {
+	public void put(String key, Value<?> value) {
 		this.value.put(new StringLiteral(key), value);
+	}
+
+	public void put(StringLiteral key, Value<?> value) {
+		this.value.put(key, value);
 	}
 
 	public void setMethod(String name, NativeCode code) {

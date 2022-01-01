@@ -5,7 +5,7 @@ import xyz.lebster.core.runtime.prototype.StringPrototype;
 public final class StringWrapper extends LiteralWrapper<StringLiteral> {
 	public StringWrapper(StringLiteral s) {
 		super(s);
-		set("length", new NumericLiteral(s.value.length()));
+		put("length", new NumericLiteral(s.value.length()));
 	}
 
 	@Override

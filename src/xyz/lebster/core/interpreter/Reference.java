@@ -24,11 +24,7 @@ public record Reference(Dictionary base, StringLiteral referencedName) {
 
 	public void setValue(Interpreter interpreter, Value<?> newValue) throws AbruptCompletion {
 		if (isResolvable()) {
-			if (this.base.get(referencedName) instanceof final NativeProperty property) {
-				property.value.set(interpreter, newValue);
-			} else {
-				this.base.set(referencedName, newValue);
-			}
+			this.base.set(interpreter, referencedName, newValue);
 		} else {
 			throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
 		}

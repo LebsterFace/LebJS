@@ -4,7 +4,7 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.SpecificationURL;
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.node.value.NumericLiteral;
 import xyz.lebster.core.node.value.StringLiteral;
 import xyz.lebster.core.node.value.Type;

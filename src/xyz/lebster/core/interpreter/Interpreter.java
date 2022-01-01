@@ -1,6 +1,6 @@
 package xyz.lebster.core.interpreter;
 
-import xyz.lebster.core.node.SpecificationURL;
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.node.expression.Identifier;
 import xyz.lebster.core.node.value.Dictionary;
 import xyz.lebster.core.node.value.StringLiteral;

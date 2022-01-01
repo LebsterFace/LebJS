@@ -1,5 +1,6 @@
 package xyz.lebster.core.parser;
 
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.exception.SyntaxError;

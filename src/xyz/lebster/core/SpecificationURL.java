@@ -1,4 +1,4 @@
-package xyz.lebster.core.node;
+package xyz.lebster.core;
 
 public @interface SpecificationURL {
 	String value();

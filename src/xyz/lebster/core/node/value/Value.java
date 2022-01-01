@@ -72,9 +72,7 @@ public abstract class Value<JType> implements Expression {
 
 	@Override
 	public int hashCode() {
-		int result = value != null ? value.hashCode() : 0;
-		result = 31 * result + (type != null ? type.hashCode() : 0);
-		return result;
+		return Objects.hash(value, type);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#table-typeof-operator-results")

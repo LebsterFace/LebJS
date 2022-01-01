@@ -15,6 +15,7 @@ public final class Interpreter {
 	public final int stackSize;
 	private final ExecutionContext[] executionContextStack;
 	private int currentExecutionContext = 0;
+	private boolean returned = false;
 
 	public Interpreter(int stackSize, GlobalObject globalObject) {
 		this.globalObject = globalObject;
@@ -76,8 +77,6 @@ public final class Interpreter {
 		enterExecutionContext(context);
 		return context;
 	}
-
-	private boolean returned = false;
 
 	public Value<?> returnFromContext(Value<?> valueToReturn) {
 		returned = true;

@@ -11,7 +11,7 @@ public final class ArrayPrototype extends Dictionary {
 
 	private ArrayPrototype() {
 		// https://tc39.es/ecma262/multipage#sec-array.prototype.push
-		this.setMethod("push",(interpreter, elements) -> {
+		this.setMethod("push", (interpreter, elements) -> {
 			final Dictionary O = interpreter.thisValue().toDictionary(interpreter);
 			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value.longValue());
 

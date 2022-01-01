@@ -6,6 +6,7 @@ import xyz.lebster.core.node.value.StringLiteral;
 
 public final class ObjectPrototype extends Dictionary {
 	public static final ObjectPrototype instance = new ObjectPrototype();
+
 	private ObjectPrototype() {
 		// https://tc39.es/ecma262/multipage#sec-object.prototype.tostring
 		// FIXME: Follow spec

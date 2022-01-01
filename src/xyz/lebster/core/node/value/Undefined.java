@@ -8,11 +8,11 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.TypeError;
 
 public final class Undefined extends Primitive<Void> {
+	public static final Undefined instance = new Undefined();
+
 	private Undefined() {
 		super(null, Type.Undefined);
 	}
-
-	public static final Undefined instance = new Undefined();
 
 	@Override
 	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {

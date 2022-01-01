@@ -1,14 +1,15 @@
 package xyz.lebster.core.runtime;
 
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.runtime.prototype.ArrayPrototype;
 
 
 public final class ArrayObject extends Dictionary {
 	public final static StringLiteral LENGTH_KEY = new StringLiteral("length");
+	private int length;
 
 	public final NativeProperty LENGTH_GETTER_SETTER = new NativeProperty(new NativeGetterSetter() {
 		@Override
@@ -23,8 +24,6 @@ public final class ArrayObject extends Dictionary {
 			throw new NotImplemented("Setter for <Array>.length");
 		}
 	});
-
-	private int length;
 
 	public ArrayObject(Value<?>[] values) {
 		this.length = values.length;

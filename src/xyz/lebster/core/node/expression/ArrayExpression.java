@@ -6,7 +6,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.ArrayObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public record ArrayExpression(List<Expression> elements) implements Expression {

@@ -1,8 +1,8 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.node.declaration.FunctionNode;
+import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.node.value.Function;
 import xyz.lebster.core.node.value.Value;
 

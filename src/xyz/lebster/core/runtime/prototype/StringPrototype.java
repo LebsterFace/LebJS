@@ -1,7 +1,10 @@
 package xyz.lebster.core.runtime.prototype;
 
 import xyz.lebster.core.exception.NotImplemented;
-import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.node.value.Dictionary;
+import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.StringWrapper;
+import xyz.lebster.core.node.value.Value;
 
 public final class StringPrototype extends Dictionary {
 	public static final StringPrototype instance = new StringPrototype();

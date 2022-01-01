@@ -22,8 +22,8 @@ public record CommandLineArguments(String fileName, ExecutionMode mode, Executio
 					case "-s", "-silent", "-q" -> silent = true;
 					case "-a", "-ast", "-tree" -> showAST = true;
 					case "-e", "-exp", "-expect" -> testingMethods = true;
-					case "-l", "-last", "-showLast", "-show" -> showLastValue = true;
-					case "-p", "-prompt", "-noPrompt" -> showPrompt = false;
+					case "-l", "-last", "-show" -> showLastValue = true;
+					case "-p", "-prompt" -> showPrompt = false;
 				}
 			} else if (fileName == null) {
 				fileName = arg;

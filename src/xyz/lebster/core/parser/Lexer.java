@@ -160,8 +160,7 @@ public final class Lexer {
 		return old;
 	}
 
-	private char consume(int size) {
-		final char old = currentChar;
+	private void consume(int size) {
 		index += size;
 
 		if (index >= length) {
@@ -170,7 +169,6 @@ public final class Lexer {
 			currentChar = source.charAt(index);
 		}
 
-		return old;
 	}
 
 	private void collect() {

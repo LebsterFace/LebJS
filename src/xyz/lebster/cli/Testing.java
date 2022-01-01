@@ -151,6 +151,6 @@ public final class Testing {
 		);
 	}
 
-	private static record Test(boolean passed, Throwable error, String output) {
+	private record Test(boolean passed, Throwable error, String output) {
 	}
 }

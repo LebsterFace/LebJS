@@ -31,6 +31,7 @@ public final class MathObject extends Dictionary {
 	/** The square root of 2 */
 	private static final double SQRT2 = 1.4142135623730951D;
 
+	@SuppressWarnings("SpellCheckingInspection")
 	private MathObject() {
 		// FIXME: Remove when spec is followed
 		this.set("toString", new NativeFunction(new StringLiteral("[object Math]")));

@@ -32,7 +32,7 @@ public final class Dumper {
 
 	public static void dumpSingle(int indent, String value) {
 		dumpIndent(indent);
-		System.out.printf("%s%s%s;", ANSI.BRIGHT_GREEN, value, ANSI.RESET);
+		System.out.printf("%s%s%s%n", ANSI.BRIGHT_GREEN, value, ANSI.RESET);
 	}
 
 	public static <T extends Enum<T>> void dumpEnum(int indent, T value) {

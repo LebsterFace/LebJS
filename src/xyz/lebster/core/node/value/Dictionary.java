@@ -61,33 +61,31 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	}
 
 	private Primitive<?> ordinaryToPrimitive(Interpreter interpreter, Type hint) throws AbruptCompletion {
-//		1. Assert: Type(O) is Object.
-//		2. Assert: hint is either string or number.
+		// 1. Assert: Type(O) is Object.
+		// 2. Assert: hint is either string or number.
 		assert hint == Type.String || hint == Type.Number;
 
-//		3. If hint is string, then
-//			a. Let methodNames be "toString", "valueOf".
-//		4. Else,
-//			a. Let methodNames be "valueOf", "toString".
+		// 3. If hint is string, then Let methodNames be "toString", "valueOf".
 		final String[] methodNames = hint == Type.String ?
 			new String[] { "toString", "valueOf" } :
+		// 4. Else, Let methodNames be "valueOf", "toString".
 			new String[] { "valueOf", "toString" };
 
-//		5. For each element name of methodNames, do
+		// 5. For each element name of methodNames, do
 		for (final String name : methodNames) {
-//			a. Let method be ? Get(O, name).
+			// a. Let method be ? Get(O, name).
 			final Value<?> method = get(new StringLiteral(name));
-//			b. If IsCallable(method) is true, then
+			// b. If IsCallable(method) is true, then
 			if (method instanceof final Executable<?> executable) {
-//				i. Let result be ? Call(method, O).
+				// i. Let result be ? Call(method, O).
 				final ExecutionContext context = new ExecutionContext(interpreter.lexicalEnvironment(), executable, this);
 				final Value<?> result = executable.callWithContext(interpreter, context, new StringLiteral(getHint(hint)));
-//				ii. If Type(result) is not Object, return result.
+				// ii. If Type(result) is not Object, return result.
 				if (result.type != Type.Dictionary) return (Primitive<?>) result;
 			}
 		}
 
-//		6. Throw a TypeError exception.
+		// 6. Throw a TypeError exception.
 		throw AbruptCompletion.error(new TypeError("Cannot convert object to primitive value"));
 	}
 

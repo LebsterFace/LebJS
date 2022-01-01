@@ -2,6 +2,7 @@ package xyz.lebster.core.runtime;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.runtime.prototype.ArrayPrototype;
@@ -20,8 +21,13 @@ public final class ArrayObject extends Dictionary {
 		@Override
 		@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-arraysetlength")
 		// FIXME: Follow spec
-		public void set(Interpreter interpreter, Value<?> value) {
-			throw new NotImplemented("Setter for <Array>.length");
+		public void set(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
+			final int newLen = (int) Math.floor(value.toNumericLiteral(interpreter).value);
+			if (newLen > length) {
+				ArrayObject.this.length = newLen;
+			} else {
+				throw new NotImplemented("Reducing array length");
+			}
 		}
 	});
 

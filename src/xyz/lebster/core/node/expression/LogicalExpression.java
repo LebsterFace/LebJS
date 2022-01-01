@@ -19,12 +19,12 @@ public record LogicalExpression(Expression left, Expression right, LogicOp op) i
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-binary-logical-operators")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> lval = left.execute(interpreter);
+		final Value<?> left_value = left.execute(interpreter);
 
 		return switch (op) {
-			case And -> lval.isTruthy(interpreter) ? right.execute(interpreter) : lval;
-			case Or -> lval.isTruthy(interpreter) ? lval : right.execute(interpreter);
-			case Coalesce -> lval.isNullish() ? right.execute(interpreter) : lval;
+			case And -> left_value.isTruthy(interpreter) ? right.execute(interpreter) : left_value;
+			case Or -> left_value.isTruthy(interpreter) ? left_value : right.execute(interpreter);
+			case Coalesce -> left_value.isNullish() ? right.execute(interpreter) : left_value;
 		};
 	}
 

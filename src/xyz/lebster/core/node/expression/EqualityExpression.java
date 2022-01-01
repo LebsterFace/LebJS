@@ -21,12 +21,12 @@ public record EqualityExpression(Expression left, Expression right, EqualityOp o
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-equality-operators-runtime-semantics-evaluation")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		Value<?> lval = left.execute(interpreter);
-		Value<?> rval = right.execute(interpreter);
+		final Value<?> left_value = left.execute(interpreter);
+		final Value<?> right_value = right.execute(interpreter);
 
 		return new BooleanLiteral(switch (op) {
-			case StrictEquals -> lval.equals(rval);
-			case StrictNotEquals -> !lval.equals(rval);
+			case StrictEquals -> left_value.equals(right_value);
+			case StrictNotEquals -> !left_value.equals(right_value);
 			default -> throw new NotImplemented("EqualityOp: " + op);
 		});
 	}

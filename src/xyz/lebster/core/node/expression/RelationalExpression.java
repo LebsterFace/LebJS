@@ -23,19 +23,19 @@ public record RelationalExpression(Expression left, Expression right, Relational
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-relational-operators")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> lval = left.execute(interpreter);
-		final Value<?> rval = right.execute(interpreter);
+		final Value<?> left_value = left.execute(interpreter);
+		final Value<?> right_value = right.execute(interpreter);
 
 		// FIXME: Comply with spec
 		// https://tc39.es/ecma262/multipage#sec-relational-operators-runtime-semantics-evaluation
 		return new BooleanLiteral(switch (op) {
-			case LessThan -> lval.toNumericLiteral(interpreter).value < rval.toNumericLiteral(interpreter).value;
-			case GreaterThan -> lval.toNumericLiteral(interpreter).value > rval.toNumericLiteral(interpreter).value;
-			case LessThanEquals -> lval.toNumericLiteral(interpreter).value <= rval.toNumericLiteral(interpreter).value;
-			case GreaterThanEquals -> lval.toNumericLiteral(interpreter).value >= rval.toNumericLiteral(interpreter).value;
+			case LessThan -> left_value.toNumericLiteral(interpreter).value < right_value.toNumericLiteral(interpreter).value;
+			case GreaterThan -> left_value.toNumericLiteral(interpreter).value > right_value.toNumericLiteral(interpreter).value;
+			case LessThanEquals -> left_value.toNumericLiteral(interpreter).value <= right_value.toNumericLiteral(interpreter).value;
+			case GreaterThanEquals -> left_value.toNumericLiteral(interpreter).value >= right_value.toNumericLiteral(interpreter).value;
 			case In -> {
-				if (rval instanceof final Dictionary dictionary) {
-					yield dictionary.hasOwnProperty(lval.toStringLiteral(interpreter));
+				if (right_value instanceof final Dictionary dictionary) {
+					yield dictionary.hasOwnProperty(left_value.toStringLiteral(interpreter));
 				} else {
 					throw AbruptCompletion.error(new TypeError("Can only use 'in' operator on an object!"));
 				}

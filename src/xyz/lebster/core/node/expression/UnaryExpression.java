@@ -37,7 +37,7 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 					throw AbruptCompletion.error(new LanguageError("Invalid left-hand side expression in postfix/prefix operation"));
 				}
 
-				final Reference lref = lhs.toReference(interpreter);
+				final Reference left_reference = lhs.toReference(interpreter);
 				final NumericLiteral oldValue = lhs.execute(interpreter).toNumericLiteral(interpreter);
 				final NumericLiteral newValue = new NumericLiteral(switch (op) {
 					case PostIncrement, PreIncrement -> oldValue.value + 1.0;
@@ -45,7 +45,7 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 					default -> throw new IllegalStateException("Unexpected value: " + op);
 				});
 
-				lref.setValue(interpreter, newValue);
+				left_reference.setValue(interpreter, newValue);
 				yield switch (op) {
 					case PostIncrement, PostDecrement -> oldValue;
 					case PreIncrement, PreDecrement -> newValue;

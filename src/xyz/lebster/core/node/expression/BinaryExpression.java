@@ -12,31 +12,30 @@ import xyz.lebster.core.node.value.Value;
 
 public record BinaryExpression(Expression left, Expression right, BinaryOp op) implements Expression {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-applystringornumericbinaryoperator")
-	public static Value<?> applyOperator(Interpreter interpreter, Value<?> lval, BinaryOp op, Value<?> rval) throws AbruptCompletion {
+	public static Value<?> applyOperator(Interpreter interpreter, Value<?> left_value, BinaryOp op, Value<?> right_value) throws AbruptCompletion {
 		if (op == BinaryOp.Add) {
-			final Value<?> lprim = lval.toPrimitive(interpreter);
-			final Value<?> rprim = rval.toPrimitive(interpreter);
-			if (lprim.type == Type.String || rprim.type == Type.String) {
-				final StringLiteral lstr = lprim.toStringLiteral(interpreter);
-				final StringLiteral rstr = rprim.toStringLiteral(interpreter);
-				return new StringLiteral(lstr.value + rstr.value);
+			final Value<?> left_primitive = left_value.toPrimitive(interpreter);
+			final Value<?> right_primitive = right_value.toPrimitive(interpreter);
+			if (left_primitive.type == Type.String || right_primitive.type == Type.String) {
+				final StringLiteral left_string = left_primitive.toStringLiteral(interpreter);
+				final StringLiteral right_string = right_primitive.toStringLiteral(interpreter);
+				return new StringLiteral(left_string.value + right_string.value);
 			} else {
-				lval = lprim;
-				rval = rprim;
+				left_value = left_primitive;
+				right_value = right_primitive;
 			}
 		}
 
-		final NumericLiteral lnum = lval.toNumericLiteral(interpreter);
-		final NumericLiteral rnum = rval.toNumericLiteral(interpreter);
-		final double result = switch (op) {
-			case Add -> lnum.value + rnum.value;
-			case Subtract -> lnum.value - rnum.value;
-			case Multiply -> lnum.value * rnum.value;
-			case Divide -> lnum.value / rnum.value;
-			case Exponent -> Math.pow(lnum.value, rnum.value);
-		};
+		final double left_num = left_value.toNumericLiteral(interpreter).value;
+		final double right_num = right_value.toNumericLiteral(interpreter).value;
 
-		return new NumericLiteral(result);
+		return new NumericLiteral(switch (op) {
+			case Add -> left_num + right_num;
+			case Subtract -> left_num - right_num;
+			case Multiply -> left_num * right_num;
+			case Divide -> left_num / right_num;
+			case Exponent -> Math.pow(left_num, right_num);
+		});
 	}
 
 	@Override
@@ -59,9 +58,9 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-evaluatestringornumericbinaryexpression")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> lval = left.execute(interpreter);
-		final Value<?> rval = right.execute(interpreter);
-		return applyOperator(interpreter, lval, op, rval);
+		final Value<?> left_value = left.execute(interpreter);
+		final Value<?> right_value = right.execute(interpreter);
+		return applyOperator(interpreter, left_value, op, right_value);
 	}
 
 	public enum BinaryOp {

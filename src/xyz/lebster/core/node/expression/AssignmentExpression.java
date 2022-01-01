@@ -26,20 +26,20 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 			throw AbruptCompletion.error(new LanguageError("Invalid left-hand side in assignment"));
 		}
 
-		final Reference lref = lhs.toReference(interpreter);
+		final Reference left_reference = lhs.toReference(interpreter);
 
 		return switch (op) {
 			case Assign -> {
-				final Value<?> rval = right.execute(interpreter);
-				lref.setValue(interpreter, rval);
-				yield rval;
+				final Value<?> right_value = right.execute(interpreter);
+				left_reference.setValue(interpreter, right_value);
+				yield right_value;
 			}
 
 			default -> {
-				final Value<?> lval = lhs.execute(interpreter);
-				final Value<?> rval = right.execute(interpreter);
-				final Value<?> result = BinaryExpression.applyOperator(interpreter, lval, lookupBinaryOp(op), rval);
-				lref.setValue(interpreter, result);
+				final Value<?> left_value = lhs.execute(interpreter);
+				final Value<?> right_value = right.execute(interpreter);
+				final Value<?> result = BinaryExpression.applyOperator(interpreter, left_value, lookupBinaryOp(op), right_value);
+				left_reference.setValue(interpreter, result);
 				yield result;
 			}
 		};

@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
+	private static int LAST_UNUSED_IDENTIFIER = 0;
+	private final int UNIQUE_ID = Dictionary.LAST_UNUSED_IDENTIFIER++;
+
 	public Dictionary(Map<StringLiteral, Value<?>> value) {
 		super(value, Type.Dictionary);
 	}
@@ -211,7 +214,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 
 	@Override
 	public int hashCode() {
-		return System.identityHashCode(this);
+		return UNIQUE_ID;
 	}
 
 	@Override

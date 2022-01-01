@@ -3,7 +3,6 @@ package xyz.lebster.core.runtime;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.Dictionary;
 import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
@@ -33,11 +32,11 @@ public final class ConsoleObject extends Dictionary {
 			return Undefined.instance;
 		});
 
-		setMethod("dump", ConsoleObject::dump);
+		setMethod("dump", (interpreter, data) -> dump(data));
 	}
 
 	@NonStandard
-	private static Undefined dump(Interpreter interpreter, Value<?>[] data) {
+	private static Undefined dump(Value<?>[] data) {
 		for (final Value<?> val : data)
 			val.dump(0);
 		return Undefined.instance;

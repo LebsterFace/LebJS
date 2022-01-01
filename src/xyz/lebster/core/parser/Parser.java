@@ -4,7 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.exception.SyntaxError;
-import xyz.lebster.core.node.*;
+import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.declaration.Declaration;
 import xyz.lebster.core.node.declaration.FunctionDeclaration;
 import xyz.lebster.core.node.declaration.VariableDeclaration;

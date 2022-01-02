@@ -16,9 +16,9 @@ public final class Interpreter {
 	private int currentExecutionContext = 0;
 	private boolean returned = false;
 
-	public Interpreter(int stackSize, GlobalObject globalObject) {
-		this.globalObject = globalObject;
-		this.stackSize = stackSize;
+	public Interpreter() {
+		this.globalObject = new GlobalObject();
+		this.stackSize = 32;
 		this.executionContextStack = new ExecutionContext[stackSize];
 		this.executionContextStack[0] = new ExecutionContext(new LexicalEnvironment(globalObject, null), null, globalObject);
 	}

@@ -4,7 +4,6 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.GlobalObject;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Program;
@@ -12,8 +11,6 @@ import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.parser.Token;
-import xyz.lebster.core.runtime.ConsoleObject;
-import xyz.lebster.core.runtime.MathObject;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -24,20 +21,6 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public final class ScriptExecutor {
-	public static Interpreter getInterpreter(boolean testingMethods) {
-		return getInterpreter(32, testingMethods);
-	}
-
-	public static Interpreter getInterpreter(int stackSize, boolean testingMethods) {
-		final GlobalObject globalObject = new GlobalObject();
-		globalObject.put("console", ConsoleObject.instance);
-		globalObject.put("Math", MathObject.instance);
-		globalObject.put("globalThis", globalObject);
-		if (testingMethods) Testing.addTestingMethods(globalObject);
-
-		return new Interpreter(stackSize, globalObject);
-	}
-
 	public static void handleError(boolean showDebug, Throwable e, PrintStream stream) {
 		stream.print(ANSI.BRIGHT_RED);
 		if (showDebug) {
@@ -145,9 +128,10 @@ public final class ScriptExecutor {
 		}
 	}
 
-	public static void repl(Interpreter interpreter, ExecutionOptions options) {
+	public static void repl(ExecutionOptions options) {
 		if (options.showPrompt()) System.out.println("Starting REPL...");
 		final Scanner scanner = new Scanner(System.in);
+		final Interpreter interpreter = new Interpreter();
 		do {
 			try {
 				if (options.showPrompt()) System.out.print("> ");

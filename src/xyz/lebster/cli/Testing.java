@@ -5,6 +5,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
+import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.runtime.ExecutionError;
 import xyz.lebster.core.runtime.LanguageError;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import static xyz.lebster.cli.ScriptExecutor.executeFile;
-import static xyz.lebster.cli.ScriptExecutor.getInterpreter;
 
 public final class Testing {
 	public static void test(ExecutionOptions options) {
@@ -68,7 +68,7 @@ public final class Testing {
 		System.setOut(tempStream);
 
 		try {
-			return new Test(executeFile(file.toPath(), getInterpreter(32, true), options), null, tempOutput.toString());
+			return new Test(executeFile(file.toPath(), new Interpreter(), options), null, tempOutput.toString());
 		} catch (Throwable throwable) {
 			return new Test(false, throwable, tempOutput.toString());
 		} finally {

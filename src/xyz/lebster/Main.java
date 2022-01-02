@@ -1,14 +1,12 @@
 package xyz.lebster;
 
 import xyz.lebster.cli.CommandLineArguments;
-import xyz.lebster.cli.ExecutionOptions;
 import xyz.lebster.cli.ScriptExecutor;
 import xyz.lebster.cli.Testing;
+import xyz.lebster.core.interpreter.Interpreter;
 
 import java.io.PrintStream;
 import java.nio.file.Path;
-
-import static xyz.lebster.cli.ScriptExecutor.*;
 
 public final class Main {
 	public static final PrintStream stdout = System.out;
@@ -23,14 +21,10 @@ public final class Main {
 			return;
 		}
 
-		final ExecutionOptions opts = arguments.options();
-		final boolean testing = opts.testingMethods();
-
-
 		switch (arguments.mode()) {
 			case Tests -> Testing.test(arguments.options());
-			case REPL -> repl(getInterpreter(testing), opts);
-			case File -> executeFileWithHandling(Path.of(arguments.fileName()), getInterpreter(testing), opts);
+			case REPL -> ScriptExecutor.repl(arguments.options());
+			case File -> ScriptExecutor.executeFileWithHandling(Path.of(arguments.fileName()), new Interpreter(), arguments.options());
 			default -> throw new Error("Mode could not be inferred");
 		}
 	}

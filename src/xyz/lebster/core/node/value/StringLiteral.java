@@ -47,7 +47,7 @@ public final class StringLiteral extends Dictionary.Key<String> {
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public StringWrapper toDictionary(Interpreter interpreter) {
 		return new StringWrapper(this);
 	}
 

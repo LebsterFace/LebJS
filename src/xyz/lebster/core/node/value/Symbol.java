@@ -21,6 +21,11 @@ public class Symbol extends Dictionary.Key<Void> {
 	}
 
 	@Override
+	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+		throw AbruptCompletion.error(new TypeError("Cannot convert a Symbol value to a string"));
+	}
+
+	@Override
 	public NumericLiteral toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert a Symbol value to a number"));
 	}

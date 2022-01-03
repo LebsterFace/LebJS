@@ -14,6 +14,11 @@ public class NativeProperty extends Value<NativeGetterSetter> {
 	}
 
 	@Override
+	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+		return value.get(interpreter).toStringLiteral(interpreter);
+	}
+
+	@Override
 	public NumericLiteral toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
 		return value.get(interpreter).toNumericLiteral(interpreter);
 	}

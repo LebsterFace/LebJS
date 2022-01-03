@@ -3,6 +3,7 @@ package xyz.lebster.core.runtime;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.Dictionary;
 import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
@@ -76,10 +77,11 @@ public final class ConsoleObject extends Dictionary {
 			case Error -> ANSI.BRIGHT_RED;
 		});
 
-		final String[] strings = new String[args.length];
-		for (int i = 0; i < args.length; i++) strings[i] = args[i].toStringForLogging();
-		System.out.print(String.join(", ", strings));
-
+		final var representation = new StringRepresentation();
+		for (int i = 0; i < args.length - 1; i++)
+			representation.append(args[i]);
+		representation.append(args[args.length - 1]);
+		System.out.print(representation);
 		System.out.println(ANSI.RESET);
 	}
 

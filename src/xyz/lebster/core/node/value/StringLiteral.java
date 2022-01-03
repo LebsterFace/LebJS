@@ -14,11 +14,6 @@ public final class StringLiteral extends Dictionary.Key<String> {
 	}
 
 	@Override
-	public String toStringForLogging() {
-		return value;
-	}
-
-	@Override
 	public StringLiteral toStringLiteral(Interpreter interpreter) {
 		return this;
 	}

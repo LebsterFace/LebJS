@@ -2,6 +2,7 @@ package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 
@@ -15,6 +16,11 @@ public final class BooleanLiteral extends Primitive<Boolean> {
 		representation.append(ANSI.BRIGHT_YELLOW);
 		representation.append(value);
 		representation.append(ANSI.RESET);
+	}
+
+	@Override
+	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+		return new StringLiteral(value.toString());
 	}
 
 	@Override

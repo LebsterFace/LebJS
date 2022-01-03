@@ -13,6 +13,11 @@ public final class Null extends Primitive<Void> {
 	}
 
 	@Override
+	public StringLiteral toStringLiteral(Interpreter interpreter) {
+		return new StringLiteral("null");
+	}
+
+	@Override
 	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
 		return new NumericLiteral(0.0);
 	}

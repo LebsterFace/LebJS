@@ -129,7 +129,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 		this.value.put(new StringLiteral(key), value);
 	}
 
-	public void put(StringLiteral key, Value<?> value) {
+	public void put(Key<?> key, Value<?> value) {
 		this.value.put(key, value);
 	}
 

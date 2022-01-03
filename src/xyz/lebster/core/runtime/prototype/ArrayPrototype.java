@@ -7,13 +7,23 @@ import xyz.lebster.core.runtime.TypeError;
 
 public final class ArrayPrototype extends Dictionary {
 	public static final ArrayPrototype instance = new ArrayPrototype();
-	public static final long MAX_LENGTH = 9007199254740991L;
+	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
+	private long lengthOfArrayLike(Dictionary O, Interpreter interpreter) throws AbruptCompletion {
+		final double number = O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value;
+		if (Double.isNaN(number) || number <= 0) {
+			return 0L;
+		} else {
+			return Long.min((long) number, MAX_LENGTH);
+		}
+	}
 
 	private ArrayPrototype() {
 		// https://tc39.es/ecma262/multipage#sec-array.prototype.push
 		this.setMethod("push", (interpreter, elements) -> {
 			final Dictionary O = interpreter.thisValue().toDictionary(interpreter);
-			final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value.longValue());
+			final long len = lengthOfArrayLike(O, interpreter);
 
 			if ((len + elements.length) > MAX_LENGTH) {
 				throw AbruptCompletion.error(new TypeError("Pushing " + elements.length + " elements on an array-like of length "

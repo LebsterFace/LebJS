@@ -9,7 +9,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.runtime.prototype.ArrayPrototype;
 
-import java.util.Set;
+import java.util.HashSet;
 
 
 public final class ArrayObject extends Dictionary {
@@ -36,7 +36,8 @@ public final class ArrayObject extends Dictionary {
 	});
 
 	@Override
-	public void representRecursive(StringRepresentation representation, Set<Dictionary> parents) {
+	@SuppressWarnings("unchecked")
+	public void representRecursive(StringRepresentation representation, HashSet<Dictionary> parents) {
 		representation.append('[');
 		if (value.isEmpty()) {
 			representation.append(']');
@@ -52,7 +53,7 @@ public final class ArrayObject extends Dictionary {
 					representation.append(this == element ? "[self]" : "[parent]");
 					representation.append(ANSI.RESET);
 				} else {
-					dictionary.representRecursive(representation, parents);
+					dictionary.representRecursive(representation, (HashSet<Dictionary>) parents.clone());
 				}
 			} else {
 				element.represent(representation);

@@ -12,7 +12,6 @@ import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
@@ -177,7 +176,8 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		dumpRecursive(indent, new HashSet<>());
 	}
 
-	protected void dumpRecursive(int indent, Set<Dictionary> parents) {
+	@SuppressWarnings("unchecked")
+	protected void dumpRecursive(int indent, HashSet<Dictionary> parents) {
 		Dumper.dumpName(indent, "Dictionary");
 		if (value.isEmpty()) {
 			Dumper.dumpIndent(indent + 1);
@@ -200,7 +200,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 					System.out.println(ANSI.RESET);
 				} else {
 					System.out.println();
-					dictionary.dumpRecursive(indent + 2, parents);
+					dictionary.dumpRecursive(indent + 2, (HashSet<Dictionary>) parents.clone());
 				}
 			} else {
 				value.dump(0);
@@ -227,7 +227,8 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		this.representRecursive(representation, new HashSet<>());
 	}
 
-	public void representRecursive(StringRepresentation representation, Set<Dictionary> parents) {
+	@SuppressWarnings("unchecked")
+	public void representRecursive(StringRepresentation representation, HashSet<Dictionary> parents) {
 		representation.append('{');
 		if (value.isEmpty()) {
 			representation.append(" }");
@@ -253,7 +254,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 					representation.append(this == value ? "[self]" : "[parent]");
 					representation.append(ANSI.RESET);
 				} else {
-					dictionary.representRecursive(representation, parents);
+					dictionary.representRecursive(representation, (HashSet<Dictionary>) parents.clone());
 				}
 			} else {
 				value.represent(representation);

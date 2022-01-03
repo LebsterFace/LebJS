@@ -7,7 +7,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 
-import java.util.Set;
+import java.util.HashSet;
 
 public final class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(NativeCode code) {
@@ -32,7 +32,7 @@ public final class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public void representRecursive(StringRepresentation representation, Set<Dictionary> parents) {
+	public void representRecursive(StringRepresentation representation, HashSet<Dictionary> parents) {
 		this.represent(representation);
 	}
 

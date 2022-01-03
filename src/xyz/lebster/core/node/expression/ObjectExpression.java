@@ -17,7 +17,7 @@ public record ObjectExpression(Map<Expression, Expression> entries) implements E
 
 	@Override
 	public Dictionary execute(Interpreter interpreter) throws AbruptCompletion {
-		final Map<StringLiteral, Value<?>> map = new HashMap<>();
+		final var map = new HashMap<Dictionary.Key<?>, Value<?>>();
 
 		for (final Map.Entry<Expression, Expression> entry : entries.entrySet()) {
 			final StringLiteral key = entry.getKey().execute(interpreter).toStringLiteral(interpreter);

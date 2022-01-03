@@ -13,11 +13,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
+public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
 	private final int UNIQUE_ID = Dictionary.LAST_UNUSED_IDENTIFIER++;
 
-	public Dictionary(Map<StringLiteral, Value<?>> value) {
+	public static abstract class Key<R> extends Primitive<R> {
+		public Key(R value, Type type) {
+			super(value, type);
+		}
+	};
+
+	public Dictionary(Map<Key<?>, Value<?>> value) {
 		super(value, Type.Dictionary);
 	}
 
@@ -188,9 +194,9 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		}
 
 		parents.add(this);
-		for (HashMap.Entry<StringLiteral, Value<?>> entry : value.entrySet()) {
+		for (var entry : value.entrySet()) {
 			Dumper.dumpIndent(indent + 1);
-			System.out.print(entry.getKey().value);
+			System.out.print(entry.getKey());
 			System.out.print(": ");
 			final Value<?> value = entry.getValue();
 			if (value instanceof final Dictionary dictionary) {
@@ -241,7 +247,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		representation.indent();
 
 		for (var iterator = this.value.entrySet().iterator(); iterator.hasNext(); ) {
-			final Map.Entry<StringLiteral, Value<?>> entry = iterator.next();
+			final var entry = iterator.next();
 			representation.appendIndent();
 			representation.append(ANSI.YELLOW);
 			representation.append(entry.getKey().value);

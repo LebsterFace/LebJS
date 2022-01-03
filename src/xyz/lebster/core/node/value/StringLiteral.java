@@ -4,7 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 
-public final class StringLiteral extends Primitive<String> {
+public final class StringLiteral extends Dictionary.Key<String> {
 	public StringLiteral(String value) {
 		super(value, Type.String);
 	}

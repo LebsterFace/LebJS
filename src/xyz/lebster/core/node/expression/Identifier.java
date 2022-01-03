@@ -11,7 +11,7 @@ import xyz.lebster.core.node.value.Value;
 public record Identifier(String value) implements LeftHandSideExpression {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		return toReference(interpreter).getValue(interpreter);
+		return interpreter.getReference(this).getValue(interpreter);
 	}
 
 	@Override

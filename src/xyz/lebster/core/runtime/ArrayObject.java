@@ -35,6 +35,16 @@ public final class ArrayObject extends Dictionary {
 		}
 	});
 
+	public ArrayObject(Value<?>[] values) {
+		this.length = values.length;
+		this.put(LENGTH_KEY, LENGTH_GETTER_SETTER);
+
+		for (int i = 0; i < values.length; i++) {
+			if (values[i] != null)
+				this.put(String.valueOf(i), values[i]);
+		}
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void representRecursive(StringRepresentation representation, HashSet<Dictionary> parents) {
@@ -64,16 +74,6 @@ public final class ArrayObject extends Dictionary {
 		}
 
 		representation.append(']');
-	}
-
-	public ArrayObject(Value<?>[] values) {
-		this.length = values.length;
-		this.put(LENGTH_KEY, LENGTH_GETTER_SETTER);
-
-		for (int i = 0; i < values.length; i++) {
-			if (values[i] != null)
-				this.put(String.valueOf(i), values[i]);
-		}
 	}
 
 	@Override

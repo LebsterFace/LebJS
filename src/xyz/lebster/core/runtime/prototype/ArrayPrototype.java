@@ -12,16 +12,6 @@ public final class ArrayPrototype extends Dictionary {
 	public static final ArrayPrototype instance = new ArrayPrototype();
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
-	private long lengthOfArrayLike(Dictionary O, Interpreter interpreter) throws AbruptCompletion {
-		final double number = O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value;
-		if (Double.isNaN(number) || number <= 0) {
-			return 0L;
-		} else {
-			return Long.min((long) number, MAX_LENGTH);
-		}
-	}
-
 	private ArrayPrototype() {
 		// https://tc39.es/ecma262/multipage#sec-array.prototype.push
 		this.setMethod("push", (interpreter, elements) -> {
@@ -89,5 +79,15 @@ public final class ArrayPrototype extends Dictionary {
 		// FIXME: Follow spec
 		// https://tc39.es/ecma262/multipage#sec-array.prototype.tostring
 		put("toString", join);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
+	private long lengthOfArrayLike(Dictionary O, Interpreter interpreter) throws AbruptCompletion {
+		final double number = O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value;
+		if (Double.isNaN(number) || number <= 0) {
+			return 0L;
+		} else {
+			return Long.min((long) number, MAX_LENGTH);
+		}
 	}
 }

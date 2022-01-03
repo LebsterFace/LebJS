@@ -7,8 +7,7 @@ import xyz.lebster.core.node.value.Type;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.TypeError;
 
-public record MemberExpression(Expression base, Expression property,
-                               boolean computed) implements LeftHandSideExpression {
+public record MemberExpression(Expression base, Expression property, boolean computed) implements LeftHandSideExpression {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return toReference(interpreter).getValue(interpreter);
@@ -28,9 +27,9 @@ public record MemberExpression(Expression base, Expression property,
 
 		if (executedBase.type == Type.Undefined || executedBase.type == Type.Null) {
 			final String msg = "Cannot read property '" +
-			                   executedProp.value + "' of " +
-			                   (executedBase.type == Type.Undefined ?
-				                   "undefined" : "null");
+							   executedProp.value + "' of " +
+							   (executedBase.type == Type.Undefined ?
+								   "undefined" : "null");
 
 			throw AbruptCompletion.error(new TypeError(msg));
 		}

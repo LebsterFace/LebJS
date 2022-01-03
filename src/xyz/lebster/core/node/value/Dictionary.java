@@ -17,12 +17,6 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
 	private final int UNIQUE_ID = Dictionary.LAST_UNUSED_IDENTIFIER++;
 
-	public static abstract class Key<R> extends Primitive<R> {
-		public Key(R value, Type type) {
-			super(value, type);
-		}
-	};
-
 	public Dictionary(Map<Key<?>, Value<?>> value) {
 		super(value, Type.Dictionary);
 	}
@@ -77,7 +71,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 		// 3. If hint is string, then Let methodNames be "toString", "valueOf".
 		final String[] methodNames = hint == Type.String ?
 			new String[] { "toString", "valueOf" } :
-		// 4. Else, Let methodNames be "valueOf", "toString".
+			// 4. Else, Let methodNames be "valueOf", "toString".
 			new String[] { "valueOf", "toString" };
 
 		// 5. For each element name of methodNames, do
@@ -273,5 +267,11 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 		representation.unindent();
 		representation.appendIndent();
 		representation.append('}');
+	}
+
+	public static abstract class Key<R> extends Primitive<R> {
+		public Key(R value, Type type) {
+			super(value, type);
+		}
 	}
 }

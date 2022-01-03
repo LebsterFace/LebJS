@@ -2,6 +2,7 @@ package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.Dumper;
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -40,6 +41,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 	}
 
 	@Override
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
 	public Primitive<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
 //		a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
 		final Value<?> exoticToPrim = get(new StringLiteral("toPrimitive")); // FIXME: Symbol.toPrimitive
@@ -61,6 +63,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 		return ordinaryToPrimitive(interpreter, preferredType == null ? Type.Number : preferredType);
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-ordinarytoprimitive")
 	private Primitive<?> ordinaryToPrimitive(Interpreter interpreter, Type hint) throws AbruptCompletion {
 		// 1. Assert: Type(O) is Object.
 		// 2. Assert: hint is either string or number.

@@ -117,7 +117,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 		return this;
 	}
 
-	public void set(Interpreter interpreter, StringLiteral key, Value<?> value) throws AbruptCompletion {
+	public void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
 		if (this.value.get(key) instanceof final NativeProperty property) {
 			property.value.set(interpreter, value);
 		} else {
@@ -137,7 +137,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 		this.value.put(new StringLiteral(name), new NativeFunction(code));
 	}
 
-	public Value<?> get(StringLiteral key) {
+	public Value<?> get(Key<?> key) {
 		Dictionary object = this;
 
 		while (object != null) {
@@ -155,7 +155,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 		// throw new ExecutionError("Property '" + key.value + "' does not exist on object!");
 	}
 
-	public boolean hasProperty(StringLiteral name) {
+	public boolean hasProperty(Key<?> name) {
 		if (hasOwnProperty(name)) return true;
 		Dictionary object = this;
 
@@ -173,7 +173,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 		return false;
 	}
 
-	public boolean hasOwnProperty(StringLiteral key) {
+	public boolean hasOwnProperty(Key<?> key) {
 		return this.value.containsKey(key);
 	}
 

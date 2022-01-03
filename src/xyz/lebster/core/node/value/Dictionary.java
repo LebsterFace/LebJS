@@ -3,7 +3,6 @@ package xyz.lebster.core.node.value;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.TypeError;
@@ -50,8 +49,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 //			i - iii. Get hint
 			final StringLiteral hint = new StringLiteral(getHint(preferredType));
 //			iv. Let result be ? Call(exoticToPrim, input, hint).
-			final ExecutionContext context = new ExecutionContext(interpreter.lexicalEnvironment(), executable, this);
-			final Value<?> result = executable.callWithContext(interpreter, context, hint);
+			final Value<?> result = executable.call(interpreter, this, hint);
 //			v. If Type(result) is not Object, return result.
 			if (result.type != Type.Dictionary) return (Primitive<?>) result;
 //			vi. Throw a TypeError exception.
@@ -81,8 +79,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 			// b. If IsCallable(method) is true, then
 			if (method instanceof final Executable<?> executable) {
 				// i. Let result be ? Call(method, O).
-				final ExecutionContext context = new ExecutionContext(interpreter.lexicalEnvironment(), executable, this);
-				final Value<?> result = executable.callWithContext(interpreter, context, new StringLiteral(getHint(hint)));
+				final Value<?> result = executable.call(interpreter, this);
 				// ii. If Type(result) is not Object, return result.
 				if (result.type != Type.Dictionary) return (Primitive<?>) result;
 			}

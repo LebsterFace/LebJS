@@ -38,7 +38,7 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	protected Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	protected Value<?> internalCall(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		interpreter.enterExecutionContext(context);
 
 		// Declare passed arguments as variables
@@ -79,7 +79,7 @@ public final class Function extends Constructor<FunctionNode> {
 		newInstance.put("constructor", this);
 
 		final Function boundSelf = this.boundTo(newInstance);
-		final Value<?> returnValue = boundSelf.call(i, args);
+		final Value<?> returnValue = boundSelf.internalCall(i, args);
 
 		if (returnValue instanceof final Dictionary dictionary) {
 			return dictionary;

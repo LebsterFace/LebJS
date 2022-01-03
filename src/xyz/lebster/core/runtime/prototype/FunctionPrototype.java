@@ -13,7 +13,7 @@ public class FunctionPrototype extends Executable<Void> {
 	}
 
 	@Override
-	protected Value<?> call(Interpreter interpreter, Value<?>... arguments) {
+	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) {
 		return Undefined.instance;
 	}
 }

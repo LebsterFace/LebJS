@@ -20,7 +20,7 @@ public final class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	protected Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	protected Value<?> internalCall(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		return code.execute(interpreter, arguments);
 	}
 

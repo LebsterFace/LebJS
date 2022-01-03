@@ -19,13 +19,23 @@ public abstract class Executable<JType> extends Dictionary {
 	public Value<?> callWithContext(Interpreter interpreter, ExecutionContext frame, Value<?>... args) throws AbruptCompletion {
 		interpreter.enterExecutionContext(frame);
 		try {
-			return this.call(interpreter, args);
+			return this.internalCall(interpreter, args);
 		} finally {
 			interpreter.exitExecutionContext(frame);
 		}
 	}
 
-	protected abstract Value<?> call(final Interpreter interpreter, final Value<?>... arguments) throws AbruptCompletion;
+	public Value<?> call(Interpreter interpreter, Value<?> thisValue, Value<?>... args) throws AbruptCompletion {
+		final ExecutionContext context = new ExecutionContext(interpreter.lexicalEnvironment(), this, thisValue);
+		interpreter.enterExecutionContext(context);
+		try {
+			return this.internalCall(interpreter, args);
+		} finally {
+			interpreter.exitExecutionContext(context);
+		}
+	}
+
+	protected abstract Value<?> internalCall(final Interpreter interpreter, final Value<?>... arguments) throws AbruptCompletion;
 
 	@Override
 	public void dump(int indent) {

@@ -53,7 +53,7 @@ public class Dictionary extends Value<Map<StringLiteral, Value<?>>> {
 //			iv. Let result be ? Call(exoticToPrim, input, hint).
 			final Value<?> result = executable.call(interpreter, this, hint);
 //			v. If Type(result) is not Object, return result.
-			if (result.type != Type.Dictionary) return (Primitive<?>) result;
+			if (result.type != Type.Dictionary) return result.toPrimitive(interpreter);
 //			vi. Throw a TypeError exception.
 			throw AbruptCompletion.error(new TypeError("Cannot convert object to primitive value"));
 		}

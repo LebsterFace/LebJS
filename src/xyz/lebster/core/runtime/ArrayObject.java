@@ -70,7 +70,8 @@ public final class ArrayObject extends Dictionary {
 		this.put(LENGTH_KEY, LENGTH_GETTER_SETTER);
 
 		for (int i = 0; i < values.length; i++) {
-			this.put(String.valueOf(i), values[i]);
+			if (values[i] != null)
+				this.put(String.valueOf(i), values[i]);
 		}
 	}
 

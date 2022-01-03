@@ -1,6 +1,9 @@
 package xyz.lebster.core.runtime.prototype;
 
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
+import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.runtime.ArrayObject;
 import xyz.lebster.core.runtime.TypeError;
@@ -36,6 +39,32 @@ public final class ArrayPrototype extends Dictionary {
 			final NumericLiteral newLength = new NumericLiteral(len + elements.length);
 			O.set(interpreter, ArrayObject.LENGTH_KEY, newLength);
 			return newLength;
+		});
+
+		// https://tc39.es/ecma262/multipage#sec-array.prototype.map
+		this.setMethod("map", (interpreter, arguments) -> {
+			final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : Undefined.instance;
+			final Value<?> thisArg = arguments.length > 1 ? arguments[1] : Undefined.instance;
+
+			final Dictionary O = interpreter.thisValue().toDictionary(interpreter);
+			final long len = lengthOfArrayLike(O, interpreter);
+
+			if (!(callbackfn instanceof final Executable<?> executable)) {
+				final StringRepresentation representation = new StringRepresentation();
+				callbackfn.represent(representation);
+				representation.append(" is not a function");
+				throw AbruptCompletion.error(new TypeError(representation.toString()));
+			}
+
+			final Value<?>[] values = new Value<?>[(int) len];
+			for (int k = 0; k < len; k++) {
+				final var Pk = new StringLiteral(k);
+				if (O.hasOwnProperty(Pk)) {
+					values[k] = executable.call(interpreter, thisArg, O.get(Pk), new NumericLiteral(k), O);
+				}
+			}
+
+			return new ArrayObject(values);
 		});
 
 		// https://tc39.es/ecma262/multipage#sec-array.prototype.join

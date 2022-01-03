@@ -440,8 +440,8 @@ public final class Parser {
 			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
 
 			case Period -> {
-				final String prop = state.require(TokenType.Identifier).value;
-				yield new MemberExpression(left, new StringLiteral(prop), false);
+				if (!matchIdentifierName()) state.expected("IdentifierName");
+				yield new MemberExpression(left, new StringLiteral(state.consume().value), false);
 			}
 
 			case LBracket -> {
@@ -600,6 +600,46 @@ public final class Parser {
 		final List<Expression> elements = parseExpressionList(false);
 		state.require(TokenType.RBracket);
 		return new ArrayExpression(elements);
+	}
+
+	private boolean matchIdentifierName() {
+		final TokenType t = state.currentToken.type;
+		return t == TokenType.Let ||
+			   t == TokenType.Break ||
+			   t == TokenType.Case ||
+			   t == TokenType.Catch ||
+			   t == TokenType.Class ||
+			   t == TokenType.Const ||
+			   t == TokenType.Continue ||
+			   t == TokenType.Debugger ||
+			   t == TokenType.Default ||
+			   t == TokenType.Delete ||
+			   t == TokenType.Do ||
+			   t == TokenType.Else ||
+			   t == TokenType.Export ||
+			   t == TokenType.Extends ||
+			   t == TokenType.Finally ||
+			   t == TokenType.For ||
+			   t == TokenType.Function ||
+			   t == TokenType.If ||
+			   t == TokenType.Import ||
+			   t == TokenType.In ||
+			   t == TokenType.Instanceof ||
+			   t == TokenType.New ||
+			   t == TokenType.Null ||
+			   t == TokenType.Return ||
+			   t == TokenType.Super ||
+			   t == TokenType.Switch ||
+			   t == TokenType.This ||
+			   t == TokenType.Throw ||
+			   t == TokenType.Try ||
+			   t == TokenType.Typeof ||
+			   t == TokenType.Var ||
+			   t == TokenType.Void ||
+			   t == TokenType.While ||
+			   t == TokenType.With ||
+			   t == TokenType.Yield ||
+			   t == TokenType.Identifier;
 	}
 
 	private boolean matchDeclaration() {

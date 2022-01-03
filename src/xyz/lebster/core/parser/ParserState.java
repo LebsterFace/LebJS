@@ -17,7 +17,11 @@ public final class ParserState implements Cloneable {
 		this.index = index;
 	}
 
-	private void expected(TokenType t) throws SyntaxError {
+	public void expected(TokenType t) throws SyntaxError {
+		throw new SyntaxError("Unexpected token " + currentToken.type + ". Expected " + t);
+	}
+
+	public void expected(String t) throws SyntaxError {
 		throw new SyntaxError("Unexpected token " + currentToken.type + ". Expected " + t);
 	}
 

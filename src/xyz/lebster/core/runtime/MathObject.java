@@ -33,8 +33,7 @@ public final class MathObject extends Dictionary {
 
 	@SuppressWarnings("SpellCheckingInspection")
 	private MathObject() {
-		// FIXME: Remove when spec is followed
-		this.put("toString", new NativeFunction(new StringLiteral("[object Math]")));
+		put(Symbol.toStringTag, new StringLiteral("Math"));
 
 		put("E",		new NumericLiteral(E));
 		put("LN2",		new NumericLiteral(LN2));

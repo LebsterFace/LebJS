@@ -192,11 +192,33 @@ public final class Lexer {
 	}
 
 	private boolean isIdentifierStart() {
-		return isAlphabetical(currentChar) || currentChar == '_' || currentChar == '$';
+		if (currentChar == '\\') {
+			return false;
+		} else if (isAlphabetical(currentChar) || currentChar == '_' || currentChar == '$') {
+			return true;
+		} else if (currentChar < 0x80) {
+			// Optimization: the first codepoint with the ID_Start property after A-Za-z is outside the
+			// ASCII range (0x00AA), so we can skip isUnicodeIdentifierStart() for any ASCII characters.
+			// (Thanks Serenity!)
+			return false;
+		} else {
+			return Character.isUnicodeIdentifierStart(currentChar);
+		}
 	}
 
 	private boolean isIdentifierMiddle() {
-		return isIdentifierStart() || isDigit(currentChar);
+		if (currentChar == '\\') {
+			return false;
+		} else if (isAlphabetical(currentChar) || isDigit(currentChar) || currentChar == '_' || currentChar == '$') {
+			return true;
+		} else if (currentChar < 0x80) {
+			// Optimization: the first codepoint with the ID_Continue property after A-Za-z0-9_ is outside the
+			// ASCII range (0x00AA), so we can skip isUnicodeIdentifierPart() for any ASCII characters.
+			// (Thanks Serenity!)
+			return false;
+		} else {
+			return Character.isUnicodeIdentifierPart(currentChar);
+		}
 	}
 
 	public Token next() throws SyntaxError {

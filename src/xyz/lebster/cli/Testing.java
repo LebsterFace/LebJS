@@ -145,10 +145,6 @@ public final class Testing {
 				return prototype == null ? Null.instance : prototype;
 			}
 		});
-
-		globalObject.setMethod("isNaN", ($, args) ->
-			BooleanLiteral.of(args.length > 0 && args[0].toNumericLiteral($).value.isNaN())
-		);
 	}
 
 	private record Test(boolean passed, Throwable error, String output) {

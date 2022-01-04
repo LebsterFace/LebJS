@@ -7,6 +7,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.runtime.TypeError;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override
@@ -55,8 +56,22 @@ public record RelationalExpression(Expression left, Expression right, Relational
 				yield BooleanLiteral.of(r == BooleanLiteral.FALSE);
 			}
 
-			// FIXME: Implement both In and InstanceOf
-			case In -> throw new NotImplemented("`in` operator");
+			case In -> {
+				// 5. If Type(rval) is not Object, throw a TypeError exception.
+				if (!(right_value instanceof final Dictionary dictionary)) {
+					final var representation = new StringRepresentation();
+					representation.append("Cannot use `in` operator to search for `");
+					left_value.represent(representation);
+					representation.append("` in ");
+					right_value.represent(representation);
+					throw AbruptCompletion.error(new TypeError(representation.toString()));
+				}
+
+				// 6. Return ? HasProperty(rval, ? ToPropertyKey(lval)).
+				yield BooleanLiteral.of(dictionary.hasProperty(left_value.toPropertyKey(interpreter)));
+			}
+
+			// FIXME: Implement InstanceOf
 			case InstanceOf -> throw new NotImplemented("`instanceof` operator");
 		};
 	}

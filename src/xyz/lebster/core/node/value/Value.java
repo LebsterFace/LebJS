@@ -69,6 +69,19 @@ public abstract class Value<JType> implements Expression {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#table-typeof-operator-results")
 	public abstract String typeOf(Interpreter interpreter) throws AbruptCompletion;
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-topropertykey")
+	public Dictionary.Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {
+		// 1. Let key be ? ToPrimitive(argument, string).
+		final var key = this.toPrimitive(interpreter, Type.String);
+		// 2. If Type(key) is Symbol, then
+		if (key instanceof final Symbol s)
+			// a. Return key.
+			return s;
+
+		// 3. Return ! ToString(key).
+		return key.toStringLiteral(interpreter);
+	}
+
 	public boolean isTruthy(Interpreter interpreter) throws AbruptCompletion {
 		return this.toBooleanLiteral(interpreter).value;
 	}

@@ -52,6 +52,8 @@ public final class Parser {
 		precedence.put(TokenType.LessThanEqual, 12);
 		precedence.put(TokenType.GreaterThan, 12);
 		precedence.put(TokenType.GreaterThanEqual, 12);
+		precedence.put(TokenType.In, 12);
+		precedence.put(TokenType.Instanceof, 12);
 
 		precedence.put(TokenType.StrictEqual, 11);
 		precedence.put(TokenType.StrictNotEqual, 11);
@@ -95,6 +97,8 @@ public final class Parser {
 		associativity.put(TokenType.LessThanEqual, Left);
 		associativity.put(TokenType.GreaterThan, Left);
 		associativity.put(TokenType.GreaterThanEqual, Left);
+		associativity.put(TokenType.In, Left);
+		associativity.put(TokenType.Instanceof, Left);
 		associativity.put(TokenType.LogicalOr, Left);
 		associativity.put(TokenType.LogicalAnd, Left);
 		associativity.put(TokenType.NullishCoalescing, Left);
@@ -438,12 +442,14 @@ public final class Parser {
 			case Equals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
 
 			case MinusMinus -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostDecrement);
-
 			case PlusPlus -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostIncrement);
+
 			case LessThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
 			case LessThanEqual -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThanEquals);
 			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
 			case GreaterThanEqual -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThanEquals);
+			case In -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.In);
+			case Instanceof -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.InstanceOf);
 
 			case Period -> {
 				if (!matchIdentifierName()) state.expected("IdentifierName");
@@ -721,6 +727,8 @@ public final class Parser {
 			   t == TokenType.LeftShiftEquals ||
 			   t == TokenType.RightShiftEquals ||
 			   t == TokenType.NullishCoalescing ||
+			   t == TokenType.In ||
+			   t == TokenType.Instanceof ||
 			   t == TokenType.LBracket ||
 			   t == TokenType.LParen ||
 			   t == TokenType.Equals ||

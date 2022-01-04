@@ -60,7 +60,6 @@ public final class GlobalObject extends Dictionary {
 		});
 
 		// https://tc39.es/ecma262/multipage#sec-parseint-string-radix
-		// TODO: Write test
 		setMethod("parseInt", (interpreter, arguments) -> {
 			// 1. Let inputString be ? ToString(string).
 			final StringLiteral inputString = arguments.length > 0 ? arguments[0].toStringLiteral(interpreter) : new StringLiteral("undefined");
@@ -132,6 +131,7 @@ public final class GlobalObject extends Dictionary {
 			return new NumericLiteral(mathInt * sign);
 		});
 
+		// 19.3 Constructor Properties of the Global Object
 		put("Math", MathObject.instance);
 
 		put("console", ConsoleObject.instance);

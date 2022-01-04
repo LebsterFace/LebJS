@@ -41,8 +41,7 @@ public final class GlobalObject extends Dictionary {
 			final double num = arguments.length > 0 ? arguments[0].toNumericLiteral(interpreter).value : Double.NaN;
 			// 2. If num is NaN, +∞𝔽, or -∞𝔽, return false.
 			// 3. Otherwise, return true.
-			final boolean result = num != Double.NaN && num != Double.POSITIVE_INFINITY && num != Double.NEGATIVE_INFINITY;
-			return new BooleanLiteral(result);
+			return new BooleanLiteral(!(Double.isNaN(num) || Double.isInfinite(num)));
 		});
 
 		// https://tc39.es/ecma262/multipage#sec-isnan-number

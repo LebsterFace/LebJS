@@ -42,23 +42,23 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
 	public Primitive<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
-//		a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
-		final Value<?> exoticToPrim = get(new StringLiteral("toPrimitive")); // FIXME: Symbol.toPrimitive
+		// a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
+		final Value<?> exoticToPrim = get(Symbol.toPrimitive);
 
-//		b. If exoticToPrim is not undefined, then
+		// b. If exoticToPrim is not undefined, then
 		if (exoticToPrim instanceof final Executable<?> executable) {
-//			i - iii. Get hint
+			// i - iii. Get hint
 			final StringLiteral hint = new StringLiteral(getHint(preferredType));
-//			iv. Let result be ? Call(exoticToPrim, input, hint).
+			// iv. Let result be ? Call(exoticToPrim, input, hint).
 			final Value<?> result = executable.call(interpreter, this, hint);
-//			v. If Type(result) is not Object, return result.
+			// v. If Type(result) is not Object, return result.
 			if (result.type != Type.Dictionary) return result.toPrimitive(interpreter);
-//			vi. Throw a TypeError exception.
+			// vi. Throw a TypeError exception.
 			throw AbruptCompletion.error(new TypeError("Cannot convert object to primitive value"));
 		}
 
-//		c. If preferredType is not present, let preferredType be number.
-//		d. Return ? OrdinaryToPrimitive(input, preferredType).
+		// c. If preferredType is not present, let preferredType be number.
+		// d. Return ? OrdinaryToPrimitive(input, preferredType).
 		return ordinaryToPrimitive(interpreter, preferredType == null ? Type.Number : preferredType);
 	}
 

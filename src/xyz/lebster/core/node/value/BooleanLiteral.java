@@ -7,8 +7,15 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 
 public final class BooleanLiteral extends Primitive<Boolean> {
-	public BooleanLiteral(boolean value) {
+	public static final BooleanLiteral TRUE = new BooleanLiteral(Boolean.TRUE);
+	public static final BooleanLiteral FALSE = new BooleanLiteral(Boolean.FALSE);
+
+	private BooleanLiteral(boolean value) {
 		super(value, Type.Boolean);
+	}
+
+	public static BooleanLiteral of(boolean b) {
+		return b ? TRUE : FALSE;
 	}
 
 	@Override

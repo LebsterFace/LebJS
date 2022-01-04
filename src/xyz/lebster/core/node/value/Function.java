@@ -58,7 +58,7 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	public BooleanLiteral toBooleanLiteral() {
-		return new BooleanLiteral(true);
+		return BooleanLiteral.TRUE;
 	}
 
 	public NumericLiteral toNumericLiteral() {

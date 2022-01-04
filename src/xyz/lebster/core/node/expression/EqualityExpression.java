@@ -24,7 +24,7 @@ public record EqualityExpression(Expression left, Expression right, EqualityOp o
 		final Value<?> left_value = left.execute(interpreter);
 		final Value<?> right_value = right.execute(interpreter);
 
-		return new BooleanLiteral(switch (op) {
+		return BooleanLiteral.of(switch (op) {
 			case StrictEquals -> left_value.equals(right_value);
 			case StrictNotEquals -> !left_value.equals(right_value);
 			default -> throw new NotImplemented("EqualityOp: " + op);

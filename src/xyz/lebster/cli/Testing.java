@@ -147,7 +147,7 @@ public final class Testing {
 		});
 
 		globalObject.setMethod("isNaN", ($, args) ->
-			new BooleanLiteral(args.length > 0 && args[0].toNumericLiteral($).value.isNaN())
+			BooleanLiteral.of(args.length > 0 && args[0].toNumericLiteral($).value.isNaN())
 		);
 	}
 

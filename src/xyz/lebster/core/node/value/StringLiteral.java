@@ -43,7 +43,7 @@ public final class StringLiteral extends Dictionary.Key<String> {
 
 	@Override
 	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
-		return new BooleanLiteral(value.length() > 0);
+		return BooleanLiteral.of(value.length() > 0);
 	}
 
 	@Override

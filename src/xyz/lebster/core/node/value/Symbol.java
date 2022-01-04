@@ -92,7 +92,7 @@ public class Symbol extends Dictionary.Key<Void> {
 
 	@Override
 	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return new BooleanLiteral(true);
+		return BooleanLiteral.TRUE;
 	}
 
 	@Override

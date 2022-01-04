@@ -485,7 +485,7 @@ public final class Parser {
 
 			case StringLiteral -> new StringLiteral(state.consume().value);
 			case NumericLiteral -> new NumericLiteral(Double.parseDouble(state.consume().value));
-			case BooleanLiteral -> new BooleanLiteral(state.consume().value.equals("true"));
+			case BooleanLiteral -> BooleanLiteral.of(state.consume().value.equals("true"));
 			case Function -> parseFunctionExpression();
 			case LBracket -> parseArrayExpression();
 			case LBrace -> parseObjectExpression();

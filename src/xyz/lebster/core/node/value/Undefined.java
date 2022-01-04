@@ -26,7 +26,7 @@ public final class Undefined extends Primitive<Void> {
 
 	@Override
 	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
-		return new BooleanLiteral(false);
+		return BooleanLiteral.FALSE;
 	}
 
 	@Override

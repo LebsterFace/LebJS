@@ -43,12 +43,12 @@ public final class GlobalObject extends Dictionary {
 			final double num = arguments.length > 0 ? arguments[0].toNumericLiteral(interpreter).value : Double.NaN;
 			// 2. If num is NaN, +∞𝔽, or -∞𝔽, return false.
 			// 3. Otherwise, return true.
-			return new BooleanLiteral(!(Double.isNaN(num) || Double.isInfinite(num)));
+			return BooleanLiteral.of(!(Double.isNaN(num) || Double.isInfinite(num)));
 		});
 
 		// https://tc39.es/ecma262/multipage#sec-isnan-number
 		// This method behaves the same as the specification, but does not follow it directly
-		setMethod("isNaN", (interpreter, arguments) -> new BooleanLiteral(arguments.length == 0 || arguments[0].toNumericLiteral(interpreter).value.isNaN()));
+		setMethod("isNaN", (interpreter, arguments) -> BooleanLiteral.of(arguments.length == 0 || arguments[0].toNumericLiteral(interpreter).value.isNaN()));
 
 		// https://tc39.es/ecma262/multipage#sec-parsefloat-string
 		setMethod("parseFloat", (interpreter, arguments) -> {

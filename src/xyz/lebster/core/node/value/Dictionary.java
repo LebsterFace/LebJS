@@ -103,7 +103,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 
 	@Override
 	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return new BooleanLiteral(true);
+		return BooleanLiteral.TRUE;
 	}
 
 	@Override

@@ -82,8 +82,7 @@ public final class NumericLiteral extends Primitive<Double> {
 
 	@Override
 	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
-		final boolean shouldBeFalse = value.isNaN() || value == 0.0;
-		return new BooleanLiteral(!shouldBeFalse);
+		return BooleanLiteral.of(!value.isNaN() && value != 0.0);
 	}
 
 	@Override
@@ -112,5 +111,37 @@ public final class NumericLiteral extends Primitive<Double> {
 		if (int32bit >= 2147483648L) return (int) (int32bit - 4294967296L);
 		// otherwise return 𝔽(int32bit).
 		return (int) int32bit;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-lessThan")
+	public BooleanLiteral lessThan(NumericLiteral other) {
+		// TODO: Find out if java.lang.Double#compareTo could be used for this
+		final double x = this.value;
+		final double y = other.value;
+
+		// 1. If x is NaN, return undefined.
+		// 2. If y is NaN, return undefined.
+		if (Double.isNaN(x) || Double.isNaN(y)) return null;
+
+		// 3. If x and y are the same Number value, return false.
+		if (x == y) return BooleanLiteral.FALSE;
+
+		// 4. If x is +0𝔽 and y is -0𝔽, return false.
+		if (isPositiveZero(x) && isNegativeZero(y)) return BooleanLiteral.FALSE;
+		// 5. If x is -0𝔽 and y is +0𝔽, return false.
+		if (isNegativeZero(x) && isPositiveZero(y)) return BooleanLiteral.FALSE;
+
+		// 6. If x is +∞𝔽, return false.
+		if (x == Double.POSITIVE_INFINITY) return BooleanLiteral.FALSE;
+		// 7. If y is +∞𝔽, return true.
+		if (y == Double.POSITIVE_INFINITY) return BooleanLiteral.TRUE;
+		// 8. If y is -∞𝔽, return false.
+		if (y == Double.NEGATIVE_INFINITY) return BooleanLiteral.FALSE;
+		// 9. If x is -∞𝔽, return true.
+		if (x == Double.NEGATIVE_INFINITY) return BooleanLiteral.TRUE;
+
+		// 10. Assert: x and y are finite and non-zero.
+		// 11. If ℝ(x) < ℝ(y), return true. Otherwise, return false.
+		return BooleanLiteral.of(x < y);
 	}
 }

@@ -19,9 +19,11 @@ public final class GlobalObject extends Dictionary {
 
 		// 19.1 Value Properties of the Global Object
 		put("globalThis", this);
-		put("NaN", new NumericLiteral(Double.NaN));
-		put("Infinity", new NumericLiteral(Double.POSITIVE_INFINITY));
-		put("undefined", Undefined.instance);
+
+		// FIXME: Property descriptors
+		put("NaN", new NativeProperty(new NumericLiteral(Double.NaN)));
+		put("Infinity", new NativeProperty(new NumericLiteral(Double.POSITIVE_INFINITY)));
+		put("undefined", new NativeProperty(Undefined.instance));
 
 		// 19.2 Function Properties of the Global Object
 		// FIXME: Follow spec

@@ -8,6 +8,18 @@ public class NativeProperty extends Value<NativeGetterSetter> {
 		super(value, Type.Dictionary);
 	}
 
+	public NativeProperty(Value<?> value) {
+		this(new NativeGetterSetter() {
+			@Override
+			public Value<?> get(Interpreter interpreter) {
+				return value;
+			}
+
+			@Override
+			public void set(Interpreter interpreter, Value<?> value) {}
+		});
+	}
+
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return value.get(interpreter).execute(interpreter);

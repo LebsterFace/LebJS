@@ -6,8 +6,7 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.BooleanLiteral;
-import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.node.value.*;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override
@@ -24,18 +23,113 @@ public record RelationalExpression(Expression left, Expression right, Relational
 		final Value<?> left_value = left.execute(interpreter);
 		final Value<?> right_value = right.execute(interpreter);
 
-		// FIXME: Comply with spec
 		// https://tc39.es/ecma262/multipage#sec-relational-operators-runtime-semantics-evaluation
-		return new BooleanLiteral(switch (op) {
-			case LessThan -> left_value.toNumericLiteral(interpreter).value < right_value.toNumericLiteral(interpreter).value;
-			case GreaterThan -> left_value.toNumericLiteral(interpreter).value > right_value.toNumericLiteral(interpreter).value;
-			case LessThanEquals -> left_value.toNumericLiteral(interpreter).value <= right_value.toNumericLiteral(interpreter).value;
-			case GreaterThanEquals -> left_value.toNumericLiteral(interpreter).value >= right_value.toNumericLiteral(interpreter).value;
+		return switch (op) {
+			case LessThan -> {
+				// 5. Let r be ? IsLessThan(left_value, right_value, true).
+				final BooleanLiteral r = isLessThan(interpreter, left_value, right_value, true);
+				// 6. If r is undefined, return false. Otherwise, return r.
+				yield r == null ? BooleanLiteral.FALSE : r;
+			}
+
+			case GreaterThan -> {
+				// 5. Let r be ? IsLessThan(rval, lval, false).
+				final BooleanLiteral r = isLessThan(interpreter, right_value, left_value, false);
+				// 6. If r is undefined, return false. Otherwise, return r.
+				yield r == null ? BooleanLiteral.FALSE : r;
+			}
+
+			case LessThanEquals -> {
+				// 5. Let r be ? IsLessThan(rval, lval, false).
+				final BooleanLiteral r = isLessThan(interpreter, right_value, left_value, false);
+				// 6. If r is true or undefined, return false. Otherwise, return true.
+				//    (If r is false, return true. Otherwise, return false.)
+				yield BooleanLiteral.of(r == BooleanLiteral.FALSE);
+			}
+
+			case GreaterThanEquals -> {
+				// 5. Let r be ? IsLessThan(lval, rval, true).
+				final BooleanLiteral r = isLessThan(interpreter, left_value, right_value, true);
+				// 6. If r is true or undefined, return false. Otherwise, return true.
+				//    (If r is false, return true. Otherwise, return false.)
+				yield BooleanLiteral.of(r == BooleanLiteral.FALSE);
+			}
 
 			// FIXME: Implement both In and InstanceOf
 			case In -> throw new NotImplemented("`in` operator");
 			case InstanceOf -> throw new NotImplemented("`instanceof` operator");
-		});
+		};
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isstringprefix")
+	private boolean isStringPrefix(String p, String q) {
+		// 1. If ! StringIndexOf(q, p, 0) is 0, return true.
+		// 2. Else, return false.
+		return q.indexOf(p) == 0;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-islessthan")
+	private BooleanLiteral isLessThan(Interpreter interpreter, Value<?> x, Value<?> y, boolean leftFirst) throws AbruptCompletion {
+		// 1. If the LeftFirst flag is true, then
+		Value<?> px = null;
+		Value<?> py = null;
+
+		if (leftFirst) {
+			// a. Let px be ? ToPrimitive(x, number).
+			px = x.toPrimitive(interpreter, Type.Number);
+			// b. Let py be ? ToPrimitive(y, number).
+			py = y.toPrimitive(interpreter, Type.Number);
+		}
+		// 2. Else,
+		else {
+			// a. NOTE: The order of evaluation needs to be reversed to preserve left to right evaluation.
+			// b. Let py be ? ToPrimitive(y, number).
+			py = y.toPrimitive(interpreter, Type.Number);
+			// c. Let px be ? ToPrimitive(x, number).
+			px = x.toPrimitive(interpreter, Type.Number);
+		}
+
+
+		// 3. If Type(px) is String and Type(py) is String, then
+		if (px instanceof final StringLiteral string_px && py instanceof final StringLiteral string_py) {
+
+			// a. If IsStringPrefix(py, px) is true, return false.
+			if (isStringPrefix(string_py.value, string_px.value)) return BooleanLiteral.FALSE;
+			// b. If IsStringPrefix(px, py) is true, return true.
+			if (isStringPrefix(string_px.value, string_py.value)) return BooleanLiteral.TRUE;
+
+			// c. Let k be the smallest non-negative integer such that the code unit at index k
+			//    within px is different from the code unit at index k within py.
+			//    (There must be such a k, for neither String is a prefix of the other.)
+			int k = 0;
+			while (k < string_px.value.length()) {
+				if (string_px.value.charAt(k) != string_py.value.charAt(k)) {
+					break;
+				}
+
+				k++;
+			}
+
+			// d. Let m be the integer that is the numeric value of the code unit at index k within px.
+			int m = string_px.value.charAt(k);
+			// e. Let n be the integer that is the numeric value of the code unit at index k within py.
+			int n = string_py.value.charAt(k);
+			// f. If m < n, return true. Otherwise, return false.
+			return BooleanLiteral.of(m < n);
+		}
+		// 4. Else,
+		else {
+			// FIXME: BigInt for this entire block
+
+			// c. NOTE: Because px and py are primitive values, evaluation order is not important.
+			// d. Let nx be ? ToNumeric(px).
+			final NumericLiteral nx = px.toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
+			// e. Let ny be ? ToNumeric(py).
+			final NumericLiteral ny = py.toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
+
+			// 1. Return Number::lessThan(nx, ny).
+			return nx.lessThan(ny);
+		}
 	}
 
 	@Override

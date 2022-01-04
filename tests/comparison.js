@@ -1,8 +1,8 @@
 // ========================= LESS THAN =========================
 
-// expect(true, "a" < "b");
-// expect(false, "a" < "a");
-// expect(false, "a" < "3");
+ expect(true, "a" < "b");
+ expect(false, "a" < "a");
+ expect(false, "a" < "3");
 
 expect(false, "5" < 3);
 expect(false, "3" < 3);
@@ -38,9 +38,9 @@ expect(false, NaN < 3);
 
 // ========================= GREATER THAN =========================
 
-// expect(false, "a" > "b");
-// expect(false, "a" > "a");
-// expect(true, "a" > "3");
+ expect(false, "a" > "b");
+ expect(false, "a" > "a");
+ expect(true, "a" > "3");
 
 expect(true, "5" > 3);
 expect(false, "3" > 3);
@@ -76,9 +76,9 @@ expect(false, NaN > 3);
 
 // ========================= LESS THAN OR EQUAL =========================
 
-// expect(true, "a" <= "b");
-// expect(true, "a" <= "a");
-// expect(false, "a" <= "3");
+ expect(true, "a" <= "b");
+ expect(true, "a" <= "a");
+ expect(false, "a" <= "3");
 
 expect(false, "5" <= 3);
 expect(true, "3" <= 3);
@@ -113,9 +113,9 @@ expect(false, NaN <= 3);
 
 // ========================= GREATER THAN OR EQUAL =========================
 
-// expect(false, "a" >= "b");
-// expect(true, "a" >= "a");
-// expect(true, "a" >= "3");
+ expect(false, "a" >= "b");
+ expect(true, "a" >= "a");
+ expect(true, "a" >= "3");
 
 expect(true, "5" >= 3);
 expect(true, "3" >= 3);

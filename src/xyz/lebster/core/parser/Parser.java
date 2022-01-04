@@ -22,7 +22,7 @@ public final class Parser {
 	private static final HashMap<TokenType, Associativity> associativity = new HashMap<>();
 
 	static {
-//		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table
+		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table
 		precedence.put(TokenType.LParen, 21);
 		precedence.put(TokenType.RParen, 21);
 
@@ -32,7 +32,7 @@ public final class Parser {
 
 		precedence.put(TokenType.New, 20);
 
-//		Unary Expressions:
+		// Unary Expressions:
 		precedence.put(TokenType.PlusPlus, 18);
 		precedence.put(TokenType.MinusMinus, 18);
 
@@ -49,7 +49,9 @@ public final class Parser {
 		precedence.put(TokenType.Minus, 14);
 
 		precedence.put(TokenType.LessThan, 12);
+		precedence.put(TokenType.LessThanEqual, 12);
 		precedence.put(TokenType.GreaterThan, 12);
+		precedence.put(TokenType.GreaterThanEqual, 12);
 
 		precedence.put(TokenType.StrictEqual, 11);
 		precedence.put(TokenType.StrictNotEqual, 11);
@@ -75,7 +77,7 @@ public final class Parser {
 		precedence.put(TokenType.LogicalOrEquals, 3);
 		precedence.put(TokenType.Equals, 3);
 
-//		FIXME: Switch statement method (when all operators are implemented)
+		// FIXME: Switch statement method (when all operators are implemented)
 		associativity.put(TokenType.LParen, NA);
 		associativity.put(TokenType.RParen, NA);
 		associativity.put(TokenType.New, NA);
@@ -90,7 +92,9 @@ public final class Parser {
 		associativity.put(TokenType.StrictEqual, Left);
 		associativity.put(TokenType.StrictNotEqual, Left);
 		associativity.put(TokenType.LessThan, Left);
+		associativity.put(TokenType.LessThanEqual, Left);
 		associativity.put(TokenType.GreaterThan, Left);
+		associativity.put(TokenType.GreaterThanEqual, Left);
 		associativity.put(TokenType.LogicalOr, Left);
 		associativity.put(TokenType.LogicalAnd, Left);
 		associativity.put(TokenType.NullishCoalescing, Left);
@@ -437,7 +441,9 @@ public final class Parser {
 
 			case PlusPlus -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostIncrement);
 			case LessThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
+			case LessThanEqual -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThanEquals);
 			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
+			case GreaterThanEqual -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThanEquals);
 
 			case Period -> {
 				if (!matchIdentifierName()) state.expected("IdentifierName");
@@ -705,7 +711,9 @@ public final class Parser {
 			   t == TokenType.LogicalAnd ||
 			   t == TokenType.Period ||
 			   t == TokenType.LessThan ||
+			   t == TokenType.LessThanEqual ||
 			   t == TokenType.GreaterThan ||
+			   t == TokenType.GreaterThanEqual ||
 			   t == TokenType.PlusEquals ||
 			   t == TokenType.MinusEquals ||
 			   t == TokenType.DivideEquals ||

@@ -7,9 +7,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.BooleanLiteral;
-import xyz.lebster.core.node.value.Dictionary;
 import xyz.lebster.core.node.value.Value;
-import xyz.lebster.core.runtime.TypeError;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override
@@ -33,14 +31,9 @@ public record RelationalExpression(Expression left, Expression right, Relational
 			case GreaterThan -> left_value.toNumericLiteral(interpreter).value > right_value.toNumericLiteral(interpreter).value;
 			case LessThanEquals -> left_value.toNumericLiteral(interpreter).value <= right_value.toNumericLiteral(interpreter).value;
 			case GreaterThanEquals -> left_value.toNumericLiteral(interpreter).value >= right_value.toNumericLiteral(interpreter).value;
-			case In -> {
-				if (right_value instanceof final Dictionary dictionary) {
-					yield dictionary.hasProperty(left_value.toStringLiteral(interpreter));
-				} else {
-					throw AbruptCompletion.error(new TypeError("Can only use 'in' operator on an object!"));
-				}
-			}
 
+			// FIXME: Implement both In and InstanceOf
+			case In -> throw new NotImplemented("`in` operator");
 			case InstanceOf -> throw new NotImplemented("`instanceof` operator");
 		});
 	}

@@ -18,9 +18,7 @@ public final class Function extends Constructor<FunctionNode> {
 		super(code);
 		this.context = context;
 		this.put("prototype", FunctionPrototype.instance);
-		final var representation = new StringRepresentation();
-		code.represent(representation);
-		this.put("toString", new NativeFunction(new StringLiteral(representation.toString())));
+		this.put("toString", new NativeFunction(new StringLiteral(code.toRepresentationString())));
 	}
 
 	@Override

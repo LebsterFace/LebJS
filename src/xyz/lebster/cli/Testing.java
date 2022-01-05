@@ -33,6 +33,11 @@ public final class Testing {
 			if (!file.isFile()) continue;
 			totalTests++;
 
+			if (file.getName().endsWith(".js.skip")) {
+				printTestResult(failedStream, ANSI.YELLOW, "SKIPPED", file.getName());
+				continue;
+			}
+
 			final Test result = runTest(file, options);
 			if (result.passed()) {
 				printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", file.getName());
@@ -48,7 +53,6 @@ public final class Testing {
 			}
 		}
 
-		final double percentage = 100.0D * ((double) successfulTests / (double) totalTests);
 		passedStream.close();
 		failedStream.close();
 
@@ -57,6 +61,8 @@ public final class Testing {
 			passedTests.writeTo(System.out);
 			System.out.printf("%n%s%s\t\tFailing Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_RED, ANSI.BLACK, totalTests - successfulTests, totalTests, ANSI.RESET);
 			failedTests.writeTo(System.out);
+			if (totalTests != successfulTests)
+				System.out.printf("%n%s\t\t%.2f%% of tests passed%n%s%n", ANSI.MAGENTA, 100.0D * ((double) successfulTests / (double) totalTests), ANSI.RESET);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -12,15 +12,30 @@ public final class ArrayPrototype extends Dictionary {
 	public static final ArrayPrototype instance = new ArrayPrototype();
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
 
+	public static final StringLiteral push = new StringLiteral("push");
+	public static final StringLiteral map = new StringLiteral("map");
+	public static final StringLiteral join = new StringLiteral("join");
+
 	static {
-		instance.setMethod("push", ArrayPrototype::push);
-		instance.setMethod("map", ArrayPrototype::map);
-		instance.setMethod("join", ArrayPrototype::join);
-		// FIXME: Follow spec (https://tc39.es/ecma262/multipage#sec-array.prototype.tostring)
-		instance.setMethod("toString", ArrayPrototype::join);
+		instance.setMethod(push, ArrayPrototype::push);
+		instance.setMethod(map, ArrayPrototype::map);
+		instance.setMethod(join, ArrayPrototype::join);
+		instance.setMethod(ObjectPrototype.toString, ArrayPrototype::toStringMethod);
 	}
 
 	private ArrayPrototype() {
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tostring")
+	private static Value<?> toStringMethod(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
+		// 1. Let array be ? ToObject(this value).
+		final Dictionary array = interpreter.thisValue().toDictionary(interpreter);
+		// 2. Let func be ? Get(array, "join").
+		final Value<?> func = array.get(join);
+		// 3. If IsCallable(func) is false, set func to the intrinsic function %Object.prototype.toString%.
+		final Executable<?> f_Func = func instanceof Executable<?> e ? e : ObjectPrototype.toStringMethod;
+		// 4. Return ? Call(func, array).
+		return f_Func.call(interpreter, array);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.join")

@@ -5,7 +5,6 @@ import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.parser.Lexer;
@@ -87,11 +86,11 @@ public final class ScriptExecutor {
 		}
 
 		final Value<?> lastValue = program.execute(interpreter);
-
 		if (options.showLastValue()) {
-			final StringRepresentation representation = new StringRepresentation();
-			lastValue.represent(representation);
-			System.out.println(representation);
+			final var builder = new StringBuilder(ANSI.RESET);
+			lastValue.toConsoleLog(builder);
+			builder.append(ANSI.RESET);
+			System.out.println(builder);
 		}
 
 		return true;

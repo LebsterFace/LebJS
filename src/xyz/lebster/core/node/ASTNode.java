@@ -18,5 +18,11 @@ public interface ASTNode {
 		representation.append(ANSI.RESET);
 	}
 
+	default String toRepresentationString() {
+		final StringRepresentation representation = new StringRepresentation();
+		this.represent(representation);
+		return representation.toString();
+	}
+
 	void dump(int indent);
 }

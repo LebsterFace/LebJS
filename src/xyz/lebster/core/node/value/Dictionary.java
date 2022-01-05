@@ -137,6 +137,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 		while (object != null) {
 			if (object.value.containsKey(key)) {
 				// Property was found
+				// FIXME: Handle native properties
 				return object.value.get(key);
 			} else {
 				// Property does not exist on current object. Move up prototype chain

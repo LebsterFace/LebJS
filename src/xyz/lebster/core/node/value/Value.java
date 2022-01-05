@@ -6,6 +6,7 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.expression.Expression;
+import xyz.lebster.core.runtime.TypeError;
 
 import java.util.Objects;
 
@@ -88,5 +89,27 @@ public abstract class Value<JType> implements Expression {
 
 	public boolean isNullish() {
 		return type == Type.Undefined || type == Type.Null;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getmethod")
+	public Value<?> getMethod(Interpreter interpreter, Dictionary.Key<?> P) throws AbruptCompletion {
+		// 1. Let func be ? GetV(V, P).
+		final var func = this.getV(interpreter, P);
+		// 2. If func is either undefined or null, return undefined.
+		if (func == Undefined.instance || func == Null.instance)
+			return Undefined.instance;
+		// 3. If IsCallable(func) is false, throw a TypeError exception.
+		if (!(func instanceof Executable<?>))
+			throw AbruptCompletion.error(new TypeError("Not a function!"));
+		// 4. Return func.
+		return func;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getv")
+	private Value<?> getV(Interpreter interpreter, Dictionary.Key<?> P) throws AbruptCompletion {
+		// 1. Let O be ? ToObject(V).
+		final Dictionary O = this.toDictionary(interpreter);
+		// 2. Return ? O.[[Get]](P, V).
+		return O.get(P);
 	}
 }

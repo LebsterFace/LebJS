@@ -2,7 +2,6 @@ package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -71,9 +70,26 @@ public record RelationalExpression(Expression left, Expression right, Relational
 				yield BooleanLiteral.of(dictionary.hasProperty(left_value.toPropertyKey(interpreter)));
 			}
 
-			// FIXME: Implement InstanceOf
-			case InstanceOf -> throw new NotImplemented("`instanceof` operator");
+			case InstanceOf -> instanceofOperator(interpreter, left_value, right_value);
 		};
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-instanceofoperator")
+	private BooleanLiteral instanceofOperator(Interpreter interpreter, Value<?> V, Value<?> target) throws AbruptCompletion {
+		// 1. If Type(target) is not Object, throw a TypeError exception.
+		if (target.type != Type.Dictionary)
+			throw AbruptCompletion.error(new TypeError("Right-hand side of `instanceof` is not an object"));
+		// 2. Let instOfHandler be ? GetMethod(target, @@hasInstance).
+		final Value<?> instOfHandler = target.getMethod(interpreter, Symbol.hasInstance);
+		// 3. If instOfHandler is not undefined, then
+		if (instOfHandler instanceof final Executable<?> executable)
+			// a. Return ! ToBoolean(? Call(instOfHandler, target, « V »)).
+			return executable.call(interpreter, target, V).toBooleanLiteral(interpreter);
+		// 4. If IsCallable(target) is false, throw a TypeError exception.
+		if (!(target instanceof final Executable<?> executable))
+			throw AbruptCompletion.error(new TypeError("Not a function!"));
+		// 5. Return ? OrdinaryHasInstance(target, V).
+		return executable.ordinaryHasInstance(V);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isstringprefix")

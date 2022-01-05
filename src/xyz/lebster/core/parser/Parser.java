@@ -305,11 +305,18 @@ public final class Parser {
 	}
 
 	private VariableDeclaration parseVariableDeclaration() throws SyntaxError, CannotParse {
+		final var kind = switch (state.currentToken.type) {
+			case Var -> VariableDeclaration.Kind.Var;
+			case Let -> VariableDeclaration.Kind.Let;
+			case Const -> VariableDeclaration.Kind.Const;
+			default -> throw new IllegalStateException("Unexpected value: " + state.currentToken.type);
+		};
+
 		state.consume();
 		final Token identifier = state.require(TokenType.Identifier);
 		state.require(TokenType.Equals);
 		final Expression value = parseExpression();
-		return new VariableDeclaration(new VariableDeclarator(new Identifier(identifier.value), value));
+		return new VariableDeclaration(kind, new VariableDeclarator(new Identifier(identifier.value), value));
 	}
 
 	private List<Identifier> parseFunctionArguments() throws SyntaxError {

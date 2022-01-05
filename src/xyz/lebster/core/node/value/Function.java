@@ -8,6 +8,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.FunctionNode;
 import xyz.lebster.core.runtime.prototype.FunctionPrototype;
+import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
 import java.util.HashSet;
 
@@ -18,7 +19,7 @@ public final class Function extends Constructor<FunctionNode> {
 		super(code);
 		this.context = context;
 		this.put("prototype", FunctionPrototype.instance);
-		this.put("toString", new NativeFunction(new StringLiteral(code.toRepresentationString())));
+		this.put(ObjectPrototype.toString, new NativeFunction(new StringLiteral(code.toRepresentationString())));
 	}
 
 	@Override

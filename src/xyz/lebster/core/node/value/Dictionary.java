@@ -69,15 +69,15 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 		assert hint == Type.String || hint == Type.Number;
 
 		// 3. If hint is string, then Let methodNames be "toString", "valueOf".
-		final String[] methodNames = hint == Type.String ?
-			new String[] { "toString", "valueOf" } :
+		final StringLiteral[] methodNames = hint == Type.String ?
+			new StringLiteral[] { ObjectPrototype.toString, ObjectPrototype.valueOf } :
 			// 4. Else, Let methodNames be "valueOf", "toString".
-			new String[] { "valueOf", "toString" };
+			new StringLiteral[] { ObjectPrototype.valueOf, ObjectPrototype.toString };
 
 		// 5. For each element name of methodNames, do
-		for (final String name : methodNames) {
+		for (final StringLiteral name : methodNames) {
 			// a. Let method be ? Get(O, name).
-			final Value<?> method = get(new StringLiteral(name));
+			final Value<?> method = get(name);
 			// b. If IsCallable(method) is true, then
 			if (method instanceof final Executable<?> executable) {
 				// i. Let result be ? Call(method, O).
@@ -125,6 +125,10 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 
 	public void put(Key<?> key, Value<?> value) {
 		this.value.put(key, value);
+	}
+
+	public void setMethod(StringLiteral name, NativeCode code) {
+		this.value.put(name, new NativeFunction(code));
 	}
 
 	public void setMethod(String name, NativeCode code) {

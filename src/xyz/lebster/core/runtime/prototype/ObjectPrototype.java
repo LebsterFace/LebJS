@@ -9,17 +9,20 @@ import xyz.lebster.core.runtime.LanguageError;
 
 public final class ObjectPrototype extends Dictionary {
 	public static final ObjectPrototype instance = new ObjectPrototype();
+	public static final StringLiteral toString = new StringLiteral("toString");
+	public static final StringLiteral valueOf = new StringLiteral("valueOf");
+	public static final NativeFunction toStringMethod = new NativeFunction(ObjectPrototype::toStringMethod);
 
 	static {
-		instance.setMethod("toString", ObjectPrototype::toStringMethod);
-		instance.setMethod("valueOf", ObjectPrototype::valueOf);
+		instance.put(toString, toStringMethod);
+		instance.setMethod(valueOf, ObjectPrototype::valueOf);
 	}
 
 	private ObjectPrototype() {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tostring")
-	private static StringLiteral toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	public static StringLiteral toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. If the `this` value is undefined, return "[object Undefined]".
 		if (interpreter.thisValue() == Undefined.instance) {
 			return new StringLiteral("[object Undefined]");

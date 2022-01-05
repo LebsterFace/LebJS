@@ -112,8 +112,4 @@ public abstract class Value<JType> implements Expression {
 		// 2. Return ? O.[[Get]](P, V).
 		return O.get(P);
 	}
-
-	public void toConsoleLog(StringBuilder builder) {
-		builder.append(this.toRepresentationString());
-	}
 }

@@ -4,6 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 
 public final class BooleanLiteral extends Primitive<Boolean> {
 	public static final BooleanLiteral TRUE = new BooleanLiteral(Boolean.TRUE);
@@ -18,10 +19,10 @@ public final class BooleanLiteral extends Primitive<Boolean> {
 	}
 
 	@Override
-	public void toConsoleLog(StringBuilder builder) {
-		builder.append(ANSI.BRIGHT_YELLOW);
-		builder.append(value);
-		builder.append(ANSI.RESET);
+	public void represent(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_YELLOW);
+		representation.append(value);
+		representation.append(ANSI.RESET);
 	}
 
 	@Override

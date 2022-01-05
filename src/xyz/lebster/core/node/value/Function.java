@@ -23,12 +23,12 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	public void toConsoleLog(StringBuilder builder) {
-		builder.append(ANSI.BRIGHT_MAGENTA);
-		builder.append("[Function: ");
-		builder.append(code.name);
-		builder.append(']');
-		builder.append(ANSI.RESET);
+	public void represent(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_MAGENTA);
+		representation.append("[Function: ");
+		representation.append(code.name);
+		representation.append(']');
+		representation.append(ANSI.RESET);
 	}
 
 	@Override

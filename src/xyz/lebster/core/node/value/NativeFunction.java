@@ -25,10 +25,10 @@ public final class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public void toConsoleLog(StringBuilder builder) {
-		builder.append(ANSI.BRIGHT_MAGENTA);
-		builder.append("[Native Function]");
-		builder.append(ANSI.RESET);
+	public void represent(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_MAGENTA);
+		representation.append("[Native Function]");
+		representation.append(ANSI.RESET);
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 
 public final class StringLiteral extends Dictionary.Key<String> {
 	public StringLiteral(String value) {
@@ -18,13 +19,13 @@ public final class StringLiteral extends Dictionary.Key<String> {
 	}
 
 	@Override
-	public void toConsoleLog(StringBuilder builder) {
+	public void represent(StringRepresentation representation) {
 		final char quoteType = this.value.contains("'") ? '"' : '\'';
-		builder.append(ANSI.GREEN);
-		builder.append(quoteType);
-		builder.append(value);
-		builder.append(quoteType);
-		builder.append(ANSI.RESET);
+		representation.append(ANSI.GREEN);
+		representation.append(quoteType);
+		representation.append(value);
+		representation.append(quoteType);
+		representation.append(ANSI.RESET);
 	}
 
 	@Override

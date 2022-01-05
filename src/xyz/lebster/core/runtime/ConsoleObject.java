@@ -3,6 +3,7 @@ package xyz.lebster.core.runtime;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.Dictionary;
 import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
@@ -69,7 +70,9 @@ public final class ConsoleObject extends Dictionary {
 	}
 
 	private void printer(LogLevel logLevel, Value<?>... args) {
-		final var builder = new StringBuilder(switch (logLevel) {
+		final var representation = new StringRepresentation();
+
+		representation.append(switch (logLevel) {
 			case Log -> ANSI.RESET;
 			case Info -> ANSI.BRIGHT_BLUE;
 			case Warn -> ANSI.BRIGHT_YELLOW;
@@ -77,14 +80,13 @@ public final class ConsoleObject extends Dictionary {
 		});
 
 		for (int i = 0; i < args.length - 1; i++) {
-			args[i].toConsoleLog(builder);
-			builder.append(' ');
+			args[i].represent(representation);
+			representation.append(' ');
 		}
 
-		args[args.length - 1].toConsoleLog(builder);
-
-		builder.append(ANSI.RESET);
-		System.out.println(builder);
+		args[args.length - 1].represent(representation);
+		representation.append(ANSI.RESET);
+		System.out.println(representation);
 	}
 
 	private enum LogLevel {

@@ -36,14 +36,9 @@ public final class Undefined extends Primitive<Void> {
 
 	@Override
 	public void represent(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_BLACK);
 		representation.append("undefined");
-	}
-
-	@Override
-	public void toConsoleLog(StringBuilder builder) {
-		builder.append(ANSI.BRIGHT_BLACK);
-		builder.append("undefined");
-		builder.append(ANSI.RESET);
+		representation.append(ANSI.RESET);
 	}
 
 	@Override

@@ -86,12 +86,7 @@ public final class ScriptExecutor {
 		}
 
 		final Value<?> lastValue = program.execute(interpreter);
-		if (options.showLastValue()) {
-			final var builder = new StringBuilder(ANSI.RESET);
-			lastValue.toConsoleLog(builder);
-			builder.append(ANSI.RESET);
-			System.out.println(builder);
-		}
+		if (options.showLastValue()) System.out.println(lastValue.toRepresentationString());
 
 		return true;
 	}

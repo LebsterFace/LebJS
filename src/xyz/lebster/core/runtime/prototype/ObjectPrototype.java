@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime.prototype;
 
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
@@ -9,14 +10,15 @@ import xyz.lebster.core.runtime.LanguageError;
 public final class ObjectPrototype extends Dictionary {
 	public static final ObjectPrototype instance = new ObjectPrototype();
 
-	private ObjectPrototype() {
-		// https://tc39.es/ecma262/multipage#sec-object.prototype.tostring
-		this.setMethod("toString", ObjectPrototype::toStringMethod);
-
-		// https://tc39.es/ecma262/multipage#sec-object.prototype.valueof
-		this.setMethod("valueOf", (interpreter, arguments) -> interpreter.thisValue().toDictionary(interpreter));
+	static {
+		instance.setMethod("toString", ObjectPrototype::toStringMethod);
+		instance.setMethod("valueOf", ObjectPrototype::valueOf);
 	}
 
+	private ObjectPrototype() {
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tostring")
 	private static StringLiteral toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. If the `this` value is undefined, return "[object Undefined]".
 		if (interpreter.thisValue() == Undefined.instance) {
@@ -29,19 +31,19 @@ public final class ObjectPrototype extends Dictionary {
 			// 5. If isArray is true, let builtinTag be "Array".
 			// TODO: Pattern matching for switch
 			if (O instanceof ArrayObject) builtinTag = "Array";
-			// 6. Else if O has a [[ParameterMap]] internal slot, let builtinTag be "Arguments".
-			// 7. Else if O has a [[Call]] internal method, let builtinTag be "Function".
+				// 6. Else if O has a [[ParameterMap]] internal slot, let builtinTag be "Arguments".
+				// 7. Else if O has a [[Call]] internal method, let builtinTag be "Function".
 			else if (O instanceof Executable<?>) builtinTag = "Function";
-			// 8. Else if O has an [[ErrorData]] internal slot, let builtinTag be "Error".
+				// 8. Else if O has an [[ErrorData]] internal slot, let builtinTag be "Error".
 			else if (O instanceof LanguageError) builtinTag = "Error";
-			// 9. Else if O has a [[BooleanData]] internal slot, let builtinTag be "Boolean".
-			// 10. Else if O has a [[NumberData]] internal slot, let builtinTag be "Number".
-			// 11. Else if O has a [[StringData]] internal slot, let builtinTag be "String".
+				// 9. Else if O has a [[BooleanData]] internal slot, let builtinTag be "Boolean".
+				// 10. Else if O has a [[NumberData]] internal slot, let builtinTag be "Number".
+				// 11. Else if O has a [[StringData]] internal slot, let builtinTag be "String".
 			else if (O instanceof StringWrapper) builtinTag = "String";
-			// 12. Else if O has a [[DateValue]] internal slot, let builtinTag be "Date".
-			// 13. Else if O has a [[RegExpMatcher]] internal slot, let builtinTag be "RegExp".
-			// 14. Else, let builtinTag be "Object".
-			// FIXME: Date Objects, RegExp Objects, BooleanWrapper Objects, NumberWrapper Objects
+				// 12. Else if O has a [[DateValue]] internal slot, let builtinTag be "Date".
+				// 13. Else if O has a [[RegExpMatcher]] internal slot, let builtinTag be "RegExp".
+				// 14. Else, let builtinTag be "Object".
+				// FIXME: Date Objects, RegExp Objects, BooleanWrapper Objects, NumberWrapper Objects
 			else builtinTag = "Object";
 
 			// 15. Let tag be ? Get(O, @@toStringTag).
@@ -54,6 +56,11 @@ public final class ObjectPrototype extends Dictionary {
 				return new StringLiteral("[object " + builtinTag + "]");
 			}
 		}
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.valueof")
+	private static Value<?> valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		return interpreter.thisValue().toDictionary(interpreter);
 	}
 
 	@Override

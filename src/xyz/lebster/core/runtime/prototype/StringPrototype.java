@@ -10,8 +10,11 @@ import xyz.lebster.core.node.value.Value;
 public final class StringPrototype extends Dictionary {
 	public static final StringPrototype instance = new StringPrototype();
 
+	static {
+		instance.setMethod("reverse", StringPrototype::reverse);
+	}
+
 	private StringPrototype() {
-		this.setMethod("reverse", StringPrototype::reverse);
 	}
 
 	@NonStandard

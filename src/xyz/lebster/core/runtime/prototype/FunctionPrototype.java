@@ -6,10 +6,13 @@ import xyz.lebster.core.node.value.*;
 public class FunctionPrototype extends Executable<Void> {
 	public static final FunctionPrototype instance = new FunctionPrototype();
 
+	static {
+		instance.put("length", new NumericLiteral(0));
+		instance.put("name", new StringLiteral(""));
+	}
+
 	private FunctionPrototype() {
 		super(null);
-		this.put("length", new NumericLiteral(0));
-		this.put("name", new StringLiteral(""));
 	}
 
 	@Override

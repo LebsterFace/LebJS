@@ -10,7 +10,7 @@ import xyz.lebster.core.node.value.Value;
 public final class BreakStatement implements Statement {
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-break-statement-runtime-semantics-evaluation")
-//	FIXME: Follow spec (labels)
+	// FIXME: Follow spec (labels)
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		throw new AbruptCompletion(null, AbruptCompletion.Type.Break);
 	}

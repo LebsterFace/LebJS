@@ -207,7 +207,7 @@ public final class Parser {
 
 			case Return -> {
 				state.consume();
-//					FIXME: Proper automatic semicolon insertion
+				// FIXME: Proper automatic semicolon insertion
 				final Expression val = matchPrimaryExpression() ? parseExpression() : Undefined.instance;
 				yield new ReturnStatement(val);
 			}
@@ -369,11 +369,11 @@ public final class Parser {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-UnaryExpression")
 	private Expression parseUnaryPrefixedExpression() throws SyntaxError, CannotParse {
 		final Token token = state.consume();
-//		TODO: Remove when all implemented
+		// TODO: Remove when all implemented
 		if (!associativity.containsKey(token.type))
 			throw new NotImplemented("Associativity for token '" + token.type + "'");
 		final Associativity assoc = associativity.get(token.type);
-//		TODO: Remove when all implemented
+		// TODO: Remove when all implemented
 		if (!precedence.containsKey(token.type)) throw new NotImplemented("Precedence for token '" + token.type + "'");
 		final int minPrecedence = precedence.get(token.type);
 
@@ -401,7 +401,7 @@ public final class Parser {
 		Expression latestExpr = parsePrimaryExpression();
 
 		while (matchSecondaryExpression(forbidden)) {
-//			TODO: Remove when all implemented
+			// TODO: Remove when all implemented
 			if (!precedence.containsKey(state.currentToken.type))
 				throw new NotImplemented("Precedence for token '" + state.currentToken.type + "'");
 			final int newPrecedence = precedence.get(state.currentToken.type);
@@ -410,7 +410,7 @@ public final class Parser {
 				break;
 			}
 
-//			TODO: Remove when all implemented
+			// TODO: Remove when all implemented
 			if (!associativity.containsKey(state.currentToken.type))
 				throw new NotImplemented("Associativity for token '" + state.currentToken.type + "'");
 			final Associativity newAssoc = associativity.get(state.currentToken.type);
@@ -525,7 +525,7 @@ public final class Parser {
 
 			case New -> {
 				final TokenType n = state.consume().type;
-//				https://tc39.es/ecma262/multipage#sec-new-operator
+				// https://tc39.es/ecma262/multipage#sec-new-operator
 				final Expression constructExpr = parseExpression(precedence.get(n), associativity.get(n), Collections.singleton(TokenType.LParen));
 				final List<Expression> arguments = state.currentToken.type == TokenType.LParen ? parseExpressionList(true) : Collections.emptyList();
 				yield new NewExpression(constructExpr, arguments.toArray(new Expression[0]));

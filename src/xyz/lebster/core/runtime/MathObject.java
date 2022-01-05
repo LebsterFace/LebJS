@@ -103,7 +103,7 @@ public final class MathObject extends Dictionary {
 				else if (number > highest) highest = number;
 			}
 
-			//	5. Return highest.
+			// 5. Return highest.
 			return highest;
 		});
 
@@ -122,7 +122,7 @@ public final class MathObject extends Dictionary {
 				else if (number < lowest) lowest = number;
 			}
 
-			//	5. Return lowest.
+			// 5. Return lowest.
 			return lowest;
 		});
 

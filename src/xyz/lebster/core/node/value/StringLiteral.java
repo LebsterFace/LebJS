@@ -29,7 +29,7 @@ public final class StringLiteral extends Dictionary.Key<String> {
 
 	@Override
 	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
-//		FIXME: Follow spec
+		// FIXME: Follow spec
 		if (value.isBlank())
 			return new NumericLiteral(0);
 

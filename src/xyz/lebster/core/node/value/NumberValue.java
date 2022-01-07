@@ -65,7 +65,7 @@ public final class NumberValue extends Primitive<Double> {
 	}
 
 	@Override
-	public StringValue toStringLiteral(Interpreter interpreter) {
+	public StringValue toStringValue(Interpreter interpreter) {
 		return new StringValue(stringValueOf(value));
 	}
 
@@ -77,17 +77,17 @@ public final class NumberValue extends Primitive<Double> {
 	}
 
 	@Override
-	public NumberValue toNumericLiteral(Interpreter interpreter) {
+	public NumberValue toNumberValue(Interpreter interpreter) {
 		return this;
 	}
 
 	@Override
-	public BooleanValue toBooleanLiteral(Interpreter interpreter) {
+	public BooleanValue toBooleanValue(Interpreter interpreter) {
 		return BooleanValue.of(!value.isNaN() && value != 0.0);
 	}
 
 	@Override
-	public ObjectValue toObjectLiteral(Interpreter interpreter) {
+	public ObjectValue toObjectValue(Interpreter interpreter) {
 		throw new NotImplemented("NumberWrapper");
 	}
 

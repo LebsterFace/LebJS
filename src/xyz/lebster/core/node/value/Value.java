@@ -45,16 +45,16 @@ public abstract class Value<JType> implements Expression {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tostring")
-	public abstract StringValue toStringLiteral(Interpreter interpreter) throws AbruptCompletion;
+	public abstract StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tonumber")
-	public abstract NumberValue toNumericLiteral(Interpreter interpreter) throws AbruptCompletion;
+	public abstract NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toboolean")
-	public abstract BooleanValue toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion;
+	public abstract BooleanValue toBooleanValue(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toobject")
-	public abstract ObjectValue toObjectLiteral(Interpreter interpreter) throws AbruptCompletion;
+	public abstract ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevalue")
 	public boolean sameValue(Value<?> y) {
@@ -122,11 +122,11 @@ public abstract class Value<JType> implements Expression {
 			return s;
 
 		// 3. Return ! ToString(key).
-		return key.toStringLiteral(interpreter);
+		return key.toStringValue(interpreter);
 	}
 
 	public boolean isTruthy(Interpreter interpreter) throws AbruptCompletion {
-		return this.toBooleanLiteral(interpreter).value;
+		return this.toBooleanValue(interpreter).value;
 	}
 
 	public boolean isNullish() {
@@ -150,7 +150,7 @@ public abstract class Value<JType> implements Expression {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getv")
 	private Value<?> getV(Interpreter interpreter, ObjectValue.Key<?> P) throws AbruptCompletion {
 		// 1. Let O be ? ToObject(V).
-		final ObjectValue O = this.toObjectLiteral(interpreter);
+		final ObjectValue O = this.toObjectValue(interpreter);
 		// 2. Return ? O.[[Get]](P, V).
 		return O.get(P);
 	}

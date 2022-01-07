@@ -86,7 +86,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 		// 3. If instOfHandler is not undefined, then
 		if (instOfHandler instanceof final Executable<?> executable)
 			// a. Return ! ToBoolean(? Call(instOfHandler, target, « V »)).
-			return executable.call(interpreter, target, V).toBooleanLiteral(interpreter);
+			return executable.call(interpreter, target, V).toBooleanValue(interpreter);
 		// 4. If IsCallable(target) is false, throw a TypeError exception.
 		if (!(target instanceof final Executable<?> executable))
 			throw AbruptCompletion.error(new TypeError("Not a function!"));
@@ -156,9 +156,9 @@ public record RelationalExpression(Expression left, Expression right, Relational
 
 			// c. NOTE: Because px and py are primitive values, evaluation order is not important.
 			// d. Let nx be ? ToNumeric(px).
-			final NumberValue nx = px.toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
+			final NumberValue nx = px.toPrimitive(interpreter, Type.Number).toNumberValue(interpreter);
 			// e. Let ny be ? ToNumeric(py).
-			final NumberValue ny = py.toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
+			final NumberValue ny = py.toPrimitive(interpreter, Type.Number).toNumberValue(interpreter);
 
 			// 1. Return Number::lessThan(nx, ny).
 			return nx.lessThan(ny);

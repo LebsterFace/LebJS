@@ -93,22 +93,22 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 	}
 
 	@Override
-	public StringValue toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return toPrimitive(interpreter, Type.String).toStringLiteral(interpreter);
+	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
+		return toPrimitive(interpreter, Type.String).toStringValue(interpreter);
 	}
 
 	@Override
-	public NumberValue toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
+	public NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion {
+		return toPrimitive(interpreter, Type.Number).toNumberValue(interpreter);
 	}
 
 	@Override
-	public BooleanValue toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public BooleanValue toBooleanValue(Interpreter interpreter) throws AbruptCompletion {
 		return BooleanValue.TRUE;
 	}
 
 	@Override
-	public ObjectValue toObjectLiteral(Interpreter interpreter) {
+	public ObjectValue toObjectValue(Interpreter interpreter) {
 		return this;
 	}
 

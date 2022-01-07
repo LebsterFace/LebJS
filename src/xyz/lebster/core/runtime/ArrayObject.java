@@ -28,7 +28,7 @@ public final class ArrayObject extends ObjectValue {
 		@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-arraysetlength")
 		// FIXME: Follow spec
 		public void set(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
-			final int newLen = (int) Math.floor(value.toNumericLiteral(interpreter).value);
+			final int newLen = (int) Math.floor(value.toNumberValue(interpreter).value);
 			if (newLen > length) {
 				ArrayObject.this.length = newLen;
 			} else {

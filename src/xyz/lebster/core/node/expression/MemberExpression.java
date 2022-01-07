@@ -23,7 +23,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 	@Override
 	public Reference toReference(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> executedBase = base.execute(interpreter);
-		final StringValue executedProp = property.execute(interpreter).toStringLiteral(interpreter);
+		final StringValue executedProp = property.execute(interpreter).toStringValue(interpreter);
 
 		if (executedBase.type == Type.Undefined || executedBase.type == Type.Null) {
 			final String msg = "Cannot read property '" +
@@ -34,7 +34,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 			throw AbruptCompletion.error(new TypeError(msg));
 		}
 
-		return new Reference(executedBase.toObjectLiteral(interpreter), executedProp);
+		return new Reference(executedBase.toObjectValue(interpreter), executedProp);
 	}
 
 	@Override

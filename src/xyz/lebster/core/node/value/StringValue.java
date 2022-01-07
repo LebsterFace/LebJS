@@ -16,7 +16,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
-	public StringValue toStringLiteral(Interpreter interpreter) {
+	public StringValue toStringValue(Interpreter interpreter) {
 		return this;
 	}
 
@@ -31,7 +31,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
-	public NumberValue toNumericLiteral(Interpreter interpreter) {
+	public NumberValue toNumberValue(Interpreter interpreter) {
 		// FIXME: Follow spec
 		if (value.isBlank())
 			return new NumberValue(0);
@@ -44,12 +44,12 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
-	public BooleanValue toBooleanLiteral(Interpreter interpreter) {
+	public BooleanValue toBooleanValue(Interpreter interpreter) {
 		return BooleanValue.of(value.length() > 0);
 	}
 
 	@Override
-	public StringWrapper toObjectLiteral(Interpreter interpreter) {
+	public StringWrapper toObjectValue(Interpreter interpreter) {
 		return new StringWrapper(this);
 	}
 

@@ -27,22 +27,22 @@ public final class BooleanValue extends Primitive<Boolean> {
 	}
 
 	@Override
-	public StringValue toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
 		return new StringValue(value.toString());
 	}
 
 	@Override
-	public NumberValue toNumericLiteral(Interpreter interpreter) {
+	public NumberValue toNumberValue(Interpreter interpreter) {
 		return new NumberValue(value ? 1.0 : 0.0);
 	}
 
 	@Override
-	public BooleanValue toBooleanLiteral(Interpreter interpreter) {
+	public BooleanValue toBooleanValue(Interpreter interpreter) {
 		return this;
 	}
 
 	@Override
-	public ObjectValue toObjectLiteral(Interpreter interpreter) {
+	public ObjectValue toObjectValue(Interpreter interpreter) {
 		throw new NotImplemented("BooleanWrapper");
 	}
 

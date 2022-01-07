@@ -15,17 +15,17 @@ public abstract class PrimitiveWrapper<P extends Primitive<?>> extends ObjectVal
 	}
 
 	@Override
-	public StringValue toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return data.toStringLiteral(interpreter);
+	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
+		return data.toStringValue(interpreter);
 	}
 
 	@Override
-	public NumberValue toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return data.toNumericLiteral(interpreter);
+	public NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion {
+		return data.toNumberValue(interpreter);
 	}
 
 	@Override
-	public BooleanValue toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return data.toBooleanLiteral(interpreter);
+	public BooleanValue toBooleanValue(Interpreter interpreter) throws AbruptCompletion {
+		return data.toBooleanValue(interpreter);
 	}
 }

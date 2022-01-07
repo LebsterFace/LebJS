@@ -28,23 +28,23 @@ public class NativeProperty extends Value<NativeGetterSetter> {
 	}
 
 	@Override
-	public StringValue toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return value.get(interpreter).toStringLiteral(interpreter);
+	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
+		return value.get(interpreter).toStringValue(interpreter);
 	}
 
 	@Override
-	public NumberValue toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return value.get(interpreter).toNumericLiteral(interpreter);
+	public NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion {
+		return value.get(interpreter).toNumberValue(interpreter);
 	}
 
 	@Override
-	public BooleanValue toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return value.get(interpreter).toBooleanLiteral(interpreter);
+	public BooleanValue toBooleanValue(Interpreter interpreter) throws AbruptCompletion {
+		return value.get(interpreter).toBooleanValue(interpreter);
 	}
 
 	@Override
-	public ObjectValue toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return value.get(interpreter).toObjectLiteral(interpreter);
+	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
+		return value.get(interpreter).toObjectValue(interpreter);
 	}
 
 	@Override

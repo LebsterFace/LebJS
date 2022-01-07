@@ -82,22 +82,22 @@ public class Symbol extends ObjectValue.Key<Void> {
 	}
 
 	@Override
-	public StringValue toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert a Symbol value to a string"));
 	}
 
 	@Override
-	public NumberValue toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert a Symbol value to a number"));
 	}
 
 	@Override
-	public BooleanValue toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public BooleanValue toBooleanValue(Interpreter interpreter) throws AbruptCompletion {
 		return BooleanValue.TRUE;
 	}
 
 	@Override
-	public ObjectValue toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
 		throw new NotImplemented("SymbolWrapper");
 	}
 

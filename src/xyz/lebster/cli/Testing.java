@@ -130,7 +130,7 @@ public final class Testing {
 		globalObject.setMethod("createObject", (interpreter, arguments) -> {
 			final ObjectValue result = new ObjectValue();
 			for (int i = 0; i < arguments.length; i += 2) {
-				final StringValue key = arguments[i].execute(interpreter).toStringLiteral(interpreter);
+				final StringValue key = arguments[i].execute(interpreter).toStringValue(interpreter);
 				if (arguments.length - 1 == i) {
 					throw AbruptCompletion.error(new LanguageError("Unmatched key '" + key.value + "' in createObject"));
 				}
@@ -148,7 +148,7 @@ public final class Testing {
 			} else if (values.length > 1) {
 				throw AbruptCompletion.error(new LanguageError("Multiple objects were provided"));
 			} else {
-				final var prototype = values[0].toObjectLiteral(interpreter).getPrototype();
+				final var prototype = values[0].toObjectValue(interpreter).getPrototype();
 				return prototype == null ? Null.instance : prototype;
 			}
 		});

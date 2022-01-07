@@ -29,7 +29,7 @@ public final class GlobalObject extends ObjectValue {
 		// 19.2 Function Properties of the Global Object
 		// FIXME: Follow spec
 		setMethod("eval", (interpreter, arguments) -> {
-			final String source = arguments.length > 0 ? arguments[0].toStringLiteral(interpreter).value : "undefined";
+			final String source = arguments.length > 0 ? arguments[0].toStringValue(interpreter).value : "undefined";
 			try {
 				final Program program = new Parser(new Lexer(source).tokenize()).parse();
 				return program.execute(interpreter);
@@ -41,7 +41,7 @@ public final class GlobalObject extends ObjectValue {
 		// https://tc39.es/ecma262/multipage#sec-isfinite-number
 		setMethod("isFinite", (interpreter, arguments) -> {
 			// 1. Let num be ? ToNumber(number).
-			final double num = arguments.length > 0 ? arguments[0].toNumericLiteral(interpreter).value : Double.NaN;
+			final double num = arguments.length > 0 ? arguments[0].toNumberValue(interpreter).value : Double.NaN;
 			// 2. If num is NaN, +∞𝔽, or -∞𝔽, return false.
 			// 3. Otherwise, return true.
 			return BooleanValue.of(!(Double.isNaN(num) || Double.isInfinite(num)));
@@ -49,12 +49,12 @@ public final class GlobalObject extends ObjectValue {
 
 		// https://tc39.es/ecma262/multipage#sec-isnan-number
 		// This method behaves the same as the specification, but does not follow it directly
-		setMethod("isNaN", (interpreter, arguments) -> BooleanValue.of(arguments.length == 0 || arguments[0].toNumericLiteral(interpreter).value.isNaN()));
+		setMethod("isNaN", (interpreter, arguments) -> BooleanValue.of(arguments.length == 0 || arguments[0].toNumberValue(interpreter).value.isNaN()));
 
 		// https://tc39.es/ecma262/multipage#sec-parsefloat-string
 		setMethod("parseFloat", (interpreter, arguments) -> {
 			// 1. Let inputString be ? ToString(string).
-			final StringValue string = arguments.length > 0 ? arguments[0].toStringLiteral(interpreter) : new StringValue("undefined");
+			final StringValue string = arguments.length > 0 ? arguments[0].toStringValue(interpreter) : new StringValue("undefined");
 			// 2. Let trimmedString be ! TrimString(inputString, start).
 			final String trimmedString = string.value.stripLeading();
 			// FIXME: Follow spec
@@ -64,7 +64,7 @@ public final class GlobalObject extends ObjectValue {
 		// https://tc39.es/ecma262/multipage#sec-parseint-string-radix
 		setMethod("parseInt", (interpreter, arguments) -> {
 			// 1. Let inputString be ? ToString(string).
-			final StringValue inputString = arguments.length > 0 ? arguments[0].toStringLiteral(interpreter) : new StringValue("undefined");
+			final StringValue inputString = arguments.length > 0 ? arguments[0].toStringValue(interpreter) : new StringValue("undefined");
 			// 2. Let S be ! TrimString(inputString, start).
 			final StringBuilder S = new StringBuilder(inputString.value.stripLeading());
 			// 3. Let sign be 1.
@@ -77,7 +77,7 @@ public final class GlobalObject extends ObjectValue {
 				S.deleteCharAt(0);
 			// 6. Let R be ℝ(? ToInt32(radix)).
 			final Value<?> radix = arguments.length > 1 ? arguments[1] : Undefined.instance;
-			int R = radix.toNumericLiteral(interpreter).toInt32();
+			int R = radix.toNumberValue(interpreter).toInt32();
 			// 7. Let stripPrefix be true.
 			boolean stripPrefix = true;
 			// 8. If R ≠ 0, then

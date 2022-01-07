@@ -19,7 +19,7 @@ public final class StringPrototype extends ObjectValue {
 
 	@NonStandard
 	private static StringValue reverse(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final String S = interpreter.thisValue().toStringLiteral(interpreter).value;
+		final String S = interpreter.thisValue().toStringValue(interpreter).value;
 		return new StringValue(new StringBuilder(S).reverse().toString());
 	}
 }

@@ -20,7 +20,7 @@ public record ObjectExpression(Map<Expression, Expression> entries) implements E
 		final var map = new HashMap<ObjectValue.Key<?>, Value<?>>();
 
 		for (final Map.Entry<Expression, Expression> entry : entries.entrySet()) {
-			final StringValue key = entry.getKey().execute(interpreter).toStringLiteral(interpreter);
+			final StringValue key = entry.getKey().execute(interpreter).toStringValue(interpreter);
 			final Value<?> value = entry.getValue().execute(interpreter);
 			map.put(key, value);
 		}

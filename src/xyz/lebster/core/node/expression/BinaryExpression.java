@@ -17,8 +17,8 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 			final Value<?> left_primitive = left_value.toPrimitive(interpreter);
 			final Value<?> right_primitive = right_value.toPrimitive(interpreter);
 			if (left_primitive.type == Type.String || right_primitive.type == Type.String) {
-				final StringValue left_string = left_primitive.toStringLiteral(interpreter);
-				final StringValue right_string = right_primitive.toStringLiteral(interpreter);
+				final StringValue left_string = left_primitive.toStringValue(interpreter);
+				final StringValue right_string = right_primitive.toStringValue(interpreter);
 				return new StringValue(left_string.value + right_string.value);
 			} else {
 				left_value = left_primitive;
@@ -26,8 +26,8 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 			}
 		}
 
-		final double left_num = left_value.toNumericLiteral(interpreter).value;
-		final double right_num = right_value.toNumericLiteral(interpreter).value;
+		final double left_num = left_value.toNumberValue(interpreter).value;
+		final double right_num = right_value.toNumberValue(interpreter).value;
 
 		return new NumberValue(switch (op) {
 			case Add -> left_num + right_num;

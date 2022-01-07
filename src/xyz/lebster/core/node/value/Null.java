@@ -15,7 +15,7 @@ public final class Null extends Primitive<Void> {
 	}
 
 	@Override
-	public StringValue toStringLiteral(Interpreter interpreter) {
+	public StringValue toStringValue(Interpreter interpreter) {
 		return new StringValue("null");
 	}
 
@@ -25,17 +25,17 @@ public final class Null extends Primitive<Void> {
 	}
 
 	@Override
-	public NumberValue toNumericLiteral(Interpreter interpreter) {
+	public NumberValue toNumberValue(Interpreter interpreter) {
 		return new NumberValue(0.0);
 	}
 
 	@Override
-	public BooleanValue toBooleanLiteral(Interpreter interpreter) {
+	public BooleanValue toBooleanValue(Interpreter interpreter) {
 		return BooleanValue.FALSE;
 	}
 
 	@Override
-	public ObjectValue toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert null to object"));
 	}
 

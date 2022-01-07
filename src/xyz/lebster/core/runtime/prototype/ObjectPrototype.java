@@ -33,7 +33,7 @@ public final class ObjectPrototype extends ObjectValue {
 		} else if (interpreter.thisValue() == Null.instance) {
 			return new StringValue("[object Null]");
 		} else {// 3. Let O be ! ToObject(this value).
-			final ObjectValue O = interpreter.thisValue().toObjectLiteral(interpreter);
+			final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 			String builtinTag;// 4. Let isArray be ? IsArray(O).
 			// 5. If isArray is true, let builtinTag be "Array".
 			// TODO: Pattern matching for switch
@@ -67,7 +67,7 @@ public final class ObjectPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.valueof")
 	private static Value<?> valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		return interpreter.thisValue().toObjectLiteral(interpreter);
+		return interpreter.thisValue().toObjectValue(interpreter);
 	}
 
 	@Override

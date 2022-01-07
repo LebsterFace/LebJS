@@ -183,7 +183,7 @@ public final class MathObject extends ObjectValue {
 
 	private double getArgument(int index, Value<?>[] arguments, Interpreter interpreter) throws AbruptCompletion {
 		if (arguments.length > index) {
-			return arguments[index].toNumericLiteral(interpreter).value;
+			return arguments[index].toNumberValue(interpreter).value;
 		} else {
 			return Double.NaN;
 		}
@@ -205,7 +205,7 @@ public final class MathObject extends ObjectValue {
 		this.setMethod(methodName, (interpreter, args) -> {
 			final double[] coerced = new double[args.length];
 			for (int i = 0; i < args.length; i++) {
-				coerced[i] = args[i].toNumericLiteral(interpreter).value;
+				coerced[i] = args[i].toNumberValue(interpreter).value;
 			}
 
 			return new NumberValue(restArgs.applyAsDouble(coerced));

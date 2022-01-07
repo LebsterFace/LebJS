@@ -14,9 +14,9 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return switch (op) {
-			case Add -> expression.execute(interpreter).toNumericLiteral(interpreter);
-			case LogicalNot -> expression.execute(interpreter).toBooleanLiteral(interpreter).not();
-			case Negate -> expression.execute(interpreter).toNumericLiteral(interpreter).unaryMinus();
+			case Add -> expression.execute(interpreter).toNumberValue(interpreter);
+			case LogicalNot -> expression.execute(interpreter).toBooleanValue(interpreter).not();
+			case Negate -> expression.execute(interpreter).toNumberValue(interpreter).unaryMinus();
 			case Typeof -> {
 				// https://tc39.es/ecma262/multipage#sec-typeof-operator-runtime-semantics-evaluation
 				if (expression instanceof final LeftHandSideExpression lhs) {
@@ -38,7 +38,7 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 				}
 
 				final Reference left_reference = lhs.toReference(interpreter);
-				final NumberValue oldValue = lhs.execute(interpreter).toNumericLiteral(interpreter);
+				final NumberValue oldValue = lhs.execute(interpreter).toNumberValue(interpreter);
 				final NumberValue newValue = new NumberValue(switch (op) {
 					case PostIncrement, PreIncrement -> oldValue.value + 1.0;
 					case PostDecrement, PreDecrement -> oldValue.value - 1.0;

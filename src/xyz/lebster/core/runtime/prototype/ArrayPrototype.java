@@ -31,7 +31,7 @@ public final class ArrayPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tostring")
 	private static Value<?> toStringMethod(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
 		// 1. Let array be ? ToObject(this value).
-		final ObjectValue array = interpreter.thisValue().toObjectLiteral(interpreter);
+		final ObjectValue array = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let func be ? Get(array, "join").
 		final Value<?> func = array.get(join);
 		// 3. If IsCallable(func) is false, set func to the intrinsic function %Object.prototype.toString%.
@@ -42,16 +42,16 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.join")
 	private static Value<?> join(Interpreter interpreter, Value<?>[] elements) throws AbruptCompletion {
-		final ObjectValue O = interpreter.thisValue().toObjectLiteral(interpreter);
-		final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value.longValue());
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.LENGTH_KEY).toNumberValue(interpreter).value.longValue());
 		final boolean noSeparator = elements.length == 0 || elements[0].type == Type.Undefined;
-		final String sep = noSeparator ? "," : elements[0].toStringLiteral(interpreter).value;
+		final String sep = noSeparator ? "," : elements[0].toStringValue(interpreter).value;
 
 		final StringBuilder result = new StringBuilder();
 		for (int k = 0; k < len; k++) {
 			if (k > 0) result.append(sep);
 			final Value<?> element = O.get(new StringValue(k));
-			result.append(element.isNullish() ? "" : element.toStringLiteral(interpreter).value);
+			result.append(element.isNullish() ? "" : element.toStringValue(interpreter).value);
 		}
 
 		return new StringValue(result.toString());
@@ -59,7 +59,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
 	private static long lengthOfArrayLike(ObjectValue O, Interpreter interpreter) throws AbruptCompletion {
-		final double number = O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value;
+		final double number = O.get(ArrayObject.LENGTH_KEY).toNumberValue(interpreter).value;
 		if (Double.isNaN(number) || number <= 0) {
 			return 0L;
 		} else {
@@ -69,7 +69,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.push")
 	private static Value<?> push(Interpreter interpreter, Value<?>[] elements) throws AbruptCompletion {
-		final ObjectValue O = interpreter.thisValue().toObjectLiteral(interpreter);
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		final long len = lengthOfArrayLike(O, interpreter);
 
 		if ((len + elements.length) > MAX_LENGTH) {
@@ -91,7 +91,7 @@ public final class ArrayPrototype extends ObjectValue {
 		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : Undefined.instance;
 		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : Undefined.instance;
 
-		final ObjectValue O = interpreter.thisValue().toObjectLiteral(interpreter);
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		final long len = lengthOfArrayLike(O, interpreter);
 
 		if (!(callbackfn instanceof final Executable<?> executable)) {

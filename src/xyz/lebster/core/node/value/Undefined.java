@@ -16,22 +16,22 @@ public final class Undefined extends Primitive<Void> {
 	}
 
 	@Override
-	public StringValue toStringLiteral(Interpreter interpreter) {
+	public StringValue toStringValue(Interpreter interpreter) {
 		return new StringValue("undefined");
 	}
 
 	@Override
-	public NumberValue toNumericLiteral(Interpreter interpreter) {
+	public NumberValue toNumberValue(Interpreter interpreter) {
 		return new NumberValue(Double.NaN);
 	}
 
 	@Override
-	public BooleanValue toBooleanLiteral(Interpreter interpreter) {
+	public BooleanValue toBooleanValue(Interpreter interpreter) {
 		return BooleanValue.FALSE;
 	}
 
 	@Override
-	public ObjectValue toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert undefined to object"));
 	}
 

@@ -6,6 +6,7 @@ import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.node.value.object.ObjectLiteral;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.runtime.ConsoleObject;

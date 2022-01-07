@@ -2,6 +2,8 @@ package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.node.value.object.NativeGetterSetter;
+import xyz.lebster.core.node.value.object.ObjectLiteral;
 
 public class NativeProperty extends Value<NativeGetterSetter> {
 	public NativeProperty(NativeGetterSetter value) {

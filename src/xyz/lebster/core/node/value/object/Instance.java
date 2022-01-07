@@ -1,4 +1,4 @@
-package xyz.lebster.core.node.value;
+package xyz.lebster.core.node.value.object;
 
 public class Instance extends ObjectLiteral {
 	private ObjectLiteral prototype;

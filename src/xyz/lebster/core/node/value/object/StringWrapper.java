@@ -1,6 +1,8 @@
-package xyz.lebster.core.node.value;
+package xyz.lebster.core.node.value.object;
 
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.node.value.NumericLiteral;
+import xyz.lebster.core.node.value.StringLiteral;
 import xyz.lebster.core.runtime.prototype.StringPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-objects")

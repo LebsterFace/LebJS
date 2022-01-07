@@ -1,7 +1,7 @@
 package xyz.lebster.core.runtime;
 
 import xyz.lebster.core.Dumper;
-import xyz.lebster.core.node.value.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectLiteral;
 import xyz.lebster.core.node.value.StringLiteral;
 
 public class LanguageError extends ObjectLiteral {

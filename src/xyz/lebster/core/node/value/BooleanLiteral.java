@@ -5,6 +5,7 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.value.object.ObjectLiteral;
 
 public final class BooleanLiteral extends Primitive<Boolean> {
 	public static final BooleanLiteral TRUE = new BooleanLiteral(Boolean.TRUE);

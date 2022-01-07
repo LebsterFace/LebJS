@@ -3,7 +3,7 @@ package xyz.lebster.core.node.expression;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.value.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectLiteral;
 import xyz.lebster.core.node.value.StringLiteral;
 import xyz.lebster.core.node.value.Value;
 

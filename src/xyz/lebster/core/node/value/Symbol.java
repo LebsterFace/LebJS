@@ -4,6 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.node.value.object.ObjectLiteral;
 import xyz.lebster.core.runtime.TypeError;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-language-types-symbol-type")

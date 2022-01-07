@@ -1,4 +1,4 @@
-package xyz.lebster.core.node.value;
+package xyz.lebster.core.node.value.object;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -6,6 +6,9 @@ import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.FunctionNode;
+import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.Undefined;
+import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
 import java.util.HashSet;

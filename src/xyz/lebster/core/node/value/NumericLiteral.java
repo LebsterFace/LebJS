@@ -5,6 +5,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.value.object.ObjectLiteral;
 
 public final class NumericLiteral extends Primitive<Double> {
 	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;

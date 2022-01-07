@@ -3,6 +3,8 @@ package xyz.lebster.core.node.value;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.StringWrapper;
 
 public final class StringLiteral extends ObjectLiteral.Key<String> {
 	public StringLiteral(String value) {

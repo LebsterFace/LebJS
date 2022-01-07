@@ -54,6 +54,46 @@ public abstract class Value<JType> implements Expression {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toobject")
 	public abstract Dictionary toDictionary(Interpreter interpreter) throws AbruptCompletion;
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevalue")
+	public boolean sameValue(Value<?> y) {
+		// 1. If Type(x) is different from Type(y), return false.
+		if (this.type != y.type) return false;
+
+		// 2. If Type(x) is Number, then
+		if (this instanceof final NumericLiteral x_n)
+			// a. Return ! Number::sameValue(x, y).
+			return x_n.sameValue((NumericLiteral) y);
+
+		// FIXME: BigInt
+		// 3. If Type(x) is BigInt, then
+			// a. Return ! BigInt::sameValue(x, y).
+
+		// 4. Return ! SameValueNonNumeric(x, y).
+		return this.sameValueNonNumeric(y);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevaluenonnumeric")
+	public boolean sameValueNonNumeric(Value<?> y) {
+		// 1. Assert: Type(x) is the same as Type(y).
+		// 2. If Type(x) is Undefined, return true.
+		if (this == Undefined.instance) return true;
+		// 3. If Type(x) is Null, return true.
+		if (this == Null.instance) return true;
+
+		if (this.type == Type.String)
+		// 4. If Type(x) is String, then
+			return this.value.equals(y.value);
+			// a. If x and y are exactly the same sequence of code units (same length and same code units at corresponding indices), return true; otherwise, return false.
+
+		// 5. If Type(x) is Boolean, then
+			// a. If x and y are both true or both false, return true; otherwise, return false.
+		// 6. If Type(x) is Symbol, then
+			// a. If x and y are both the same Symbol value, return true; otherwise, return false.
+		// 7. If x and y are the same Object value, return true. Otherwise, return false.
+
+		return this == y;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

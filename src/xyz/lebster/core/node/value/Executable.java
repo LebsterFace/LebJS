@@ -84,8 +84,7 @@ public abstract class Executable<JType> extends Dictionary {
 			// b. If O is null, return false.
 			if (dictionary == null) return BooleanLiteral.FALSE;
 			// c. If SameValue(P, O) is true, return true.
-			// FIXME: SameValue
-			if (P.equals(O)) return BooleanLiteral.TRUE;
+			if (P.sameValue(dictionary)) return BooleanLiteral.TRUE;
 		}
 	}
 

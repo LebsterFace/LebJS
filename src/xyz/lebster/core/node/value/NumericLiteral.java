@@ -144,4 +144,17 @@ public final class NumericLiteral extends Primitive<Double> {
 		// 11. If ℝ(x) < ℝ(y), return true. Otherwise, return false.
 		return BooleanLiteral.of(x < y);
 	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-sameValue")
+	public boolean sameValue(NumericLiteral y) {
+		// 1. If x is NaN and y is NaN, return true.
+		if (this.value.isNaN() && y.value.isNaN()) return true;
+		// 2. If x is +0𝔽 and y is -0𝔽, return false.
+		if (isPositiveZero(this) && isNegativeZero(y)) return false;
+		// 3. If x is -0𝔽 and y is +0𝔽, return false.
+		if (isNegativeZero(this) && isPositiveZero(y)) return false;
+		// 4. If x is the same Number value as y, return true.
+		// 5. Return false.
+		return this.value.doubleValue() == y.value.doubleValue();
+	}
 }

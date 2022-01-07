@@ -46,7 +46,11 @@ public final class Function extends Constructor<FunctionNode> {
 		}
 
 		try {
-			return code.body.execute(interpreter);
+			code.body.execute(interpreter);
+			return Undefined.instance;
+		} catch (AbruptCompletion e) {
+			if (e.type != AbruptCompletion.Type.Return) throw e;
+			return e.value;
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}

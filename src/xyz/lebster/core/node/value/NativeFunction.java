@@ -21,7 +21,12 @@ public final class NativeFunction extends Executable<NativeCode> {
 
 	@Override
 	protected Value<?> internalCall(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		return code.execute(interpreter, arguments);
+		try {
+			return code.execute(interpreter, arguments);
+		} catch (AbruptCompletion e) {
+			if (e.type != AbruptCompletion.Type.Return) throw e;
+			return e.value;
+		}
 	}
 
 	@Override

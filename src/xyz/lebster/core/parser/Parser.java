@@ -10,6 +10,7 @@ import xyz.lebster.core.node.declaration.FunctionDeclaration;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.node.declaration.VariableDeclarator;
 import xyz.lebster.core.node.expression.*;
+import xyz.lebster.core.node.expression.literal.LiteralExpression;
 import xyz.lebster.core.node.statement.*;
 import xyz.lebster.core.node.value.*;
 
@@ -208,8 +209,7 @@ public final class Parser {
 			case Return -> {
 				state.consume();
 				// FIXME: Proper automatic semicolon insertion
-				final Expression val = matchPrimaryExpression() ? parseExpression() : Undefined.instance;
-				yield new ReturnStatement(val);
+				yield new ReturnStatement(matchPrimaryExpression() ? parseExpression() : null);
 			}
 
 			case Break -> {
@@ -460,7 +460,7 @@ public final class Parser {
 
 			case Period -> {
 				if (!matchIdentifierName()) state.expected("IdentifierName");
-				yield new MemberExpression(left, new StringValue(state.consume().value), false);
+				yield new MemberExpression(left, new LiteralExpression(new StringValue(state.consume().value)), false);
 			}
 
 			case LBracket -> {
@@ -496,9 +496,9 @@ public final class Parser {
 				yield result != null ? result : new Identifier(state.consume().value);
 			}
 
-			case StringLiteral -> new StringValue(state.consume().value);
-			case NumericLiteral -> new NumberValue(Double.parseDouble(state.consume().value));
-			case BooleanLiteral -> BooleanValue.of(state.consume().value.equals("true"));
+			case StringLiteral -> new LiteralExpression(new StringValue(state.consume().value));
+			case NumericLiteral -> new LiteralExpression(new NumberValue(Double.parseDouble(state.consume().value)));
+			case BooleanLiteral -> new LiteralExpression(BooleanValue.of(state.consume().value.equals("true")));
 			case Function -> parseFunctionExpression();
 			case LBracket -> parseArrayExpression();
 			case LBrace -> parseObjectExpression();
@@ -510,17 +510,7 @@ public final class Parser {
 
 			case Null -> {
 				state.consume();
-				yield Null.instance;
-			}
-
-			case Infinity -> {
-				state.consume();
-				yield new NumberValue(Double.POSITIVE_INFINITY);
-			}
-
-			case NaN -> {
-				state.consume();
-				yield new NumberValue(Double.NaN);
+				yield new LiteralExpression(Null.instance);
 			}
 
 			case New -> {
@@ -529,11 +519,6 @@ public final class Parser {
 				final Expression constructExpr = parseExpression(precedence.get(n), associativity.get(n), Collections.singleton(TokenType.LParen));
 				final List<Expression> arguments = state.currentToken.type == TokenType.LParen ? parseExpressionList(true) : Collections.emptyList();
 				yield new NewExpression(constructExpr, arguments.toArray(new Expression[0]));
-			}
-
-			case Undefined -> {
-				state.consume();
-				yield Undefined.instance;
 			}
 
 			default -> throw new CannotParse(state.currentToken, "PrimaryExpression");
@@ -599,7 +584,7 @@ public final class Parser {
 
 		while (state.currentToken.type == TokenType.StringLiteral || state.currentToken.type == TokenType.Identifier) {
 			state.consumeAll(TokenType.Terminator);
-			final StringValue key = new StringValue(state.consume().value);
+			final var key = new LiteralExpression(new StringValue(state.consume().value));
 			state.consumeAll(TokenType.Terminator);
 			state.require(TokenType.Colon);
 			state.consumeAll(TokenType.Terminator);

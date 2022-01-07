@@ -23,8 +23,8 @@ public class NativeProperty extends Value<NativeGetterSetter> {
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		return value.get(interpreter).execute(interpreter);
+	public Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {
+		return value.get(interpreter).getValue(interpreter);
 	}
 
 	@Override

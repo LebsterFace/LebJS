@@ -1,12 +1,11 @@
 package xyz.lebster.core.runtime;
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.node.value.object.ObjectValue;
 
 @SpecificationURL("https://console.spec.whatwg.org/")
 public final class ConsoleObject extends ObjectValue {
@@ -32,15 +31,6 @@ public final class ConsoleObject extends ObjectValue {
 			logger(LogLevel.Info, data);
 			return Undefined.instance;
 		});
-
-		setMethod("dump", (interpreter, data) -> dump(data));
-	}
-
-	@NonStandard
-	private static Undefined dump(Value<?>[] data) {
-		for (final Value<?> val : data)
-			val.dump(0);
-		return Undefined.instance;
 	}
 
 	private void logger(LogLevel logLevel, Value<?>[] args) {

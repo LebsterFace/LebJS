@@ -1,7 +1,6 @@
 package xyz.lebster.core.node.value.object;
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -173,43 +172,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 
 	public boolean hasOwnProperty(Key<?> key) {
 		return this.value.containsKey(key);
-	}
-
-	@Override
-	public void dump(int indent) {
-		dumpRecursive(indent, new HashSet<>());
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void dumpRecursive(int indent, HashSet<ObjectValue> parents) {
-		Dumper.dumpName(indent, "ObjectLiteral");
-		if (value.isEmpty()) {
-			Dumper.dumpIndent(indent + 1);
-			System.out.print(ANSI.RED);
-			System.out.print("[empty]");
-			System.out.println(ANSI.RESET);
-			return;
-		}
-
-		parents.add(this);
-		for (var entry : value.entrySet()) {
-			Dumper.dumpIndent(indent + 1);
-			System.out.print(entry.getKey());
-			System.out.print(": ");
-			final Value<?> value = entry.getValue();
-			if (value instanceof final ObjectValue object) {
-				if (parents.contains(object)) {
-					System.out.print(ANSI.RED);
-					System.out.print(this == value ? "[self]" : "[parent]");
-					System.out.println(ANSI.RESET);
-				} else {
-					System.out.println();
-					object.dumpRecursive(indent + 2, (HashSet<ObjectValue>) parents.clone());
-				}
-			} else {
-				value.dump(0);
-			}
-		}
 	}
 
 	public ObjectValue getPrototype() {

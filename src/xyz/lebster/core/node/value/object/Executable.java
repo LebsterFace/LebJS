@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.value.object;
 
-import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
@@ -8,8 +7,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.runtime.TypeError;
 import xyz.lebster.core.runtime.prototype.FunctionPrototype;
-
-import java.util.HashSet;
 
 public abstract class Executable<JType> extends ObjectValue {
 	public final JType code;
@@ -41,16 +38,6 @@ public abstract class Executable<JType> extends ObjectValue {
 	}
 
 	protected abstract Value<?> internalCall(final Interpreter interpreter, final Value<?>... arguments) throws AbruptCompletion;
-
-	@Override
-	public void dump(int indent) {
-		Dumper.dumpValue(indent, getClass().getSimpleName(), toString());
-	}
-
-	@Override
-	protected void dumpRecursive(int indent, HashSet<ObjectValue> parents) {
-		dump(indent);
-	}
 
 	@Override
 	public String typeOf(Interpreter interpreter) {

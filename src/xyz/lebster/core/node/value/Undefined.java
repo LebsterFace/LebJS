@@ -1,7 +1,6 @@
 package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -40,11 +39,6 @@ public final class Undefined extends Primitive<Void> {
 		representation.append(ANSI.BRIGHT_BLACK);
 		representation.append("undefined");
 		representation.append(ANSI.RESET);
-	}
-
-	@Override
-	public void dump(int indent) {
-		Dumper.dumpValue(indent, "Undefined");
 	}
 
 	@Override

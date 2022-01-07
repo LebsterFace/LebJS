@@ -52,7 +52,8 @@ public record MemberExpression(Expression base, Expression property, boolean com
 			representation.append(']');
 		} else {
 			representation.append('.');
-			representation.append(((StringValue) property).value);
+			// FIXME: Append property
+			// representation.append(((StringValue) property).value);
 		}
 	}
 }

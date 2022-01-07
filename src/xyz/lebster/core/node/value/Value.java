@@ -1,18 +1,17 @@
 package xyz.lebster.core.node.value;
 
-import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.expression.Expression;
+import xyz.lebster.core.node.Representable;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.TypeError;
 
 import java.util.Objects;
 
-public abstract class Value<JType> implements Expression {
+public abstract class Value<JType> implements Representable {
 	public final JType value;
 	public final Type type;
 
@@ -21,14 +20,8 @@ public abstract class Value<JType> implements Expression {
 		this.type = type;
 	}
 
-	@Override
-	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
+	public Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {
 		return this;
-	}
-
-	@Override
-	public void dump(int indent) {
-		Dumper.dumpValue(indent, type.name(), String.valueOf(value));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")

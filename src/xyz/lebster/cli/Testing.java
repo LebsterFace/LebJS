@@ -6,7 +6,10 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.node.value.Null;
+import xyz.lebster.core.node.value.StringValue;
+import xyz.lebster.core.node.value.Undefined;
+import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.ExecutionError;
 import xyz.lebster.core.runtime.LanguageError;
@@ -97,8 +100,10 @@ public final class Testing {
 			final Value<?> received = arguments[1];
 
 			if (!expected.equals(received)) {
-				Dumper.dumpIndicated(0, "Expected", expected);
-				Dumper.dumpIndicated(0, "Received", received);
+				Dumper.dumpIndicator(0, "Expected");
+				Dumper.dumpValue(0, expected.type.name(), String.valueOf(expected.value));
+				Dumper.dumpIndicator(0, "Received");
+				Dumper.dumpValue(0, received.type.name(), String.valueOf(received.value));
 				throw new ExecutionError("Assertion failed!");
 			}
 
@@ -130,12 +135,12 @@ public final class Testing {
 		globalObject.setMethod("createObject", (interpreter, arguments) -> {
 			final ObjectValue result = new ObjectValue();
 			for (int i = 0; i < arguments.length; i += 2) {
-				final StringValue key = arguments[i].execute(interpreter).toStringValue(interpreter);
+				final StringValue key = arguments[i].getValue(interpreter).toStringValue(interpreter);
 				if (arguments.length - 1 == i) {
 					throw AbruptCompletion.error(new LanguageError("Unmatched key '" + key.value + "' in createObject"));
 				}
 
-				final Value<?> value = arguments[i + 1].execute(interpreter);
+				final Value<?> value = arguments[i + 1].getValue(interpreter);
 				result.put(key, value);
 			}
 

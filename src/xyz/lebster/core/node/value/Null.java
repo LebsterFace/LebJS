@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.value;
 
-import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -37,11 +36,6 @@ public final class Null extends Primitive<Void> {
 	@Override
 	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert null to object"));
-	}
-
-	@Override
-	public void dump(int indent) {
-		Dumper.dumpValue(indent, "Null");
 	}
 
 	@Override

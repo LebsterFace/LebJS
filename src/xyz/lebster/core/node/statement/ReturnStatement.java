@@ -5,12 +5,14 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
+import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
 
 public record ReturnStatement(Expression value) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		throw new AbruptCompletion(value.execute(interpreter), AbruptCompletion.Type.Return);
+		final Value<?> valueToReturn = value == null ? Undefined.instance : value.execute(interpreter);
+		throw new AbruptCompletion(valueToReturn, AbruptCompletion.Type.Return);
 	}
 
 	@Override

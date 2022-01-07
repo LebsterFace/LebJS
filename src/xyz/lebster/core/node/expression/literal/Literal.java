@@ -5,14 +5,11 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.value.Value;
 
-// TODO: Specialised classes for different Value types
-public record LiteralExpression(Value<?> value) implements Expression {
-	public Value<?> execute(Interpreter interpreter) {
-		return this.value();
-	}
+public interface Literal<ValueType extends Value<?>> extends Expression {
+	ValueType execute(Interpreter interpreter);
 
 	@Override
-	public void dump(int indent) {
+	default void dump(int indent) {
 		throw new NotImplemented("LiteralExpression#dump");
 	}
 }

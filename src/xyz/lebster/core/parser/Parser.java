@@ -10,7 +10,10 @@ import xyz.lebster.core.node.declaration.FunctionDeclaration;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.node.declaration.VariableDeclarator;
 import xyz.lebster.core.node.expression.*;
-import xyz.lebster.core.node.expression.literal.LiteralExpression;
+import xyz.lebster.core.node.expression.literal.BooleanLiteral;
+import xyz.lebster.core.node.expression.literal.NullLiteral;
+import xyz.lebster.core.node.expression.literal.NumericLiteral;
+import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.node.statement.*;
 import xyz.lebster.core.node.value.*;
 
@@ -460,7 +463,7 @@ public final class Parser {
 
 			case Period -> {
 				if (!matchIdentifierName()) state.expected("IdentifierName");
-				yield new MemberExpression(left, new LiteralExpression(new StringValue(state.consume().value)), false);
+				yield new MemberExpression(left, new StringLiteral(new StringValue(state.consume().value)), false);
 			}
 
 			case LBracket -> {
@@ -496,9 +499,10 @@ public final class Parser {
 				yield result != null ? result : new Identifier(state.consume().value);
 			}
 
-			case StringLiteral -> new LiteralExpression(new StringValue(state.consume().value));
-			case NumericLiteral -> new LiteralExpression(new NumberValue(Double.parseDouble(state.consume().value)));
-			case BooleanLiteral -> new LiteralExpression(BooleanValue.of(state.consume().value.equals("true")));
+			case StringLiteral -> new StringLiteral(new StringValue(state.consume().value));
+			case NumericLiteral -> new NumericLiteral(new NumberValue(Double.parseDouble(state.consume().value)));
+			case BooleanLiteral -> new BooleanLiteral(BooleanValue.of(state.consume().value.equals("true")));
+
 			case Function -> parseFunctionExpression();
 			case LBracket -> parseArrayExpression();
 			case LBrace -> parseObjectExpression();
@@ -510,7 +514,7 @@ public final class Parser {
 
 			case Null -> {
 				state.consume();
-				yield new LiteralExpression(Null.instance);
+				yield new NullLiteral();
 			}
 
 			case New -> {
@@ -584,7 +588,7 @@ public final class Parser {
 
 		while (state.currentToken.type == TokenType.StringLiteral || state.currentToken.type == TokenType.Identifier) {
 			state.consumeAll(TokenType.Terminator);
-			final var key = new LiteralExpression(new StringValue(state.consume().value));
+			final var key = new StringLiteral(new StringValue(state.consume().value));
 			state.consumeAll(TokenType.Terminator);
 			state.require(TokenType.Colon);
 			state.consumeAll(TokenType.Terminator);

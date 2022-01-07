@@ -64,6 +64,10 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		}
 	}
 
+	public String stringValueOf() {
+		return NumberValue.stringValueOf(this.value);
+	}
+
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) {
 		return new StringValue(stringValueOf(value));

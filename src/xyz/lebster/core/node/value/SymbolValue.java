@@ -8,75 +8,75 @@ import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.TypeError;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-language-types-symbol-type")
-public class Symbol extends ObjectValue.Key<Void> {
+public class SymbolValue extends ObjectValue.Key<Void> {
 	// https://tc39.es/ecma262/multipage#table-well-known-symbols
 
 	/**
 	 * A method that returns the default AsyncIterator for an object.
 	 * Called by the semantics of the for-await-of statement.
 	 */
-	public static final Symbol asyncIterator = new Symbol("Symbol.asyncIterator");
+	public static final SymbolValue asyncIterator = new SymbolValue("Symbol.asyncIterator");
 	/**
 	 * A method that determines if a constructor object recognizes an object as one of the constructor's instances.
 	 * Called by the semantics of the instanceof operator.
 	 */
-	public static final Symbol hasInstance = new Symbol("Symbol.hasInstance");
+	public static final SymbolValue hasInstance = new SymbolValue("Symbol.hasInstance");
 	/**
 	 * A Boolean valued property that if true indicates that an object should be flattened to
 	 * its array elements by Array.prototype.concat.
 	 */
-	public static final Symbol isConcatSpreadable = new Symbol("Symbol.isConcatSpreadable");
+	public static final SymbolValue isConcatSpreadable = new SymbolValue("Symbol.isConcatSpreadable");
 	/**
 	 * A method that returns the default Iterator for an object. Called by the semantics of the for-of statement.
 	 */
-	public static final Symbol iterator = new Symbol("Symbol.iterator");
+	public static final SymbolValue iterator = new SymbolValue("Symbol.iterator");
 	/**
 	 * A regular expression method that matches the regular expression against a string.
 	 * Called by the String.prototype.match method.
 	 */
-	public static final Symbol match = new Symbol("Symbol.match");
+	public static final SymbolValue match = new SymbolValue("Symbol.match");
 	/**
 	 * A regular expression method that returns an iterator, that yields matches of the regular expression against a
 	 * string. Called by the String.prototype.matchAll method.
 	 */
-	public static final Symbol matchAll = new Symbol("Symbol.matchAll");
+	public static final SymbolValue matchAll = new SymbolValue("Symbol.matchAll");
 	/**
 	 * A regular expression method that replaces matched substrings of a string.
 	 * Called by the String.prototype.replace method.
 	 */
-	public static final Symbol replace = new Symbol("Symbol.replace");
+	public static final SymbolValue replace = new SymbolValue("Symbol.replace");
 	/**
 	 * A regular expression method that returns the index within a string that matches the regular expression.
 	 * Called by the String.prototype.search method.
 	 */
-	public static final Symbol search = new Symbol("Symbol.search");
+	public static final SymbolValue search = new SymbolValue("Symbol.search");
 	/**
 	 * A function valued property that is the constructor function that is used to create derived objects.
 	 */
-	public static final Symbol species = new Symbol("Symbol.species");
+	public static final SymbolValue species = new SymbolValue("Symbol.species");
 	/**
 	 * A regular expression method that splits a string at the indices that match the regular expression.
 	 * Called by the String.prototype.split method.
 	 */
-	public static final Symbol split = new Symbol("Symbol.split");
+	public static final SymbolValue split = new SymbolValue("Symbol.split");
 	/**
 	 * A method that converts an object to a corresponding primitive value.
 	 * Called by the ToPrimitive abstract operation.
 	 */
-	public static final Symbol toPrimitive = new Symbol("Symbol.toPrimitive");
+	public static final SymbolValue toPrimitive = new SymbolValue("Symbol.toPrimitive");
 	/**
 	 * A String valued property that is used in the creation of the default string description of an object.
 	 * Accessed by the built-in method Object.prototype.toString.
 	 */
-	public static final Symbol toStringTag = new Symbol("Symbol.toStringTag");
+	public static final SymbolValue toStringTag = new SymbolValue("Symbol.toStringTag");
 	/**
 	 * An object valued property whose own and inherited property names are property names that are excluded
 	 * from the with environment bindings of the associated object.
 	 */
-	public static final Symbol unscopables = new Symbol("Symbol.unscopables");
+	public static final SymbolValue unscopables = new SymbolValue("Symbol.unscopables");
 	public final String description;
 
-	public Symbol(String description) {
+	public SymbolValue(String description) {
 		super(null, Type.Symbol);
 		this.description = description;
 	}

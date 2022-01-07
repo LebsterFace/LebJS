@@ -7,7 +7,8 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
-import xyz.lebster.core.node.value.object.NativeGetterSetter;
+import xyz.lebster.core.node.value.native_.NativeGetterSetter;
+import xyz.lebster.core.node.value.native_.NativeProperty;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.prototype.ArrayPrototype;
 

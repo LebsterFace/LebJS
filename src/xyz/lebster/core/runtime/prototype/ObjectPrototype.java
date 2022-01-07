@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.object.Executable;
-import xyz.lebster.core.node.value.object.NativeFunction;
+import xyz.lebster.core.node.value.native_.NativeFunction;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.object.StringWrapper;
 import xyz.lebster.core.runtime.ArrayObject;
@@ -28,9 +28,9 @@ public final class ObjectPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tostring")
 	public static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. If the `this` value is undefined, return "[object Undefined]".
-		if (interpreter.thisValue() == Undefined.instance) {
+		if (interpreter.thisValue() == UndefinedValue.instance) {
 			return new StringValue("[object Undefined]");
-		} else if (interpreter.thisValue() == Null.instance) {
+		} else if (interpreter.thisValue() == NullValue.instance) {
 			return new StringValue("[object Null]");
 		} else {// 3. Let O be ! ToObject(this value).
 			final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
@@ -54,7 +54,7 @@ public final class ObjectPrototype extends ObjectValue {
 			else builtinTag = "Object";
 
 			// 15. Let tag be ? Get(O, @@toStringTag).
-			final Value<?> tag = O.get(Symbol.toStringTag);
+			final Value<?> tag = O.get(SymbolValue.toStringTag);
 			// 16. If Type(tag) is not String, set tag to builtinTag.
 			// 17. Return the string-concatenation of "[object ", tag, and "]".
 			if (tag instanceof final StringValue stringValue) {

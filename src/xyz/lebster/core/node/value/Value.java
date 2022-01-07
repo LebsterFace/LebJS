@@ -15,6 +15,18 @@ public abstract class Value<JType> implements Representable {
 	public final JType value;
 	public final Type type;
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-primitive-value")
+	public enum Type {
+		String,
+		Symbol,
+		// TODO: BigInt
+		Number,
+		Boolean,
+		Object,
+		Null,
+		Undefined
+	}
+
 	public Value(JType value, Type type) {
 		this.value = value;
 		this.type = type;
@@ -25,15 +37,15 @@ public abstract class Value<JType> implements Representable {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
-	public Primitive<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
-		if (this instanceof Primitive) {
-			return (Primitive<JType>) this;
+	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
+		if (this instanceof PrimitiveValue) {
+			return (PrimitiveValue<JType>) this;
 		} else {
 			throw new NotImplemented("A non-primitive value's toPrimitive method");
 		}
 	}
 
-	public Primitive<?> toPrimitive(Interpreter interpreter) throws AbruptCompletion {
+	public PrimitiveValue<?> toPrimitive(Interpreter interpreter) throws AbruptCompletion {
 		return toPrimitive(interpreter, null);
 	}
 
@@ -71,11 +83,11 @@ public abstract class Value<JType> implements Representable {
 	public boolean sameValueNonNumeric(Value<?> y) {
 		// 1. Assert: Type(x) is the same as Type(y).
 		// 2. If Type(x) is Undefined, return true.
-		if (this == Undefined.instance) return true;
+		if (this == UndefinedValue.instance) return true;
 		// 3. If Type(x) is Null, return true.
-		if (this == Null.instance) return true;
+		if (this == NullValue.instance) return true;
 
-		if (this.type == Type.String)
+		if (this.type == Value.Type.String)
 		// 4. If Type(x) is String, then
 			return this.value.equals(y.value);
 			// a. If x and y are exactly the same sequence of code units (same length and same code units at corresponding indices), return true; otherwise, return false.
@@ -108,9 +120,9 @@ public abstract class Value<JType> implements Representable {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-topropertykey")
 	public ObjectValue.Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {
 		// 1. Let key be ? ToPrimitive(argument, string).
-		final var key = this.toPrimitive(interpreter, Type.String);
+		final var key = this.toPrimitive(interpreter, Value.Type.String);
 		// 2. If Type(key) is Symbol, then
-		if (key instanceof final Symbol s)
+		if (key instanceof final SymbolValue s)
 			// a. Return key.
 			return s;
 
@@ -131,8 +143,8 @@ public abstract class Value<JType> implements Representable {
 		// 1. Let func be ? GetV(V, P).
 		final var func = this.getV(interpreter, P);
 		// 2. If func is either undefined or null, return undefined.
-		if (func == Undefined.instance || func == Null.instance)
-			return Undefined.instance;
+		if (func == UndefinedValue.instance || func == NullValue.instance)
+			return UndefinedValue.instance;
 		// 3. If IsCallable(func) is false, throw a TypeError exception.
 		if (!(func instanceof Executable<?>))
 			throw AbruptCompletion.error(new TypeError("Not a function!"));

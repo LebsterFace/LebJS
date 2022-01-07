@@ -1,13 +1,14 @@
-package xyz.lebster.core.node.value.object;
+package xyz.lebster.core.node.value.native_;
 
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.NativeCode;
 import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.node.value.object.Executable;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
 import java.util.HashSet;

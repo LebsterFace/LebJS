@@ -1,27 +1,36 @@
 package xyz.lebster.core.node.value;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.TypeError;
 
-public final class Undefined extends Primitive<Void> {
-	public static final Undefined instance = new Undefined();
+public final class NullValue extends PrimitiveValue<Void> {
+	public static final NullValue instance = new NullValue();
 
-	private Undefined() {
-		super(null, Type.Undefined);
+	private NullValue() {
+		super(null, Type.Null);
+	}
+
+	@Override
+	public String toString() {
+		return "null";
 	}
 
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) {
-		return new StringValue("undefined");
+		return new StringValue("null");
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append("null");
 	}
 
 	@Override
 	public NumberValue toNumberValue(Interpreter interpreter) {
-		return new NumberValue(Double.NaN);
+		return new NumberValue(0.0);
 	}
 
 	@Override
@@ -31,18 +40,11 @@ public final class Undefined extends Primitive<Void> {
 
 	@Override
 	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError("Cannot convert undefined to object"));
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append(ANSI.BRIGHT_BLACK);
-		representation.append("undefined");
-		representation.append(ANSI.RESET);
+		throw AbruptCompletion.error(new TypeError("Cannot convert null to object"));
 	}
 
 	@Override
 	public String typeOf(Interpreter interpreter) {
-		return "undefined";
+		return "object";
 	}
 }

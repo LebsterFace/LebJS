@@ -79,10 +79,10 @@ public record RelationalExpression(Expression left, Expression right, Relational
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-instanceofoperator")
 	private BooleanValue instanceofOperator(Interpreter interpreter, Value<?> V, Value<?> target) throws AbruptCompletion {
 		// 1. If Type(target) is not Object, throw a TypeError exception.
-		if (target.type != Type.Object)
+		if (target.type != Value.Type.Object)
 			throw AbruptCompletion.error(new TypeError("Right-hand side of `instanceof` is not an object"));
 		// 2. Let instOfHandler be ? GetMethod(target, @@hasInstance).
-		final Value<?> instOfHandler = target.getMethod(interpreter, Symbol.hasInstance);
+		final Value<?> instOfHandler = target.getMethod(interpreter, SymbolValue.hasInstance);
 		// 3. If instOfHandler is not undefined, then
 		if (instOfHandler instanceof final Executable<?> executable)
 			// a. Return ! ToBoolean(? Call(instOfHandler, target, « V »)).
@@ -109,17 +109,17 @@ public record RelationalExpression(Expression left, Expression right, Relational
 
 		if (leftFirst) {
 			// a. Let px be ? ToPrimitive(x, number).
-			px = x.toPrimitive(interpreter, Type.Number);
+			px = x.toPrimitive(interpreter, Value.Type.Number);
 			// b. Let py be ? ToPrimitive(y, number).
-			py = y.toPrimitive(interpreter, Type.Number);
+			py = y.toPrimitive(interpreter, Value.Type.Number);
 		}
 		// 2. Else,
 		else {
 			// a. NOTE: The order of evaluation needs to be reversed to preserve left to right evaluation.
 			// b. Let py be ? ToPrimitive(y, number).
-			py = y.toPrimitive(interpreter, Type.Number);
+			py = y.toPrimitive(interpreter, Value.Type.Number);
 			// c. Let px be ? ToPrimitive(x, number).
-			px = x.toPrimitive(interpreter, Type.Number);
+			px = x.toPrimitive(interpreter, Value.Type.Number);
 		}
 
 
@@ -156,9 +156,9 @@ public record RelationalExpression(Expression left, Expression right, Relational
 
 			// c. NOTE: Because px and py are primitive values, evaluation order is not important.
 			// d. Let nx be ? ToNumeric(px).
-			final NumberValue nx = px.toPrimitive(interpreter, Type.Number).toNumberValue(interpreter);
+			final NumberValue nx = px.toPrimitive(interpreter, Value.Type.Number).toNumberValue(interpreter);
 			// e. Let ny be ? ToNumeric(py).
-			final NumberValue ny = py.toPrimitive(interpreter, Type.Number).toNumberValue(interpreter);
+			final NumberValue ny = py.toPrimitive(interpreter, Value.Type.Number).toNumberValue(interpreter);
 
 			// 1. Return Number::lessThan(nx, ny).
 			return nx.lessThan(ny);

@@ -6,8 +6,9 @@ import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.FunctionNode;
+import xyz.lebster.core.node.value.native_.NativeFunction;
 import xyz.lebster.core.node.value.StringValue;
-import xyz.lebster.core.node.value.Undefined;
+import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
@@ -50,7 +51,7 @@ public final class Function extends Constructor<FunctionNode> {
 
 		try {
 			code.body.execute(interpreter);
-			return Undefined.instance;
+			return UndefinedValue.instance;
 		} catch (AbruptCompletion e) {
 			if (e.type != AbruptCompletion.Type.Return) throw e;
 			return e.value;

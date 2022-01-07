@@ -5,7 +5,7 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.Undefined;
+import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 
 public record VariableDeclaration(Kind kind, VariableDeclarator... declarations) implements Declaration {
@@ -34,7 +34,7 @@ public record VariableDeclaration(Kind kind, VariableDeclarator... declarations)
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		for (VariableDeclarator declarator : declarations) declarator.execute(interpreter);
-		return Undefined.instance;
+		return UndefinedValue.instance;
 	}
 
 	@Override

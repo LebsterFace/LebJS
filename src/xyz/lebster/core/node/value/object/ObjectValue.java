@@ -6,6 +6,9 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.node.value.native_.NativeCode;
+import xyz.lebster.core.node.value.native_.NativeFunction;
+import xyz.lebster.core.node.value.native_.NativeProperty;
 import xyz.lebster.core.runtime.TypeError;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
@@ -29,11 +32,11 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 		// i. If preferredType is not present, let hint be "default".
 		if (preferredType == null) return "default";
 		// ii. Else if preferredType is string, let hint be "string".
-		if (preferredType == Type.String) return "string";
+		if (preferredType == Value.Type.String) return "string";
 			// iii. Else,
 		else {
 			// 1. Assert: preferredType is number.
-			assert preferredType == Type.Number;
+			assert preferredType == Value.Type.Number;
 			// 2. Let hint be "number".
 			return "number";
 		}
@@ -41,9 +44,9 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
-	public Primitive<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
+	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
 		// a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
-		final Value<?> exoticToPrim = get(Symbol.toPrimitive);
+		final Value<?> exoticToPrim = get(SymbolValue.toPrimitive);
 
 		// b. If exoticToPrim is not undefined, then
 		if (exoticToPrim instanceof final Executable<?> executable) {
@@ -59,17 +62,17 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 
 		// c. If preferredType is not present, let preferredType be number.
 		// d. Return ? OrdinaryToPrimitive(input, preferredType).
-		return ordinaryToPrimitive(interpreter, preferredType == null ? Type.Number : preferredType);
+		return ordinaryToPrimitive(interpreter, preferredType == null ? Value.Type.Number : preferredType);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-ordinarytoprimitive")
-	private Primitive<?> ordinaryToPrimitive(Interpreter interpreter, Type hint) throws AbruptCompletion {
+	private PrimitiveValue<?> ordinaryToPrimitive(Interpreter interpreter, Type hint) throws AbruptCompletion {
 		// 1. Assert: Type(O) is Object.
 		// 2. Assert: hint is either string or number.
-		assert hint == Type.String || hint == Type.Number;
+		assert hint == Value.Type.String || hint == Value.Type.Number;
 
 		// 3. If hint is string, then Let methodNames be "toString", "valueOf".
-		final StringValue[] methodNames = hint == Type.String ?
+		final StringValue[] methodNames = hint == Value.Type.String ?
 			new StringValue[] { ObjectPrototype.toString, ObjectPrototype.valueOf } :
 			// 4. Else, Let methodNames be "valueOf", "toString".
 			new StringValue[] { ObjectPrototype.valueOf, ObjectPrototype.toString };
@@ -83,7 +86,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 				// i. Let result be ? Call(method, O).
 				final Value<?> result = executable.call(interpreter, this);
 				// ii. If Type(result) is not Object, return result.
-				if (result.type != Type.Object) return (Primitive<?>) result;
+				if (result.type != Type.Object) return (PrimitiveValue<?>) result;
 			}
 		}
 
@@ -93,12 +96,12 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
-		return toPrimitive(interpreter, Type.String).toStringValue(interpreter);
+		return toPrimitive(interpreter, Value.Type.String).toStringValue(interpreter);
 	}
 
 	@Override
 	public NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion {
-		return toPrimitive(interpreter, Type.Number).toNumberValue(interpreter);
+		return toPrimitive(interpreter, Value.Type.Number).toNumberValue(interpreter);
 	}
 
 	@Override
@@ -149,7 +152,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 		}
 
 		// End of prototype chain; property does not exist.
-		return Undefined.instance;
+		return UndefinedValue.instance;
 	}
 
 	public boolean hasProperty(Key<?> name) {
@@ -235,7 +238,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 		representation.append('}');
 	}
 
-	public static abstract class Key<R> extends Primitive<R> {
+	public static abstract class Key<R> extends PrimitiveValue<R> {
 		public Key(R value, Type type) {
 			super(value, type);
 		}

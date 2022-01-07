@@ -2,8 +2,8 @@ package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.interpreter.StringRepresentation;
 
-public abstract class Primitive<JType> extends Value<JType> {
-	public Primitive(JType value, Type type) {
+public abstract class PrimitiveValue<JType> extends Value<JType> {
+	public PrimitiveValue(JType value, Type type) {
 		super(value, type);
 	}
 

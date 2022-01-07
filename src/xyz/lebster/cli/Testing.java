@@ -6,9 +6,9 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.value.Null;
+import xyz.lebster.core.node.value.NullValue;
 import xyz.lebster.core.node.value.StringValue;
-import xyz.lebster.core.node.value.Undefined;
+import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.ExecutionError;
@@ -107,7 +107,7 @@ public final class Testing {
 				throw new ExecutionError("Assertion failed!");
 			}
 
-			return Undefined.instance;
+			return UndefinedValue.instance;
 		});
 
 		globalObject.setMethod("bind", (interpreter, arguments) -> {
@@ -118,7 +118,7 @@ public final class Testing {
 			interpreter.enterExecutionContext(new ExecutionContext(interpreter.lexicalEnvironment(), null, arguments[0]));
 			// Re-enter the `bind()` ExecutionContext
 			interpreter.enterExecutionContext(current);
-			return Undefined.instance;
+			return UndefinedValue.instance;
 		});
 
 		globalObject.setMethod("unbind", (interpreter, arguments) -> {
@@ -129,7 +129,7 @@ public final class Testing {
 			interpreter.exitExecutionContext(interpreter.getExecutionContext());
 			// Re-enter the `unbind()` ExecutionContext
 			interpreter.enterExecutionContext(current);
-			return Undefined.instance;
+			return UndefinedValue.instance;
 		});
 
 		globalObject.setMethod("createObject", (interpreter, arguments) -> {
@@ -154,7 +154,7 @@ public final class Testing {
 				throw AbruptCompletion.error(new LanguageError("Multiple objects were provided"));
 			} else {
 				final var prototype = values[0].toObjectValue(interpreter).getPrototype();
-				return prototype == null ? Null.instance : prototype;
+				return prototype == null ? NullValue.instance : prototype;
 			}
 		});
 	}

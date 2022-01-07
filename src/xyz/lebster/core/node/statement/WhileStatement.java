@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.node.value.Undefined;
+import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 
 
@@ -14,7 +14,7 @@ public record WhileStatement(Expression condition, Statement body) implements St
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-WhileStatement")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> result = Undefined.instance;
+		final Value<?> result = UndefinedValue.instance;
 
 		while (condition.execute(interpreter).isTruthy(interpreter)) {
 			try {

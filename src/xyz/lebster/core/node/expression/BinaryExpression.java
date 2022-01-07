@@ -7,7 +7,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.NumberValue;
 import xyz.lebster.core.node.value.StringValue;
-import xyz.lebster.core.node.value.Type;
 import xyz.lebster.core.node.value.Value;
 
 public record BinaryExpression(Expression left, Expression right, BinaryOp op) implements Expression {
@@ -16,7 +15,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 		if (op == BinaryOp.Add) {
 			final Value<?> left_primitive = left_value.toPrimitive(interpreter);
 			final Value<?> right_primitive = right_value.toPrimitive(interpreter);
-			if (left_primitive.type == Type.String || right_primitive.type == Type.String) {
+			if (left_primitive.type == Value.Type.String || right_primitive.type == Value.Type.String) {
 				final StringValue left_string = left_primitive.toStringValue(interpreter);
 				final StringValue right_string = right_primitive.toStringValue(interpreter);
 				return new StringValue(left_string.value + right_string.value);

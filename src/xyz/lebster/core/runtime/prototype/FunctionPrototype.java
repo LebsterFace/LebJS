@@ -14,7 +14,7 @@ public class FunctionPrototype extends Executable<Void> {
 
 	@Override
 	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) {
-		return Undefined.instance;
+		return UndefinedValue.instance;
 	}
 
 	@Override

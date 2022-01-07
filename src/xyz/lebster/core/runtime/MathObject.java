@@ -34,7 +34,7 @@ public final class MathObject extends ObjectValue {
 
 	@SuppressWarnings("SpellCheckingInspection")
 	private MathObject() {
-		put(Symbol.toStringTag, new StringValue("Math"));
+		put(SymbolValue.toStringTag, new StringValue("Math"));
 
 		put("E",		new NumberValue(E));
 		put("LN2",		new NumberValue(LN2));

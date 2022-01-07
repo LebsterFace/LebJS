@@ -7,7 +7,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.object.ObjectValue;
 
-public final class BooleanValue extends Primitive<Boolean> {
+public final class BooleanValue extends PrimitiveValue<Boolean> {
 	public static final BooleanValue TRUE = new BooleanValue(Boolean.TRUE);
 	public static final BooleanValue FALSE = new BooleanValue(Boolean.FALSE);
 

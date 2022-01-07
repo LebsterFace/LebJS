@@ -4,7 +4,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.statement.Statement;
-import xyz.lebster.core.node.value.Undefined;
+import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public record Program(List<Statement> children) implements ASTNode {
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		Value<?> lastValue = Undefined.instance;
+		Value<?> lastValue = UndefinedValue.instance;
 		for (ASTNode child : children) lastValue = child.execute(interpreter);
 		return lastValue;
 	}

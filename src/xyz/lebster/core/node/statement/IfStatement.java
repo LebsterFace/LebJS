@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.node.value.Undefined;
+import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 
 public record IfStatement(Expression condition, Statement consequence, Statement elseStatement) implements Statement {
@@ -24,7 +24,7 @@ public record IfStatement(Expression condition, Statement consequence, Statement
 		if (condition.execute(interpreter).isTruthy(interpreter)) {
 			return consequence.execute(interpreter);
 		} else if (elseStatement == null) {
-			return Undefined.instance;
+			return UndefinedValue.instance;
 		} else {
 			return elseStatement.execute(interpreter);
 		}

@@ -1,4 +1,4 @@
-package xyz.lebster.core.node.value.object;
+package xyz.lebster.core.node.value.native_;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;

@@ -7,7 +7,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.object.ObjectValue;
 
-public final class NumberValue extends Primitive<Double> {
+public final class NumberValue extends PrimitiveValue<Double> {
 	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;
 	public static final long POSITIVE_ZERO_BITS = 0;
 
@@ -20,15 +20,15 @@ public final class NumberValue extends Primitive<Double> {
 	public static boolean isPositiveZero(NumberValue n) { return isPositiveZero(n.value); }
 
 	public NumberValue(double num) {
-		super(num, Type.Number);
+		super(num, Value.Type.Number);
 	}
 
 	public NumberValue(Double num) {
-		super(num, Type.Number);
+		super(num, Value.Type.Number);
 	}
 
 	public NumberValue(int num) {
-		super((double) num, Type.Number);
+		super((double) num, Value.Type.Number);
 	}
 
 	private static String stringValueOf(Double d) {

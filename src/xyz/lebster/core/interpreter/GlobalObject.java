@@ -6,6 +6,7 @@ import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.node.value.native_.NativeProperty;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
@@ -24,7 +25,7 @@ public final class GlobalObject extends ObjectValue {
 		// FIXME: Property descriptors
 		put("NaN", new NativeProperty(new NumberValue(Double.NaN)));
 		put("Infinity", new NativeProperty(new NumberValue(Double.POSITIVE_INFINITY)));
-		put("undefined", new NativeProperty(Undefined.instance));
+		put("undefined", new NativeProperty(UndefinedValue.instance));
 
 		// 19.2 Function Properties of the Global Object
 		// FIXME: Follow spec
@@ -76,7 +77,7 @@ public final class GlobalObject extends ObjectValue {
 				// remove the first code unit from S.
 				S.deleteCharAt(0);
 			// 6. Let R be ℝ(? ToInt32(radix)).
-			final Value<?> radix = arguments.length > 1 ? arguments[1] : Undefined.instance;
+			final Value<?> radix = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
 			int R = radix.toNumberValue(interpreter).toInt32();
 			// 7. Let stripPrefix be true.
 			boolean stripPrefix = true;

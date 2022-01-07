@@ -5,14 +5,14 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.node.value.Undefined;
+import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 
 public record ForStatement(Statement init, Expression test, Expression update, Statement body) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		if (init != null) init.execute(interpreter);
-		final Value<?> result = Undefined.instance;
+		final Value<?> result = UndefinedValue.instance;
 
 		while (test.execute(interpreter).isTruthy(interpreter)) {
 			try {

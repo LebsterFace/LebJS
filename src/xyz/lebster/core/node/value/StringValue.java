@@ -8,11 +8,11 @@ import xyz.lebster.core.node.value.object.StringWrapper;
 
 public final class StringValue extends ObjectValue.Key<String> {
 	public StringValue(String value) {
-		super(value, Type.String);
+		super(value, Value.Type.String);
 	}
 
 	public StringValue(Object value) {
-		super(String.valueOf(value), Type.String);
+		super(String.valueOf(value), Value.Type.String);
 	}
 
 	@Override

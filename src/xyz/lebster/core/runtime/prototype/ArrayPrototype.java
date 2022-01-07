@@ -88,8 +88,8 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.map")
 	private static Value<?> map(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : Undefined.instance;
-		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : Undefined.instance;
+		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
+		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
 
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		final long len = lengthOfArrayLike(O, interpreter);

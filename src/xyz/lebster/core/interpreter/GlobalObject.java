@@ -13,7 +13,7 @@ import xyz.lebster.core.runtime.EvalError;
 import xyz.lebster.core.runtime.MathObject;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
-public final class GlobalObject extends Dictionary {
+public final class GlobalObject extends ObjectLiteral {
 	public GlobalObject() {
 		super();
 

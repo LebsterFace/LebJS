@@ -3,7 +3,7 @@ package xyz.lebster.core.node.value;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 
-public abstract class PrimitiveWrapper<P extends Primitive<?>> extends Dictionary {
+public abstract class PrimitiveWrapper<P extends Primitive<?>> extends ObjectLiteral {
 	public final P data;
 
 	public PrimitiveWrapper(P data) {

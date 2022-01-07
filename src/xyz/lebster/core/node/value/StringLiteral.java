@@ -4,7 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 
-public final class StringLiteral extends Dictionary.Key<String> {
+public final class StringLiteral extends ObjectLiteral.Key<String> {
 	public StringLiteral(String value) {
 		super(value, Type.String);
 	}
@@ -47,7 +47,7 @@ public final class StringLiteral extends Dictionary.Key<String> {
 	}
 
 	@Override
-	public StringWrapper toDictionary(Interpreter interpreter) {
+	public StringWrapper toObjectLiteral(Interpreter interpreter) {
 		return new StringWrapper(this);
 	}
 

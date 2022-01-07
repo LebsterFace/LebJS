@@ -34,7 +34,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 			throw AbruptCompletion.error(new TypeError(msg));
 		}
 
-		return new Reference(executedBase.toDictionary(interpreter), executedProp);
+		return new Reference(executedBase.toObjectLiteral(interpreter), executedProp);
 	}
 
 	@Override

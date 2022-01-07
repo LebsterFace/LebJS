@@ -7,7 +7,7 @@ import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.runtime.ArrayObject;
 import xyz.lebster.core.runtime.LanguageError;
 
-public final class ObjectPrototype extends Dictionary {
+public final class ObjectPrototype extends ObjectLiteral {
 	public static final ObjectPrototype instance = new ObjectPrototype();
 	public static final StringLiteral toString = new StringLiteral("toString");
 	public static final StringLiteral valueOf = new StringLiteral("valueOf");
@@ -29,7 +29,7 @@ public final class ObjectPrototype extends Dictionary {
 		} else if (interpreter.thisValue() == Null.instance) {
 			return new StringLiteral("[object Null]");
 		} else {// 3. Let O be ! ToObject(this value).
-			final Dictionary O = interpreter.thisValue().toDictionary(interpreter);
+			final ObjectLiteral O = interpreter.thisValue().toObjectLiteral(interpreter);
 			String builtinTag;// 4. Let isArray be ? IsArray(O).
 			// 5. If isArray is true, let builtinTag be "Array".
 			// TODO: Pattern matching for switch
@@ -63,11 +63,11 @@ public final class ObjectPrototype extends Dictionary {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.valueof")
 	private static Value<?> valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		return interpreter.thisValue().toDictionary(interpreter);
+		return interpreter.thisValue().toObjectLiteral(interpreter);
 	}
 
 	@Override
-	public Dictionary getPrototype() {
+	public ObjectLiteral getPrototype() {
 		return null;
 	}
 }

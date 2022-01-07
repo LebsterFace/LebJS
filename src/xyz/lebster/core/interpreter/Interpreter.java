@@ -2,7 +2,7 @@ package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.node.expression.Identifier;
-import xyz.lebster.core.node.value.Dictionary;
+import xyz.lebster.core.node.value.ObjectLiteral;
 import xyz.lebster.core.node.value.StringLiteral;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.ExecutionError;
@@ -68,7 +68,7 @@ public final class Interpreter {
 	}
 
 	public ExecutionContext pushExecutionContext(Value<?> thisValue) throws AbruptCompletion {
-		final LexicalEnvironment env = new LexicalEnvironment(new Dictionary(), lexicalEnvironment());
+		final LexicalEnvironment env = new LexicalEnvironment(new ObjectLiteral(), lexicalEnvironment());
 		final ExecutionContext context = new ExecutionContext(env, null, thisValue);
 		enterExecutionContext(context);
 		return context;

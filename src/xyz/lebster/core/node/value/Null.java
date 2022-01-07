@@ -34,7 +34,7 @@ public final class Null extends Primitive<Void> {
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectLiteral toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert null to object"));
 	}
 

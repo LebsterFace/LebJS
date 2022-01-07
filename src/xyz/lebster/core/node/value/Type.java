@@ -9,7 +9,7 @@ public enum Type {
 	// TODO: BigInt
 	Number,
 	Boolean,
-	Dictionary,
+	Object,
 	Null,
 	Undefined
 }

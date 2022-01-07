@@ -90,7 +90,7 @@ public final class Testing {
 		if (!silent && !output.isBlank()) stream.println(output);
 	}
 
-	public static void addTestingMethods(Dictionary globalObject) {
+	public static void addTestingMethods(ObjectLiteral globalObject) {
 		globalObject.setMethod("expect", (interpreter, arguments) -> {
 			final Value<?> expected = arguments[0];
 			final Value<?> received = arguments[1];
@@ -127,7 +127,7 @@ public final class Testing {
 		});
 
 		globalObject.setMethod("createObject", (interpreter, arguments) -> {
-			final Dictionary result = new Dictionary();
+			final ObjectLiteral result = new ObjectLiteral();
 			for (int i = 0; i < arguments.length; i += 2) {
 				final StringLiteral key = arguments[i].execute(interpreter).toStringLiteral(interpreter);
 				if (arguments.length - 1 == i) {
@@ -147,7 +147,7 @@ public final class Testing {
 			} else if (values.length > 1) {
 				throw AbruptCompletion.error(new LanguageError("Multiple objects were provided"));
 			} else {
-				final var prototype = values[0].toDictionary(interpreter).getPrototype();
+				final var prototype = values[0].toObjectLiteral(interpreter).getPrototype();
 				return prototype == null ? Null.instance : prototype;
 			}
 		});

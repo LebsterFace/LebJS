@@ -13,15 +13,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
+public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
-	private final int UNIQUE_ID = Dictionary.LAST_UNUSED_IDENTIFIER++;
+	private final int UNIQUE_ID = ObjectLiteral.LAST_UNUSED_IDENTIFIER++;
 
-	public Dictionary(Map<Key<?>, Value<?>> value) {
-		super(value, Type.Dictionary);
+	public ObjectLiteral(Map<Key<?>, Value<?>> value) {
+		super(value, Type.Object);
 	}
 
-	public Dictionary() {
+	public ObjectLiteral() {
 		this(new HashMap<>());
 	}
 
@@ -52,7 +52,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 			// iv. Let result be ? Call(exoticToPrim, input, hint).
 			final Value<?> result = executable.call(interpreter, this, hint);
 			// v. If Type(result) is not Object, return result.
-			if (result.type != Type.Dictionary) return result.toPrimitive(interpreter);
+			if (result.type != Type.Object) return result.toPrimitive(interpreter);
 			// vi. Throw a TypeError exception.
 			throw AbruptCompletion.error(new TypeError("Cannot convert object to primitive value"));
 		}
@@ -83,7 +83,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 				// i. Let result be ? Call(method, O).
 				final Value<?> result = executable.call(interpreter, this);
 				// ii. If Type(result) is not Object, return result.
-				if (result.type != Type.Dictionary) return (Primitive<?>) result;
+				if (result.type != Type.Object) return (Primitive<?>) result;
 			}
 		}
 
@@ -107,7 +107,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public ObjectLiteral toObjectLiteral(Interpreter interpreter) {
 		return this;
 	}
 
@@ -136,7 +136,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 	}
 
 	public Value<?> get(Key<?> key) {
-		Dictionary object = this;
+		ObjectLiteral object = this;
 
 		while (object != null) {
 			if (object.value.containsKey(key)) {
@@ -154,7 +154,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 
 	public boolean hasProperty(Key<?> name) {
 		if (hasOwnProperty(name)) return true;
-		Dictionary object = this;
+		ObjectLiteral object = this;
 
 		while (object != null) {
 			if (object.value.containsKey(name)) {
@@ -180,8 +180,8 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void dumpRecursive(int indent, HashSet<Dictionary> parents) {
-		Dumper.dumpName(indent, "Dictionary");
+	protected void dumpRecursive(int indent, HashSet<ObjectLiteral> parents) {
+		Dumper.dumpName(indent, "ObjectLiteral");
 		if (value.isEmpty()) {
 			Dumper.dumpIndent(indent + 1);
 			System.out.print(ANSI.RED);
@@ -196,14 +196,14 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 			System.out.print(entry.getKey());
 			System.out.print(": ");
 			final Value<?> value = entry.getValue();
-			if (value instanceof final Dictionary dictionary) {
-				if (parents.contains(dictionary)) {
+			if (value instanceof final ObjectLiteral object) {
+				if (parents.contains(object)) {
 					System.out.print(ANSI.RED);
 					System.out.print(this == value ? "[self]" : "[parent]");
 					System.out.println(ANSI.RESET);
 				} else {
 					System.out.println();
-					dictionary.dumpRecursive(indent + 2, (HashSet<Dictionary>) parents.clone());
+					object.dumpRecursive(indent + 2, (HashSet<ObjectLiteral>) parents.clone());
 				}
 			} else {
 				value.dump(0);
@@ -211,7 +211,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 		}
 	}
 
-	public Dictionary getPrototype() {
+	public ObjectLiteral getPrototype() {
 		return ObjectPrototype.instance;
 	}
 
@@ -231,7 +231,7 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void representRecursive(StringRepresentation representation, HashSet<Dictionary> parents) {
+	public void representRecursive(StringRepresentation representation, HashSet<ObjectLiteral> parents) {
 		representation.append('{');
 		if (value.isEmpty()) {
 			representation.append(" }");
@@ -251,13 +251,13 @@ public class Dictionary extends Value<Map<Dictionary.Key<?>, Value<?>>> {
 			representation.append(ANSI.RESET);
 			representation.append(": ");
 			final Value<?> value = entry.getValue();
-			if (value instanceof final Dictionary dictionary) {
-				if (parents.contains(dictionary)) {
+			if (value instanceof final ObjectLiteral object) {
+				if (parents.contains(object)) {
 					representation.append(ANSI.RED);
 					representation.append(this == value ? "[self]" : "[parent]");
 					representation.append(ANSI.RESET);
 				} else {
-					dictionary.representRecursive(representation, (HashSet<Dictionary>) parents.clone());
+					object.representRecursive(representation, (HashSet<ObjectLiteral>) parents.clone());
 				}
 			} else {
 				value.represent(representation);

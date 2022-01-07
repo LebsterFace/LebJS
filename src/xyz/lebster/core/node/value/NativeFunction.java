@@ -2,7 +2,6 @@ package xyz.lebster.core.node.value;
 
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -38,22 +37,7 @@ public final class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public void representRecursive(StringRepresentation representation, HashSet<Dictionary> parents) {
+	public void representRecursive(StringRepresentation representation, HashSet<ObjectLiteral> parents) {
 		this.represent(representation);
-	}
-
-	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
-		throw new NotImplemented("NativeFunction -> NumericLiteral");
-	}
-
-	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
-		throw new NotImplemented("NativeFunction -> BooleanLiteral");
-	}
-
-	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
-		throw new NotImplemented("NativeFunction -> Dictionary");
 	}
 }

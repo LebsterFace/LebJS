@@ -86,7 +86,7 @@ public final class NumericLiteral extends Primitive<Double> {
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public ObjectLiteral toObjectLiteral(Interpreter interpreter) {
 		throw new NotImplemented("NumberWrapper");
 	}
 

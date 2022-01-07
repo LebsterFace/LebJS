@@ -11,7 +11,7 @@ import java.util.function.DoubleUnaryOperator;
 import static xyz.lebster.core.node.value.NumericLiteral.isNegativeZero;
 import static xyz.lebster.core.node.value.NumericLiteral.isPositiveZero;
 
-public final class MathObject extends Dictionary {
+public final class MathObject extends ObjectLiteral {
 	public static final MathObject instance = new MathObject();
 
 	/** Euler's number, the base of natural logarithms, e */

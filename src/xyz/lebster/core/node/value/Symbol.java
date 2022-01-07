@@ -7,7 +7,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.TypeError;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-language-types-symbol-type")
-public class Symbol extends Dictionary.Key<Void> {
+public class Symbol extends ObjectLiteral.Key<Void> {
 	// https://tc39.es/ecma262/multipage#table-well-known-symbols
 
 	/**
@@ -96,7 +96,7 @@ public class Symbol extends Dictionary.Key<Void> {
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectLiteral toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
 		throw new NotImplemented("SymbolWrapper");
 	}
 

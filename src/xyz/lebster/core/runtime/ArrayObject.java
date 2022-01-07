@@ -12,7 +12,7 @@ import xyz.lebster.core.runtime.prototype.ArrayPrototype;
 import java.util.HashSet;
 
 
-public final class ArrayObject extends Dictionary {
+public final class ArrayObject extends ObjectLiteral {
 	public final static StringLiteral LENGTH_KEY = new StringLiteral("length");
 	private int length;
 
@@ -47,7 +47,7 @@ public final class ArrayObject extends Dictionary {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void representRecursive(StringRepresentation representation, HashSet<Dictionary> parents) {
+	public void representRecursive(StringRepresentation representation, HashSet<ObjectLiteral> parents) {
 		representation.append('[');
 		if (value.isEmpty()) {
 			representation.append(']');
@@ -57,13 +57,13 @@ public final class ArrayObject extends Dictionary {
 		parents.add(this);
 		for (int index = 0; index < this.length; index++) {
 			final Value<?> element = this.get(new StringLiteral(index));
-			if (element instanceof final Dictionary dictionary) {
-				if (parents.contains(dictionary)) {
+			if (element instanceof final ObjectLiteral object) {
+				if (parents.contains(object)) {
 					representation.append(ANSI.RED);
 					representation.append(this == element ? "[self]" : "[parent]");
 					representation.append(ANSI.RESET);
 				} else {
-					dictionary.representRecursive(representation, (HashSet<Dictionary>) parents.clone());
+					object.representRecursive(representation, (HashSet<ObjectLiteral>) parents.clone());
 				}
 			} else {
 				element.represent(representation);
@@ -77,7 +77,7 @@ public final class ArrayObject extends Dictionary {
 	}
 
 	@Override
-	public Dictionary getPrototype() {
+	public ObjectLiteral getPrototype() {
 		return ArrayPrototype.instance;
 	}
 }

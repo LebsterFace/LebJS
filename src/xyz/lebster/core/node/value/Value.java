@@ -52,7 +52,7 @@ public abstract class Value<JType> implements Expression {
 	public abstract BooleanLiteral toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toobject")
-	public abstract Dictionary toDictionary(Interpreter interpreter) throws AbruptCompletion;
+	public abstract ObjectLiteral toObjectLiteral(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevalue")
 	public boolean sameValue(Value<?> y) {
@@ -111,7 +111,7 @@ public abstract class Value<JType> implements Expression {
 	public abstract String typeOf(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-topropertykey")
-	public Dictionary.Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectLiteral.Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {
 		// 1. Let key be ? ToPrimitive(argument, string).
 		final var key = this.toPrimitive(interpreter, Type.String);
 		// 2. If Type(key) is Symbol, then
@@ -132,7 +132,7 @@ public abstract class Value<JType> implements Expression {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getmethod")
-	public Value<?> getMethod(Interpreter interpreter, Dictionary.Key<?> P) throws AbruptCompletion {
+	public Value<?> getMethod(Interpreter interpreter, ObjectLiteral.Key<?> P) throws AbruptCompletion {
 		// 1. Let func be ? GetV(V, P).
 		final var func = this.getV(interpreter, P);
 		// 2. If func is either undefined or null, return undefined.
@@ -146,9 +146,9 @@ public abstract class Value<JType> implements Expression {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getv")
-	private Value<?> getV(Interpreter interpreter, Dictionary.Key<?> P) throws AbruptCompletion {
+	private Value<?> getV(Interpreter interpreter, ObjectLiteral.Key<?> P) throws AbruptCompletion {
 		// 1. Let O be ? ToObject(V).
-		final Dictionary O = this.toDictionary(interpreter);
+		final ObjectLiteral O = this.toObjectLiteral(interpreter);
 		// 2. Return ? O.[[Get]](P, V).
 		return O.get(P);
 	}

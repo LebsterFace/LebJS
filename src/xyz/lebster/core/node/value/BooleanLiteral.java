@@ -41,7 +41,7 @@ public final class BooleanLiteral extends Primitive<Boolean> {
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) {
+	public ObjectLiteral toObjectLiteral(Interpreter interpreter) {
 		throw new NotImplemented("BooleanWrapper");
 	}
 

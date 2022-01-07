@@ -57,7 +57,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 
 			case In -> {
 				// 5. If Type(rval) is not Object, throw a TypeError exception.
-				if (!(right_value instanceof final Dictionary dictionary)) {
+				if (!(right_value instanceof final ObjectLiteral object)) {
 					final var representation = new StringRepresentation();
 					representation.append("Cannot use `in` operator to search for `");
 					left_value.represent(representation);
@@ -67,7 +67,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 				}
 
 				// 6. Return ? HasProperty(rval, ? ToPropertyKey(lval)).
-				yield BooleanLiteral.of(dictionary.hasProperty(left_value.toPropertyKey(interpreter)));
+				yield BooleanLiteral.of(object.hasProperty(left_value.toPropertyKey(interpreter)));
 			}
 
 			case InstanceOf -> instanceofOperator(interpreter, left_value, right_value);
@@ -77,7 +77,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-instanceofoperator")
 	private BooleanLiteral instanceofOperator(Interpreter interpreter, Value<?> V, Value<?> target) throws AbruptCompletion {
 		// 1. If Type(target) is not Object, throw a TypeError exception.
-		if (target.type != Type.Dictionary)
+		if (target.type != Type.Object)
 			throw AbruptCompletion.error(new TypeError("Right-hand side of `instanceof` is not an object"));
 		// 2. Let instOfHandler be ? GetMethod(target, @@hasInstance).
 		final Value<?> instOfHandler = target.getMethod(interpreter, Symbol.hasInstance);

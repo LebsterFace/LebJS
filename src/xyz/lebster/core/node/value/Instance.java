@@ -1,18 +1,18 @@
 package xyz.lebster.core.node.value;
 
-public class Instance extends Dictionary {
-	private Dictionary prototype;
+public class Instance extends ObjectLiteral {
+	private ObjectLiteral prototype;
 
-	public Instance(Dictionary prototype) {
+	public Instance(ObjectLiteral prototype) {
 		this.prototype = prototype;
 	}
 
 	@Override
-	public Dictionary getPrototype() {
+	public ObjectLiteral getPrototype() {
 		return prototype;
 	}
 
-	public void setPrototype(Dictionary prototype) {
+	public void setPrototype(ObjectLiteral prototype) {
 		this.prototype = prototype;
 	}
 }

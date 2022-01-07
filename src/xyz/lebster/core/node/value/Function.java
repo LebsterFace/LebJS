@@ -1,7 +1,6 @@
 package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -17,7 +16,7 @@ public final class Function extends Constructor<FunctionNode> {
 	public Function(FunctionNode code, ExecutionContext context) {
 		super(code);
 		this.context = context;
-		final Dictionary prototype = new Dictionary();
+		final ObjectLiteral prototype = new ObjectLiteral();
 		prototype.put("constructor", this);
 		this.put("prototype", prototype);
 		this.put(ObjectPrototype.toString, new NativeFunction(new StringLiteral(code.toRepresentationString())));
@@ -33,7 +32,7 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	public void representRecursive(StringRepresentation representation, HashSet<Dictionary> parents) {
+	public void representRecursive(StringRepresentation representation, HashSet<ObjectLiteral> parents) {
 		this.represent(representation);
 	}
 
@@ -57,22 +56,6 @@ public final class Function extends Constructor<FunctionNode> {
 		}
 	}
 
-	public StringLiteral toStringLiteral() {
-		throw new NotImplemented("Function -> StringLiteral");
-	}
-
-	public BooleanLiteral toBooleanLiteral() {
-		return BooleanLiteral.TRUE;
-	}
-
-	public NumericLiteral toNumericLiteral() {
-		return new NumericLiteral(Double.NaN);
-	}
-
-	public Dictionary toDictionary() {
-		return this;
-	}
-
 	public Function boundTo(Value<?> value) {
 		return new Function(code, this.context.boundTo(value));
 	}
@@ -81,13 +64,13 @@ public final class Function extends Constructor<FunctionNode> {
 	public Instance construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		final Value<?> prototypeProperty = this.get(new StringLiteral("prototype"));
 
-		final Instance newInstance = new Instance(prototypeProperty instanceof Dictionary dictionary ? dictionary : ObjectPrototype.instance);
+		final Instance newInstance = new Instance(prototypeProperty instanceof ObjectLiteral object ? object : ObjectPrototype.instance);
 		final Function boundSelf = this.boundTo(newInstance);
 		final Value<?> returnValue = boundSelf.internalCall(interpreter, args);
 
-		if (returnValue instanceof final Dictionary dictionary) {
+		if (returnValue instanceof final ObjectLiteral object) {
 			// TODO: Improve this as it is a little hackish
-			for (var entry : dictionary.value.entrySet()) {
+			for (var entry : object.value.entrySet()) {
 				newInstance.put(entry.getKey(), entry.getValue());
 			}
 		}

@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 
 public class NativeProperty extends Value<NativeGetterSetter> {
 	public NativeProperty(NativeGetterSetter value) {
-		super(value, Type.Dictionary);
+		super(value, Type.Object);
 	}
 
 	public NativeProperty(Value<?> value) {
@@ -41,8 +41,8 @@ public class NativeProperty extends Value<NativeGetterSetter> {
 	}
 
 	@Override
-	public Dictionary toDictionary(Interpreter interpreter) throws AbruptCompletion {
-		return value.get(interpreter).toDictionary(interpreter);
+	public ObjectLiteral toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
+		return value.get(interpreter).toObjectLiteral(interpreter);
 	}
 
 	@Override

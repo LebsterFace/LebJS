@@ -3,11 +3,11 @@ package xyz.lebster.core.runtime.prototype;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.value.Dictionary;
+import xyz.lebster.core.node.value.ObjectLiteral;
 import xyz.lebster.core.node.value.StringLiteral;
 import xyz.lebster.core.node.value.Value;
 
-public final class StringPrototype extends Dictionary {
+public final class StringPrototype extends ObjectLiteral {
 	public static final StringPrototype instance = new StringPrototype();
 
 	static {

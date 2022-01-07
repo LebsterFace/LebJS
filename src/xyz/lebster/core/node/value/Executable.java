@@ -11,7 +11,6 @@ import xyz.lebster.core.runtime.prototype.FunctionPrototype;
 import java.util.HashSet;
 
 public abstract class Executable<JType> extends Dictionary {
-	// public static Identifier name = new Identifier("name");
 	public final JType code;
 
 	public Executable(JType code) {
@@ -59,7 +58,6 @@ public abstract class Executable<JType> extends Dictionary {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinaryhasinstance")
 	public BooleanLiteral ordinaryHasInstance(Value<?> O) throws AbruptCompletion {
-		final var C = this;
 		// 1. If IsCallable(C) is false, return false.
 
 		// FIXME: BoundTargetFunction
@@ -72,7 +70,7 @@ public abstract class Executable<JType> extends Dictionary {
 			return BooleanLiteral.FALSE;
 
 		// 4. Let P be ? Get(C, "prototype").
-		final Value<?> P = C.get(new StringLiteral("prototype"));
+		final Value<?> P = this.get(new StringLiteral("prototype"));
 		// 5. If Type(P) is not Object, throw a TypeError exception.
 		if (P.type != Type.Dictionary)
 			throw AbruptCompletion.error(new TypeError("Not an object!"));

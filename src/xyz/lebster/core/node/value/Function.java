@@ -78,22 +78,20 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	public Dictionary construct(Interpreter i, Value<?>[] args) throws AbruptCompletion {
-		final Dictionary newInstance = new Dictionary();
-		newInstance.put("constructor", this);
+	public Instance construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		final Value<?> prototypeProperty = this.get(new StringLiteral("prototype"));
 
+		final Instance newInstance = new Instance(prototypeProperty instanceof Dictionary dictionary ? dictionary : ObjectPrototype.instance);
 		final Function boundSelf = this.boundTo(newInstance);
-		final Value<?> returnValue = boundSelf.internalCall(i, args);
+		final Value<?> returnValue = boundSelf.internalCall(interpreter, args);
 
 		if (returnValue instanceof final Dictionary dictionary) {
-			return dictionary;
-		} else {
-			return newInstance;
+			// TODO: Improve this as it is a little hackish
+			for (var entry : dictionary.value.entrySet()) {
+				newInstance.put(entry.getKey(), entry.getValue());
+			}
 		}
-	}
 
-	@Override
-	public FunctionPrototype getPrototype() {
-		return FunctionPrototype.instance;
+		return newInstance;
 	}
 }

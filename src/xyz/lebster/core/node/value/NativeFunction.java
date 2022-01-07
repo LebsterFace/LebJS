@@ -6,13 +6,14 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
 import java.util.HashSet;
 
 public final class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(NativeCode code) {
 		super(code);
-		put("toString", new NativeFunction(new StringLiteral("function () { [native code] }")));
+		put(ObjectPrototype.toString, new NativeFunction(new StringLiteral("function () { [native code] }")));
 	}
 
 	public NativeFunction(Value<?> value) {

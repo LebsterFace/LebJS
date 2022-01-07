@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime.prototype;
 
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
 
@@ -18,5 +19,11 @@ public class FunctionPrototype extends Executable<Void> {
 	@Override
 	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) {
 		return Undefined.instance;
+	}
+
+	@Override
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-function-prototype-object")
+	public ObjectPrototype getPrototype() {
+		return ObjectPrototype.instance;
 	}
 }

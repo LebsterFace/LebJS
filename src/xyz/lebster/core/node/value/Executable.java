@@ -6,6 +6,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.TypeError;
+import xyz.lebster.core.runtime.prototype.FunctionPrototype;
 
 import java.util.HashSet;
 
@@ -84,5 +85,10 @@ public abstract class Executable<JType> extends Dictionary {
 			// FIXME: SameValue
 			if (P.equals(O)) return BooleanLiteral.TRUE;
 		}
+	}
+
+	@Override
+	public Dictionary getPrototype() {
+		return FunctionPrototype.instance;
 	}
 }

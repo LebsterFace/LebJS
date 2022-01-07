@@ -6,7 +6,7 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.BooleanLiteral;
+import xyz.lebster.core.node.value.BooleanValue;
 import xyz.lebster.core.node.value.Value;
 
 public record EqualityExpression(Expression left, Expression right, EqualityOp op) implements Expression {
@@ -24,7 +24,7 @@ public record EqualityExpression(Expression left, Expression right, EqualityOp o
 		final Value<?> left_value = left.execute(interpreter);
 		final Value<?> right_value = right.execute(interpreter);
 
-		return BooleanLiteral.of(switch (op) {
+		return BooleanValue.of(switch (op) {
 			case StrictEquals -> left_value.equals(right_value);
 			case StrictNotEquals -> !left_value.equals(right_value);
 			default -> throw new NotImplemented("EqualityOp: " + op);

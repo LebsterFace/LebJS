@@ -460,7 +460,7 @@ public final class Parser {
 
 			case Period -> {
 				if (!matchIdentifierName()) state.expected("IdentifierName");
-				yield new MemberExpression(left, new StringLiteral(state.consume().value), false);
+				yield new MemberExpression(left, new StringValue(state.consume().value), false);
 			}
 
 			case LBracket -> {
@@ -496,9 +496,9 @@ public final class Parser {
 				yield result != null ? result : new Identifier(state.consume().value);
 			}
 
-			case StringLiteral -> new StringLiteral(state.consume().value);
-			case NumericLiteral -> new NumericLiteral(Double.parseDouble(state.consume().value));
-			case BooleanLiteral -> BooleanLiteral.of(state.consume().value.equals("true"));
+			case StringLiteral -> new StringValue(state.consume().value);
+			case NumericLiteral -> new NumberValue(Double.parseDouble(state.consume().value));
+			case BooleanLiteral -> BooleanValue.of(state.consume().value.equals("true"));
 			case Function -> parseFunctionExpression();
 			case LBracket -> parseArrayExpression();
 			case LBrace -> parseObjectExpression();
@@ -515,12 +515,12 @@ public final class Parser {
 
 			case Infinity -> {
 				state.consume();
-				yield new NumericLiteral(Double.POSITIVE_INFINITY);
+				yield new NumberValue(Double.POSITIVE_INFINITY);
 			}
 
 			case NaN -> {
 				state.consume();
-				yield new NumericLiteral(Double.NaN);
+				yield new NumberValue(Double.NaN);
 			}
 
 			case New -> {
@@ -599,7 +599,7 @@ public final class Parser {
 
 		while (state.currentToken.type == TokenType.StringLiteral || state.currentToken.type == TokenType.Identifier) {
 			state.consumeAll(TokenType.Terminator);
-			final StringLiteral key = new StringLiteral(state.consume().value);
+			final StringValue key = new StringValue(state.consume().value);
 			state.consumeAll(TokenType.Terminator);
 			state.require(TokenType.Colon);
 			state.consumeAll(TokenType.Terminator);

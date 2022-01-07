@@ -7,7 +7,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.object.Executable;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.TypeError;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
@@ -29,37 +29,37 @@ public record RelationalExpression(Expression left, Expression right, Relational
 		return switch (op) {
 			case LessThan -> {
 				// 5. Let r be ? IsLessThan(left_value, right_value, true).
-				final BooleanLiteral r = isLessThan(interpreter, left_value, right_value, true);
+				final BooleanValue r = isLessThan(interpreter, left_value, right_value, true);
 				// 6. If r is undefined, return false. Otherwise, return r.
-				yield r == null ? BooleanLiteral.FALSE : r;
+				yield r == null ? BooleanValue.FALSE : r;
 			}
 
 			case GreaterThan -> {
 				// 5. Let r be ? IsLessThan(rval, lval, false).
-				final BooleanLiteral r = isLessThan(interpreter, right_value, left_value, false);
+				final BooleanValue r = isLessThan(interpreter, right_value, left_value, false);
 				// 6. If r is undefined, return false. Otherwise, return r.
-				yield r == null ? BooleanLiteral.FALSE : r;
+				yield r == null ? BooleanValue.FALSE : r;
 			}
 
 			case LessThanEquals -> {
 				// 5. Let r be ? IsLessThan(rval, lval, false).
-				final BooleanLiteral r = isLessThan(interpreter, right_value, left_value, false);
+				final BooleanValue r = isLessThan(interpreter, right_value, left_value, false);
 				// 6. If r is true or undefined, return false. Otherwise, return true.
 				//    (If r is false, return true. Otherwise, return false.)
-				yield BooleanLiteral.of(r == BooleanLiteral.FALSE);
+				yield BooleanValue.of(r == BooleanValue.FALSE);
 			}
 
 			case GreaterThanEquals -> {
 				// 5. Let r be ? IsLessThan(lval, rval, true).
-				final BooleanLiteral r = isLessThan(interpreter, left_value, right_value, true);
+				final BooleanValue r = isLessThan(interpreter, left_value, right_value, true);
 				// 6. If r is true or undefined, return false. Otherwise, return true.
 				//    (If r is false, return true. Otherwise, return false.)
-				yield BooleanLiteral.of(r == BooleanLiteral.FALSE);
+				yield BooleanValue.of(r == BooleanValue.FALSE);
 			}
 
 			case In -> {
 				// 5. If Type(rval) is not Object, throw a TypeError exception.
-				if (!(right_value instanceof final ObjectLiteral object)) {
+				if (!(right_value instanceof final ObjectValue object)) {
 					final var representation = new StringRepresentation();
 					representation.append("Cannot use `in` operator to search for `");
 					left_value.represent(representation);
@@ -69,7 +69,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 				}
 
 				// 6. Return ? HasProperty(rval, ? ToPropertyKey(lval)).
-				yield BooleanLiteral.of(object.hasProperty(left_value.toPropertyKey(interpreter)));
+				yield BooleanValue.of(object.hasProperty(left_value.toPropertyKey(interpreter)));
 			}
 
 			case InstanceOf -> instanceofOperator(interpreter, left_value, right_value);
@@ -77,7 +77,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-instanceofoperator")
-	private BooleanLiteral instanceofOperator(Interpreter interpreter, Value<?> V, Value<?> target) throws AbruptCompletion {
+	private BooleanValue instanceofOperator(Interpreter interpreter, Value<?> V, Value<?> target) throws AbruptCompletion {
 		// 1. If Type(target) is not Object, throw a TypeError exception.
 		if (target.type != Type.Object)
 			throw AbruptCompletion.error(new TypeError("Right-hand side of `instanceof` is not an object"));
@@ -102,7 +102,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-islessthan")
-	private BooleanLiteral isLessThan(Interpreter interpreter, Value<?> x, Value<?> y, boolean leftFirst) throws AbruptCompletion {
+	private BooleanValue isLessThan(Interpreter interpreter, Value<?> x, Value<?> y, boolean leftFirst) throws AbruptCompletion {
 		// 1. If the LeftFirst flag is true, then
 		Value<?> px = null;
 		Value<?> py = null;
@@ -124,12 +124,12 @@ public record RelationalExpression(Expression left, Expression right, Relational
 
 
 		// 3. If Type(px) is String and Type(py) is String, then
-		if (px instanceof final StringLiteral string_px && py instanceof final StringLiteral string_py) {
+		if (px instanceof final StringValue string_px && py instanceof final StringValue string_py) {
 
 			// a. If IsStringPrefix(py, px) is true, return false.
-			if (isStringPrefix(string_py.value, string_px.value)) return BooleanLiteral.FALSE;
+			if (isStringPrefix(string_py.value, string_px.value)) return BooleanValue.FALSE;
 			// b. If IsStringPrefix(px, py) is true, return true.
-			if (isStringPrefix(string_px.value, string_py.value)) return BooleanLiteral.TRUE;
+			if (isStringPrefix(string_px.value, string_py.value)) return BooleanValue.TRUE;
 
 			// c. Let k be the smallest non-negative integer such that the code unit at index k
 			//    within px is different from the code unit at index k within py.
@@ -148,7 +148,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 			// e. Let n be the integer that is the numeric value of the code unit at index k within py.
 			int n = string_py.value.charAt(k);
 			// f. If m < n, return true. Otherwise, return false.
-			return BooleanLiteral.of(m < n);
+			return BooleanValue.of(m < n);
 		}
 		// 4. Else,
 		else {
@@ -156,9 +156,9 @@ public record RelationalExpression(Expression left, Expression right, Relational
 
 			// c. NOTE: Because px and py are primitive values, evaluation order is not important.
 			// d. Let nx be ? ToNumeric(px).
-			final NumericLiteral nx = px.toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
+			final NumberValue nx = px.toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
 			// e. Let ny be ? ToNumeric(py).
-			final NumericLiteral ny = py.toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
+			final NumberValue ny = py.toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
 
 			// 1. Return Number::lessThan(nx, ny).
 			return nx.lessThan(ny);

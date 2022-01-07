@@ -6,7 +6,7 @@ import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.value.*;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.runtime.ConsoleObject;
@@ -14,7 +14,7 @@ import xyz.lebster.core.runtime.EvalError;
 import xyz.lebster.core.runtime.MathObject;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
-public final class GlobalObject extends ObjectLiteral {
+public final class GlobalObject extends ObjectValue {
 	public GlobalObject() {
 		super();
 
@@ -22,8 +22,8 @@ public final class GlobalObject extends ObjectLiteral {
 		put("globalThis", this);
 
 		// FIXME: Property descriptors
-		put("NaN", new NativeProperty(new NumericLiteral(Double.NaN)));
-		put("Infinity", new NativeProperty(new NumericLiteral(Double.POSITIVE_INFINITY)));
+		put("NaN", new NativeProperty(new NumberValue(Double.NaN)));
+		put("Infinity", new NativeProperty(new NumberValue(Double.POSITIVE_INFINITY)));
 		put("undefined", new NativeProperty(Undefined.instance));
 
 		// 19.2 Function Properties of the Global Object
@@ -44,27 +44,27 @@ public final class GlobalObject extends ObjectLiteral {
 			final double num = arguments.length > 0 ? arguments[0].toNumericLiteral(interpreter).value : Double.NaN;
 			// 2. If num is NaN, +∞𝔽, or -∞𝔽, return false.
 			// 3. Otherwise, return true.
-			return BooleanLiteral.of(!(Double.isNaN(num) || Double.isInfinite(num)));
+			return BooleanValue.of(!(Double.isNaN(num) || Double.isInfinite(num)));
 		});
 
 		// https://tc39.es/ecma262/multipage#sec-isnan-number
 		// This method behaves the same as the specification, but does not follow it directly
-		setMethod("isNaN", (interpreter, arguments) -> BooleanLiteral.of(arguments.length == 0 || arguments[0].toNumericLiteral(interpreter).value.isNaN()));
+		setMethod("isNaN", (interpreter, arguments) -> BooleanValue.of(arguments.length == 0 || arguments[0].toNumericLiteral(interpreter).value.isNaN()));
 
 		// https://tc39.es/ecma262/multipage#sec-parsefloat-string
 		setMethod("parseFloat", (interpreter, arguments) -> {
 			// 1. Let inputString be ? ToString(string).
-			final StringLiteral string = arguments.length > 0 ? arguments[0].toStringLiteral(interpreter) : new StringLiteral("undefined");
+			final StringValue string = arguments.length > 0 ? arguments[0].toStringLiteral(interpreter) : new StringValue("undefined");
 			// 2. Let trimmedString be ! TrimString(inputString, start).
 			final String trimmedString = string.value.stripLeading();
 			// FIXME: Follow spec
-			return new NumericLiteral(Double.parseDouble(trimmedString));
+			return new NumberValue(Double.parseDouble(trimmedString));
 		});
 
 		// https://tc39.es/ecma262/multipage#sec-parseint-string-radix
 		setMethod("parseInt", (interpreter, arguments) -> {
 			// 1. Let inputString be ? ToString(string).
-			final StringLiteral inputString = arguments.length > 0 ? arguments[0].toStringLiteral(interpreter) : new StringLiteral("undefined");
+			final StringValue inputString = arguments.length > 0 ? arguments[0].toStringLiteral(interpreter) : new StringValue("undefined");
 			// 2. Let S be ! TrimString(inputString, start).
 			final StringBuilder S = new StringBuilder(inputString.value.stripLeading());
 			// 3. Let sign be 1.
@@ -83,7 +83,7 @@ public final class GlobalObject extends ObjectLiteral {
 			// 8. If R ≠ 0, then
 			if (R != 0) {
 				// a. If R < 2 or R > 36, return NaN.
-				if (R < 2 || R > 36) return new NumericLiteral(Double.NaN);
+				if (R < 2 || R > 36) return new NumberValue(Double.NaN);
 				// b. If R ≠ 16, set stripPrefix to false.
 				if (R != 16) stripPrefix = false;
 			} else {
@@ -113,7 +113,7 @@ public final class GlobalObject extends ObjectLiteral {
 			// 12. Let Z be the substring of S from 0 to end.
 			final String Z = S.substring(0, end);
 			// 13. If Z is empty, return NaN.
-			if (Z.isEmpty()) return new NumericLiteral(Double.NaN);
+			if (Z.isEmpty()) return new NumberValue(Double.NaN);
 
 			// 14. Let mathInt be the integer value that is represented by Z in radix-R notation, using the letters
 			// A-Z and a-z for digits with values 10 through 35. (However, if R is 10 and Z contains more than 20
@@ -126,11 +126,11 @@ public final class GlobalObject extends ObjectLiteral {
 			if (mathInt == 0) {
 				// a. If sign = -1, return -0𝔽.
 				// b. Return +0𝔽.
-				return new NumericLiteral(0.0D * sign);
+				return new NumberValue(0.0D * sign);
 			}
 
 			// 16. Return 𝔽(sign × mathInt).
-			return new NumericLiteral(mathInt * sign);
+			return new NumberValue(mathInt * sign);
 		});
 
 		// 19.3 Constructor Properties of the Global Object

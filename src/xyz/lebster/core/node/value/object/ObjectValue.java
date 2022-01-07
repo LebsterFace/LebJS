@@ -14,15 +14,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
+public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
-	private final int UNIQUE_ID = ObjectLiteral.LAST_UNUSED_IDENTIFIER++;
+	private final int UNIQUE_ID = ObjectValue.LAST_UNUSED_IDENTIFIER++;
 
-	public ObjectLiteral(Map<Key<?>, Value<?>> value) {
+	public ObjectValue(Map<Key<?>, Value<?>> value) {
 		super(value, Type.Object);
 	}
 
-	public ObjectLiteral() {
+	public ObjectValue() {
 		this(new HashMap<>());
 	}
 
@@ -49,7 +49,7 @@ public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 		// b. If exoticToPrim is not undefined, then
 		if (exoticToPrim instanceof final Executable<?> executable) {
 			// i - iii. Get hint
-			final StringLiteral hint = new StringLiteral(getHint(preferredType));
+			final StringValue hint = new StringValue(getHint(preferredType));
 			// iv. Let result be ? Call(exoticToPrim, input, hint).
 			final Value<?> result = executable.call(interpreter, this, hint);
 			// v. If Type(result) is not Object, return result.
@@ -70,13 +70,13 @@ public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 		assert hint == Type.String || hint == Type.Number;
 
 		// 3. If hint is string, then Let methodNames be "toString", "valueOf".
-		final StringLiteral[] methodNames = hint == Type.String ?
-			new StringLiteral[] { ObjectPrototype.toString, ObjectPrototype.valueOf } :
+		final StringValue[] methodNames = hint == Type.String ?
+			new StringValue[] { ObjectPrototype.toString, ObjectPrototype.valueOf } :
 			// 4. Else, Let methodNames be "valueOf", "toString".
-			new StringLiteral[] { ObjectPrototype.valueOf, ObjectPrototype.toString };
+			new StringValue[] { ObjectPrototype.valueOf, ObjectPrototype.toString };
 
 		// 5. For each element name of methodNames, do
-		for (final StringLiteral name : methodNames) {
+		for (final StringValue name : methodNames) {
 			// a. Let method be ? Get(O, name).
 			final Value<?> method = get(name);
 			// b. If IsCallable(method) is true, then
@@ -93,22 +93,22 @@ public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public StringValue toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
 		return toPrimitive(interpreter, Type.String).toStringLiteral(interpreter);
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public NumberValue toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
 		return toPrimitive(interpreter, Type.Number).toNumericLiteral(interpreter);
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return BooleanLiteral.TRUE;
+	public BooleanValue toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
+		return BooleanValue.TRUE;
 	}
 
 	@Override
-	public ObjectLiteral toObjectLiteral(Interpreter interpreter) {
+	public ObjectValue toObjectLiteral(Interpreter interpreter) {
 		return this;
 	}
 
@@ -121,23 +121,23 @@ public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 	}
 
 	public void put(String key, Value<?> value) {
-		this.value.put(new StringLiteral(key), value);
+		this.value.put(new StringValue(key), value);
 	}
 
 	public void put(Key<?> key, Value<?> value) {
 		this.value.put(key, value);
 	}
 
-	public void setMethod(StringLiteral name, NativeCode code) {
+	public void setMethod(StringValue name, NativeCode code) {
 		this.value.put(name, new NativeFunction(code));
 	}
 
 	public void setMethod(String name, NativeCode code) {
-		this.value.put(new StringLiteral(name), new NativeFunction(code));
+		this.value.put(new StringValue(name), new NativeFunction(code));
 	}
 
 	public Value<?> get(Key<?> key) {
-		ObjectLiteral object = this;
+		ObjectValue object = this;
 
 		while (object != null) {
 			if (object.value.containsKey(key)) {
@@ -155,7 +155,7 @@ public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 
 	public boolean hasProperty(Key<?> name) {
 		if (hasOwnProperty(name)) return true;
-		ObjectLiteral object = this;
+		ObjectValue object = this;
 
 		while (object != null) {
 			if (object.value.containsKey(name)) {
@@ -181,7 +181,7 @@ public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void dumpRecursive(int indent, HashSet<ObjectLiteral> parents) {
+	protected void dumpRecursive(int indent, HashSet<ObjectValue> parents) {
 		Dumper.dumpName(indent, "ObjectLiteral");
 		if (value.isEmpty()) {
 			Dumper.dumpIndent(indent + 1);
@@ -197,14 +197,14 @@ public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 			System.out.print(entry.getKey());
 			System.out.print(": ");
 			final Value<?> value = entry.getValue();
-			if (value instanceof final ObjectLiteral object) {
+			if (value instanceof final ObjectValue object) {
 				if (parents.contains(object)) {
 					System.out.print(ANSI.RED);
 					System.out.print(this == value ? "[self]" : "[parent]");
 					System.out.println(ANSI.RESET);
 				} else {
 					System.out.println();
-					object.dumpRecursive(indent + 2, (HashSet<ObjectLiteral>) parents.clone());
+					object.dumpRecursive(indent + 2, (HashSet<ObjectValue>) parents.clone());
 				}
 			} else {
 				value.dump(0);
@@ -212,7 +212,7 @@ public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 		}
 	}
 
-	public ObjectLiteral getPrototype() {
+	public ObjectValue getPrototype() {
 		return ObjectPrototype.instance;
 	}
 
@@ -232,7 +232,7 @@ public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void representRecursive(StringRepresentation representation, HashSet<ObjectLiteral> parents) {
+	public void representRecursive(StringRepresentation representation, HashSet<ObjectValue> parents) {
 		representation.append('{');
 		if (value.isEmpty()) {
 			representation.append(" }");
@@ -252,13 +252,13 @@ public class ObjectLiteral extends Value<Map<ObjectLiteral.Key<?>, Value<?>>> {
 			representation.append(ANSI.RESET);
 			representation.append(": ");
 			final Value<?> value = entry.getValue();
-			if (value instanceof final ObjectLiteral object) {
+			if (value instanceof final ObjectValue object) {
 				if (parents.contains(object)) {
 					representation.append(ANSI.RED);
 					representation.append(this == value ? "[self]" : "[parent]");
 					representation.append(ANSI.RESET);
 				} else {
-					object.representRecursive(representation, (HashSet<ObjectLiteral>) parents.clone());
+					object.representRecursive(representation, (HashSet<ObjectValue>) parents.clone());
 				}
 			} else {
 				value.represent(representation);

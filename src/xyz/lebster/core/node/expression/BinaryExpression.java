@@ -5,8 +5,8 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.NumericLiteral;
-import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.NumberValue;
+import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Type;
 import xyz.lebster.core.node.value.Value;
 
@@ -17,9 +17,9 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 			final Value<?> left_primitive = left_value.toPrimitive(interpreter);
 			final Value<?> right_primitive = right_value.toPrimitive(interpreter);
 			if (left_primitive.type == Type.String || right_primitive.type == Type.String) {
-				final StringLiteral left_string = left_primitive.toStringLiteral(interpreter);
-				final StringLiteral right_string = right_primitive.toStringLiteral(interpreter);
-				return new StringLiteral(left_string.value + right_string.value);
+				final StringValue left_string = left_primitive.toStringLiteral(interpreter);
+				final StringValue right_string = right_primitive.toStringLiteral(interpreter);
+				return new StringValue(left_string.value + right_string.value);
 			} else {
 				left_value = left_primitive;
 				right_value = right_primitive;
@@ -29,7 +29,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 		final double left_num = left_value.toNumericLiteral(interpreter).value;
 		final double right_num = right_value.toNumericLiteral(interpreter).value;
 
-		return new NumericLiteral(switch (op) {
+		return new NumberValue(switch (op) {
 			case Add -> left_num + right_num;
 			case Subtract -> left_num - right_num;
 			case Multiply -> left_num * right_num;

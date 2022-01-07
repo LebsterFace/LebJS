@@ -4,15 +4,15 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
 
-import static xyz.lebster.core.node.value.NumericLiteral.isNegativeZero;
-import static xyz.lebster.core.node.value.NumericLiteral.isPositiveZero;
+import static xyz.lebster.core.node.value.NumberValue.isNegativeZero;
+import static xyz.lebster.core.node.value.NumberValue.isPositiveZero;
 
-public final class MathObject extends ObjectLiteral {
+public final class MathObject extends ObjectValue {
 	public static final MathObject instance = new MathObject();
 
 	/** Euler's number, the base of natural logarithms, e */
@@ -34,16 +34,16 @@ public final class MathObject extends ObjectLiteral {
 
 	@SuppressWarnings("SpellCheckingInspection")
 	private MathObject() {
-		put(Symbol.toStringTag, new StringLiteral("Math"));
+		put(Symbol.toStringTag, new StringValue("Math"));
 
-		put("E",		new NumericLiteral(E));
-		put("LN2",		new NumericLiteral(LN2));
-		put("LN10",		new NumericLiteral(LN10));
-		put("LOG2E",	new NumericLiteral(LOG2E));
-		put("LOG10E",	new NumericLiteral(LOG10E));
-		put("PI",		new NumericLiteral(PI));
-		put("SQRT1_2",	new NumericLiteral(SQRT1_2));
-		put("SQRT2",	new NumericLiteral(SQRT2));
+		put("E",		new NumberValue(E));
+		put("LN2",		new NumberValue(LN2));
+		put("LN10",		new NumberValue(LN10));
+		put("LOG2E",	new NumberValue(LOG2E));
+		put("LOG10E",	new NumberValue(LOG10E));
+		put("PI",		new NumberValue(PI));
+		put("SQRT1_2",	new NumberValue(SQRT1_2));
+		put("SQRT2",	new NumberValue(SQRT2));
 
 		// (double) -> double
 		addWrapper("abs",	(DoubleUnaryOperator) Math::abs);
@@ -128,7 +128,7 @@ public final class MathObject extends ObjectLiteral {
 		});
 
 		// () -> double
-		this.setMethod("random", (interpreter, args) -> new NumericLiteral(Math.random()));
+		this.setMethod("random", (interpreter, args) -> new NumberValue(Math.random()));
 
 		// https://tc39.es/ecma262/multipage#sec-math.trunc
 		addWrapper("trunc", (double n) -> {
@@ -208,14 +208,14 @@ public final class MathObject extends ObjectLiteral {
 				coerced[i] = args[i].toNumericLiteral(interpreter).value;
 			}
 
-			return new NumericLiteral(restArgs.applyAsDouble(coerced));
+			return new NumberValue(restArgs.applyAsDouble(coerced));
 		});
 	}
 
 	private void addWrapper(String methodName, DoubleUnaryOperator unaryOperator) {
 		this.setMethod(methodName, (interpreter, args) -> {
 			final var number = getArgument(0, args, interpreter);
-			return new NumericLiteral(unaryOperator.applyAsDouble(number));
+			return new NumberValue(unaryOperator.applyAsDouble(number));
 		});
 	}
 
@@ -223,7 +223,7 @@ public final class MathObject extends ObjectLiteral {
 		this.setMethod(methodName, (interpreter, args) -> {
 			final var a = getArgument(0, args, interpreter);
 			final var b = getArgument(1, args, interpreter);
-			return new NumericLiteral(binaryOperator.applyAsDouble(a, b));
+			return new NumberValue(binaryOperator.applyAsDouble(a, b));
 		});
 	}
 }

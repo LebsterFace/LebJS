@@ -1,18 +1,18 @@
 package xyz.lebster.core.node.value.object;
 
-public class Instance extends ObjectLiteral {
-	private ObjectLiteral prototype;
+public class Instance extends ObjectValue {
+	private ObjectValue prototype;
 
-	public Instance(ObjectLiteral prototype) {
+	public Instance(ObjectValue prototype) {
 		this.prototype = prototype;
 	}
 
 	@Override
-	public ObjectLiteral getPrototype() {
+	public ObjectValue getPrototype() {
 		return prototype;
 	}
 
-	public void setPrototype(ObjectLiteral prototype) {
+	public void setPrototype(ObjectValue prototype) {
 		this.prototype = prototype;
 	}
 }

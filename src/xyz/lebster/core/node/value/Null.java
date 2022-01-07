@@ -4,7 +4,7 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.TypeError;
 
 public final class Null extends Primitive<Void> {
@@ -15,8 +15,8 @@ public final class Null extends Primitive<Void> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral(Interpreter interpreter) {
-		return new StringLiteral("null");
+	public StringValue toStringLiteral(Interpreter interpreter) {
+		return new StringValue("null");
 	}
 
 	@Override
@@ -25,17 +25,17 @@ public final class Null extends Primitive<Void> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
-		return new NumericLiteral(0.0);
+	public NumberValue toNumericLiteral(Interpreter interpreter) {
+		return new NumberValue(0.0);
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
-		return BooleanLiteral.FALSE;
+	public BooleanValue toBooleanLiteral(Interpreter interpreter) {
+		return BooleanValue.FALSE;
 	}
 
 	@Override
-	public ObjectLiteral toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectValue toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert null to object"));
 	}
 

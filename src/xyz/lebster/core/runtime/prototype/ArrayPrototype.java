@@ -6,17 +6,17 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.object.Executable;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.ArrayObject;
 import xyz.lebster.core.runtime.TypeError;
 
-public final class ArrayPrototype extends ObjectLiteral {
+public final class ArrayPrototype extends ObjectValue {
 	public static final ArrayPrototype instance = new ArrayPrototype();
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
 
-	public static final StringLiteral push = new StringLiteral("push");
-	public static final StringLiteral map = new StringLiteral("map");
-	public static final StringLiteral join = new StringLiteral("join");
+	public static final StringValue push = new StringValue("push");
+	public static final StringValue map = new StringValue("map");
+	public static final StringValue join = new StringValue("join");
 
 	static {
 		instance.setMethod(push, ArrayPrototype::push);
@@ -31,7 +31,7 @@ public final class ArrayPrototype extends ObjectLiteral {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tostring")
 	private static Value<?> toStringMethod(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
 		// 1. Let array be ? ToObject(this value).
-		final ObjectLiteral array = interpreter.thisValue().toObjectLiteral(interpreter);
+		final ObjectValue array = interpreter.thisValue().toObjectLiteral(interpreter);
 		// 2. Let func be ? Get(array, "join").
 		final Value<?> func = array.get(join);
 		// 3. If IsCallable(func) is false, set func to the intrinsic function %Object.prototype.toString%.
@@ -42,7 +42,7 @@ public final class ArrayPrototype extends ObjectLiteral {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.join")
 	private static Value<?> join(Interpreter interpreter, Value<?>[] elements) throws AbruptCompletion {
-		final ObjectLiteral O = interpreter.thisValue().toObjectLiteral(interpreter);
+		final ObjectValue O = interpreter.thisValue().toObjectLiteral(interpreter);
 		final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value.longValue());
 		final boolean noSeparator = elements.length == 0 || elements[0].type == Type.Undefined;
 		final String sep = noSeparator ? "," : elements[0].toStringLiteral(interpreter).value;
@@ -50,15 +50,15 @@ public final class ArrayPrototype extends ObjectLiteral {
 		final StringBuilder result = new StringBuilder();
 		for (int k = 0; k < len; k++) {
 			if (k > 0) result.append(sep);
-			final Value<?> element = O.get(new StringLiteral(k));
+			final Value<?> element = O.get(new StringValue(k));
 			result.append(element.isNullish() ? "" : element.toStringLiteral(interpreter).value);
 		}
 
-		return new StringLiteral(result.toString());
+		return new StringValue(result.toString());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
-	private static long lengthOfArrayLike(ObjectLiteral O, Interpreter interpreter) throws AbruptCompletion {
+	private static long lengthOfArrayLike(ObjectValue O, Interpreter interpreter) throws AbruptCompletion {
 		final double number = O.get(ArrayObject.LENGTH_KEY).toNumericLiteral(interpreter).value;
 		if (Double.isNaN(number) || number <= 0) {
 			return 0L;
@@ -69,7 +69,7 @@ public final class ArrayPrototype extends ObjectLiteral {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.push")
 	private static Value<?> push(Interpreter interpreter, Value<?>[] elements) throws AbruptCompletion {
-		final ObjectLiteral O = interpreter.thisValue().toObjectLiteral(interpreter);
+		final ObjectValue O = interpreter.thisValue().toObjectLiteral(interpreter);
 		final long len = lengthOfArrayLike(O, interpreter);
 
 		if ((len + elements.length) > MAX_LENGTH) {
@@ -79,9 +79,9 @@ public final class ArrayPrototype extends ObjectLiteral {
 		}
 
 		for (final Value<?> E : elements)
-			O.set(interpreter, new StringLiteral(len), E);
+			O.set(interpreter, new StringValue(len), E);
 
-		final NumericLiteral newLength = new NumericLiteral(len + elements.length);
+		final NumberValue newLength = new NumberValue(len + elements.length);
 		O.set(interpreter, ArrayObject.LENGTH_KEY, newLength);
 		return newLength;
 	}
@@ -91,7 +91,7 @@ public final class ArrayPrototype extends ObjectLiteral {
 		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : Undefined.instance;
 		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : Undefined.instance;
 
-		final ObjectLiteral O = interpreter.thisValue().toObjectLiteral(interpreter);
+		final ObjectValue O = interpreter.thisValue().toObjectLiteral(interpreter);
 		final long len = lengthOfArrayLike(O, interpreter);
 
 		if (!(callbackfn instanceof final Executable<?> executable)) {
@@ -103,9 +103,9 @@ public final class ArrayPrototype extends ObjectLiteral {
 
 		final Value<?>[] values = new Value<?>[(int) len];
 		for (int k = 0; k < len; k++) {
-			final var Pk = new StringLiteral(k);
+			final var Pk = new StringValue(k);
 			if (O.hasOwnProperty(Pk)) {
-				values[k] = executable.call(interpreter, thisArg, O.get(Pk), new NumericLiteral(k), O);
+				values[k] = executable.call(interpreter, thisArg, O.get(Pk), new NumberValue(k), O);
 			}
 		}
 

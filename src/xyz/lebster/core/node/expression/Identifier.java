@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
 
 public record Identifier(String value) implements LeftHandSideExpression {
@@ -24,8 +24,8 @@ public record Identifier(String value) implements LeftHandSideExpression {
 		return interpreter.getReference(this);
 	}
 
-	public StringLiteral stringValue() {
-		return new StringLiteral(toString());
+	public StringValue stringValue() {
+		return new StringValue(toString());
 	}
 
 	@Override

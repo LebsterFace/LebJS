@@ -5,7 +5,7 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.TypeError;
 
 public final class Undefined extends Primitive<Void> {
@@ -16,22 +16,22 @@ public final class Undefined extends Primitive<Void> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral(Interpreter interpreter) {
-		return new StringLiteral("undefined");
+	public StringValue toStringLiteral(Interpreter interpreter) {
+		return new StringValue("undefined");
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
-		return new NumericLiteral(Double.NaN);
+	public NumberValue toNumericLiteral(Interpreter interpreter) {
+		return new NumberValue(Double.NaN);
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
-		return BooleanLiteral.FALSE;
+	public BooleanValue toBooleanLiteral(Interpreter interpreter) {
+		return BooleanValue.FALSE;
 	}
 
 	@Override
-	public ObjectLiteral toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectValue toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert undefined to object"));
 	}
 

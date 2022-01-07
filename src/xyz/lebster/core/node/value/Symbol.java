@@ -4,11 +4,11 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.TypeError;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-language-types-symbol-type")
-public class Symbol extends ObjectLiteral.Key<Void> {
+public class Symbol extends ObjectValue.Key<Void> {
 	// https://tc39.es/ecma262/multipage#table-well-known-symbols
 
 	/**
@@ -82,22 +82,22 @@ public class Symbol extends ObjectLiteral.Key<Void> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public StringValue toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert a Symbol value to a string"));
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public NumberValue toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert a Symbol value to a number"));
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
-		return BooleanLiteral.TRUE;
+	public BooleanValue toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
+		return BooleanValue.TRUE;
 	}
 
 	@Override
-	public ObjectLiteral toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectValue toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
 		throw new NotImplemented("SymbolWrapper");
 	}
 

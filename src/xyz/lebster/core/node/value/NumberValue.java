@@ -5,29 +5,29 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 
-public final class NumericLiteral extends Primitive<Double> {
+public final class NumberValue extends Primitive<Double> {
 	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;
 	public static final long POSITIVE_ZERO_BITS = 0;
 
 	public static boolean isNegativeZero(double d) { return Double.doubleToRawLongBits(d) == NEGATIVE_ZERO_BITS; }
 	public static boolean isNegativeZero(Double d) { return Double.doubleToRawLongBits(d) == NEGATIVE_ZERO_BITS; }
-	public static boolean isNegativeZero(NumericLiteral n) { return isNegativeZero(n.value); }
+	public static boolean isNegativeZero(NumberValue n) { return isNegativeZero(n.value); }
 
 	public static boolean isPositiveZero(double d) { return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS; }
 	public static boolean isPositiveZero(Double d) { return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS; }
-	public static boolean isPositiveZero(NumericLiteral n) { return isPositiveZero(n.value); }
+	public static boolean isPositiveZero(NumberValue n) { return isPositiveZero(n.value); }
 
-	public NumericLiteral(double num) {
+	public NumberValue(double num) {
 		super(num, Type.Number);
 	}
 
-	public NumericLiteral(Double num) {
+	public NumberValue(Double num) {
 		super(num, Type.Number);
 	}
 
-	public NumericLiteral(int num) {
+	public NumberValue(int num) {
 		super((double) num, Type.Number);
 	}
 
@@ -65,8 +65,8 @@ public final class NumericLiteral extends Primitive<Double> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral(Interpreter interpreter) {
-		return new StringLiteral(stringValueOf(value));
+	public StringValue toStringLiteral(Interpreter interpreter) {
+		return new StringValue(stringValueOf(value));
 	}
 
 	@Override
@@ -77,17 +77,17 @@ public final class NumericLiteral extends Primitive<Double> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
+	public NumberValue toNumericLiteral(Interpreter interpreter) {
 		return this;
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
-		return BooleanLiteral.of(!value.isNaN() && value != 0.0);
+	public BooleanValue toBooleanLiteral(Interpreter interpreter) {
+		return BooleanValue.of(!value.isNaN() && value != 0.0);
 	}
 
 	@Override
-	public ObjectLiteral toObjectLiteral(Interpreter interpreter) {
+	public ObjectValue toObjectLiteral(Interpreter interpreter) {
 		throw new NotImplemented("NumberWrapper");
 	}
 
@@ -96,8 +96,8 @@ public final class NumericLiteral extends Primitive<Double> {
 		return "number";
 	}
 
-	public NumericLiteral unaryMinus() {
-		return new NumericLiteral(-value);
+	public NumberValue unaryMinus() {
+		return new NumberValue(-value);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toint32")
@@ -115,7 +115,7 @@ public final class NumericLiteral extends Primitive<Double> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-lessThan")
-	public BooleanLiteral lessThan(NumericLiteral other) {
+	public BooleanValue lessThan(NumberValue other) {
 		// TODO: Find out if java.lang.Double#compareTo could be used for this
 		final double x = this.value;
 		final double y = other.value;
@@ -125,29 +125,29 @@ public final class NumericLiteral extends Primitive<Double> {
 		if (Double.isNaN(x) || Double.isNaN(y)) return null;
 
 		// 3. If x and y are the same Number value, return false.
-		if (x == y) return BooleanLiteral.FALSE;
+		if (x == y) return BooleanValue.FALSE;
 
 		// 4. If x is +0𝔽 and y is -0𝔽, return false.
-		if (isPositiveZero(x) && isNegativeZero(y)) return BooleanLiteral.FALSE;
+		if (isPositiveZero(x) && isNegativeZero(y)) return BooleanValue.FALSE;
 		// 5. If x is -0𝔽 and y is +0𝔽, return false.
-		if (isNegativeZero(x) && isPositiveZero(y)) return BooleanLiteral.FALSE;
+		if (isNegativeZero(x) && isPositiveZero(y)) return BooleanValue.FALSE;
 
 		// 6. If x is +∞𝔽, return false.
-		if (x == Double.POSITIVE_INFINITY) return BooleanLiteral.FALSE;
+		if (x == Double.POSITIVE_INFINITY) return BooleanValue.FALSE;
 		// 7. If y is +∞𝔽, return true.
-		if (y == Double.POSITIVE_INFINITY) return BooleanLiteral.TRUE;
+		if (y == Double.POSITIVE_INFINITY) return BooleanValue.TRUE;
 		// 8. If y is -∞𝔽, return false.
-		if (y == Double.NEGATIVE_INFINITY) return BooleanLiteral.FALSE;
+		if (y == Double.NEGATIVE_INFINITY) return BooleanValue.FALSE;
 		// 9. If x is -∞𝔽, return true.
-		if (x == Double.NEGATIVE_INFINITY) return BooleanLiteral.TRUE;
+		if (x == Double.NEGATIVE_INFINITY) return BooleanValue.TRUE;
 
 		// 10. Assert: x and y are finite and non-zero.
 		// 11. If ℝ(x) < ℝ(y), return true. Otherwise, return false.
-		return BooleanLiteral.of(x < y);
+		return BooleanValue.of(x < y);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-sameValue")
-	public boolean sameValue(NumericLiteral y) {
+	public boolean sameValue(NumberValue y) {
 		// 1. If x is NaN and y is NaN, return true.
 		if (this.value.isNaN() && y.value.isNaN()) return true;
 		// 2. If x is +0𝔽 and y is -0𝔽, return false.

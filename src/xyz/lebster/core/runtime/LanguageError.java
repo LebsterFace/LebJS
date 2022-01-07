@@ -1,16 +1,16 @@
 package xyz.lebster.core.runtime;
 
 import xyz.lebster.core.Dumper;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
-import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
+import xyz.lebster.core.node.value.StringValue;
 
-public class LanguageError extends ObjectLiteral {
+public class LanguageError extends ObjectValue {
 	public final String message;
 
 	public LanguageError(String message) {
 		this.message = message;
-		put("message", new StringLiteral(message));
-		put("name", new StringLiteral(getClass().getSimpleName()));
+		put("message", new StringValue(message));
+		put("name", new StringValue(getClass().getSimpleName()));
 	}
 
 	@Override

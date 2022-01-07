@@ -2,8 +2,8 @@ package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.node.expression.Identifier;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
-import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
+import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.ExecutionError;
 import xyz.lebster.core.runtime.LexicalEnvironment;
@@ -24,7 +24,7 @@ public final class Interpreter {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-resolvebinding")
 	public Reference getReference(Identifier identifier) {
-		final StringLiteral name = identifier.stringValue();
+		final StringValue name = identifier.stringValue();
 		for (LexicalEnvironment env = lexicalEnvironment(); env != null; env = env.parent()) {
 			if (env.hasBinding(name)) {
 				return new Reference(env.variables(), name);
@@ -68,7 +68,7 @@ public final class Interpreter {
 	}
 
 	public ExecutionContext pushExecutionContext(Value<?> thisValue) throws AbruptCompletion {
-		final LexicalEnvironment env = new LexicalEnvironment(new ObjectLiteral(), lexicalEnvironment());
+		final LexicalEnvironment env = new LexicalEnvironment(new ObjectValue(), lexicalEnvironment());
 		final ExecutionContext context = new ExecutionContext(env, null, thisValue);
 		enterExecutionContext(context);
 		return context;

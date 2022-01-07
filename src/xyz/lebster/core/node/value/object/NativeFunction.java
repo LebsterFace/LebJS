@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.NativeCode;
-import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
@@ -15,7 +15,7 @@ import java.util.HashSet;
 public final class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(NativeCode code) {
 		super(code);
-		put(ObjectPrototype.toString, new NativeFunction(new StringLiteral("function () { [native code] }")));
+		put(ObjectPrototype.toString, new NativeFunction(new StringValue("function () { [native code] }")));
 	}
 
 	public NativeFunction(Value<?> value) {
@@ -40,7 +40,7 @@ public final class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public void representRecursive(StringRepresentation representation, HashSet<ObjectLiteral> parents) {
+	public void representRecursive(StringRepresentation representation, HashSet<ObjectValue> parents) {
 		this.represent(representation);
 	}
 }

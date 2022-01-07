@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.FunctionNode;
-import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
@@ -19,10 +19,10 @@ public final class Function extends Constructor<FunctionNode> {
 	public Function(FunctionNode code, ExecutionContext context) {
 		super(code);
 		this.context = context;
-		final ObjectLiteral prototype = new ObjectLiteral();
+		final ObjectValue prototype = new ObjectValue();
 		prototype.put("constructor", this);
 		this.put("prototype", prototype);
-		this.put(ObjectPrototype.toString, new NativeFunction(new StringLiteral(code.toRepresentationString())));
+		this.put(ObjectPrototype.toString, new NativeFunction(new StringValue(code.toRepresentationString())));
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	public void representRecursive(StringRepresentation representation, HashSet<ObjectLiteral> parents) {
+	public void representRecursive(StringRepresentation representation, HashSet<ObjectValue> parents) {
 		this.represent(representation);
 	}
 
@@ -65,13 +65,13 @@ public final class Function extends Constructor<FunctionNode> {
 
 	@Override
 	public Instance construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final Value<?> prototypeProperty = this.get(new StringLiteral("prototype"));
+		final Value<?> prototypeProperty = this.get(new StringValue("prototype"));
 
-		final Instance newInstance = new Instance(prototypeProperty instanceof ObjectLiteral object ? object : ObjectPrototype.instance);
+		final Instance newInstance = new Instance(prototypeProperty instanceof ObjectValue object ? object : ObjectPrototype.instance);
 		final Function boundSelf = this.boundTo(newInstance);
 		final Value<?> returnValue = boundSelf.internalCall(interpreter, args);
 
-		if (returnValue instanceof final ObjectLiteral object) {
+		if (returnValue instanceof final ObjectValue object) {
 			// TODO: Improve this as it is a little hackish
 			for (var entry : object.value.entrySet()) {
 				newInstance.put(entry.getKey(), entry.getValue());

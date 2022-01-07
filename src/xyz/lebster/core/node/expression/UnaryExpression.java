@@ -5,8 +5,8 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.NumericLiteral;
-import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.NumberValue;
+import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.LanguageError;
 
@@ -22,12 +22,12 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 				if (expression instanceof final LeftHandSideExpression lhs) {
 					final Reference reference = lhs.toReference(interpreter);
 					if (reference.isResolvable()) {
-						yield new StringLiteral(reference.getValue(interpreter).typeOf(interpreter));
+						yield new StringValue(reference.getValue(interpreter).typeOf(interpreter));
 					} else {
-						yield new StringLiteral("undefined");
+						yield new StringValue("undefined");
 					}
 				} else {
-					yield new StringLiteral(expression.execute(interpreter).typeOf(interpreter));
+					yield new StringValue(expression.execute(interpreter).typeOf(interpreter));
 				}
 			}
 
@@ -38,8 +38,8 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 				}
 
 				final Reference left_reference = lhs.toReference(interpreter);
-				final NumericLiteral oldValue = lhs.execute(interpreter).toNumericLiteral(interpreter);
-				final NumericLiteral newValue = new NumericLiteral(switch (op) {
+				final NumberValue oldValue = lhs.execute(interpreter).toNumericLiteral(interpreter);
+				final NumberValue newValue = new NumberValue(switch (op) {
 					case PostIncrement, PreIncrement -> oldValue.value + 1.0;
 					case PostDecrement, PreDecrement -> oldValue.value - 1.0;
 					default -> throw new IllegalStateException("Unexpected value: " + op);

@@ -2,7 +2,7 @@ package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.*;
-import xyz.lebster.core.node.value.StringLiteral;
+import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Type;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.TypeError;
@@ -23,7 +23,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 	@Override
 	public Reference toReference(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> executedBase = base.execute(interpreter);
-		final StringLiteral executedProp = property.execute(interpreter).toStringLiteral(interpreter);
+		final StringValue executedProp = property.execute(interpreter).toStringLiteral(interpreter);
 
 		if (executedBase.type == Type.Undefined || executedBase.type == Type.Null) {
 			final String msg = "Cannot read property '" +
@@ -52,7 +52,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 			representation.append(']');
 		} else {
 			representation.append('.');
-			representation.append(((StringLiteral) property).value);
+			representation.append(((StringValue) property).value);
 		}
 	}
 }

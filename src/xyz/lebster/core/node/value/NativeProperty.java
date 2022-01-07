@@ -3,7 +3,7 @@ package xyz.lebster.core.node.value;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.object.NativeGetterSetter;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 
 public class NativeProperty extends Value<NativeGetterSetter> {
 	public NativeProperty(NativeGetterSetter value) {
@@ -28,22 +28,22 @@ public class NativeProperty extends Value<NativeGetterSetter> {
 	}
 
 	@Override
-	public StringLiteral toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public StringValue toStringLiteral(Interpreter interpreter) throws AbruptCompletion {
 		return value.get(interpreter).toStringLiteral(interpreter);
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public NumberValue toNumericLiteral(Interpreter interpreter) throws AbruptCompletion {
 		return value.get(interpreter).toNumericLiteral(interpreter);
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public BooleanValue toBooleanLiteral(Interpreter interpreter) throws AbruptCompletion {
 		return value.get(interpreter).toBooleanLiteral(interpreter);
 	}
 
 	@Override
-	public ObjectLiteral toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectValue toObjectLiteral(Interpreter interpreter) throws AbruptCompletion {
 		return value.get(interpreter).toObjectLiteral(interpreter);
 	}
 

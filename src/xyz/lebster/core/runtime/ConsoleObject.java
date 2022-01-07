@@ -4,12 +4,12 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.Undefined;
 import xyz.lebster.core.node.value.Value;
 
 @SpecificationURL("https://console.spec.whatwg.org/")
-public final class ConsoleObject extends ObjectLiteral {
+public final class ConsoleObject extends ObjectValue {
 	public static final ConsoleObject instance = new ConsoleObject();
 
 	private ConsoleObject() {

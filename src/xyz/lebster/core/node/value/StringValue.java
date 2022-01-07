@@ -3,20 +3,20 @@ package xyz.lebster.core.node.value;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.object.StringWrapper;
 
-public final class StringLiteral extends ObjectLiteral.Key<String> {
-	public StringLiteral(String value) {
+public final class StringValue extends ObjectValue.Key<String> {
+	public StringValue(String value) {
 		super(value, Type.String);
 	}
 
-	public StringLiteral(Object value) {
+	public StringValue(Object value) {
 		super(String.valueOf(value), Type.String);
 	}
 
 	@Override
-	public StringLiteral toStringLiteral(Interpreter interpreter) {
+	public StringValue toStringLiteral(Interpreter interpreter) {
 		return this;
 	}
 
@@ -31,21 +31,21 @@ public final class StringLiteral extends ObjectLiteral.Key<String> {
 	}
 
 	@Override
-	public NumericLiteral toNumericLiteral(Interpreter interpreter) {
+	public NumberValue toNumericLiteral(Interpreter interpreter) {
 		// FIXME: Follow spec
 		if (value.isBlank())
-			return new NumericLiteral(0);
+			return new NumberValue(0);
 
 		try {
-			return new NumericLiteral(Double.parseDouble(value));
+			return new NumberValue(Double.parseDouble(value));
 		} catch (NumberFormatException e) {
-			return new NumericLiteral(Double.NaN);
+			return new NumberValue(Double.NaN);
 		}
 	}
 
 	@Override
-	public BooleanLiteral toBooleanLiteral(Interpreter interpreter) {
-		return BooleanLiteral.of(value.length() > 0);
+	public BooleanValue toBooleanLiteral(Interpreter interpreter) {
+		return BooleanValue.of(value.length() > 0);
 	}
 
 	@Override

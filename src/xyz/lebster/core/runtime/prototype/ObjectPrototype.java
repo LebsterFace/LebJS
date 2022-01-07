@@ -6,15 +6,15 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.object.NativeFunction;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.object.StringWrapper;
 import xyz.lebster.core.runtime.ArrayObject;
 import xyz.lebster.core.runtime.LanguageError;
 
-public final class ObjectPrototype extends ObjectLiteral {
+public final class ObjectPrototype extends ObjectValue {
 	public static final ObjectPrototype instance = new ObjectPrototype();
-	public static final StringLiteral toString = new StringLiteral("toString");
-	public static final StringLiteral valueOf = new StringLiteral("valueOf");
+	public static final StringValue toString = new StringValue("toString");
+	public static final StringValue valueOf = new StringValue("valueOf");
 	public static final NativeFunction toStringMethod = new NativeFunction(ObjectPrototype::toStringMethod);
 
 	static {
@@ -26,14 +26,14 @@ public final class ObjectPrototype extends ObjectLiteral {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tostring")
-	public static StringLiteral toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	public static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. If the `this` value is undefined, return "[object Undefined]".
 		if (interpreter.thisValue() == Undefined.instance) {
-			return new StringLiteral("[object Undefined]");
+			return new StringValue("[object Undefined]");
 		} else if (interpreter.thisValue() == Null.instance) {
-			return new StringLiteral("[object Null]");
+			return new StringValue("[object Null]");
 		} else {// 3. Let O be ! ToObject(this value).
-			final ObjectLiteral O = interpreter.thisValue().toObjectLiteral(interpreter);
+			final ObjectValue O = interpreter.thisValue().toObjectLiteral(interpreter);
 			String builtinTag;// 4. Let isArray be ? IsArray(O).
 			// 5. If isArray is true, let builtinTag be "Array".
 			// TODO: Pattern matching for switch
@@ -57,10 +57,10 @@ public final class ObjectPrototype extends ObjectLiteral {
 			final Value<?> tag = O.get(Symbol.toStringTag);
 			// 16. If Type(tag) is not String, set tag to builtinTag.
 			// 17. Return the string-concatenation of "[object ", tag, and "]".
-			if (tag instanceof final StringLiteral stringLiteral) {
-				return new StringLiteral("[object " + stringLiteral.value + "]");
+			if (tag instanceof final StringValue stringValue) {
+				return new StringValue("[object " + stringValue.value + "]");
 			} else {
-				return new StringLiteral("[object " + builtinTag + "]");
+				return new StringValue("[object " + builtinTag + "]");
 			}
 		}
 	}
@@ -71,7 +71,7 @@ public final class ObjectPrototype extends ObjectLiteral {
 	}
 
 	@Override
-	public ObjectLiteral getPrototype() {
+	public ObjectValue getPrototype() {
 		return null;
 	}
 }

@@ -8,20 +8,20 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.object.NativeGetterSetter;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.prototype.ArrayPrototype;
 
 import java.util.HashSet;
 
 
-public final class ArrayObject extends ObjectLiteral {
-	public final static StringLiteral LENGTH_KEY = new StringLiteral("length");
+public final class ArrayObject extends ObjectValue {
+	public final static StringValue LENGTH_KEY = new StringValue("length");
 	private int length;
 
 	public final NativeProperty LENGTH_GETTER_SETTER = new NativeProperty(new NativeGetterSetter() {
 		@Override
 		public Value<?> get(Interpreter interpreter) {
-			return new NumericLiteral(length);
+			return new NumberValue(length);
 		}
 
 		@Override
@@ -49,7 +49,7 @@ public final class ArrayObject extends ObjectLiteral {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void representRecursive(StringRepresentation representation, HashSet<ObjectLiteral> parents) {
+	public void representRecursive(StringRepresentation representation, HashSet<ObjectValue> parents) {
 		representation.append('[');
 		if (value.isEmpty()) {
 			representation.append(']');
@@ -58,14 +58,14 @@ public final class ArrayObject extends ObjectLiteral {
 
 		parents.add(this);
 		for (int index = 0; index < this.length; index++) {
-			final Value<?> element = this.get(new StringLiteral(index));
-			if (element instanceof final ObjectLiteral object) {
+			final Value<?> element = this.get(new StringValue(index));
+			if (element instanceof final ObjectValue object) {
 				if (parents.contains(object)) {
 					representation.append(ANSI.RED);
 					representation.append(this == element ? "[self]" : "[parent]");
 					representation.append(ANSI.RESET);
 				} else {
-					object.representRecursive(representation, (HashSet<ObjectLiteral>) parents.clone());
+					object.representRecursive(representation, (HashSet<ObjectValue>) parents.clone());
 				}
 			} else {
 				element.represent(representation);
@@ -79,7 +79,7 @@ public final class ArrayObject extends ObjectLiteral {
 	}
 
 	@Override
-	public ObjectLiteral getPrototype() {
+	public ObjectValue getPrototype() {
 		return ArrayPrototype.instance;
 	}
 }

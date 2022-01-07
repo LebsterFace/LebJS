@@ -11,14 +11,14 @@ import xyz.lebster.core.runtime.prototype.FunctionPrototype;
 
 import java.util.HashSet;
 
-public abstract class Executable<JType> extends ObjectLiteral {
+public abstract class Executable<JType> extends ObjectValue {
 	public final JType code;
 
 	public Executable(JType code) {
 		super();
 		this.code = code;
-		this.put("length", new NumericLiteral(0));
-		this.put("name", new StringLiteral(""));
+		this.put("length", new NumberValue(0));
+		this.put("name", new StringValue(""));
 	}
 
 	public Value<?> callWithContext(Interpreter interpreter, ExecutionContext frame, Value<?>... args) throws AbruptCompletion {
@@ -48,7 +48,7 @@ public abstract class Executable<JType> extends ObjectLiteral {
 	}
 
 	@Override
-	protected void dumpRecursive(int indent, HashSet<ObjectLiteral> parents) {
+	protected void dumpRecursive(int indent, HashSet<ObjectValue> parents) {
 		dump(indent);
 	}
 
@@ -58,7 +58,7 @@ public abstract class Executable<JType> extends ObjectLiteral {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinaryhasinstance")
-	public BooleanLiteral ordinaryHasInstance(Value<?> O) throws AbruptCompletion {
+	public BooleanValue ordinaryHasInstance(Value<?> O) throws AbruptCompletion {
 		// 1. If IsCallable(C) is false, return false.
 
 		// FIXME: BoundTargetFunction
@@ -67,11 +67,11 @@ public abstract class Executable<JType> extends ObjectLiteral {
 			// b. Return ? InstanceofOperator(O, BC).
 
 		// 3. If Type(O) is not Object, return false.
-		if (!(O instanceof ObjectLiteral object))
-			return BooleanLiteral.FALSE;
+		if (!(O instanceof ObjectValue object))
+			return BooleanValue.FALSE;
 
 		// 4. Let P be ? Get(C, "prototype").
-		final Value<?> P = this.get(new StringLiteral("prototype"));
+		final Value<?> P = this.get(new StringValue("prototype"));
 		// 5. If Type(P) is not Object, throw a TypeError exception.
 		if (P.type != Type.Object)
 			throw AbruptCompletion.error(new TypeError("Not an object!"));
@@ -81,14 +81,14 @@ public abstract class Executable<JType> extends ObjectLiteral {
 			// a. Set O to ? O.[[GetPrototypeOf]]().
 			object = object.getPrototype();
 			// b. If O is null, return false.
-			if (object == null) return BooleanLiteral.FALSE;
+			if (object == null) return BooleanValue.FALSE;
 			// c. If SameValue(P, O) is true, return true.
-			if (P.sameValue(object)) return BooleanLiteral.TRUE;
+			if (P.sameValue(object)) return BooleanValue.TRUE;
 		}
 	}
 
 	@Override
-	public ObjectLiteral getPrototype() {
+	public ObjectValue getPrototype() {
 		return FunctionPrototype.instance;
 	}
 }

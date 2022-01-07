@@ -7,7 +7,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
-import xyz.lebster.core.node.value.object.ObjectLiteral;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.ExecutionError;
 import xyz.lebster.core.runtime.LanguageError;
 
@@ -91,7 +91,7 @@ public final class Testing {
 		if (!silent && !output.isBlank()) stream.println(output);
 	}
 
-	public static void addTestingMethods(ObjectLiteral globalObject) {
+	public static void addTestingMethods(ObjectValue globalObject) {
 		globalObject.setMethod("expect", (interpreter, arguments) -> {
 			final Value<?> expected = arguments[0];
 			final Value<?> received = arguments[1];
@@ -128,9 +128,9 @@ public final class Testing {
 		});
 
 		globalObject.setMethod("createObject", (interpreter, arguments) -> {
-			final ObjectLiteral result = new ObjectLiteral();
+			final ObjectValue result = new ObjectValue();
 			for (int i = 0; i < arguments.length; i += 2) {
-				final StringLiteral key = arguments[i].execute(interpreter).toStringLiteral(interpreter);
+				final StringValue key = arguments[i].execute(interpreter).toStringLiteral(interpreter);
 				if (arguments.length - 1 == i) {
 					throw AbruptCompletion.error(new LanguageError("Unmatched key '" + key.value + "' in createObject"));
 				}

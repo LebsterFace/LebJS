@@ -17,6 +17,8 @@ public abstract class Executable<JType> extends Dictionary {
 	public Executable(JType code) {
 		super();
 		this.code = code;
+		this.put("length", new NumericLiteral(0));
+		this.put("name", new StringLiteral(""));
 	}
 
 	public Value<?> callWithContext(Interpreter interpreter, ExecutionContext frame, Value<?>... args) throws AbruptCompletion {

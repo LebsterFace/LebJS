@@ -47,7 +47,7 @@ public final class BooleanValue extends PrimitiveValue<Boolean> {
 	}
 
 	public BooleanValue not() {
-		return new BooleanValue(!value);
+		return this.value ? BooleanValue.FALSE : BooleanValue.TRUE;
 	}
 
 	@Override

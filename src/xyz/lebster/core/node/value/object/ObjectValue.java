@@ -28,6 +28,57 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 		this(new HashMap<>());
 	}
 
+	private ObjectValue prototypeSlot = this.getDefaultPrototype();
+
+	public ObjectValue getDefaultPrototype() {
+		return ObjectPrototype.instance;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarygetprototypeof")
+	public final ObjectValue getPrototype() {
+		return this.prototypeSlot;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarysetprototypeof")
+	public final boolean setPrototype(ObjectValue V) {
+		// 1. Let current be O.[[Prototype]].
+		final ObjectValue current = this.prototypeSlot;
+		// 2. If SameValue(V, current) is true, return true.
+		if (V.sameValue(current)) return true;
+
+		// FIXME: [[Extensible]]
+		// 3. Let extensible be O.[[Extensible]].
+		// 4. If extensible is false, return false.
+
+		// 5. Let p be V.
+		ObjectValue p = V;
+		// 6. Let done be false.
+		boolean done = false;
+		// 7. Repeat, while done is false,
+		while (!done) {
+			// a. If p is null, set done to true.
+			if (p == null) {
+				done = true;
+			}
+			// b. Else if SameValue(p, O) is true, return false.
+			else if (p.sameValue(this)) {
+				return false;
+			}
+			// c. Else,
+			else {
+				// FIXME: Custom [[GetPrototypeOf]]
+				// i. If p.[[GetPrototypeOf]] is not the ordinary object internal method defined in 10.1.1, set done to true.
+				// ii. Else, set p to p.[[Prototype]].
+				p = p.getPrototype();
+			}
+		}
+
+		// 8. Set O.[[Prototype]] to V.
+		this.prototypeSlot = V;
+		// 9. Return true.
+		return true;
+	}
+
 	private static String getHint(Type preferredType) {
 		// i. If preferredType is not present, let hint be "default".
 		if (preferredType == null) return "default";
@@ -175,10 +226,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 
 	public boolean hasOwnProperty(Key<?> key) {
 		return this.value.containsKey(key);
-	}
-
-	public ObjectValue getPrototype() {
-		return ObjectPrototype.instance;
 	}
 
 	@Override

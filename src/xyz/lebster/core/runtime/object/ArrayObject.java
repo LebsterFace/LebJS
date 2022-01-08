@@ -80,7 +80,7 @@ public final class ArrayObject extends ObjectValue {
 	}
 
 	@Override
-	public ObjectValue getPrototype() {
+	public ObjectValue getDefaultPrototype() {
 		return ArrayPrototype.instance;
 	}
 }

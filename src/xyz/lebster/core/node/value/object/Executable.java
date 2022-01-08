@@ -75,7 +75,7 @@ public abstract class Executable<JType> extends ObjectValue {
 	}
 
 	@Override
-	public ObjectValue getPrototype() {
+	public ObjectValue getDefaultPrototype() {
 		return FunctionPrototype.instance;
 	}
 }

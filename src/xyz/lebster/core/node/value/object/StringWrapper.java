@@ -13,7 +13,7 @@ public final class StringWrapper extends PrimitiveWrapper<StringValue> {
 	}
 
 	@Override
-	public StringPrototype getPrototype() {
+	public ObjectValue getDefaultPrototype() {
 		return StringPrototype.instance;
 	}
 }

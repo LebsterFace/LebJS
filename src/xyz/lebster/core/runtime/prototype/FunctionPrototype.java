@@ -19,7 +19,7 @@ public class FunctionPrototype extends Executable<Void> {
 
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-function-prototype-object")
-	public ObjectPrototype getPrototype() {
+	public ObjectPrototype getDefaultPrototype() {
 		return ObjectPrototype.instance;
 	}
 }

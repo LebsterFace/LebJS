@@ -65,10 +65,13 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	public Instance construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+	public ObjectValue construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		final Value<?> prototypeProperty = this.get(new StringValue("prototype"));
 
-		final Instance newInstance = new Instance(prototypeProperty instanceof ObjectValue object ? object : ObjectPrototype.instance);
+		final ObjectValue prototype = prototypeProperty instanceof ObjectValue object ? object : ObjectPrototype.instance;
+		final ObjectValue newInstance = new ObjectValue();
+		newInstance.setPrototype(prototype);
+
 		final Function boundSelf = this.boundTo(newInstance);
 		final Value<?> returnValue = boundSelf.internalCall(interpreter, args);
 

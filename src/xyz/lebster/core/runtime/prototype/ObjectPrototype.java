@@ -71,7 +71,7 @@ public final class ObjectPrototype extends ObjectValue {
 	}
 
 	@Override
-	public ObjectValue getPrototype() {
+	public ObjectValue getDefaultPrototype() {
 		return null;
 	}
 }

@@ -9,5 +9,5 @@ public abstract class Constructor<V> extends Executable<V> {
 		super(code);
 	}
 
-	public abstract Instance construct(Interpreter interpreter, Value<?>[] executedArguments) throws AbruptCompletion;
+	public abstract ObjectValue construct(Interpreter interpreter, Value<?>[] executedArguments) throws AbruptCompletion;
 }

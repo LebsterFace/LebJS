@@ -84,10 +84,12 @@ public final class ScriptExecutor {
 	}
 
 	public static void repl(CLArguments.ExecutionOptions options) {
+		System.out.println("Starting REPL...");
 		final Scanner scanner = new Scanner(System.in);
 		final Interpreter interpreter = new Interpreter();
 
 		while (scanner.hasNextLine()) {
+			System.out.print("> ");
 			final String next = scanner.nextLine();
 			if (next.isBlank()) continue;
 

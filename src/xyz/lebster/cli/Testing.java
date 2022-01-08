@@ -6,7 +6,6 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.GlobalObject;
-import xyz.lebster.core.node.value.NullValue;
 import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
@@ -120,7 +119,7 @@ public class Testing {
 			System.setOut(tempStream);
 
 			try {
-				ScriptExecutor.file(file.toPath(), options);
+				ScriptExecutor.executeFileWithoutErrorHandling(file.toPath(), options);
 				successfulTests++;
 				printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", file.getName());
 				printTestOutput(passedStream, tempOutput);

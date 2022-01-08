@@ -63,15 +63,7 @@ public final class ScriptExecutor {
 			System.out.println(lastValue.toRepresentationString());
 	}
 
-	public static void execute(String source, Interpreter interpreter, CLArguments.ExecutionOptions options) {
-		try {
-			executeWithoutErrorHandling(source, interpreter, options);
-		} catch (SyntaxError | CannotParse | AbruptCompletion e) {
-			error(e, System.out, options.showStackTrace());
-		}
-	}
-
-	public static void file(Path path, CLArguments.ExecutionOptions options) {
+	public static void executeFileWithoutErrorHandling(Path path, CLArguments.ExecutionOptions options) throws CannotParse, AbruptCompletion, SyntaxError {
 		String source;
 
 		try {
@@ -81,7 +73,23 @@ public final class ScriptExecutor {
 			return;
 		}
 
-		execute(source, new Interpreter(), options);
+		executeWithoutErrorHandling(source, new Interpreter(), options);
+	}
+
+	public static void execute(String source, Interpreter interpreter, CLArguments.ExecutionOptions options) {
+		try {
+			executeWithoutErrorHandling(source, interpreter, options);
+		} catch (SyntaxError | CannotParse | AbruptCompletion e) {
+			error(e, System.out, options.showStackTrace());
+		}
+	}
+
+	public static void file(Path path, CLArguments.ExecutionOptions options) {
+		try {
+			executeFileWithoutErrorHandling(path, options);
+		} catch (SyntaxError | CannotParse | AbruptCompletion e) {
+			error(e, System.out, options.showStackTrace());
+		}
 	}
 
 	public static void repl(CLArguments.ExecutionOptions options) {

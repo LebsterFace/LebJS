@@ -7,7 +7,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.object.Constructor;
 import xyz.lebster.core.node.value.Value;
-import xyz.lebster.core.runtime.TypeError;
+import xyz.lebster.core.runtime.error.TypeError;
 
 
 public record NewExpression(Expression constructExpr, Expression... arguments) implements Expression {

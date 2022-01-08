@@ -9,7 +9,7 @@ import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.native_.NativeCode;
 import xyz.lebster.core.node.value.native_.NativeFunction;
 import xyz.lebster.core.node.value.native_.NativeProperty;
-import xyz.lebster.core.runtime.TypeError;
+import xyz.lebster.core.runtime.error.TypeError;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
 import java.util.HashMap;

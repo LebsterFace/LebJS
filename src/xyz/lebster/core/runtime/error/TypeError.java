@@ -1,4 +1,4 @@
-package xyz.lebster.core.runtime;
+package xyz.lebster.core.runtime.error;
 
 public final class TypeError extends LanguageError {
 	public TypeError(String message) {

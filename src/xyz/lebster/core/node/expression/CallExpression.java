@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.Value;
-import xyz.lebster.core.runtime.TypeError;
+import xyz.lebster.core.runtime.error.TypeError;
 
 public record CallExpression(Expression callee, Expression... arguments) implements Expression {
 	@Override

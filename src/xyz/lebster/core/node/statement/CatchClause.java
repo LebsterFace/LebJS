@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Identifier;
 import xyz.lebster.core.node.value.Value;
-import xyz.lebster.core.runtime.ExecutionError;
+import xyz.lebster.core.runtime.error.ExecutionError;
 
 public record CatchClause(Identifier parameter, BlockStatement body) implements Statement {
 	@Override

@@ -1,4 +1,4 @@
-package xyz.lebster.core.runtime;
+package xyz.lebster.core.runtime.object;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;

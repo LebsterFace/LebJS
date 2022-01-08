@@ -1,4 +1,4 @@
-package xyz.lebster.core.runtime;
+package xyz.lebster.core.runtime.object;
 
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;

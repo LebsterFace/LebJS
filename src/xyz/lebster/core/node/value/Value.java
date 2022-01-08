@@ -7,7 +7,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.Representable;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.object.ObjectValue;
-import xyz.lebster.core.runtime.TypeError;
+import xyz.lebster.core.runtime.error.TypeError;
 
 import java.util.Objects;
 

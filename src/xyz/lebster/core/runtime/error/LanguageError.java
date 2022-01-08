@@ -1,4 +1,4 @@
-package xyz.lebster.core.runtime;
+package xyz.lebster.core.runtime.error;
 
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.StringValue;

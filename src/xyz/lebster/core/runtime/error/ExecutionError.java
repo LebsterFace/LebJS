@@ -1,4 +1,4 @@
-package xyz.lebster.core.runtime;
+package xyz.lebster.core.runtime.error;
 
 public final class ExecutionError extends RuntimeException {
 	public ExecutionError(String message) {

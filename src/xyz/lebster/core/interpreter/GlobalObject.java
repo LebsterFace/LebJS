@@ -10,9 +10,9 @@ import xyz.lebster.core.node.value.native_.NativeProperty;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
-import xyz.lebster.core.runtime.ConsoleObject;
-import xyz.lebster.core.runtime.EvalError;
-import xyz.lebster.core.runtime.MathObject;
+import xyz.lebster.core.runtime.object.ConsoleObject;
+import xyz.lebster.core.runtime.error.EvalError;
+import xyz.lebster.core.runtime.object.MathObject;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
 public final class GlobalObject extends ObjectValue {

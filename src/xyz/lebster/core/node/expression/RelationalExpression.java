@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.object.ObjectValue;
-import xyz.lebster.core.runtime.TypeError;
+import xyz.lebster.core.runtime.error.TypeError;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override

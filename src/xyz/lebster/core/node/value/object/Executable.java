@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.*;
-import xyz.lebster.core.runtime.TypeError;
+import xyz.lebster.core.runtime.error.TypeError;
 import xyz.lebster.core.runtime.prototype.FunctionPrototype;
 
 public abstract class Executable<JType> extends ObjectValue {

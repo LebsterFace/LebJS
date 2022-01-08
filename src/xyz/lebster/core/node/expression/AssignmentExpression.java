@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.Value;
-import xyz.lebster.core.runtime.LanguageError;
+import xyz.lebster.core.runtime.error.LanguageError;
 
 public record AssignmentExpression(Expression left, Expression right, AssignmentOp op) implements Expression {
 	@Override

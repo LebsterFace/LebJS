@@ -11,8 +11,8 @@ import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.ObjectValue;
-import xyz.lebster.core.runtime.ExecutionError;
-import xyz.lebster.core.runtime.LanguageError;
+import xyz.lebster.core.runtime.error.ExecutionError;
+import xyz.lebster.core.runtime.error.LanguageError;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

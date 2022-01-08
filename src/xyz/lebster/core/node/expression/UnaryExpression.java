@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.NumberValue;
 import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
-import xyz.lebster.core.runtime.LanguageError;
+import xyz.lebster.core.runtime.error.LanguageError;
 
 public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op) implements Expression {
 	@Override

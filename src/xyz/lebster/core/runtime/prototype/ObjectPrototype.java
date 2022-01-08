@@ -8,8 +8,8 @@ import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.native_.NativeFunction;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.object.StringWrapper;
-import xyz.lebster.core.runtime.ArrayObject;
-import xyz.lebster.core.runtime.LanguageError;
+import xyz.lebster.core.runtime.object.ArrayObject;
+import xyz.lebster.core.runtime.error.LanguageError;
 
 public final class ObjectPrototype extends ObjectValue {
 	public static final ObjectPrototype instance = new ObjectPrototype();

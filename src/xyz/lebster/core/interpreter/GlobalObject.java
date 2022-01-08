@@ -10,8 +10,9 @@ import xyz.lebster.core.node.value.native_.NativeProperty;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
-import xyz.lebster.core.runtime.object.ConsoleObject;
+import xyz.lebster.core.runtime.constructor.ObjectConstructor;
 import xyz.lebster.core.runtime.error.EvalError;
+import xyz.lebster.core.runtime.object.ConsoleObject;
 import xyz.lebster.core.runtime.object.MathObject;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
@@ -136,6 +137,7 @@ public final class GlobalObject extends ObjectValue {
 
 		// 19.3 Constructor Properties of the Global Object
 		put("Math", MathObject.instance);
+		put("Object", ObjectConstructor.instance);
 
 		put("console", ConsoleObject.instance);
 		Testing.addTestingMethods(this);

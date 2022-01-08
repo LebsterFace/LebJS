@@ -78,17 +78,6 @@ public class Testing {
 
 			return result;
 		});
-
-		globalObject.setMethod("__proto__", (interpreter, values) -> {
-			if (values.length == 0) {
-				throw AbruptCompletion.error(new LanguageError("You must provide an object to get the prototype of"));
-			} else if (values.length > 1) {
-				throw AbruptCompletion.error(new LanguageError("Multiple objects were provided"));
-			} else {
-				final var prototype = values[0].toObjectValue(interpreter).getPrototype();
-				return prototype == null ? NullValue.instance : prototype;
-			}
-		});
 	}
 
 	private static void printTestResult(PrintStream stream, String color, String status, String name) {

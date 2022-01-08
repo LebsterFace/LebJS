@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public final class ScriptExecutor {
@@ -88,20 +89,24 @@ public final class ScriptExecutor {
 		final Scanner scanner = new Scanner(System.in);
 		final Interpreter interpreter = new Interpreter();
 
-		while (scanner.hasNextLine()) {
+		do {
 			System.out.print("> ");
-			final String next = scanner.nextLine();
-			if (next.isBlank()) continue;
+			try {
+				final String next = scanner.nextLine();
+				if (next.isBlank()) continue;
 
-			if (next.equals(".exit")) {
+				if (next.equals(".exit")) {
+					break;
+				} else if (next.equals(".clear")) {
+					System.out.print("\033[H\033[2J");
+					System.out.flush();
+				} else {
+					execute(next, interpreter, options);
+				}
+			} catch (NoSuchElementException e) {
 				break;
-			} else if (next.equals(".clear")) {
-				System.out.print("\033[H\033[2J");
-				System.out.flush();
-			} else {
-				execute(next, interpreter, options);
 			}
-		}
+		} while (true);
 	}
 
 	public static void gif(CLArguments.ExecutionOptions options) {

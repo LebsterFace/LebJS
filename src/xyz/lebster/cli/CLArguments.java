@@ -63,6 +63,9 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private CLArguments toCLIArguments() {
 			if (this.mode == null) {
 				this.mode = ExecutionMode.REPL;
+			}
+
+			if (this.mode == ExecutionMode.REPL || this.mode == ExecutionMode.GIF) {
 				this.showLastValue = true;
 			}
 

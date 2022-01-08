@@ -245,20 +245,15 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 
 	@SuppressWarnings("unchecked")
 	public void representRecursive(StringRepresentation representation, HashSet<ObjectValue> parents) {
-		representation.append('{');
+		representation.append("{ ");
 		if (value.isEmpty()) {
-			representation.append(" }");
+			representation.append('}');
 			return;
 		}
 
 		parents.add(this);
-
-		representation.appendLine();
-		representation.indent();
-
 		for (var iterator = this.value.entrySet().iterator(); iterator.hasNext(); ) {
 			final var entry = iterator.next();
-			representation.appendIndent();
 			representation.append(ANSI.YELLOW);
 			representation.append(entry.getKey().value);
 			representation.append(ANSI.RESET);
@@ -277,11 +272,9 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 			}
 
 			if (iterator.hasNext()) representation.append(',');
-			representation.appendLine();
+			representation.append(' ');
 		}
 
-		representation.unindent();
-		representation.appendIndent();
 		representation.append('}');
 	}
 

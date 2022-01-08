@@ -4,6 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.exception.SyntaxError;
+import xyz.lebster.core.exception.UnexpectedEndOfInput;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.declaration.Declaration;
 import xyz.lebster.core.node.declaration.FunctionDeclaration;
@@ -15,7 +16,9 @@ import xyz.lebster.core.node.expression.literal.NullLiteral;
 import xyz.lebster.core.node.expression.literal.NumericLiteral;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.node.statement.*;
-import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.node.value.BooleanValue;
+import xyz.lebster.core.node.value.NumberValue;
+import xyz.lebster.core.node.value.StringValue;
 
 import java.util.*;
 
@@ -188,7 +191,7 @@ public final class Parser {
 
 		while (state.index < state.tokens.length && state.currentToken.type != TokenType.RBrace) {
 			if (state.currentToken.type == TokenType.EOF) {
-				break;
+				throw new UnexpectedEndOfInput(state.expected(TokenType.RBrace));
 			} else {
 				result.append(parseLine());
 			}
@@ -462,7 +465,7 @@ public final class Parser {
 			case Instanceof -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.InstanceOf);
 
 			case Period -> {
-				if (!matchIdentifierName()) state.expected("IdentifierName");
+				if (!matchIdentifierName()) throw new SyntaxError(state.expected("IdentifierName"));
 				yield new MemberExpression(left, new StringLiteral(new StringValue(state.consume().value)), false);
 			}
 

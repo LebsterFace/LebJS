@@ -1,3 +1,6 @@
+expect(true, 1 === 1)
+expect(false, 1 === 0)
+
 // ========================= LESS THAN =========================
 
  expect(true, "a" < "b");

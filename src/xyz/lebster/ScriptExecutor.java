@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public final class ScriptExecutor {
@@ -76,14 +75,6 @@ public final class ScriptExecutor {
 		executeWithoutErrorHandling(source, new Interpreter(), options);
 	}
 
-	public static void execute(String source, Interpreter interpreter, CLArguments.ExecutionOptions options) {
-		try {
-			executeWithoutErrorHandling(source, interpreter, options);
-		} catch (SyntaxError | CannotParse | AbruptCompletion e) {
-			error(e, System.out, options.showStackTrace());
-		}
-	}
-
 	public static void file(Path path, CLArguments.ExecutionOptions options) {
 		try {
 			executeFileWithoutErrorHandling(path, options);
@@ -92,38 +83,17 @@ public final class ScriptExecutor {
 		}
 	}
 
-	public static void repl(CLArguments.ExecutionOptions options) {
-		System.out.println("Starting REPL...");
-		final Scanner scanner = new Scanner(System.in);
-		final Interpreter interpreter = new Interpreter();
-
-		do {
-			System.out.print("> ");
-			try {
-				final String next = scanner.nextLine();
-				if (next.isBlank()) continue;
-
-				if (next.equals(".exit")) {
-					break;
-				} else if (next.equals(".clear")) {
-					System.out.print("\033[H\033[2J");
-					System.out.flush();
-				} else {
-					execute(next, interpreter, options);
-				}
-			} catch (NoSuchElementException e) {
-				break;
-			}
-		} while (true);
-	}
-
 	public static void gif(CLArguments.ExecutionOptions options) {
 		final Scanner scanner = new Scanner(System.in);
 		final Interpreter interpreter = new Interpreter();
 
 		while (scanner.hasNextLine()) {
-			execute(scanner.nextLine(), interpreter, options);
-			System.out.print("#[END-OF-OUTPUT]#");
+			try {
+				executeWithoutErrorHandling(scanner.nextLine(), interpreter, options);
+				System.out.print("#[END-OF-OUTPUT]#");
+			} catch (Throwable e) {
+				throw new Error(e);
+			}
 		}
 	}
 }

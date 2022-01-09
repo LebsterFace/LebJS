@@ -22,6 +22,6 @@ public record ExpressionStatement(Expression expression) implements Statement {
 	@Override
 	public void represent(StringRepresentation representation) {
 		expression.represent(representation);
-		representation.appendLine(";");
+		representation.append(";");
 	}
 }

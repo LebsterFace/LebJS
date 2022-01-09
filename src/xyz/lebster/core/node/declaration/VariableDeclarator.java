@@ -29,6 +29,6 @@ public record VariableDeclarator(Identifier identifier, Expression init) impleme
 		representation.append(identifier.value());
 		representation.append(" = ");
 		init.represent(representation);
-		representation.appendLine(';');
+		representation.append(';');
 	}
 }

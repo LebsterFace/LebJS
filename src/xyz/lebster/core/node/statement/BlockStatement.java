@@ -42,11 +42,12 @@ public record BlockStatement(List<Statement> children) implements Statement {
 		for (ASTNode child : children) {
 			representation.appendIndent();
 			child.represent(representation);
+			representation.appendLine();
 		}
 
 		representation.unindent();
 		representation.appendIndent();
-		representation.appendLine("}");
+		representation.append('}');
 	}
 
 	@Override

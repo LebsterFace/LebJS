@@ -2,6 +2,7 @@ package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.*;
+import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.error.TypeError;
@@ -47,8 +48,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 			representation.append(']');
 		} else {
 			representation.append('.');
-			// FIXME: Append property
-			// representation.append(((StringValue) property).value);
+			representation.append(((StringLiteral) property).stringValue());
 		}
 	}
 }

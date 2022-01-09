@@ -12,6 +12,7 @@ public final class Lexer {
 	private static final List<HashMap<String, TokenType>> symbols = new ArrayList<>();
 
 	static {
+		keywords.put("await", TokenType.Await);
 		keywords.put("let", TokenType.Let);
 		keywords.put("break", TokenType.Break);
 		keywords.put("case", TokenType.Case);
@@ -107,6 +108,7 @@ public final class Lexer {
 		symbols_length_1.put("(", TokenType.LParen);
 		symbols_length_1.put(".", TokenType.Period);
 		symbols_length_1.put("!", TokenType.Bang);
+		symbols_length_1.put("?", TokenType.QuestionMark);
 		symbols_length_1.put(";", TokenType.Semicolon);
 		symbols_length_1.put(",", TokenType.Comma);
 		symbols_length_1.put("-", TokenType.Minus);

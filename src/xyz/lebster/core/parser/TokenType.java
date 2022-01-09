@@ -99,5 +99,7 @@ public enum TokenType {
 	UnsignedRightShift,
 	LogicalOrEquals,
 	Infinity,
+	QuestionMark,
+	Await,
 	Colon
 }

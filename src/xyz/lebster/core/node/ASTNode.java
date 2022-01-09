@@ -1,6 +1,5 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -11,13 +10,7 @@ public interface ASTNode {
 
 	void dump(int indent);
 
-	default void represent(StringRepresentation representation) {
-		representation.append(ANSI.BACKGROUND_BRIGHT_YELLOW);
-		representation.append('(');
-		representation.append(getClass().getSimpleName());
-		representation.append(')');
-		representation.append(ANSI.RESET);
-	}
+	void represent(StringRepresentation representation);
 
 	default String toRepresentationString() {
 		final StringRepresentation representation = new StringRepresentation();

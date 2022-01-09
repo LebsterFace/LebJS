@@ -4,10 +4,10 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.Constructor;
 import xyz.lebster.core.runtime.error.TypeError;
-
 
 public record NewExpression(Expression constructExpr, Expression... arguments) implements Expression {
 	@Override
@@ -39,5 +39,20 @@ public record NewExpression(Expression constructExpr, Expression... arguments) i
 		Dumper.dumpIndicated(indent + 1, "constructExpr", constructExpr);
 		Dumper.dumpIndicator(indent + 1, "arguments");
 		for (final Expression argument : arguments) argument.dump(indent + 2);
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append("new ");
+		constructExpr.represent(representation);
+		representation.append('(');
+		if (arguments.length > 0) {
+			arguments[0].represent(representation);
+			for (int i = 1; i < arguments.length; i++) {
+				representation.append(", ");
+				arguments[i].represent(representation);
+			}
+		}
+		representation.append(')');
 	}
 }

@@ -6,5 +6,5 @@ let sproto = Object.getPrototypeOf("123");
 expect(Object.getPrototypeOf(""), sproto);
 
 // Object prototype
-let oproto = Object.getPrototypeOf(createObject());
+let oproto = Object.getPrototypeOf({});
 expect(oproto, Object.getPrototypeOf(sproto));

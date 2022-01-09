@@ -3,15 +3,11 @@ package xyz.lebster.cli;
 import xyz.lebster.ScriptExecutor;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.Dumper;
-import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.GlobalObject;
-import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
-import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.error.ExecutionError;
-import xyz.lebster.core.runtime.error.LanguageError;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -62,21 +58,6 @@ public class Testing {
 			// Re-enter the `unbind()` ExecutionContext
 			interpreter.enterExecutionContext(current);
 			return UndefinedValue.instance;
-		});
-
-		globalObject.setMethod("createObject", (interpreter, arguments) -> {
-			final ObjectValue result = new ObjectValue();
-			for (int i = 0; i < arguments.length; i += 2) {
-				final StringValue key = arguments[i].getValue(interpreter).toStringValue(interpreter);
-				if (arguments.length - 1 == i) {
-					throw AbruptCompletion.error(new LanguageError("Unmatched key '" + key.value + "' in createObject"));
-				}
-
-				final Value<?> value = arguments[i + 1].getValue(interpreter);
-				result.put(key, value);
-			}
-
-			return result;
 		});
 	}
 

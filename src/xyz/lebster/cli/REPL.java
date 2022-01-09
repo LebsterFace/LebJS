@@ -2,7 +2,6 @@ package xyz.lebster.cli;
 
 import xyz.lebster.ScriptExecutor;
 import xyz.lebster.core.exception.UnexpectedEndOfInput;
-import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.value.Value;

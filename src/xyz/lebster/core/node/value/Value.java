@@ -4,16 +4,26 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.Representable;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.error.TypeError;
 
 import java.util.Objects;
 
-public abstract class Value<JType> implements Representable {
+public abstract class Value<JType> {
 	public final JType value;
 	public final Type type;
+
+	public abstract void display(StringBuilder builder);
+	public final String toDisplayString() {
+		final StringBuilder builder = new StringBuilder();
+		this.display(builder);
+		return builder.toString();
+	}
+
+	public String toConsoleLogString() {
+		return this.toDisplayString();
+	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-primitive-value")
 	public enum Type {

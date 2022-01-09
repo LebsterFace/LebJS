@@ -59,7 +59,7 @@ public final class ScriptExecutor {
 
 		final Value<?> lastValue = program.execute(interpreter);
 		if (options.showLastValue())
-			System.out.println(lastValue.toRepresentationString());
+			System.out.println(lastValue.toDisplayString());
 	}
 
 	public static void executeFileWithoutErrorHandling(Path path, CLArguments.ExecutionOptions options) throws CannotParse, AbruptCompletion, SyntaxError {

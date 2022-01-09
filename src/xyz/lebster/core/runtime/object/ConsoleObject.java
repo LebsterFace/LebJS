@@ -2,7 +2,6 @@ package xyz.lebster.core.runtime.object;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.ObjectValue;
@@ -60,23 +59,22 @@ public final class ConsoleObject extends ObjectValue {
 	}
 
 	private void printer(LogLevel logLevel, Value<?>... args) {
-		final var representation = new StringRepresentation();
+		final StringBuilder builder = new StringBuilder();
 
-		representation.append(switch (logLevel) {
+		builder.append(switch (logLevel) {
 			case Log -> ANSI.RESET;
 			case Info -> ANSI.BRIGHT_BLUE;
 			case Warn -> ANSI.BRIGHT_YELLOW;
 			case Error -> ANSI.BRIGHT_RED;
 		});
 
-		for (int i = 0; i < args.length - 1; i++) {
-			args[i].represent(representation);
-			representation.append(' ');
+		for (final Value<?> arg : args) {
+			builder.append(arg.toConsoleLogString());
+			builder.append(' ');
 		}
 
-		args[args.length - 1].represent(representation);
-		representation.append(ANSI.RESET);
-		System.out.println(representation);
+		builder.append(ANSI.RESET);
+		System.out.println(builder);
 	}
 
 	private enum LogLevel {

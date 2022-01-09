@@ -4,7 +4,6 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.native_.NativeCode;
 import xyz.lebster.core.node.value.native_.NativeFunction;
@@ -239,12 +238,12 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 	}
 
 	@Override
-	public void represent(StringRepresentation representation) {
-		this.representRecursive(representation, new HashSet<>());
+	public void display(StringBuilder builder) {
+		this.displayRecursive(builder, new HashSet<>());
 	}
 
 	@SuppressWarnings("unchecked")
-	public void representRecursive(StringRepresentation representation, HashSet<ObjectValue> parents) {
+	public void displayRecursive(StringBuilder representation, HashSet<ObjectValue> parents) {
 		representation.append("{ ");
 		if (value.isEmpty()) {
 			representation.append('}');
@@ -265,10 +264,10 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 					representation.append(this == value ? "[self]" : "[parent]");
 					representation.append(ANSI.RESET);
 				} else {
-					object.representRecursive(representation, (HashSet<ObjectValue>) parents.clone());
+					object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone());
 				}
 			} else {
-				value.represent(representation);
+				value.display(representation);
 			}
 
 			if (iterator.hasNext()) representation.append(',');

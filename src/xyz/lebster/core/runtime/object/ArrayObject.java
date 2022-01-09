@@ -5,7 +5,6 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.native_.NativeGetterSetter;
 import xyz.lebster.core.node.value.native_.NativeProperty;
@@ -50,7 +49,7 @@ public final class ArrayObject extends ObjectValue {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void representRecursive(StringRepresentation representation, HashSet<ObjectValue> parents) {
+	public void displayRecursive(StringBuilder representation, HashSet<ObjectValue> parents) {
 		representation.append('[');
 		if (value.isEmpty()) {
 			representation.append(']');
@@ -66,10 +65,10 @@ public final class ArrayObject extends ObjectValue {
 					representation.append(this == element ? "[self]" : "[parent]");
 					representation.append(ANSI.RESET);
 				} else {
-					object.representRecursive(representation, (HashSet<ObjectValue>) parents.clone());
+					object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone());
 				}
 			} else {
-				element.represent(representation);
+				element.display(representation);
 			}
 
 			if (index != this.length - 1)

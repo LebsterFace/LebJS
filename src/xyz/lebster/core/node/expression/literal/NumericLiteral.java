@@ -1,17 +1,17 @@
 package xyz.lebster.core.node.expression.literal;
 
 import xyz.lebster.core.Dumper;
-import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.NumberValue;
 
-public record NumericLiteral(NumberValue numberValue) implements Literal<NumberValue> {
+public record NumericLiteral(NumberValue value) implements Literal<NumberValue> {
 	@Override
-	public NumberValue execute(Interpreter interpreter) {
-		return this.numberValue;
+	public void dump(int indent) {
+		Dumper.dumpValue(indent, value.type.name(), value.stringValueOf());
 	}
 
 	@Override
-	public void dump(int indent) {
-		Dumper.dumpValue(indent, numberValue.type.name(), numberValue.stringValueOf());
+	public void represent(StringRepresentation representation) {
+		representation.append(value.stringValueOf());
 	}
 }

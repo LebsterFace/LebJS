@@ -5,5 +5,9 @@ import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.value.Value;
 
 public interface Literal<ValueType extends Value<?>> extends Expression {
-	ValueType execute(Interpreter interpreter);
+	default ValueType execute(Interpreter interpreter) {
+		return this.value();
+	}
+
+	ValueType value();
 }

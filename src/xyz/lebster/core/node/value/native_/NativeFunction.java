@@ -4,7 +4,6 @@ package xyz.lebster.core.node.value.native_;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.Executable;
@@ -34,14 +33,14 @@ public final class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append(ANSI.BRIGHT_MAGENTA);
-		representation.append("[Native Function]");
-		representation.append(ANSI.RESET);
+	public void display(StringBuilder builder) {
+		builder.append(ANSI.BRIGHT_MAGENTA);
+		builder.append("[Native Function]");
+		builder.append(ANSI.RESET);
 	}
 
 	@Override
-	public void representRecursive(StringRepresentation representation, HashSet<ObjectValue> parents) {
-		this.represent(representation);
+	public void displayRecursive(StringBuilder representation, HashSet<ObjectValue> parents) {
+		this.display(representation);
 	}
 }

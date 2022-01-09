@@ -48,7 +48,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 			representation.append(']');
 		} else {
 			representation.append('.');
-			representation.append(((StringLiteral) property).stringValue());
+			representation.append(((StringLiteral) property).value().value);
 		}
 	}
 }

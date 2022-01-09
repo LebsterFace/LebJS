@@ -63,7 +63,7 @@ public class REPL {
 
 		try {
 			final Value<?> lastValue = program.execute(interpreter);
-			System.out.println(lastValue.toRepresentationString());
+			System.out.println(lastValue.toDisplayString());
 		} catch (AbruptCompletion e) {
 			ScriptExecutor.error(e, System.out, options.showStackTrace());
 		}

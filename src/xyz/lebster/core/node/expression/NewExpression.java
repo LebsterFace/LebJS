@@ -4,9 +4,8 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.object.Constructor;
 import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.node.value.object.Constructor;
 import xyz.lebster.core.runtime.error.TypeError;
 
 
@@ -27,10 +26,10 @@ public record NewExpression(Expression constructExpr, Expression... arguments) i
 		if (exprValue instanceof final Constructor<?> constructor) {
 			return constructor;
 		} else {
-			final var representation = new StringRepresentation();
-			exprValue.represent(representation);
-			representation.append(" is not a constructor");
-			throw AbruptCompletion.error(new TypeError(representation.toString()));
+			final StringBuilder builder = new StringBuilder();
+			exprValue.display(builder);
+			builder.append(" is not a constructor");
+			throw AbruptCompletion.error(new TypeError(builder.toString()));
 		}
 	}
 

@@ -3,12 +3,14 @@ package xyz.lebster.core.runtime.prototype;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.node.value.NumberValue;
+import xyz.lebster.core.node.value.StringValue;
+import xyz.lebster.core.node.value.UndefinedValue;
+import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.object.ObjectValue;
-import xyz.lebster.core.runtime.object.ArrayObject;
 import xyz.lebster.core.runtime.error.TypeError;
+import xyz.lebster.core.runtime.object.ArrayObject;
 
 public final class ArrayPrototype extends ObjectValue {
 	public static final ArrayPrototype instance = new ArrayPrototype();
@@ -95,10 +97,10 @@ public final class ArrayPrototype extends ObjectValue {
 		final long len = lengthOfArrayLike(O, interpreter);
 
 		if (!(callbackfn instanceof final Executable<?> executable)) {
-			final StringRepresentation representation = new StringRepresentation();
-			callbackfn.represent(representation);
-			representation.append(" is not a function");
-			throw AbruptCompletion.error(new TypeError(representation.toString()));
+			final StringBuilder builder = new StringBuilder();
+			callbackfn.display(builder);
+			builder.append(" is not a function");
+			throw AbruptCompletion.error(new TypeError(builder.toString()));
 		}
 
 		final Value<?>[] values = new Value<?>[(int) len];

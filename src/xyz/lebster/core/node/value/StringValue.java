@@ -2,7 +2,6 @@ package xyz.lebster.core.node.value;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.object.StringWrapper;
 
@@ -21,13 +20,18 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
-	public void represent(StringRepresentation representation) {
+	public void display(StringBuilder builder) {
 		final char quoteType = this.value.contains("'") ? '"' : '\'';
-		representation.append(ANSI.GREEN);
-		representation.append(quoteType);
-		representation.append(value);
-		representation.append(quoteType);
-		representation.append(ANSI.RESET);
+		builder.append(ANSI.GREEN);
+		builder.append(quoteType);
+		builder.append(value);
+		builder.append(quoteType);
+		builder.append(ANSI.RESET);
+	}
+
+	@Override
+	public String toConsoleLogString() {
+		return this.value;
 	}
 
 	@Override

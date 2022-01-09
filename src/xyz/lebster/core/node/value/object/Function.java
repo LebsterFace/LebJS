@@ -4,7 +4,6 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.FunctionNode;
 import xyz.lebster.core.node.value.native_.NativeFunction;
 import xyz.lebster.core.node.value.StringValue;
@@ -27,17 +26,17 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append(ANSI.BRIGHT_MAGENTA);
-		representation.append("[Function: ");
-		representation.append(code.name);
-		representation.append(']');
-		representation.append(ANSI.RESET);
+	public void display(StringBuilder builder) {
+		builder.append(ANSI.BRIGHT_MAGENTA);
+		builder.append("[Function: ");
+		builder.append(code.name);
+		builder.append(']');
+		builder.append(ANSI.RESET);
 	}
 
 	@Override
-	public void representRecursive(StringRepresentation representation, HashSet<ObjectValue> parents) {
-		this.represent(representation);
+	public void displayRecursive(StringBuilder representation, HashSet<ObjectValue> parents) {
+		this.display(representation);
 	}
 
 	@Override

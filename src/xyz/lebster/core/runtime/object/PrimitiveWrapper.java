@@ -1,4 +1,4 @@
-package xyz.lebster.core.node.value.object;
+package xyz.lebster.core.runtime.object;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -6,6 +6,7 @@ import xyz.lebster.core.node.value.BooleanValue;
 import xyz.lebster.core.node.value.NumberValue;
 import xyz.lebster.core.node.value.PrimitiveValue;
 import xyz.lebster.core.node.value.StringValue;
+import xyz.lebster.core.node.value.object.ObjectValue;
 
 public abstract class PrimitiveWrapper<P extends PrimitiveValue<?>> extends ObjectValue {
 	public final P data;

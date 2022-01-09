@@ -3,7 +3,7 @@ package xyz.lebster.core.node.value;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.object.ObjectValue;
-import xyz.lebster.core.node.value.object.StringWrapper;
+import xyz.lebster.core.runtime.object.StringWrapper;
 
 public final class StringValue extends ObjectValue.Key<String> {
 	public StringValue(String value) {

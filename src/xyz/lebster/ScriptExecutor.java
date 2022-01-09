@@ -78,7 +78,7 @@ public final class ScriptExecutor {
 	public static void file(Path path, CLArguments.ExecutionOptions options) {
 		try {
 			executeFileWithoutErrorHandling(path, options);
-		} catch (SyntaxError | CannotParse | AbruptCompletion e) {
+		} catch (Throwable e) {
 			error(e, System.out, options.showStackTrace());
 		}
 	}

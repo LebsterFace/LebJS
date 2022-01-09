@@ -1,8 +1,6 @@
 package xyz.lebster.cli;
 
 import xyz.lebster.ScriptExecutor;
-import xyz.lebster.core.exception.CannotParse;
-import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.exception.UnexpectedEndOfInput;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -76,7 +74,7 @@ public class REPL {
 	private Program getProgram(String currentLine) {
 		try {
 			return new Parser(new Lexer(isMultiline ? getMultilineSource() : currentLine).tokenize()).parse();
-		} catch (SyntaxError | CannotParse e) {
+		} catch (Throwable e) {
 			if (e instanceof UnexpectedEndOfInput) {
 				if (!isMultiline) {
 					isMultiline = true;

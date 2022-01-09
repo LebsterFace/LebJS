@@ -8,14 +8,14 @@ import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.object.ObjectValue;
-import xyz.lebster.core.runtime.prototype.ObjectPrototype;
+import xyz.lebster.core.runtime.Names;
 
 import java.util.HashSet;
 
 public final class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(NativeCode code) {
 		super(code);
-		put(ObjectPrototype.toString, new NativeFunction(new StringValue("function () { [native code] }")));
+		put(Names.toString, new NativeFunction(new StringValue("function () { [native code] }")));
 	}
 
 	public NativeFunction(Value<?> value) {

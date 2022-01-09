@@ -8,6 +8,7 @@ import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.native_.NativeCode;
 import xyz.lebster.core.node.value.native_.NativeFunction;
 import xyz.lebster.core.node.value.native_.NativeProperty;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.error.TypeError;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
@@ -123,9 +124,9 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 
 		// 3. If hint is string, then Let methodNames be "toString", "valueOf".
 		final StringValue[] methodNames = hint == Value.Type.String ?
-			new StringValue[] { ObjectPrototype.toString, ObjectPrototype.valueOf } :
+			new StringValue[] { Names.toString, Names.valueOf } :
 			// 4. Else, Let methodNames be "valueOf", "toString".
-			new StringValue[] { ObjectPrototype.valueOf, ObjectPrototype.toString };
+			new StringValue[] { Names.valueOf, Names.toString };
 
 		// 5. For each element name of methodNames, do
 		for (final StringValue name : methodNames) {

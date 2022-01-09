@@ -7,19 +7,17 @@ import xyz.lebster.core.node.value.*;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.native_.NativeFunction;
 import xyz.lebster.core.node.value.object.ObjectValue;
-import xyz.lebster.core.node.value.object.StringWrapper;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.object.ArrayObject;
 import xyz.lebster.core.runtime.error.LanguageError;
 
 public final class ObjectPrototype extends ObjectValue {
 	public static final ObjectPrototype instance = new ObjectPrototype();
-	public static final StringValue toString = new StringValue("toString");
-	public static final StringValue valueOf = new StringValue("valueOf");
 	public static final NativeFunction toStringMethod = new NativeFunction(ObjectPrototype::toStringMethod);
 
 	static {
-		instance.put(toString, toStringMethod);
-		instance.setMethod(valueOf, ObjectPrototype::valueOf);
+		instance.put(Names.toString, toStringMethod);
+		instance.setMethod(Names.valueOf, ObjectPrototype::valueOf);
 	}
 
 	private ObjectPrototype() {

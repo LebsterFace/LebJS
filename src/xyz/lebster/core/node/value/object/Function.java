@@ -5,10 +5,11 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.declaration.FunctionNode;
-import xyz.lebster.core.node.value.native_.NativeFunction;
 import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.node.value.native_.NativeFunction;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.prototype.ObjectPrototype;
 
 import java.util.HashSet;
@@ -22,7 +23,7 @@ public final class Function extends Constructor<FunctionNode> {
 		final ObjectValue prototype = new ObjectValue();
 		prototype.put("constructor", this);
 		this.put("prototype", prototype);
-		this.put(ObjectPrototype.toString, new NativeFunction(new StringValue(code.toRepresentationString())));
+		this.put(Names.toString, new NativeFunction(new StringValue(code.toRepresentationString())));
 	}
 
 	@Override

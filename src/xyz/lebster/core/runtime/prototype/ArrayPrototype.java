@@ -9,6 +9,7 @@ import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.object.ObjectValue;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.error.TypeError;
 import xyz.lebster.core.runtime.object.ArrayObject;
 
@@ -16,15 +17,11 @@ public final class ArrayPrototype extends ObjectValue {
 	public static final ArrayPrototype instance = new ArrayPrototype();
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
 
-	public static final StringValue push = new StringValue("push");
-	public static final StringValue map = new StringValue("map");
-	public static final StringValue join = new StringValue("join");
-
 	static {
-		instance.setMethod(push, ArrayPrototype::push);
-		instance.setMethod(map, ArrayPrototype::map);
-		instance.setMethod(join, ArrayPrototype::join);
-		instance.setMethod(ObjectPrototype.toString, ArrayPrototype::toStringMethod);
+		instance.setMethod(Names.push, ArrayPrototype::push);
+		instance.setMethod(Names.map, ArrayPrototype::map);
+		instance.setMethod(Names.join, ArrayPrototype::join);
+		instance.setMethod(Names.toString, ArrayPrototype::toStringMethod);
 	}
 
 	private ArrayPrototype() {
@@ -35,7 +32,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let array be ? ToObject(this value).
 		final ObjectValue array = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let func be ? Get(array, "join").
-		final Value<?> func = array.get(join);
+		final Value<?> func = array.get(Names.join);
 		// 3. If IsCallable(func) is false, set func to the intrinsic function %Object.prototype.toString%.
 		final Executable<?> f_Func = func instanceof Executable<?> e ? e : ObjectPrototype.toStringMethod;
 		// 4. Return ? Call(func, array).

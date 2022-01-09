@@ -22,117 +22,47 @@ import xyz.lebster.core.node.value.StringValue;
 
 import java.util.*;
 
-import static xyz.lebster.core.parser.Associativity.*;
+import static xyz.lebster.core.parser.Associativity.Left;
 
 public final class Parser {
-	private static final HashMap<TokenType, Integer> precedence = new HashMap<>();
-	private static final HashMap<TokenType, Associativity> associativity = new HashMap<>();
+	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
+	private int precedenceForTokenType(TokenType type) {
+		return switch (type) {
+			case Period, LBracket, LParen, OptionalChain -> 20;
+			case New -> 19;
+			case PlusPlus, MinusMinus -> 18;
+			case Bang, Tilde, Typeof, Void, Delete, Await -> 17;
+			case Exponent -> 16;
+			case Star, Slash, Percent -> 15;
+			case Plus, Minus -> 14;
+			case LeftShift, RightShift, UnsignedRightShift -> 13;
+			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, Instanceof -> 12;
+			case LooseEqual, NotEqual, StrictEqual, StrictNotEqual -> 11;
+			case Ampersand -> 10;
+			case Caret -> 9;
+			case Pipe -> 8;
+			case NullishCoalescing -> 7;
+			case LogicalAnd -> 6;
+			case LogicalOr -> 5;
+			case QuestionMark -> 4;
+			case Equals, PlusEquals, MinusEquals, ExponentEquals, NullishCoalescingEquals, LogicalOrEquals,
+				LogicalAndEquals, PipeEquals, CaretEquals, AmpersandEquals, UnsignedRightShiftEquals, RightShiftEquals,
+				LeftShiftEquals, PercentEquals, DivideEquals, MultiplyEquals -> 3;
+			case Yield -> 2;
+			case Comma -> 1;
+			default -> throw new NotImplemented("Precedence for token '" + state.currentToken.type + "'");
+		};
+	}
 
-	static {
-		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table
-		precedence.put(TokenType.LParen, 21);
-		precedence.put(TokenType.RParen, 21);
-
-		precedence.put(TokenType.LBracket, 20);
-		precedence.put(TokenType.RBracket, 20);
-		precedence.put(TokenType.Period, 20);
-
-		precedence.put(TokenType.New, 20);
-
-		// Unary Expressions:
-		precedence.put(TokenType.PlusPlus, 18);
-		precedence.put(TokenType.MinusMinus, 18);
-
-		precedence.put(TokenType.Bang, 17);
-		precedence.put(TokenType.Typeof, 17);
-
-		precedence.put(TokenType.Exponent, 16);
-
-		precedence.put(TokenType.Star, 15);
-		precedence.put(TokenType.Slash, 15);
-		precedence.put(TokenType.Percent, 15);
-
-		precedence.put(TokenType.Plus, 14);
-		precedence.put(TokenType.Minus, 14);
-
-		precedence.put(TokenType.LessThan, 12);
-		precedence.put(TokenType.LessThanEqual, 12);
-		precedence.put(TokenType.GreaterThan, 12);
-		precedence.put(TokenType.GreaterThanEqual, 12);
-		precedence.put(TokenType.In, 12);
-		precedence.put(TokenType.Instanceof, 12);
-
-		precedence.put(TokenType.StrictEqual, 11);
-		precedence.put(TokenType.StrictNotEqual, 11);
-
-		precedence.put(TokenType.LogicalAnd, 7);
-		precedence.put(TokenType.LogicalOr, 6);
-		precedence.put(TokenType.NullishCoalescing, 5);
-
-		precedence.put(TokenType.UnsignedRightShiftEquals, 3);
-		precedence.put(TokenType.LeftShiftEquals, 3);
-		precedence.put(TokenType.MinusEquals, 3);
-		precedence.put(TokenType.MultiplyEquals, 3);
-		precedence.put(TokenType.DivideEquals, 3);
-		precedence.put(TokenType.AmpersandEquals, 3);
-		precedence.put(TokenType.PercentEquals, 3);
-		precedence.put(TokenType.CaretEquals, 3);
-		precedence.put(TokenType.PlusEquals, 3);
-		precedence.put(TokenType.PipeEquals, 3);
-		precedence.put(TokenType.NullishCoalescingEquals, 3);
-		precedence.put(TokenType.ExponentEquals, 3);
-		precedence.put(TokenType.LogicalAndEquals, 3);
-		precedence.put(TokenType.RightShiftEquals, 3);
-		precedence.put(TokenType.LogicalOrEquals, 3);
-		precedence.put(TokenType.Equals, 3);
-
-		// FIXME: Switch statement method (when all operators are implemented)
-		associativity.put(TokenType.LParen, NA);
-		associativity.put(TokenType.RParen, NA);
-		associativity.put(TokenType.New, NA);
-
-		associativity.put(TokenType.LBracket, Left);
-		associativity.put(TokenType.RBracket, Left);
-		associativity.put(TokenType.Star, Left);
-		associativity.put(TokenType.Slash, Left);
-		associativity.put(TokenType.Plus, Left);
-		associativity.put(TokenType.Minus, Left);
-		associativity.put(TokenType.Period, Left);
-		associativity.put(TokenType.StrictEqual, Left);
-		associativity.put(TokenType.StrictNotEqual, Left);
-		associativity.put(TokenType.LessThan, Left);
-		associativity.put(TokenType.LessThanEqual, Left);
-		associativity.put(TokenType.GreaterThan, Left);
-		associativity.put(TokenType.GreaterThanEqual, Left);
-		associativity.put(TokenType.In, Left);
-		associativity.put(TokenType.Instanceof, Left);
-		associativity.put(TokenType.LogicalOr, Left);
-		associativity.put(TokenType.LogicalAnd, Left);
-		associativity.put(TokenType.NullishCoalescing, Left);
-
-		associativity.put(TokenType.Exponent, Right);
-
-		associativity.put(TokenType.Bang, Right);
-		associativity.put(TokenType.Typeof, Right);
-		associativity.put(TokenType.PlusPlus, Right);
-		associativity.put(TokenType.MinusMinus, Right);
-
-		associativity.put(TokenType.UnsignedRightShiftEquals, Right);
-		associativity.put(TokenType.LeftShiftEquals, Right);
-		associativity.put(TokenType.MinusEquals, Right);
-		associativity.put(TokenType.MultiplyEquals, Right);
-		associativity.put(TokenType.DivideEquals, Right);
-		associativity.put(TokenType.AmpersandEquals, Right);
-		associativity.put(TokenType.PercentEquals, Right);
-		associativity.put(TokenType.CaretEquals, Right);
-		associativity.put(TokenType.PlusEquals, Right);
-		associativity.put(TokenType.PipeEquals, Right);
-		associativity.put(TokenType.NullishCoalescingEquals, Right);
-		associativity.put(TokenType.ExponentEquals, Right);
-		associativity.put(TokenType.LogicalAndEquals, Right);
-		associativity.put(TokenType.RightShiftEquals, Right);
-		associativity.put(TokenType.LogicalOrEquals, Right);
-		associativity.put(TokenType.Equals, Right);
+	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
+	private Associativity associativityForTokenType(TokenType type) {
+		return switch (type) {
+			case Period, LBracket, LParen, OptionalChain, Star, Slash, Percent, Plus, Minus, LeftShift, RightShift,
+				UnsignedRightShift, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, Instanceof, LooseEqual,
+				NotEqual, StrictEqual, StrictNotEqual, Typeof, Void, Delete, Await, Ampersand, Caret, Pipe,
+				NullishCoalescing, LogicalAnd, LogicalOr, Comma -> Associativity.Left;
+			default -> Associativity.Right;
+		};
 	}
 
 	private ParserState state;
@@ -375,13 +305,8 @@ public final class Parser {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-UnaryExpression")
 	private Expression parseUnaryPrefixedExpression() throws SyntaxError, CannotParse {
 		final Token token = state.consume();
-		// TODO: Remove when all implemented
-		if (!associativity.containsKey(token.type))
-			throw new NotImplemented("Associativity for token '" + token.type + "'");
-		final Associativity assoc = associativity.get(token.type);
-		// TODO: Remove when all implemented
-		if (!precedence.containsKey(token.type)) throw new NotImplemented("Precedence for token '" + token.type + "'");
-		final int minPrecedence = precedence.get(token.type);
+		final Associativity assoc = associativityForTokenType(token.type);
+		final int minPrecedence = precedenceForTokenType(token.type);
 
 		final UnaryExpression.UnaryOp op = switch (token.type) {
 			case Minus -> UnaryExpression.UnaryOp.UnaryMinus;
@@ -407,19 +332,12 @@ public final class Parser {
 		Expression latestExpr = parsePrimaryExpression();
 
 		while (matchSecondaryExpression(forbidden)) {
-			// TODO: Remove when all implemented
-			if (!precedence.containsKey(state.currentToken.type))
-				throw new NotImplemented("Precedence for token '" + state.currentToken.type + "'");
-			final int newPrecedence = precedence.get(state.currentToken.type);
+			final int newPrecedence = precedenceForTokenType(state.currentToken.type);
 
-			if (newPrecedence < minPrecedence || newPrecedence == minPrecedence && assoc == Left) {
+			if (newPrecedence < minPrecedence || newPrecedence == minPrecedence && assoc == Left)
 				break;
-			}
 
-			// TODO: Remove when all implemented
-			if (!associativity.containsKey(state.currentToken.type))
-				throw new NotImplemented("Associativity for token '" + state.currentToken.type + "'");
-			final Associativity newAssoc = associativity.get(state.currentToken.type);
+			final Associativity newAssoc = associativityForTokenType(state.currentToken.type);
 			latestExpr = parseSecondaryExpression(latestExpr, newPrecedence, newAssoc);
 		}
 
@@ -523,7 +441,7 @@ public final class Parser {
 			case New -> {
 				final TokenType n = state.consume().type;
 				// https://tc39.es/ecma262/multipage#sec-new-operator
-				final Expression constructExpr = parseExpression(precedence.get(n), associativity.get(n), Collections.singleton(TokenType.LParen));
+				final Expression constructExpr = parseExpression(precedenceForTokenType(n), associativityForTokenType(n), Collections.singleton(TokenType.LParen));
 				final List<Expression> arguments = state.currentToken.type == TokenType.LParen ? parseExpressionList(true) : Collections.emptyList();
 				yield new NewExpression(constructExpr, arguments.toArray(new Expression[0]));
 			}

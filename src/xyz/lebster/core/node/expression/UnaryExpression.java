@@ -1,6 +1,7 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.Dumper;
+import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
@@ -14,9 +15,9 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return switch (op) {
-			case Add -> expression.execute(interpreter).toNumberValue(interpreter);
+			case UnaryPlus -> expression.execute(interpreter).toNumberValue(interpreter);
+			case UnaryMinus -> expression.execute(interpreter).toNumberValue(interpreter).unaryMinus();
 			case LogicalNot -> expression.execute(interpreter).toBooleanValue(interpreter).not();
-			case Negate -> expression.execute(interpreter).toNumberValue(interpreter).unaryMinus();
 			case Typeof -> {
 				// https://tc39.es/ecma262/multipage#sec-typeof-operator-runtime-semantics-evaluation
 				if (expression instanceof final LeftHandSideExpression lhs) {
@@ -52,6 +53,12 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 					default -> throw new IllegalStateException("Unexpected value: " + op);
 				};
 			}
+
+
+			case Delete -> throw new NotImplemented("The `delete` operator");
+			case Void -> throw new NotImplemented("The `void` operator");
+			case BitwiseNot -> throw new NotImplemented("The `~` operator");
+			case Await -> throw new NotImplemented("The `await` operator");
 		};
 	}
 
@@ -65,13 +72,17 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append(switch (op) {
-			case Negate -> '-';
+			case UnaryMinus -> '-';
 			case LogicalNot -> '!';
-			case Add -> '+';
+			case UnaryPlus -> '+';
+			case Delete -> "delete ";
+			case Void -> "void ";
 			case Typeof -> "typeof ";
 			case PreDecrement -> "--";
 			case PreIncrement -> "++";
 			case PostIncrement, PostDecrement -> "";
+			case BitwiseNot -> '~';
+			case Await -> "await ";
 		});
 
 		expression.represent(representation);
@@ -83,8 +94,8 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 	}
 
 	public enum UnaryOp {
-		Negate, LogicalNot, Add, Typeof,
-		PostDecrement, PostIncrement,
-		PreDecrement, PreIncrement
+		// FIXME: Split into UpdateExpression
+		PostIncrement, PostDecrement, PreIncrement, PreDecrement,
+		Delete, Void, Typeof, UnaryPlus, UnaryMinus, BitwiseNot, LogicalNot, Await
 	}
 }

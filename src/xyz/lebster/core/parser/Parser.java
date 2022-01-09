@@ -384,7 +384,7 @@ public final class Parser {
 		final int minPrecedence = precedence.get(token.type);
 
 		final UnaryExpression.UnaryOp op = switch (token.type) {
-			case Minus -> UnaryExpression.UnaryOp.Negate;
+			case Minus -> UnaryExpression.UnaryOp.UnaryMinus;
 			case Bang -> UnaryExpression.UnaryOp.LogicalNot;
 			case Typeof -> UnaryExpression.UnaryOp.Typeof;
 			case PlusPlus -> UnaryExpression.UnaryOp.PreIncrement;

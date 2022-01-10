@@ -4,7 +4,10 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.node.value.BooleanValue;
+import xyz.lebster.core.node.value.NumberValue;
+import xyz.lebster.core.node.value.StringValue;
+import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.error.TypeError;
 import xyz.lebster.core.runtime.prototype.FunctionPrototype;
 
@@ -50,8 +53,8 @@ public abstract class Executable<JType> extends ObjectValue {
 
 		// FIXME: BoundTargetFunction
 		// 2. If C has a [[BoundTargetFunction]] internal slot, then
-			// a. Let BC be C.[[BoundTargetFunction]].
-			// b. Return ? InstanceofOperator(O, BC).
+		// a. Let BC be C.[[BoundTargetFunction]].
+		// b. Return ? InstanceofOperator(O, BC).
 
 		// 3. If Type(O) is not Object, return false.
 		if (!(O instanceof ObjectValue object))

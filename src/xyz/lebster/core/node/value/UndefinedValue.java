@@ -12,6 +12,7 @@ public final class UndefinedValue extends PrimitiveValue<Void> {
 	private UndefinedValue() {
 		super(null, Type.Undefined);
 	}
+
 	@Override
 	public String toString() {
 		return "undefined";

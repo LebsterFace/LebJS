@@ -25,6 +25,13 @@ import java.util.*;
 import static xyz.lebster.core.parser.Associativity.Left;
 
 public final class Parser {
+	private ParserState state;
+	private ParserState saved = null;
+
+	public Parser(Token[] tokens) {
+		this.state = new ParserState(tokens);
+	}
+
 	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
 	private int precedenceForTokenType(TokenType type) {
 		return switch (type) {
@@ -63,13 +70,6 @@ public final class Parser {
 				NullishCoalescing, LogicalAnd, LogicalOr, Comma -> Associativity.Left;
 			default -> Associativity.Right;
 		};
-	}
-
-	private ParserState state;
-	private ParserState saved = null;
-
-	public Parser(Token[] tokens) {
-		this.state = new ParserState(tokens);
 	}
 
 	private void save() {

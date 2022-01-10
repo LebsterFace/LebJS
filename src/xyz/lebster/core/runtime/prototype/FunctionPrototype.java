@@ -2,7 +2,8 @@ package xyz.lebster.core.runtime.prototype;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.node.value.UndefinedValue;
+import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.Executable;
 
 public class FunctionPrototype extends Executable<Void> {

@@ -14,7 +14,13 @@ public abstract class Value<JType> {
 	public final JType value;
 	public final Type type;
 
+	public Value(JType value, Type type) {
+		this.value = value;
+		this.type = type;
+	}
+
 	public abstract void display(StringBuilder builder);
+
 	public final String toDisplayString() {
 		final StringBuilder builder = new StringBuilder();
 		this.display(builder);
@@ -23,23 +29,6 @@ public abstract class Value<JType> {
 
 	public String toConsoleLogString() {
 		return this.toDisplayString();
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-primitive-value")
-	public enum Type {
-		String,
-		Symbol,
-		// TODO: BigInt
-		Number,
-		Boolean,
-		Object,
-		Null,
-		Undefined
-	}
-
-	public Value(JType value, Type type) {
-		this.value = value;
-		this.type = type;
 	}
 
 	public Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {
@@ -83,7 +72,7 @@ public abstract class Value<JType> {
 
 		// FIXME: BigInt
 		// 3. If Type(x) is BigInt, then
-			// a. Return ! BigInt::sameValue(x, y).
+		// a. Return ! BigInt::sameValue(x, y).
 
 		// 4. Return ! SameValueNonNumeric(x, y).
 		return this.sameValueNonNumeric(y);
@@ -98,14 +87,14 @@ public abstract class Value<JType> {
 		if (this == NullValue.instance) return true;
 
 		if (this.type == Value.Type.String)
-		// 4. If Type(x) is String, then
+			// 4. If Type(x) is String, then
 			return this.value.equals(y.value);
-			// a. If x and y are exactly the same sequence of code units (same length and same code units at corresponding indices), return true; otherwise, return false.
+		// a. If x and y are exactly the same sequence of code units (same length and same code units at corresponding indices), return true; otherwise, return false.
 
 		// 5. If Type(x) is Boolean, then
-			// a. If x and y are both true or both false, return true; otherwise, return false.
+		// a. If x and y are both true or both false, return true; otherwise, return false.
 		// 6. If Type(x) is Symbol, then
-			// a. If x and y are both the same Symbol value, return true; otherwise, return false.
+		// a. If x and y are both the same Symbol value, return true; otherwise, return false.
 		// 7. If x and y are the same Object value, return true. Otherwise, return false.
 
 		return this == y;
@@ -168,5 +157,17 @@ public abstract class Value<JType> {
 		final ObjectValue O = this.toObjectValue(interpreter);
 		// 2. Return ? O.[[Get]](P, V).
 		return O.get(P);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-primitive-value")
+	public enum Type {
+		String,
+		Symbol,
+		// TODO: BigInt
+		Number,
+		Boolean,
+		Object,
+		Null,
+		Undefined
 	}
 }

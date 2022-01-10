@@ -3,11 +3,30 @@ package xyz.lebster.cli;
 import java.nio.file.Path;
 
 public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOptions options) {
+	public static CLArguments from(String[] args) throws CLArgumentException {
+		final TemporaryResult result = new TemporaryResult();
+
+		for (final String argument : args) {
+			if (argument.startsWith("-")) {
+				if (argument.startsWith("--")) {
+					result.setFlag(argument.substring(2).toLowerCase());
+				} else {
+					result.setFlags(argument.substring(1).toLowerCase());
+				}
+			} else {
+				result.setFilename(argument);
+			}
+		}
+
+		return result.toCLIArguments();
+	}
+
 	public record ExecutionOptions(
 		boolean showAST,
 		boolean showStackTrace,
 		boolean showLastValue
-	) {}
+	) {
+	}
 
 	private static class TemporaryResult {
 		private String fileNameOrNull = null;
@@ -71,23 +90,5 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 
 			return new CLArguments(this.fileNameOrNull == null ? null : Path.of(this.fileNameOrNull), this.mode, this.toExecutionOptions());
 		}
-	}
-
-	public static CLArguments from(String[] args) throws CLArgumentException {
-		final TemporaryResult result = new TemporaryResult();
-
-		for (final String argument : args) {
-			if (argument.startsWith("-")) {
-				if (argument.startsWith("--")) {
-					result.setFlag(argument.substring(2).toLowerCase());
-				} else {
-					result.setFlags(argument.substring(1).toLowerCase());
-				}
-			} else {
-				result.setFilename(argument);
-			}
-		}
-
-		return result.toCLIArguments();
 	}
 }

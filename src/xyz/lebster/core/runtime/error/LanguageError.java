@@ -1,7 +1,7 @@
 package xyz.lebster.core.runtime.error;
 
-import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.StringValue;
+import xyz.lebster.core.node.value.object.ObjectValue;
 
 public class LanguageError extends ObjectValue {
 	public final String message;

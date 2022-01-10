@@ -16,9 +16,8 @@ public class REPL {
 	private final CLArguments.ExecutionOptions options;
 	private final Scanner scanner = new Scanner(System.in);
 	private final Interpreter interpreter = new Interpreter();
-
-	private boolean isMultiline = false;
 	private final ArrayList<String> multilineComponents = new ArrayList<>();
+	private boolean isMultiline = false;
 
 	public REPL(CLArguments.ExecutionOptions options) {
 		this.options = options;

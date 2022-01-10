@@ -2,11 +2,11 @@ package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.node.expression.Identifier;
-import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
-import xyz.lebster.core.runtime.error.ExecutionError;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.LexicalEnvironment;
+import xyz.lebster.core.runtime.error.ExecutionError;
 import xyz.lebster.core.runtime.error.RangeError;
 
 public final class Interpreter {

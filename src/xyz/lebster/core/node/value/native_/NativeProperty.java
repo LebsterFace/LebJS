@@ -3,7 +3,10 @@ package xyz.lebster.core.node.value.native_;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.value.*;
+import xyz.lebster.core.node.value.BooleanValue;
+import xyz.lebster.core.node.value.NumberValue;
+import xyz.lebster.core.node.value.StringValue;
+import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.node.value.object.ObjectValue;
 
 public class NativeProperty extends Value<NativeGetterSetter> {
@@ -19,7 +22,8 @@ public class NativeProperty extends Value<NativeGetterSetter> {
 			}
 
 			@Override
-			public void set(Interpreter interpreter, Value<?> value) {}
+			public void set(Interpreter interpreter, Value<?> value) {
+			}
 		});
 	}
 

@@ -12,8 +12,6 @@ import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.error.TypeError;
 import xyz.lebster.core.runtime.object.NumberWrapper;
 
-
-
 public final class NumberPrototype extends ObjectValue {
 	public static final NumberPrototype instance = new NumberPrototype();
 

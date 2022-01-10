@@ -19,6 +19,7 @@ import java.util.Map;
 public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
 	private final int UNIQUE_ID = ObjectValue.LAST_UNUSED_IDENTIFIER++;
+	private ObjectValue prototypeSlot = this.getDefaultPrototype();
 
 	public ObjectValue(Map<Key<?>, Value<?>> value) {
 		super(value, Type.Object);
@@ -28,7 +29,19 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 		this(new HashMap<>());
 	}
 
-	private ObjectValue prototypeSlot = this.getDefaultPrototype();
+	private static String getHint(Type preferredType) {
+		// i. If preferredType is not present, let hint be "default".
+		if (preferredType == null) return "default";
+		// ii. Else if preferredType is string, let hint be "string".
+		if (preferredType == Value.Type.String) return "string";
+			// iii. Else,
+		else {
+			// 1. Assert: preferredType is number.
+			assert preferredType == Value.Type.Number;
+			// 2. Let hint be "number".
+			return "number";
+		}
+	}
 
 	public ObjectValue getDefaultPrototype() {
 		return ObjectPrototype.instance;
@@ -77,20 +90,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 		this.prototypeSlot = V;
 		// 9. Return true.
 		return true;
-	}
-
-	private static String getHint(Type preferredType) {
-		// i. If preferredType is not present, let hint be "default".
-		if (preferredType == null) return "default";
-		// ii. Else if preferredType is string, let hint be "string".
-		if (preferredType == Value.Type.String) return "string";
-			// iii. Else,
-		else {
-			// 1. Assert: preferredType is number.
-			assert preferredType == Value.Type.Number;
-			// 2. Let hint be "number".
-			return "number";
-		}
 	}
 
 	@Override

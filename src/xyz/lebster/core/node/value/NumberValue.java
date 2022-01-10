@@ -4,8 +4,8 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.runtime.object.NumberWrapper;
 import xyz.lebster.core.node.value.object.ObjectValue;
+import xyz.lebster.core.runtime.object.NumberWrapper;
 
 public final class NumberValue extends PrimitiveValue<Double> {
 	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;
@@ -64,6 +64,61 @@ public final class NumberValue extends PrimitiveValue<Double> {
 				return input.substring(0, firstZeros);
 			}
 		}
+	}
+
+	@NonStandard
+	private static String toLocaleString(Double d) {
+		if (d.isNaN()) return "NaN";
+		else if (d == 0.0) return "0";
+		else if (d < 0.0) return "-" + NumberValue.toLocaleString(-d);
+		else if (d.isInfinite()) return "Infinity";
+
+		final String input = String.valueOf(d);
+		int decimalPosition = -1;
+		int firstZeros = -1;
+		for (int i = 0; i < input.length(); i++) {
+			if (input.charAt(i) == '.') {
+				decimalPosition = i;
+			} else if (decimalPosition != -1) {
+				if (input.charAt(i) == '0') {
+					if (firstZeros == -1) {
+						firstZeros = i;
+					}
+				} else {
+					firstZeros = -1;
+				}
+			}
+		}
+
+		String str;
+		if (decimalPosition == -1 || firstZeros == -1) {
+			str = input;
+		} else if (decimalPosition + 1 == firstZeros) {
+			str = input.substring(0, decimalPosition);
+		} else {
+			str = input.substring(0, firstZeros);
+		}
+
+		String afterDecimal = "";
+		StringBuilder output = new StringBuilder();
+		boolean isDecimal = str.contains(".");
+
+		if (isDecimal) {
+			int charPos = str.indexOf(".");
+			afterDecimal = str.substring(charPos);
+			str = str.substring(0, charPos);
+		}
+
+		int i = str.length();
+		for (; i > 2; i -= 3) {
+			output.insert(0, str.substring(i - 3, i) + ',');
+		}
+
+		if (i > 0) {
+			output.insert(0, str.substring(0, i) + ',');
+		}
+
+		return output.substring(0, output.length() - 1) + afterDecimal;
 	}
 
 	public String stringValueOf() {
@@ -168,60 +223,5 @@ public final class NumberValue extends PrimitiveValue<Double> {
 	@NonStandard
 	public String toLocaleString() {
 		return NumberValue.toLocaleString(this.value);
-	}
-
-	@NonStandard
-	private static String toLocaleString(Double d) {
-		if (d.isNaN()) return "NaN";
-		else if (d == 0.0) return "0";
-		else if (d < 0.0) return "-" + NumberValue.toLocaleString(-d);
-		else if (d.isInfinite()) return "Infinity";
-
-		final String input = String.valueOf(d);
-		int decimalPosition = -1;
-		int firstZeros = -1;
-		for (int i = 0; i < input.length(); i++) {
-			if (input.charAt(i) == '.') {
-				decimalPosition = i;
-			} else if (decimalPosition != -1) {
-				if (input.charAt(i) == '0') {
-					if (firstZeros == -1) {
-						firstZeros = i;
-					}
-				} else {
-					firstZeros = -1;
-				}
-			}
-		}
-
-		String str;
-		if (decimalPosition == -1 || firstZeros == -1) {
-			str = input;
-		} else if (decimalPosition + 1 == firstZeros) {
-			str = input.substring(0, decimalPosition);
-		} else {
-			str = input.substring(0, firstZeros);
-		}
-
-		String afterDecimal = "";
-		StringBuilder output = new StringBuilder();
-		boolean isDecimal = str.contains(".");
-
-		if (isDecimal) {
-			int charPos = str.indexOf(".");
-			afterDecimal = str.substring(charPos);
-			str = str.substring(0, charPos);
-		}
-
-		int i = str.length();
-		for (; i > 2; i -= 3) {
-			output.insert(0, str.substring(i - 3, i) + ',');
-		}
-
-		if (i > 0) {
-			output.insert(0, str.substring(0, i) + ',');
-		}
-
-		return output.substring(0, output.length() - 1) + afterDecimal;
 	}
 }

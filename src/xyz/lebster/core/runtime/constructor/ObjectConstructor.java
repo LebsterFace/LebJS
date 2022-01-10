@@ -11,7 +11,7 @@ import xyz.lebster.core.runtime.error.TypeError;
 
 public class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	public static final ObjectConstructor instance = new ObjectConstructor();
-	private ObjectConstructor() { super(); }
+
 	static {
 		instance.setMethod("setPrototypeOf", (interpreter, arguments) -> {
 			final Value<?> O = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
@@ -46,6 +46,10 @@ public class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 			final ObjectValue prototype = O.toObjectValue(interpreter).getPrototype();
 			return prototype == null ? NullValue.instance : prototype;
 		});
+	}
+
+	private ObjectConstructor() {
+		super();
 	}
 
 	@Override

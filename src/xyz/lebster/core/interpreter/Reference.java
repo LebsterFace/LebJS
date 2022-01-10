@@ -1,9 +1,9 @@
 package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.error.ReferenceError;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-reference-record-specification-type")

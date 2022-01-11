@@ -8,6 +8,7 @@ import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.NumberValue;
 import xyz.lebster.core.node.value.StringValue;
+import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.error.LanguageError;
 
@@ -55,8 +56,17 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 			}
 
 
+			// https://tc39.es/ecma262/multipage#sec-void-operator-runtime-semantics-evaluation
+			case Void -> {
+				// UnaryExpression : void UnaryExpression
+				// 1. Let expr be the result of evaluating UnaryExpression.
+				// 2. Perform ? GetValue(expr).
+				expression.execute(interpreter);
+				// 3. Return undefined.
+				yield UndefinedValue.instance;
+			}
+
 			case Delete -> throw new NotImplemented("The `delete` operator");
-			case Void -> throw new NotImplemented("The `void` operator");
 			case BitwiseNot -> throw new NotImplemented("The `~` operator");
 			case Await -> throw new NotImplemented("The `await` operator");
 		};

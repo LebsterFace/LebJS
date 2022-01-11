@@ -11,7 +11,6 @@ import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,33 +50,15 @@ public final class ScriptExecutor {
 		}
 
 		final Program program = new Parser(new Lexer(source).tokenize()).parse();
-		if (options.showAST()) {
-			System.out.println("------- AST -------");
-			program.dump(0);
-			System.out.println("------- END -------");
-		}
-
+		if (options.showAST()) dumpAST(program);
 		final Value<?> lastValue = program.execute(interpreter);
 		if (options.showLastValue())
 			System.out.println(lastValue.toDisplayString());
 	}
 
-	public static void executeFileWithoutErrorHandling(Path path, CLArguments.ExecutionOptions options) throws CannotParse, AbruptCompletion, SyntaxError {
-		String source;
-
-		try {
-			source = Files.readString(path);
-		} catch (IOException e) {
-			error(e, System.out, options.showStackTrace());
-			return;
-		}
-
-		executeWithoutErrorHandling(source, new Interpreter(), options);
-	}
-
 	public static void file(Path path, CLArguments.ExecutionOptions options) {
 		try {
-			executeFileWithoutErrorHandling(path, options);
+			executeWithoutErrorHandling(Files.readString(path), new Interpreter(), options);
 		} catch (Throwable e) {
 			error(e, System.out, options.showStackTrace());
 		}
@@ -95,5 +76,11 @@ public final class ScriptExecutor {
 				throw new Error(e);
 			}
 		}
+	}
+
+	public static void dumpAST(Program program) {
+		System.out.println("------- AST -------");
+		program.dump(0);
+		System.out.println("------- END -------");
 	}
 }

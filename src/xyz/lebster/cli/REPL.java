@@ -1,11 +1,10 @@
 package xyz.lebster.cli;
 
 import xyz.lebster.ScriptExecutor;
+import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.Program;
-import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.parser.Lexer;
-import xyz.lebster.core.parser.Parser;
+import xyz.lebster.core.parser.Token;
 
 import java.util.Scanner;
 
@@ -21,38 +20,54 @@ public class REPL {
 	public void run() {
 		System.out.println("Starting REPL...");
 		while (true) {
-			this.prompt();
 			final String input = this.readNextInput();
 			if (input == null || input.equals(".exit")) break;
 			if (input.isBlank()) continue;
-
 			if (input.equals(".clear")) {
 				System.out.print("\033[H\033[2J");
 				System.out.flush();
-			} else {
-				try {
-					final Lexer lexer = new Lexer(input);
-					Program program = new Parser(lexer.tokenize()).parse();
-					if (options.showAST()) {
-						System.out.println("------- AST -------");
-						program.dump(0);
-						System.out.println("------- END -------");
-					}
+				continue;
+			}
 
-					final Value<?> lastValue = program.execute(interpreter);
-					System.out.println(lastValue.toDisplayString());
-				} catch (Throwable e) {
-					ScriptExecutor.error(e, System.out, options.showStackTrace());
-				}
+			try {
+				ScriptExecutor.executeWithoutErrorHandling(input, interpreter, options);
+			} catch (Throwable e) {
+				ScriptExecutor.error(e, System.out, options.showStackTrace());
 			}
 		}
 	}
 
-	private String readNextInput() {
-		return this.scanner.hasNextLine() ? scanner.nextLine() : null;
+	private String readLine(int indent) {
+		if (indent == 0) {
+			System.out.print("> ");
+		} else {
+			for (int i = 0; i < indent; i++)
+				System.out.print('\t');
+		}
+
+		return this.scanner.hasNextLine() ? this.scanner.nextLine() : null;
 	}
 
-	private void prompt() {
-		System.out.print("> ");
+	private String readNextInput() {
+		final StringBuilder result = new StringBuilder();
+		int indent = 0;
+
+		do {
+			if (result.length() != 0) result.append('\n');
+			final String line = readLine(indent);
+			if (line == null) return null;
+			Token[] tokens;
+			try { tokens = new Lexer(line).tokenize(); } catch (SyntaxError e) { return null; }
+			for (final Token token : tokens) {
+				switch (token.type) {
+					case LParen, LBrace, LBracket -> indent++;
+					case RParen, RBrace, RBracket -> indent--;
+				}
+			}
+
+			result.append(line);
+		} while (indent > 0);
+
+		return result.toString();
 	}
 }

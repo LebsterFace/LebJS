@@ -5,6 +5,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.GlobalObject;
+import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.value.UndefinedValue;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.runtime.error.ExecutionError;
@@ -13,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
 
 public class Testing {
 	private static final ByteArrayOutputStream passedOutput = new ByteArrayOutputStream();
@@ -89,7 +91,7 @@ public class Testing {
 			System.setOut(tempStream);
 
 			try {
-				ScriptExecutor.executeFileWithoutErrorHandling(file.toPath(), options);
+				ScriptExecutor.executeWithoutErrorHandling(Files.readString(file.toPath()), new Interpreter(), options);
 				successfulTests++;
 				printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", file.getName());
 				printTestOutput(passedStream, tempOutput);

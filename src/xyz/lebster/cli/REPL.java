@@ -1,23 +1,18 @@
 package xyz.lebster.cli;
 
 import xyz.lebster.ScriptExecutor;
-import xyz.lebster.core.exception.UnexpectedEndOfInput;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.value.Value;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class REPL {
 	private final CLArguments.ExecutionOptions options;
 	private final Scanner scanner = new Scanner(System.in);
 	private final Interpreter interpreter = new Interpreter();
-	private final ArrayList<String> multilineComponents = new ArrayList<>();
-	private boolean isMultiline = false;
 
 	public REPL(CLArguments.ExecutionOptions options) {
 		this.options = options;
@@ -25,77 +20,39 @@ public class REPL {
 
 	public void run() {
 		System.out.println("Starting REPL...");
-		do {
+		while (true) {
 			this.prompt();
-			try {
-				final String nextLine = scanner.nextLine();
-				if (nextLine.isBlank()) continue;
+			final String input = this.readNextInput();
+			if (input == null || input.equals(".exit")) break;
+			if (input.isBlank()) continue;
 
-				if (nextLine.equals(".exit")) {
-					break;
-				} else if (nextLine.equals(".clear")) {
-					System.out.print("\033[H\033[2J");
-					System.out.flush();
-				} else {
-					this.handle(nextLine);
-				}
-			} catch (NoSuchElementException e) {
-				break;
-			}
-		} while (true);
-	}
-
-	private void handle(String currentLine) {
-		if (isMultiline) multilineComponents.add(currentLine);
-		final Program program = getProgram(currentLine);
-		if (program == null) return;
-		else if (isMultiline) endMultiline();
-
-		if (options.showAST()) {
-			System.out.println("------- AST -------");
-			program.dump(0);
-			System.out.println("------- END -------");
-		}
-
-		try {
-			final Value<?> lastValue = program.execute(interpreter);
-			System.out.println(lastValue.toDisplayString());
-		} catch (Throwable e) {
-			ScriptExecutor.error(e, System.out, options.showStackTrace());
-		}
-	}
-
-	private String getMultilineSource() {
-		return String.join("\n", multilineComponents);
-	}
-
-	private Program getProgram(String currentLine) {
-		try {
-			return new Parser(new Lexer(isMultiline ? getMultilineSource() : currentLine).tokenize()).parse();
-		} catch (Throwable e) {
-			if (e instanceof UnexpectedEndOfInput) {
-				if (!isMultiline) {
-					isMultiline = true;
-					multilineComponents.add(currentLine);
-				}
+			if (input.equals(".clear")) {
+				System.out.print("\033[H\033[2J");
+				System.out.flush();
 			} else {
-				endMultiline();
-				ScriptExecutor.error(e, System.out, options.showStackTrace());
-			}
+				try {
+					final Lexer lexer = new Lexer(input);
+					Program program = new Parser(lexer.tokenize()).parse();
+					if (options.showAST()) {
+						System.out.println("------- AST -------");
+						program.dump(0);
+						System.out.println("------- END -------");
+					}
 
-			return null;
+					final Value<?> lastValue = program.execute(interpreter);
+					System.out.println(lastValue.toDisplayString());
+				} catch (Throwable e) {
+					ScriptExecutor.error(e, System.out, options.showStackTrace());
+				}
+			}
 		}
 	}
 
-	private void endMultiline() {
-		isMultiline = false;
-		multilineComponents.clear();
+	private String readNextInput() {
+		return this.scanner.hasNextLine() ? scanner.nextLine() : null;
 	}
 
 	private void prompt() {
-		if (this.isMultiline)
-			System.out.print("... ");
-		else
-			System.out.print("> ");
+		System.out.print("> ");
 	}
 }

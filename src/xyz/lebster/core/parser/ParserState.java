@@ -17,12 +17,12 @@ public final class ParserState implements Cloneable {
 		this.index = index;
 	}
 
-	public String expected(TokenType t) {
-		return "Unexpected token " + currentToken.type + ". Expected " + t;
+	public void expected(TokenType t) throws SyntaxError {
+		throw new SyntaxError("Unexpected token " + currentToken.type + ". Expected " + t);
 	}
 
-	public String expected(String t) {
-		return "Unexpected token " + currentToken.type + ". Expected " + t;
+	public void expected(String t) throws SyntaxError {
+		throw new SyntaxError("Unexpected token " + currentToken.type + ". Expected " + t);
 	}
 
 	Token consume() {
@@ -33,7 +33,7 @@ public final class ParserState implements Cloneable {
 	}
 
 	Token require(TokenType t) throws SyntaxError {
-		if (currentToken.type != t) throw new SyntaxError(expected(t));
+		if (currentToken.type != t) expected(t);
 		return consume();
 	}
 

@@ -308,11 +308,16 @@ public final class Parser {
 		final int minPrecedence = precedenceForTokenType(token.type);
 
 		final UnaryExpression.UnaryOp op = switch (token.type) {
-			case Minus -> UnaryExpression.UnaryOp.UnaryMinus;
-			case Bang -> UnaryExpression.UnaryOp.LogicalNot;
-			case Typeof -> UnaryExpression.UnaryOp.Typeof;
 			case PlusPlus -> UnaryExpression.UnaryOp.PreIncrement;
 			case MinusMinus -> UnaryExpression.UnaryOp.PreDecrement;
+			case Delete -> UnaryExpression.UnaryOp.Delete;
+			case Void -> UnaryExpression.UnaryOp.Void;
+			case Typeof -> UnaryExpression.UnaryOp.Typeof;
+			case Plus -> UnaryExpression.UnaryOp.UnaryPlus;
+			case Minus -> UnaryExpression.UnaryOp.UnaryMinus;
+			case Tilde -> UnaryExpression.UnaryOp.BitwiseNot;
+			case Bang -> UnaryExpression.UnaryOp.LogicalNot;
+			case Await -> UnaryExpression.UnaryOp.Await;
 			default -> throw new CannotParse(token, "Unary Operator");
 		};
 

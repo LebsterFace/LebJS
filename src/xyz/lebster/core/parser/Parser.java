@@ -416,7 +416,9 @@ public final class Parser {
 					if (result != null) yield result;
 				}
 
+				state.consumeAll(TokenType.Terminator);
 				final Expression expression = parseExpression();
+				state.consumeAll(TokenType.Terminator);
 				state.require(TokenType.RParen);
 				yield expression;
 			}

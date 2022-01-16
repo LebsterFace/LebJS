@@ -98,7 +98,7 @@ public class Testing {
 			} catch (Throwable throwable) {
 				printTestResult(failedStream, ANSI.BRIGHT_RED, "FAILED", file.getName());
 				printTestOutput(failedStream, tempOutput);
-				ScriptExecutor.error(throwable, failedStream, true);
+				ScriptExecutor.error(throwable, failedStream, options.showStackTrace());
 			}
 
 			System.setOut(stdout);

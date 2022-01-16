@@ -4,6 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.object.Executable;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.error.TypeError;
@@ -19,12 +20,12 @@ public abstract class Value<JType> {
 		this.type = type;
 	}
 
-	public abstract void display(StringBuilder builder);
+	public abstract void display(StringRepresentation representation);
 
 	public final String toDisplayString() {
-		final StringBuilder builder = new StringBuilder();
-		this.display(builder);
-		return builder.toString();
+		final StringRepresentation representation = new StringRepresentation();
+		this.display(representation);
+		return representation.toString();
 	}
 
 	public String toConsoleLogString() {

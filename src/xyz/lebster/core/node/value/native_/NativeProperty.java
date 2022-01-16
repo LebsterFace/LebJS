@@ -3,6 +3,7 @@ package xyz.lebster.core.node.value.native_;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.BooleanValue;
 import xyz.lebster.core.node.value.NumberValue;
 import xyz.lebster.core.node.value.StringValue;
@@ -58,7 +59,7 @@ public class NativeProperty extends Value<NativeGetterSetter> {
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
+	public void display(StringRepresentation builder) {
 		builder.append(ANSI.CYAN);
 		builder.append("[Native Property]");
 		builder.append(ANSI.RESET);

@@ -26,7 +26,7 @@ public record NewExpression(Expression constructExpr, Expression... arguments) i
 		if (exprValue instanceof final Constructor<?> constructor) {
 			return constructor;
 		} else {
-			final StringBuilder builder = new StringBuilder();
+			final StringRepresentation builder = new StringRepresentation();
 			exprValue.display(builder);
 			builder.append(" is not a constructor");
 			throw AbruptCompletion.error(new TypeError(builder.toString()));

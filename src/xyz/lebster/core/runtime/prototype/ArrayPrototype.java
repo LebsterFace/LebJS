@@ -3,6 +3,7 @@ package xyz.lebster.core.runtime.prototype;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.NumberValue;
 import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.UndefinedValue;
@@ -94,7 +95,7 @@ public final class ArrayPrototype extends ObjectValue {
 		final long len = lengthOfArrayLike(O, interpreter);
 
 		if (!(callbackfn instanceof final Executable<?> executable)) {
-			final StringBuilder builder = new StringBuilder();
+			final StringRepresentation builder = new StringRepresentation();
 			callbackfn.display(builder);
 			builder.append(" is not a function");
 			throw AbruptCompletion.error(new TypeError(builder.toString()));

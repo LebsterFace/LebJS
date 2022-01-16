@@ -5,6 +5,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.NumberValue;
 import xyz.lebster.core.node.value.StringValue;
 import xyz.lebster.core.node.value.Value;
@@ -51,10 +52,10 @@ public final class ArrayObject extends ObjectValue {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void displayRecursive(StringBuilder representation, HashSet<ObjectValue> parents) {
-		representation.append('[');
+	public void displayRecursive(StringRepresentation builder, HashSet<ObjectValue> parents, boolean singleLine) {
+		builder.append('[');
 		if (value.isEmpty()) {
-			representation.append(']');
+			builder.append(']');
 			return;
 		}
 
@@ -63,21 +64,21 @@ public final class ArrayObject extends ObjectValue {
 			final Value<?> element = this.get(new StringValue(index));
 			if (element instanceof final ObjectValue object) {
 				if (parents.contains(object)) {
-					representation.append(ANSI.RED);
-					representation.append(this == element ? "[self]" : "[parent]");
-					representation.append(ANSI.RESET);
+					builder.append(ANSI.RED);
+					builder.append(this == element ? "[self]" : "[parent]");
+					builder.append(ANSI.RESET);
 				} else {
-					object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone());
+					object.displayRecursive(builder, (HashSet<ObjectValue>) parents.clone(), singleLine);
 				}
 			} else {
-				element.display(representation);
+				element.display(builder);
 			}
 
 			if (index != this.length - 1)
-				representation.append(", ");
+				builder.append(", ");
 		}
 
-		representation.append(']');
+		builder.append(']');
 	}
 
 	@Override

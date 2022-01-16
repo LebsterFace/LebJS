@@ -4,6 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.object.NumberWrapper;
 
@@ -131,7 +132,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
+	public void display(StringRepresentation builder) {
 		builder.append(ANSI.BRIGHT_YELLOW);
 		builder.append(stringValueOf(value));
 		builder.append(ANSI.RESET);

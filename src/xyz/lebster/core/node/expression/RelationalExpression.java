@@ -60,7 +60,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 			case In -> {
 				// 5. If Type(rval) is not Object, throw a TypeError exception.
 				if (!(right_value instanceof final ObjectValue object)) {
-					final StringBuilder builder = new StringBuilder();
+					final StringRepresentation builder = new StringRepresentation();
 					builder.append("Cannot use `in` operator to search for `");
 					left_value.display(builder);
 					builder.append("` in ");

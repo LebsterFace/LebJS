@@ -4,6 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.error.TypeError;
 
@@ -104,5 +105,12 @@ public class SymbolValue extends ObjectValue.Key<Void> {
 	@Override
 	public String typeOf(Interpreter interpreter) throws AbruptCompletion {
 		return "symbol";
+	}
+
+	@Override
+	public void display(StringRepresentation builder) {
+		builder.append("Symbol(");
+		if (this.description != null) builder.append(this.description);
+		builder.append(')');
 	}
 }

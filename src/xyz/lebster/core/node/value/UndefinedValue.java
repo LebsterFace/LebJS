@@ -3,6 +3,7 @@ package xyz.lebster.core.node.value;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.value.object.ObjectValue;
 import xyz.lebster.core.runtime.error.TypeError;
 
@@ -39,7 +40,7 @@ public final class UndefinedValue extends PrimitiveValue<Void> {
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
+	public void display(StringRepresentation builder) {
 		builder.append(ANSI.BRIGHT_BLACK);
 		builder.append("undefined");
 		builder.append(ANSI.RESET);

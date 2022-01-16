@@ -245,8 +245,10 @@ public final class Lexer {
 				return new Token(TokenType.Identifier, value, start, index);
 			}
 		} else if (currentChar == '"' || currentChar == '\'') {
+			// FIXME: Template strings
 			final char stringType = currentChar;
 			consume();
+			// FIXME: Handle escape sequences
 			while (currentChar != stringType) collect();
 			consume();
 			return new Token(TokenType.StringLiteral, builder.toString(), start, index);
@@ -269,7 +271,7 @@ public final class Lexer {
 				}
 			}
 
-			throw new SyntaxError(StringEscapeUtils.escape("Invalid character '" + currentChar + "' at " + 0 + ":" + 0));
+			throw new SyntaxError(StringEscapeUtils.escape("Invalid character '" + currentChar + " (index " + index +")"));
 		}
 	}
 

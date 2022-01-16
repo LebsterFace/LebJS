@@ -513,7 +513,6 @@ public final class Parser {
 		final ObjectExpression result = new ObjectExpression();
 
 		while (state.currentToken.type == TokenType.StringLiteral || state.currentToken.type == TokenType.Identifier) {
-			state.consumeAll(TokenType.Terminator);
 			final var key = new StringLiteral(new StringValue(state.consume().value));
 			state.consumeAll(TokenType.Terminator);
 			state.require(TokenType.Colon);

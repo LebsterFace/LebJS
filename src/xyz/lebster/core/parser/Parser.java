@@ -374,6 +374,10 @@ public final class Parser {
 			case Slash -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Divide);
 			case Percent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Remainder);
 			case Exponent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Exponent);
+
+			case Pipe, Ampersand -> throw new NotImplemented("Parsing binary bitwise expressions");
+			case QuestionMark -> throw new NotImplemented("Parsing ternary expressions");
+
 			case LParen -> parseCallExpression(left);
 
 			case StrictEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictEquals);

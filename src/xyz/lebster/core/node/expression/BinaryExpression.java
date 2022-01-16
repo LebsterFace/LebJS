@@ -2,6 +2,7 @@ package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -34,6 +35,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 			case Multiply -> left_num * right_num;
 			case Divide -> left_num / right_num;
 			case Exponent -> Math.pow(left_num, right_num);
+			case Remainder -> throw new NotImplemented("The remainder (`%`) operator");
 		});
 	}
 
@@ -67,7 +69,8 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 		Subtract("-"),
 		Multiply("*"),
 		Divide("/"),
-		Exponent("**");
+		Exponent("**"),
+		Remainder("%");
 
 		public final String str;
 

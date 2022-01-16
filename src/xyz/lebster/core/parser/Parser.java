@@ -273,28 +273,60 @@ public final class Parser {
 		return new VariableDeclaration(kind, declarators.toArray(new VariableDeclarator[0]));
 	}
 
+	private Identifier[] parseIdentifierList() {
+		final List<Identifier> result = new ArrayList<>();
 		while (state.currentToken.type == TokenType.Identifier) {
-			arguments.add(new Identifier(state.consume().value));
+			result.add(new Identifier(state.consume().value));
 			if (state.accept(TokenType.Comma) == null) break;
 		}
 
+		return result.toArray(new Identifier[0]);
+	}
+
+	private Identifier[] parseFunctionArguments() throws SyntaxError {
+		state.require(TokenType.LParen);
+		final Identifier[] arguments = parseIdentifierList();
+		this.FAIL_FOR_UNSUPPORTED_ARG();
 		state.require(TokenType.RParen);
 		return arguments;
+	}
+
+	private Identifier[] parseArrowFunctionArguments(boolean expectParens) {
+		if (!expectParens) {
+			final Token t = state.accept(TokenType.Identifier);
+			if (t == null) return null;
+			return new Identifier[] { new Identifier(t.value) };
+		}
+
+
+		final Identifier[] result = parseIdentifierList();
+		this.FAIL_FOR_UNSUPPORTED_ARG();
+		if (state.accept(TokenType.RParen) == null) return null;
+		return result;
+	}
+
+	private void FAIL_FOR_UNSUPPORTED_ARG() {
+		if (state.currentToken.type == TokenType.DotDotDot)
+			throw new NotImplemented("Parsing rest (`...`) arguments");
+		else if (state.currentToken.type == TokenType.LBrace || state.currentToken.type == TokenType.LBracket)
+			throw new NotImplemented("Parsing destructuring arguments");
+		else if (state.currentToken.type == TokenType.Equals)
+			throw new NotImplemented("Parsing default parameters");
 	}
 
 	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
 		final Identifier name = new Identifier(state.require(TokenType.Identifier).value);
-		final List<Identifier> arguments = parseFunctionArguments();
-		return new FunctionDeclaration(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
+		final Identifier[] arguments = parseFunctionArguments();
+		return new FunctionDeclaration(parseBlockStatement(), name, arguments);
 	}
 
 	private FunctionExpression parseFunctionExpression() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
 		final Token potentialName = state.accept(TokenType.Identifier);
 		final Identifier name = potentialName == null ? null : new Identifier(potentialName.value);
-		final List<Identifier> arguments = parseFunctionArguments();
-		return new FunctionExpression(parseBlockStatement(), name, arguments.toArray(new Identifier[0]));
+		final Identifier[] arguments = parseFunctionArguments();
+		return new FunctionExpression(parseBlockStatement(), name, arguments);
 	}
 
 	private List<Expression> parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {
@@ -517,23 +549,6 @@ public final class Parser {
 			return body;
 		} else {
 			return null;
-		}
-	}
-
-	private Identifier[] parseArrowFunctionArguments(boolean expectParens) {
-		if (expectParens) {
-			final List<Identifier> result = new ArrayList<>();
-			while (state.currentToken.type == TokenType.Identifier) {
-				result.add(new Identifier(state.consume().value));
-				if (state.accept(TokenType.Comma) == null) break;
-			}
-
-			if (state.accept(TokenType.RParen) == null) return null;
-			return result.toArray(new Identifier[0]);
-		} else {
-			final Token t = state.accept(TokenType.Identifier);
-			if (t == null) return null;
-			return new Identifier[] { new Identifier(t.value) };
 		}
 	}
 

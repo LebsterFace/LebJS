@@ -9,5 +9,6 @@ public enum TokenType {
 	Tilde, MinusMinus, MinusEquals, NotEqual, NullishCoalescing, OptionalChain, Exponent, MultiplyEquals, DivideEquals,
 	LogicalAnd, AmpersandEquals, PercentEquals, CaretEquals, PlusPlus, PlusEquals, LeftShift, LessThanEqual, LooseEqual,
 	Arrow, GreaterThanEqual, RightShift, PipeEquals, LogicalOr, StrictNotEqual, NullishCoalescingEquals, ExponentEquals,
-	LogicalAndEquals, RightShiftEquals, UnsignedRightShift, LogicalOrEquals, Infinity, QuestionMark, Await, Colon
+	LogicalAndEquals, RightShiftEquals, UnsignedRightShift, LogicalOrEquals, Infinity, QuestionMark, Await, Colon,
+	Backslash, DotDotDot,
 }

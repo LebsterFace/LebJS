@@ -65,6 +65,7 @@ public final class Lexer {
 		symbols_length_3.put("**=", TokenType.ExponentEquals);
 		symbols_length_3.put("??=", TokenType.NullishCoalescingEquals);
 		symbols_length_3.put("!==", TokenType.StrictNotEqual);
+		symbols_length_3.put("...", TokenType.DotDotDot);
 
 		symbols_length_2.put("||", TokenType.LogicalOr);
 		symbols_length_2.put("|=", TokenType.PipeEquals);
@@ -113,6 +114,7 @@ public final class Lexer {
 		symbols_length_1.put(",", TokenType.Comma);
 		symbols_length_1.put("-", TokenType.Minus);
 		symbols_length_1.put(":", TokenType.Colon);
+		symbols_length_1.put("\\", TokenType.Backslash);
 
 		symbols.add(symbols_length_4);
 		symbols.add(symbols_length_3);

@@ -237,6 +237,7 @@ public final class Parser {
 		return switch (state.currentToken.type) {
 			case Let, Var, Const -> parseVariableDeclaration();
 			case Function -> parseFunctionDeclaration();
+			case Class -> throw new NotImplemented("Parsing class declarations");
 			default -> throw new CannotParse(state.currentToken, "Declaration");
 		};
 	}

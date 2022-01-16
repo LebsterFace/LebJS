@@ -531,6 +531,8 @@ public final class Parser {
 	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {
 		state.require(TokenType.LBracket);
 		final List<Expression> elements = parseExpressionList(false);
+		if (state.currentToken.type == TokenType.DotDotDot)
+			throw new NotImplemented("Parsing spread syntax `[...a]`");
 		state.require(TokenType.RBracket);
 		return new ArrayExpression(elements);
 	}

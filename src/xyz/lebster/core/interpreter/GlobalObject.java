@@ -1,6 +1,6 @@
 package xyz.lebster.core.interpreter;
 
-import xyz.lebster.cli.Testing;
+import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
@@ -12,6 +12,7 @@ import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.runtime.constructor.ObjectConstructor;
 import xyz.lebster.core.runtime.error.EvalError;
+import xyz.lebster.core.runtime.error.ExecutionError;
 import xyz.lebster.core.runtime.object.ConsoleObject;
 import xyz.lebster.core.runtime.object.MathObject;
 
@@ -39,8 +40,11 @@ public final class GlobalObject extends ObjectValue {
 		put("Math", MathObject.instance);
 		put("Object", ObjectConstructor.instance);
 
+		// Non-Standard properties
 		put("console", ConsoleObject.instance);
-		Testing.addTestingMethods(this);
+		setMethod("expect", GlobalObject::expect);
+		setMethod("bind", GlobalObject::bind);
+		setMethod("unbind", GlobalObject::unbind);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parseint-string-radix")
@@ -150,5 +154,42 @@ public final class GlobalObject extends ObjectValue {
 	private static Value<?> isNaN(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		if (arguments.length == 0) return BooleanValue.FALSE;
 		return BooleanValue.of(arguments[0].toNumberValue(interpreter).value.isNaN());
+	}
+
+	private static Value<?> expect(Interpreter interpreter, Value<?>[] arguments) {
+		final Value<?> expected = arguments[0];
+		final Value<?> received = arguments[1];
+
+		if (!expected.equals(received)) {
+			Dumper.dumpIndicator(0, "Expected");
+			Dumper.dumpValue(0, expected.type.name(), String.valueOf(expected.value));
+			Dumper.dumpIndicator(0, "Received");
+			Dumper.dumpValue(0, received.type.name(), String.valueOf(received.value));
+			throw new ExecutionError("Assertion failed.");
+		}
+
+		return UndefinedValue.instance;
+	}
+
+	private static Value<?> bind(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// Exit the `bind()` ExecutionContext
+		final ExecutionContext current = interpreter.getExecutionContext();
+		interpreter.exitExecutionContext(current);
+		// Enter the new ExecutionContext
+		interpreter.enterExecutionContext(new ExecutionContext(interpreter.lexicalEnvironment(), null, arguments[0]));
+		// Re-enter the `bind()` ExecutionContext
+		interpreter.enterExecutionContext(current);
+		return UndefinedValue.instance;
+	}
+
+	private static Value<?> unbind(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// Exit the `unbind()` ExecutionContext
+		final ExecutionContext current = interpreter.getExecutionContext();
+		interpreter.exitExecutionContext(current);
+		// Exit the bound ExecutionContext
+		interpreter.exitExecutionContext(interpreter.getExecutionContext());
+		// Re-enter the `unbind()` ExecutionContext
+		interpreter.enterExecutionContext(current);
+		return UndefinedValue.instance;
 	}
 }

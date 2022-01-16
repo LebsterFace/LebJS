@@ -2,13 +2,7 @@ package xyz.lebster.cli;
 
 import xyz.lebster.ScriptExecutor;
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.Dumper;
-import xyz.lebster.core.interpreter.ExecutionContext;
-import xyz.lebster.core.interpreter.GlobalObject;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.value.UndefinedValue;
-import xyz.lebster.core.node.value.Value;
-import xyz.lebster.core.runtime.error.ExecutionError;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,45 +17,6 @@ public class Testing {
 	private static final PrintStream failedStream = new PrintStream(failedOutput);
 	private static int successfulTests = 0;
 	private static int totalTests = 0;
-
-	public static void addTestingMethods(GlobalObject globalObject) {
-		globalObject.setMethod("expect", (interpreter, arguments) -> {
-			final Value<?> expected = arguments[0];
-			final Value<?> received = arguments[1];
-
-			if (!expected.equals(received)) {
-				Dumper.dumpIndicator(0, "Expected");
-				Dumper.dumpValue(0, expected.type.name(), String.valueOf(expected.value));
-				Dumper.dumpIndicator(0, "Received");
-				Dumper.dumpValue(0, received.type.name(), String.valueOf(received.value));
-				throw new ExecutionError("Assertion failed.");
-			}
-
-			return UndefinedValue.instance;
-		});
-
-		globalObject.setMethod("bind", (interpreter, arguments) -> {
-			// Exit the `bind()` ExecutionContext
-			final ExecutionContext current = interpreter.getExecutionContext();
-			interpreter.exitExecutionContext(current);
-			// Enter the new ExecutionContext
-			interpreter.enterExecutionContext(new ExecutionContext(interpreter.lexicalEnvironment(), null, arguments[0]));
-			// Re-enter the `bind()` ExecutionContext
-			interpreter.enterExecutionContext(current);
-			return UndefinedValue.instance;
-		});
-
-		globalObject.setMethod("unbind", (interpreter, arguments) -> {
-			// Exit the `unbind()` ExecutionContext
-			final ExecutionContext current = interpreter.getExecutionContext();
-			interpreter.exitExecutionContext(current);
-			// Exit the bound ExecutionContext
-			interpreter.exitExecutionContext(interpreter.getExecutionContext());
-			// Re-enter the `unbind()` ExecutionContext
-			interpreter.enterExecutionContext(current);
-			return UndefinedValue.instance;
-		});
-	}
 
 	private static void printTestResult(PrintStream stream, String color, String status, String name) {
 		stream.printf("%s%s %s %s%s %s%s%n", ANSI.BACKGROUND_BLACK, color, status, ANSI.RESET, ANSI.BRIGHT_BLUE, name, ANSI.RESET);

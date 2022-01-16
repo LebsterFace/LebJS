@@ -305,6 +305,8 @@ public final class Parser {
 
 	private CallExpression parseCallExpression(Expression left) throws SyntaxError, CannotParse {
 		final List<Expression> arguments = parseExpressionList(false);
+		if (state.currentToken.type == TokenType.DotDotDot)
+			throw new NotImplemented("Parsing spread arguments (`fn(...p)`)");
 		state.require(TokenType.RParen);
 		return new CallExpression(left, arguments.toArray(new Expression[0]));
 	}

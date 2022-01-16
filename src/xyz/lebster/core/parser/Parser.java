@@ -288,12 +288,17 @@ public final class Parser {
 	private List<Expression> parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {
 		final List<Expression> result = new ArrayList<>();
 		if (expectParens) state.require(TokenType.LParen);
+		state.consumeAll(TokenType.Terminator);
 
 		while (matchPrimaryExpression()) {
+			state.consumeAll(TokenType.Terminator);
 			result.add(parseExpression());
+			state.consumeAll(TokenType.Terminator);
 			if (state.accept(TokenType.Comma) == null) break;
+			state.consumeAll(TokenType.Terminator);
 		}
 
+		state.consumeAll(TokenType.Terminator);
 		if (expectParens) state.require(TokenType.RParen);
 		return result;
 	}

@@ -429,6 +429,7 @@ public final class Parser {
 			case StringLiteral -> new StringLiteral(new StringValue(state.consume().value));
 			case NumericLiteral -> new NumericLiteral(new NumberValue(Double.parseDouble(state.consume().value)));
 			case BooleanLiteral -> new BooleanLiteral(BooleanValue.of(state.consume().value.equals("true")));
+			case Await -> throw new NotImplemented("Parsing `await` expressions");
 
 			case Function -> parseFunctionExpression();
 			case LBracket -> parseArrayExpression();

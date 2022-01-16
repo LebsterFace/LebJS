@@ -170,6 +170,7 @@ public final class Parser {
 	}
 
 	private ForStatement parseForStatement() throws SyntaxError, CannotParse {
+		// FIXME: For .. of & For .. in
 		state.require(TokenType.For);
 		state.require(TokenType.LParen);
 
@@ -512,6 +513,12 @@ public final class Parser {
 		state.consumeAll(TokenType.Terminator);
 		final ObjectExpression result = new ObjectExpression();
 
+		// FIXME:
+		// 		- Methods { a() { alert(1) } }
+		// 		- Getters / Setters { get a() { return Math.random() } }
+		// 		- Computed property names { ["a" + "b"]: 123 }
+		// 		- Shorthand initializers { a, b }
+		// 		- Allow all property names { 0: "hello" }
 		while (state.currentToken.type == TokenType.StringLiteral || state.currentToken.type == TokenType.Identifier) {
 			final var key = new StringLiteral(new StringValue(state.consume().value));
 			state.consumeAll(TokenType.Terminator);

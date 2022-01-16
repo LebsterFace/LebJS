@@ -255,15 +255,23 @@ public final class Parser {
 		};
 
 		state.consume();
-		final Token identifier = state.require(TokenType.Identifier);
-		state.require(TokenType.Equals);
-		final Expression value = parseExpression();
-		return new VariableDeclaration(kind, new VariableDeclarator(new Identifier(identifier.value), value));
-	}
 
-	private List<Identifier> parseFunctionArguments() throws SyntaxError {
-		state.require(TokenType.LParen);
-		final List<Identifier> arguments = new ArrayList<>();
+		final List<VariableDeclarator> declarators = new ArrayList<>();
+		while (true) {
+			if (state.currentToken.type == TokenType.LBrace || state.currentToken.type == TokenType.LBracket)
+				throw new NotImplemented("Parsing destructuring assignment");
+
+			final Token identifier = state.require(TokenType.Identifier);
+			final Expression value = state.accept(TokenType.Equals) == null ? null : parseExpression();
+			declarators.add(new VariableDeclarator(new Identifier(identifier.value), value));
+			state.consumeAll(TokenType.Terminator);
+			if (state.currentToken.type != TokenType.Comma) break;
+			state.consume();
+			state.consumeAll(TokenType.Terminator);
+		}
+
+		return new VariableDeclaration(kind, declarators.toArray(new VariableDeclarator[0]));
+	}
 
 		while (state.currentToken.type == TokenType.Identifier) {
 			arguments.add(new Identifier(state.consume().value));

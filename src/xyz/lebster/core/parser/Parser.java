@@ -578,6 +578,7 @@ public final class Parser {
 	private boolean matchDeclaration() {
 		final TokenType t = state.currentToken.type;
 		return t == TokenType.Function ||
+			   t == TokenType.Class ||
 			   t == TokenType.Let ||
 			   t == TokenType.Var ||
 			   t == TokenType.Const;
@@ -600,6 +601,8 @@ public final class Parser {
 			   t == TokenType.Break ||
 			   t == TokenType.Continue ||
 			   t == TokenType.Var ||
+			   t == TokenType.Import ||
+			   t == TokenType.Export ||
 			   t == TokenType.Debugger ||
 			   t == TokenType.Semicolon;
 
@@ -631,9 +634,13 @@ public final class Parser {
 			   t == TokenType.Minus ||
 			   t == TokenType.Star ||
 			   t == TokenType.Slash ||
+			   t == TokenType.Percent ||
+			   t == TokenType.QuestionMark ||
 			   t == TokenType.Exponent ||
 			   t == TokenType.StrictEqual ||
 			   t == TokenType.StrictNotEqual ||
+			   t == TokenType.LooseEqual ||
+			   t == TokenType.NotEqual ||
 			   t == TokenType.LogicalOr ||
 			   t == TokenType.LogicalAnd ||
 			   t == TokenType.Period ||
@@ -649,6 +656,8 @@ public final class Parser {
 			   t == TokenType.RightShiftEquals ||
 			   t == TokenType.NullishCoalescing ||
 			   t == TokenType.In ||
+			   t == TokenType.Pipe ||
+			   t == TokenType.Ampersand ||
 			   t == TokenType.Instanceof ||
 			   t == TokenType.LBracket ||
 			   t == TokenType.LParen ||

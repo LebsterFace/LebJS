@@ -3,6 +3,7 @@ package xyz.lebster.core.parser;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.declaration.Declaration;
@@ -56,7 +57,7 @@ public final class Parser {
 				LeftShiftEquals, PercentEquals, DivideEquals, MultiplyEquals -> 3;
 			case Yield -> 2;
 			case Comma -> 1;
-			default -> throw new NotImplemented("Precedence for token '" + state.currentToken.type + "'");
+			default -> throw new ShouldNotHappen("Attempting to get precedence for token type '" + state.currentToken.type + "'");
 		};
 	}
 

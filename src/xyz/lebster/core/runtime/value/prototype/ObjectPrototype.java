@@ -6,6 +6,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.LanguageError;
+import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
@@ -26,6 +27,15 @@ public final class ObjectPrototype extends ObjectValue {
 	}
 
 	private ObjectPrototype() {
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-requireobjectcoercible")
+	public static Value<?> requireObjectCoercible(Value<?> argument, String methodName) throws AbruptCompletion {
+		if (argument.isNullish()) {
+			throw AbruptCompletion.error(new TypeError(methodName + " called on null or undefined"));
+		} else {
+			return argument;
+		}
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tostring")

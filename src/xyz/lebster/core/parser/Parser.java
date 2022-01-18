@@ -402,6 +402,14 @@ public final class Parser {
 		return latestExpr;
 	}
 
+	private LeftHandSideExpression ensureLHS(Expression expression, String failureMessage) throws SyntaxError {
+		if (expression instanceof final LeftHandSideExpression leftHandSideExpression) {
+			return leftHandSideExpression;
+		} else {
+			throw new SyntaxError(failureMessage);
+		}
+	}
+
 	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws SyntaxError, CannotParse {
 		state.consumeAll(TokenType.Terminator);
 		final Token token = state.consume();
@@ -429,12 +437,12 @@ public final class Parser {
 			case LogicalAnd -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
 			case NullishCoalescing -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Coalesce);
 
-			case PlusEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.PlusAssign);
-			case MinusEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
-			case MultiplyEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MultiplyAssign);
-			case DivideEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.DivideAssign);
-			case ExponentEquals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.ExponentAssign);
-			case Equals -> new AssignmentExpression(left, parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
+			case PlusEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.PlusAssign);
+			case MinusEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
+			case MultiplyEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MultiplyAssign);
+			case DivideEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.DivideAssign);
+			case ExponentEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.ExponentAssign);
+			case Equals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
 
 			case MinusMinus -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostDecrement);
 			case PlusPlus -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostIncrement);

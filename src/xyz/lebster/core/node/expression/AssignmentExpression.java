@@ -10,7 +10,9 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.LanguageError;
 
-public record AssignmentExpression(Expression left, Expression right, AssignmentOp op) implements Expression {
+public record AssignmentExpression(LeftHandSideExpression left, Expression right, AssignmentOp op) implements Expression {
+	public static final String invalidLHS = "Invalid left-hand side in assignment";
+
 	@Override
 	public void dump(int indent) {
 		Dumper.dumpName(indent, "AssignmentExpression");
@@ -22,11 +24,7 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-assignment-operators-runtime-semantics-evaluation")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		if (!(left instanceof final LeftHandSideExpression lhs)) {
-			throw AbruptCompletion.error(new LanguageError("Invalid left-hand side in assignment"));
-		}
-
-		final Reference left_reference = lhs.toReference(interpreter);
+		final Reference left_reference = left.toReference(interpreter);
 
 		return switch (op) {
 			case Assign -> {
@@ -36,7 +34,7 @@ public record AssignmentExpression(Expression left, Expression right, Assignment
 			}
 
 			default -> {
-				final Value<?> left_value = lhs.execute(interpreter);
+				final Value<?> left_value = left.execute(interpreter);
 				final Value<?> right_value = right.execute(interpreter);
 				final Value<?> result = BinaryExpression.applyOperator(interpreter, left_value, lookupBinaryOp(op), right_value);
 				left_reference.setValue(interpreter, result);

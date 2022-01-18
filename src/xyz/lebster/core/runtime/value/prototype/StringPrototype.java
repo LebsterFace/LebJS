@@ -19,9 +19,29 @@ public final class StringPrototype extends ObjectValue {
 	static {
 		instance.setMethod("reverse", StringPrototype::reverse);
 		instance.setMethod("slice", StringPrototype::slice);
+		instance.setMethod("charAt", StringPrototype::charAt);
 	}
 
 	private StringPrototype() {
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charat")
+	private static StringValue charAt(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		// String.prototype.charAt ( pos )
+		final Value<?> pos = args.length > 0 ? args[0] : UndefinedValue.instance;
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.charAt");
+		// 2. Let S be ? ToString(O).
+		final StringValue S = O.toStringValue(interpreter);
+		// 3. Let position be ? ToIntegerOrInfinity(pos).
+		final int position = toIntegerOrInfinity(interpreter, pos);
+		// 4. Let size be the length of S.
+		final int size = S.value.length();
+		// 5. If position < 0 or position ≥ size, return the empty String.
+		if (position < 0 || position >= size)
+			return new StringValue("");
+		// 6. Return the substring of S from position to position + 1.
+		return new StringValue(S.value.substring(position, position + 1));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.slice")

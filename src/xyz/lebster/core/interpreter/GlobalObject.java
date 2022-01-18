@@ -3,6 +3,7 @@ package xyz.lebster.core.interpreter;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.parser.Lexer;
@@ -10,7 +11,6 @@ import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.ObjectConstructor;
 import xyz.lebster.core.runtime.value.error.EvalError;
-import xyz.lebster.core.runtime.value.error.ExecutionError;
 import xyz.lebster.core.runtime.value.native_.NativeProperty;
 import xyz.lebster.core.runtime.value.object.ConsoleObject;
 import xyz.lebster.core.runtime.value.object.MathObject;
@@ -169,7 +169,7 @@ public final class GlobalObject extends ObjectValue {
 			Dumper.dumpValue(0, expected.type.name(), String.valueOf(expected.value));
 			Dumper.dumpIndicator(0, "Received");
 			Dumper.dumpValue(0, received.type.name(), String.valueOf(received.value));
-			throw new ExecutionError("Assertion failed.");
+			throw new ShouldNotHappen("Assertion failed.");
 		}
 
 		return UndefinedValue.instance;

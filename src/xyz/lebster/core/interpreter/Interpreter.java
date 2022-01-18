@@ -1,10 +1,10 @@
 package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.node.expression.Identifier;
 import xyz.lebster.core.runtime.LexicalEnvironment;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.ExecutionError;
 import xyz.lebster.core.runtime.value.error.RangeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
@@ -49,7 +49,7 @@ public final class Interpreter {
 
 	public void exitExecutionContext(ExecutionContext frame) {
 		if (currentExecutionContext == 0 || executionContextStack[currentExecutionContext] != frame) {
-			throw new ExecutionError("Attempting to exit from an invalid ExecutionContext");
+			throw new ShouldNotHappen("Attempting to exit from an invalid ExecutionContext");
 		}
 
 		executionContextStack[currentExecutionContext--] = null;

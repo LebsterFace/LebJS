@@ -1,11 +1,11 @@
 package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.Dumper;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Identifier;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.ExecutionError;
 
 public record CatchClause(Identifier parameter, BlockStatement body) implements Statement {
 	@Override
@@ -16,7 +16,7 @@ public record CatchClause(Identifier parameter, BlockStatement body) implements 
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) {
-		throw new ExecutionError("CatchClause execution is handled by TryStatement");
+		throw new ShouldNotHappen("CatchClause execution is handled by TryStatement");
 	}
 
 	@Override

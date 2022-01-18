@@ -1,6 +1,6 @@
 package xyz.lebster.core.interpreter;
 
-import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.runtime.value.Value;
 
 public final class AbruptCompletion extends Throwable {
 	public final Type type;

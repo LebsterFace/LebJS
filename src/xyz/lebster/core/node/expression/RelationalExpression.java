@@ -5,10 +5,14 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.*;
-import xyz.lebster.core.node.value.object.Executable;
-import xyz.lebster.core.node.value.object.ObjectValue;
-import xyz.lebster.core.runtime.error.TypeError;
+import xyz.lebster.core.runtime.value.*;
+import xyz.lebster.core.runtime.value.executable.Executable;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.primitive.BooleanValue;
+import xyz.lebster.core.runtime.value.primitive.NumberValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.runtime.value.primitive.SymbolValue;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override

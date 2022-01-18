@@ -1,6 +1,6 @@
 package xyz.lebster.core.runtime;
 
-import xyz.lebster.core.node.value.StringValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 public final class Names {
 	public static final StringValue push = new StringValue("push");

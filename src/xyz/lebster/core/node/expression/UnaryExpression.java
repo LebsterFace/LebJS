@@ -6,11 +6,11 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.NumberValue;
-import xyz.lebster.core.node.value.StringValue;
-import xyz.lebster.core.node.value.UndefinedValue;
-import xyz.lebster.core.node.value.Value;
-import xyz.lebster.core.runtime.error.LanguageError;
+import xyz.lebster.core.runtime.value.primitive.NumberValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.error.LanguageError;
 
 public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op) implements Expression {
 	@Override

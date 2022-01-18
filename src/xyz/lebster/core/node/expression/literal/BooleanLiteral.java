@@ -2,7 +2,7 @@ package xyz.lebster.core.node.expression.literal;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.BooleanValue;
+import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 
 public record BooleanLiteral(BooleanValue value) implements Literal<BooleanValue> {
 	@Override

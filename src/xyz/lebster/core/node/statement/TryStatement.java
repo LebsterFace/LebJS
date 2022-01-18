@@ -4,7 +4,7 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.runtime.value.Value;
 
 public record TryStatement(BlockStatement body, CatchClause handler) implements Statement {
 

@@ -5,8 +5,8 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.node.value.UndefinedValue;
-import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.Value;
 
 public record IfStatement(Expression condition, Statement consequence, Statement elseStatement) implements Statement {
 	@Override

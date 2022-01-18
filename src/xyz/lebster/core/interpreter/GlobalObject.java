@@ -5,16 +5,20 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.Program;
-import xyz.lebster.core.node.value.*;
-import xyz.lebster.core.node.value.native_.NativeProperty;
-import xyz.lebster.core.node.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.*;
+import xyz.lebster.core.runtime.value.native_.NativeProperty;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
-import xyz.lebster.core.runtime.constructor.ObjectConstructor;
-import xyz.lebster.core.runtime.error.EvalError;
-import xyz.lebster.core.runtime.error.ExecutionError;
-import xyz.lebster.core.runtime.object.ConsoleObject;
-import xyz.lebster.core.runtime.object.MathObject;
+import xyz.lebster.core.runtime.value.constructor.ObjectConstructor;
+import xyz.lebster.core.runtime.value.error.EvalError;
+import xyz.lebster.core.runtime.value.error.ExecutionError;
+import xyz.lebster.core.runtime.value.object.ConsoleObject;
+import xyz.lebster.core.runtime.value.object.MathObject;
+import xyz.lebster.core.runtime.value.primitive.BooleanValue;
+import xyz.lebster.core.runtime.value.primitive.NumberValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
 public final class GlobalObject extends ObjectValue {

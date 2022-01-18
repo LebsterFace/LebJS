@@ -3,8 +3,8 @@ package xyz.lebster.core.node.statement;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.value.UndefinedValue;
-import xyz.lebster.core.node.value.Value;
+import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.Value;
 
 public final class EmptyStatement implements Statement {
 	@Override

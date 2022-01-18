@@ -362,8 +362,6 @@ public final class Parser {
 		final int minPrecedence = precedenceForTokenType(token.type);
 
 		final UnaryExpression.UnaryOp op = switch (token.type) {
-			case PlusPlus -> UnaryExpression.UnaryOp.PreIncrement;
-			case MinusMinus -> UnaryExpression.UnaryOp.PreDecrement;
 			case Delete -> UnaryExpression.UnaryOp.Delete;
 			case Void -> UnaryExpression.UnaryOp.Void;
 			case Typeof -> UnaryExpression.UnaryOp.Typeof;
@@ -376,6 +374,21 @@ public final class Parser {
 		};
 
 		return new UnaryExpression(parseExpression(minPrecedence, assoc), op);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-UpdateExpression")
+	private UpdateExpression parsePrefixedUpdateExpression() throws CannotParse, SyntaxError {
+		final Token token = state.consume();
+		final Associativity assoc = associativityForTokenType(token.type);
+		final int minPrecedence = precedenceForTokenType(token.type);
+
+		final UpdateExpression.UpdateOp op = switch (token.type) {
+			case PlusPlus -> UpdateExpression.UpdateOp.PreIncrement;
+			case MinusMinus -> UpdateExpression.UpdateOp.PreDecrement;
+			default -> throw new CannotParse(token, "Prefix update Operator");
+		};
+
+		return new UpdateExpression(ensureLHS(parseExpression(minPrecedence, assoc), UpdateExpression.invalidPreLHS), op);
 	}
 
 	private Expression parseExpression() throws SyntaxError, CannotParse {
@@ -444,8 +457,8 @@ public final class Parser {
 			case ExponentEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.ExponentAssign);
 			case Equals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
 
-			case MinusMinus -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostDecrement);
-			case PlusPlus -> new UnaryExpression(left, UnaryExpression.UnaryOp.PostIncrement);
+			case MinusMinus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), UpdateExpression.UpdateOp.PostDecrement);
+			case PlusPlus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), UpdateExpression.UpdateOp.PostIncrement);
 
 			case LessThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
 			case LessThanEqual -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThanEquals);
@@ -470,7 +483,9 @@ public final class Parser {
 	}
 
 	private Expression parsePrimaryExpression() throws SyntaxError, CannotParse {
-		if (matchUnaryPrefixedExpression()) {
+		if (matchPrefixedUpdateExpression()) {
+			return parsePrefixedUpdateExpression();
+		} else if (matchUnaryPrefixedExpression()) {
 			return parseUnaryPrefixedExpression();
 		}
 
@@ -685,7 +700,8 @@ public final class Parser {
 			   t == TokenType.Infinity ||
 			   t == TokenType.NaN ||
 			   t == TokenType.Undefined ||
-			   matchUnaryPrefixedExpression();
+			   matchUnaryPrefixedExpression() ||
+			   matchPrefixedUpdateExpression();
 	}
 
 	private boolean matchSecondaryExpression(Set<TokenType> forbidden) {
@@ -727,11 +743,14 @@ public final class Parser {
 			   t == TokenType.MinusMinus;
 	}
 
+	private boolean matchPrefixedUpdateExpression() {
+		return state.currentToken.type == TokenType.PlusPlus ||
+			   state.currentToken.type == TokenType.MinusMinus;
+	}
+
 	private boolean matchUnaryPrefixedExpression() {
 		final TokenType t = state.currentToken.type;
-		return t == TokenType.PlusPlus ||
-			   t == TokenType.MinusMinus ||
-			   t == TokenType.Bang ||
+		return t == TokenType.Bang ||
 			   t == TokenType.Tilde ||
 			   t == TokenType.Plus ||
 			   t == TokenType.Minus ||

@@ -6,20 +6,12 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.NumberWrapper;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
 
 public final class NumberValue extends PrimitiveValue<Double> {
 	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;
 	public static final long POSITIVE_ZERO_BITS = 0;
-
-	public static boolean isNegativeZero(double d) { return Double.doubleToRawLongBits(d) == NEGATIVE_ZERO_BITS; }
-	public static boolean isNegativeZero(Double d) { return Double.doubleToRawLongBits(d) == NEGATIVE_ZERO_BITS; }
-	public static boolean isNegativeZero(NumberValue n) { return isNegativeZero(n.value); }
-
-	public static boolean isPositiveZero(double d) { return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS; }
-	public static boolean isPositiveZero(Double d) { return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS; }
-	public static boolean isPositiveZero(NumberValue n) { return isPositiveZero(n.value); }
 
 	public NumberValue(double num) {
 		super(num, Value.Type.Number);
@@ -31,6 +23,30 @@ public final class NumberValue extends PrimitiveValue<Double> {
 
 	public NumberValue(int num) {
 		super((double) num, Value.Type.Number);
+	}
+
+	public static boolean isNegativeZero(double d) {
+		return Double.doubleToRawLongBits(d) == NEGATIVE_ZERO_BITS;
+	}
+
+	public static boolean isNegativeZero(Double d) {
+		return Double.doubleToRawLongBits(d) == NEGATIVE_ZERO_BITS;
+	}
+
+	public static boolean isNegativeZero(NumberValue n) {
+		return isNegativeZero(n.value);
+	}
+
+	public static boolean isPositiveZero(double d) {
+		return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS;
+	}
+
+	public static boolean isPositiveZero(Double d) {
+		return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS;
+	}
+
+	public static boolean isPositiveZero(NumberValue n) {
+		return isPositiveZero(n.value);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-tostring")

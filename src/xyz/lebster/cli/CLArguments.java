@@ -28,7 +28,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 	) {
 	}
 
-	private static class TemporaryResult {
+	private static final class TemporaryResult {
 		private String fileNameOrNull = null;
 		private ExecutionMode mode = null;
 

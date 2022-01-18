@@ -2,11 +2,11 @@ package xyz.lebster.core.runtime.value.prototype;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Executable;
+import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 
-public class FunctionPrototype extends Executable<Void> {
+public final class FunctionPrototype extends Executable<Void> {
 	public static final FunctionPrototype instance = new FunctionPrototype();
 
 	private FunctionPrototype() {

@@ -4,12 +4,12 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 
 public abstract class Executable<JType> extends ObjectValue {

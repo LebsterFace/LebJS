@@ -1,10 +1,10 @@
 package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.error.ReferenceError;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-reference-record-specification-type")
 // FIXME: The `base` 'should' be possible to be a LexicalEnvironment as well as an ObjectLiteral

@@ -2,8 +2,8 @@ package xyz.lebster.core.runtime.value.object;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 
 @SpecificationURL("https://console.spec.whatwg.org/")
 public final class ConsoleObject extends ObjectValue {

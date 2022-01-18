@@ -4,13 +4,13 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
 
-public class NativeProperty extends Value<NativeGetterSetter> {
+public final class NativeProperty extends Value<NativeGetterSetter> {
 	public NativeProperty(NativeGetterSetter value) {
 		super(value, Type.Object);
 	}

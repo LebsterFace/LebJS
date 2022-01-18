@@ -8,7 +8,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.LanguageError;
 
 public record AssignmentExpression(LeftHandSideExpression left, Expression right, AssignmentOp op) implements Expression {
 	public static final String invalidLHS = "Invalid left-hand side in assignment";

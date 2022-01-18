@@ -5,13 +5,13 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.*;
+import xyz.lebster.core.runtime.Names;
+import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.native_.NativeCode;
 import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.native_.NativeProperty;
-import xyz.lebster.core.runtime.Names;
-import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.primitive.*;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 

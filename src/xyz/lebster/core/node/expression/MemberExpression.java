@@ -3,9 +3,9 @@ package xyz.lebster.core.node.expression;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.*;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 public record MemberExpression(Expression base, Expression property,
 							   boolean computed) implements LeftHandSideExpression {

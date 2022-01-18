@@ -5,8 +5,8 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 public record Identifier(String value) implements LeftHandSideExpression {
 	@Override

@@ -6,11 +6,11 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.primitive.NumberValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.native_.NativeGetterSetter;
 import xyz.lebster.core.runtime.value.native_.NativeProperty;
+import xyz.lebster.core.runtime.value.primitive.NumberValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 
 import java.util.HashSet;

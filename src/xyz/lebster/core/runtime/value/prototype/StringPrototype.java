@@ -3,9 +3,9 @@ package xyz.lebster.core.runtime.value.prototype;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 public final class StringPrototype extends ObjectValue {
 	public static final StringPrototype instance = new StringPrototype();

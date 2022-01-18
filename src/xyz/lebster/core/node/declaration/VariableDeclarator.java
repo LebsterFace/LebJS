@@ -7,8 +7,8 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.expression.Identifier;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 
 public record VariableDeclarator(Identifier identifier, Expression init) implements ASTNode {
 	@Override

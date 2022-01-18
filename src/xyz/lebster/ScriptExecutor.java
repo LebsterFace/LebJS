@@ -7,9 +7,9 @@ import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.Program;
-import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
+import xyz.lebster.core.runtime.value.Value;
 
 import java.io.PrintStream;
 import java.nio.file.Files;

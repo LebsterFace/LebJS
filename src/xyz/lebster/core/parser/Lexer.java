@@ -17,7 +17,7 @@ public final class Lexer {
 		keywords.put("break", TokenType.Break);
 		keywords.put("case", TokenType.Case);
 		keywords.put("catch", TokenType.Catch);
-		keywords.put("class", TokenType.Class);
+		keywords.put("final class", TokenType.Class);
 		keywords.put("const", TokenType.Const);
 		keywords.put("continue", TokenType.Continue);
 		keywords.put("debugger", TokenType.Debugger);
@@ -271,7 +271,7 @@ public final class Lexer {
 				}
 			}
 
-			throw new SyntaxError(StringEscapeUtils.escape("Invalid character '" + currentChar + " (index " + index +")"));
+			throw new SyntaxError(StringEscapeUtils.escape("Invalid character '" + currentChar + " (index " + index + ")"));
 		}
 	}
 

@@ -5,8 +5,8 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
 
 public final class UndefinedValue extends PrimitiveValue<Void> {
 	public static final UndefinedValue instance = new UndefinedValue();

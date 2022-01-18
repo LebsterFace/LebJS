@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 
-public class Testing {
+public final class Testing {
 	private static final ByteArrayOutputStream passedOutput = new ByteArrayOutputStream();
 	private static final PrintStream passedStream = new PrintStream(passedOutput);
 	private static final ByteArrayOutputStream failedOutput = new ByteArrayOutputStream();

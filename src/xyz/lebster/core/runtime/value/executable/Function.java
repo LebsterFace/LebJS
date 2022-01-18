@@ -6,12 +6,12 @@ import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.FunctionNode;
+import xyz.lebster.core.runtime.Names;
+import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.native_.NativeFunction;
-import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 import java.util.HashSet;

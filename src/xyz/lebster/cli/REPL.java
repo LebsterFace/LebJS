@@ -8,7 +8,7 @@ import xyz.lebster.core.parser.Token;
 
 import java.util.Scanner;
 
-public class REPL {
+public final class REPL {
 	private final CLArguments.ExecutionOptions options;
 	private final Scanner scanner = new Scanner(System.in);
 	private final Interpreter interpreter = new Interpreter();
@@ -57,7 +57,11 @@ public class REPL {
 			final String line = readLine(indent);
 			if (line == null) return null;
 			Token[] tokens;
-			try { tokens = new Lexer(line).tokenize(); } catch (SyntaxError e) { return null; }
+			try {
+				tokens = new Lexer(line).tokenize();
+			} catch (SyntaxError e) {
+				return null;
+			}
 			for (final Token token : tokens) {
 				switch (token.type) {
 					case LParen, LBrace, LBracket -> indent++;

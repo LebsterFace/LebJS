@@ -4,8 +4,8 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.statement.Statement;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,10 +3,10 @@ package xyz.lebster.core.runtime.value.object;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.SymbolValue;
-import xyz.lebster.core.runtime.value.Value;
 
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
@@ -17,62 +17,78 @@ import static xyz.lebster.core.runtime.value.primitive.NumberValue.isPositiveZer
 public final class MathObject extends ObjectValue {
 	public static final MathObject instance = new MathObject();
 
-	/** Euler's number, the base of natural logarithms, e */
+	/**
+	 * Euler's number, the base of natural logarithms, e
+	 */
 	private static final double E = Math.E;
-	/** The ratio of the circumference of a circle to its diameter */
+	/**
+	 * The ratio of the circumference of a circle to its diameter
+	 */
 	private static final double PI = Math.PI;
-	/** The natural logarithm of 2 */
+	/**
+	 * The natural logarithm of 2
+	 */
 	private static final double LN2 = 0.6931471805599453D;
-	/** The natural logarithm of 10 */
+	/**
+	 * The natural logarithm of 10
+	 */
 	private static final double LN10 = 2.302585092994046D;
-	/** The base 2 logarithm of e */
+	/**
+	 * The base 2 logarithm of e
+	 */
 	private static final double LOG2E = 1.4426950408889634D;
-	/** The base 10 logarithm of e */
+	/**
+	 * The base 10 logarithm of e
+	 */
 	private static final double LOG10E = 0.4342944819032518D;
-	/** The square root of 1/2 */
+	/**
+	 * The square root of 1/2
+	 */
 	private static final double SQRT1_2 = 0.7071067811865476D;
-	/** The square root of 2 */
+	/**
+	 * The square root of 2
+	 */
 	private static final double SQRT2 = 1.4142135623730951D;
 
 	@SuppressWarnings("SpellCheckingInspection")
 	private MathObject() {
 		put(SymbolValue.toStringTag, new StringValue("Math"));
 
-		put("E",		new NumberValue(E));
-		put("LN2",		new NumberValue(LN2));
-		put("LN10",		new NumberValue(LN10));
-		put("LOG2E",	new NumberValue(LOG2E));
-		put("LOG10E",	new NumberValue(LOG10E));
-		put("PI",		new NumberValue(PI));
-		put("SQRT1_2",	new NumberValue(SQRT1_2));
-		put("SQRT2",	new NumberValue(SQRT2));
+		put("E", new NumberValue(E));
+		put("LN2", new NumberValue(LN2));
+		put("LN10", new NumberValue(LN10));
+		put("LOG2E", new NumberValue(LOG2E));
+		put("LOG10E", new NumberValue(LOG10E));
+		put("PI", new NumberValue(PI));
+		put("SQRT1_2", new NumberValue(SQRT1_2));
+		put("SQRT2", new NumberValue(SQRT2));
 
 		// (double) -> double
-		addWrapper("abs",	(DoubleUnaryOperator) Math::abs);
-		addWrapper("acos",	Math::acos);
-		addWrapper("asin",	Math::asin);
-		addWrapper("atan",	Math::atan);
-		addWrapper("ceil",	Math::ceil);
-		addWrapper("cbrt",	Math::cbrt);
-		addWrapper("expm1",	Math::expm1);
-		addWrapper("cos",	Math::cos);
-		addWrapper("cosh",	Math::cosh);
-		addWrapper("exp",	Math::exp);
-		addWrapper("floor",	Math::floor);
-		addWrapper("log",	Math::log);
-		addWrapper("log1p",	Math::log1p);
-		addWrapper("log10",	Math::log10);
-		addWrapper("round",	(DoubleUnaryOperator) Math::round);
-		addWrapper("sin",	Math::sin);
-		addWrapper("sinh",	Math::sinh);
-		addWrapper("sqrt",	Math::sqrt);
-		addWrapper("tan",	Math::tan);
-		addWrapper("tanh",	Math::tanh);
-		addWrapper("sign",	(DoubleUnaryOperator) Math::signum);
+		addWrapper("abs", (DoubleUnaryOperator) Math::abs);
+		addWrapper("acos", Math::acos);
+		addWrapper("asin", Math::asin);
+		addWrapper("atan", Math::atan);
+		addWrapper("ceil", Math::ceil);
+		addWrapper("cbrt", Math::cbrt);
+		addWrapper("expm1", Math::expm1);
+		addWrapper("cos", Math::cos);
+		addWrapper("cosh", Math::cosh);
+		addWrapper("exp", Math::exp);
+		addWrapper("floor", Math::floor);
+		addWrapper("log", Math::log);
+		addWrapper("log1p", Math::log1p);
+		addWrapper("log10", Math::log10);
+		addWrapper("round", (DoubleUnaryOperator) Math::round);
+		addWrapper("sin", Math::sin);
+		addWrapper("sinh", Math::sinh);
+		addWrapper("sqrt", Math::sqrt);
+		addWrapper("tan", Math::tan);
+		addWrapper("tanh", Math::tanh);
+		addWrapper("sign", (DoubleUnaryOperator) Math::signum);
 
 		// (double, double) -> double
-		addWrapper("atan2",	Math::atan2);
-		addWrapper("pow",	Math::pow);
+		addWrapper("atan2", Math::atan2);
+		addWrapper("pow", Math::pow);
 
 		// This method conforms to the same interface as the specification, but doesn't
 		// follow it exactly. It should behave the same for any given input, however.
@@ -98,11 +114,11 @@ public final class MathObject extends ObjectValue {
 			for (double number : coerced) {
 				// a. If number is NaN, return NaN.
 				if (Double.isNaN(number)) return Double.NaN;
-				// b. If number is +0𝔽 and highest is -0𝔽, set highest to +0𝔽.
+					// b. If number is +0𝔽 and highest is -0𝔽, set highest to +0𝔽.
 				else if (isPositiveZero(number) && isNegativeZero(highest))
 					highest = 0.0;
 
-				// c. If number > highest, set highest to number.
+					// c. If number > highest, set highest to number.
 				else if (number > highest) highest = number;
 			}
 
@@ -118,10 +134,10 @@ public final class MathObject extends ObjectValue {
 			for (double number : coerced) {
 				// a. If number is NaN, return NaN.
 				if (Double.isNaN(number)) return Double.NaN;
-				// b. If number is -0𝔽 and lowest is +0𝔽, set lowest to -0𝔽.
+					// b. If number is -0𝔽 and lowest is +0𝔽, set lowest to -0𝔽.
 				else if (isNegativeZero(number) && isPositiveZero(lowest))
 					lowest = -0.0;
-				// c. If number < lowest, set lowest to number.
+					// c. If number < lowest, set lowest to number.
 				else if (number < lowest) lowest = number;
 			}
 
@@ -174,9 +190,9 @@ public final class MathObject extends ObjectValue {
 			return x > 0 ? w : -w;
 		});
 
-		addWrapper("log2",	(double x) -> Math.log(x) / LN2);
-		addWrapper("acosh",	(double x) -> Math.log(x + Math.sqrt(x * x - 1)));
-		addWrapper("atanh",	(double x) -> Math.log((1 + x) / (1 - x)) / 2);
+		addWrapper("log2", (double x) -> Math.log(x) / LN2);
+		addWrapper("acosh", (double x) -> Math.log(x + Math.sqrt(x * x - 1)));
+		addWrapper("atanh", (double x) -> Math.log((1 + x) / (1 - x)) / 2);
 
 		notImplemented("imul");
 		notImplemented("clz32");
@@ -195,11 +211,6 @@ public final class MathObject extends ObjectValue {
 		this.setMethod(methodName, (interpreter, args) -> {
 			throw new NotImplemented(methodName);
 		});
-	}
-
-	@FunctionalInterface
-	private interface DoubleRestArgs {
-		double applyAsDouble(double[] coerced);
 	}
 
 	// https://tc39.es/ecma262/multipage#sec-math.hypot + sec-math.min + sec-math.max
@@ -227,5 +238,10 @@ public final class MathObject extends ObjectValue {
 			final var b = getArgument(1, args, interpreter);
 			return new NumberValue(binaryOperator.applyAsDouble(a, b));
 		});
+	}
+
+	@FunctionalInterface
+	private interface DoubleRestArgs {
+		double applyAsDouble(double[] coerced);
 	}
 }

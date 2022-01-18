@@ -3,13 +3,13 @@ package xyz.lebster.core.runtime.value.constructor;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.NullValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.error.TypeError;
 
-public class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
+public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	public static final ObjectConstructor instance = new ObjectConstructor();
 
 	static {

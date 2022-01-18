@@ -6,11 +6,11 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-language-types-symbol-type")
-public class SymbolValue extends ObjectValue.Key<Void> {
+public final class SymbolValue extends ObjectValue.Key<Void> {
 	// https://tc39.es/ecma262/multipage#table-well-known-symbols
 
 	/**

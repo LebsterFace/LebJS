@@ -4,15 +4,15 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.Names;
+import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.executable.Executable;
+import xyz.lebster.core.runtime.value.object.ArrayObject;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.executable.Executable;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.Names;
-import xyz.lebster.core.runtime.value.error.TypeError;
-import xyz.lebster.core.runtime.value.object.ArrayObject;
 
 public final class ArrayPrototype extends ObjectValue {
 	public static final ArrayPrototype instance = new ArrayPrototype();

@@ -5,10 +5,12 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+
+import static xyz.lebster.core.runtime.value.prototype.NumberPrototype.toIntegerOrInfinity;
+import static xyz.lebster.core.runtime.value.prototype.ObjectPrototype.requireObjectCoercible;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-string-prototype-object")
 public final class StringPrototype extends ObjectValue {
@@ -28,17 +30,15 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> start = args.length > 0 ? args[0] : UndefinedValue.instance;
 		final Value<?> end = args.length > 1 ? args[1] : UndefinedValue.instance;
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = interpreter.thisValue();
-		if (O.isNullish())
-			throw AbruptCompletion.error(new TypeError("String.prototype.slice called on null or undefined"));
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.slice");
 		// 2. Let S be ? ToString(O).
-		final var S = O.toStringValue(interpreter);
+		final StringValue S = O.toStringValue(interpreter);
 		// 3. Let len be the length of S.
-		final var len = S.value.length();
+		final int len = S.value.length();
 		// 4. Let intStart be ? ToIntegerOrInfinity(start).
-		int intStart = NumberPrototype.toIntegerOrInfinity(interpreter, start);
+		final int intStart = toIntegerOrInfinity(interpreter, start);
 		// 5. If intStart is -∞, let from be 0.
-		int from;
+		final int from;
 		if (intStart == Integer.MIN_VALUE) {
 			from = 0;
 		}
@@ -51,24 +51,24 @@ public final class StringPrototype extends ObjectValue {
 			from = Math.min(intStart, len);
 		}
 		// 8. If end is undefined, let intEnd be len; else let intEnd be ? ToIntegerOrInfinity(end).
-		int intEnd = end == UndefinedValue.instance ? len : NumberPrototype.toIntegerOrInfinity(interpreter, end);
-		// 9. If intEnd is -∞, let to be 0.
-		int to;
+		final int intEnd = end == UndefinedValue.instance ? len : toIntegerOrInfinity(interpreter, end);
+		// 9. If intEnd is -∞, let `to` be 0.
+		final int to;
 		if (intEnd == Integer.MIN_VALUE) {
 			to = 0;
 		}
-		// 10. Else if intEnd < 0, let to be max(len + intEnd, 0).
+		// 10. Else if intEnd < 0, let `to` be max(len + intEnd, 0).
 		else if (intEnd < 0) {
 			to = Math.max(len + intEnd, 0);
 		}
-		// 11. Else, let to be min(intEnd, len).
+		// 11. Else, let `to` be min(intEnd, len).
 		else {
 			to = Math.min(intEnd, len);
 		}
-		// 12. If from ≥ to, return the empty String.
+		// 12. If `from` ≥ `to`, return the empty String.
 		if (from >= to)
 			return new StringValue("");
-		// 13. Return the substring of S from from to to.
+		// 13. Return the substring of S from `from` to `to`.
 		return new StringValue(S.value.substring(from, to));
 	}
 

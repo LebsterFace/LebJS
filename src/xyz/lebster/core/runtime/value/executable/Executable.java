@@ -4,6 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -18,7 +19,7 @@ public abstract class Executable<JType> extends ObjectValue {
 	public Executable(JType code) {
 		super();
 		this.code = code;
-		this.put("length", new NumberValue(0));
+		this.put(Names.length, new NumberValue(0));
 		this.put("name", new StringValue(""));
 	}
 

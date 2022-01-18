@@ -43,7 +43,7 @@ public final class ArrayPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.join")
 	private static Value<?> join(Interpreter interpreter, Value<?>[] elements) throws AbruptCompletion {
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
-		final long len = Long.min(MAX_LENGTH, O.get(ArrayObject.LENGTH_KEY).toNumberValue(interpreter).value.longValue());
+		final long len = Long.min(MAX_LENGTH, O.get(Names.length).toNumberValue(interpreter).value.longValue());
 		final boolean noSeparator = elements.length == 0 || elements[0].type == Type.Undefined;
 		final String sep = noSeparator ? "," : elements[0].toStringValue(interpreter).value;
 
@@ -59,7 +59,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
 	private static long lengthOfArrayLike(ObjectValue O, Interpreter interpreter) throws AbruptCompletion {
-		final double number = O.get(ArrayObject.LENGTH_KEY).toNumberValue(interpreter).value;
+		final double number = O.get(Names.length).toNumberValue(interpreter).value;
 		if (Double.isNaN(number) || number <= 0) {
 			return 0L;
 		} else {
@@ -82,7 +82,7 @@ public final class ArrayPrototype extends ObjectValue {
 			O.set(interpreter, new StringValue(len), E);
 
 		final NumberValue newLength = new NumberValue(len + elements.length);
-		O.set(interpreter, ArrayObject.LENGTH_KEY, newLength);
+		O.set(interpreter, Names.length, newLength);
 		return newLength;
 	}
 

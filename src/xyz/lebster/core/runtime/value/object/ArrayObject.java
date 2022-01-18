@@ -6,6 +6,7 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.native_.NativeGetterSetter;
 import xyz.lebster.core.runtime.value.native_.NativeProperty;
@@ -17,7 +18,6 @@ import java.util.HashSet;
 
 
 public final class ArrayObject extends ObjectValue {
-	public final static StringValue LENGTH_KEY = new StringValue("length");
 	private int length;
 
 	public final NativeProperty LENGTH_GETTER_SETTER = new NativeProperty(new NativeGetterSetter() {
@@ -41,7 +41,7 @@ public final class ArrayObject extends ObjectValue {
 
 	public ArrayObject(Value<?>[] values) {
 		this.length = values.length;
-		this.put(LENGTH_KEY, LENGTH_GETTER_SETTER);
+		this.put(Names.length, LENGTH_GETTER_SETTER);
 
 		for (int i = 0; i < values.length; i++) {
 			if (values[i] != null)

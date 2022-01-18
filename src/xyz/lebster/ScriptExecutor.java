@@ -32,6 +32,9 @@ public final class ScriptExecutor {
 		) {
 			stream.print("Uncaught ");
 			stream.print(abruptCompletion.getValue());
+		} else if (throwable instanceof final SyntaxError syntaxError) {
+			stream.print("Uncaught SyntaxError: ");
+			stream.print(syntaxError.getLocalizedMessage());
 		} else if (throwable instanceof CannotParse) {
 			stream.print(throwable.getLocalizedMessage());
 		} else {

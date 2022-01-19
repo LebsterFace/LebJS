@@ -7,7 +7,6 @@ import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Executable;
 
 public record CallExpression(Expression callee, Expression... arguments) implements Expression {
@@ -18,14 +17,8 @@ public record CallExpression(Expression callee, Expression... arguments) impleme
 		for (int i = 0; i < arguments.length; i++) executedArguments[i] = arguments[i].execute(interpreter);
 
 		final ExecutionContext frame = callee.toExecutionContext(interpreter);
-		if (frame.executedCallee() instanceof final Executable<?> executable) {
-			return executable.callWithContext(interpreter, frame, executedArguments);
-		} else {
-			final StringRepresentation representation = new StringRepresentation();
-			callee.represent(representation);
-			representation.append(" is not a function");
-			throw AbruptCompletion.error(new TypeError(representation.toString()));
-		}
+		final var executable = Executable.getExecutable(frame.executedCallee());
+		return executable.callWithContext(interpreter, frame, executedArguments);
 	}
 
 	@Override

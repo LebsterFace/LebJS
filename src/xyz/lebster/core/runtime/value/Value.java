@@ -23,14 +23,8 @@ public abstract class Value<JType> {
 
 	public abstract void display(StringRepresentation representation);
 
-	public final String toDisplayString() {
-		final StringRepresentation representation = new StringRepresentation();
+	public void displayForConsoleLog(StringRepresentation representation) {
 		this.display(representation);
-		return representation.toString();
-	}
-
-	public String toConsoleLogString() {
-		return this.toDisplayString();
 	}
 
 	public Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {

@@ -5,9 +5,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
@@ -32,15 +30,10 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 		final Value<?> callbackFn = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
 		final Value<?> thisArg = arguments.length > 2 ? arguments[2] : UndefinedValue.instance;
 
-		if (!(callbackFn instanceof final Executable<?> executable)) {
-			final StringRepresentation builder = new StringRepresentation();
-			callbackFn.display(builder);
-			builder.append(" is not a function");
-			throw AbruptCompletion.error(new TypeError(builder.toString()));
-		}
-
+		final var executable = Executable.getExecutable(callbackFn);
 		final Value<?>[] result = new Value<?>[(int) len];
-		for (int k = 0; k < len; k++) result[k] = executable.call(interpreter, thisArg, new NumberValue(k));
+		for (int k = 0; k < len; k++)
+			result[k] = executable.call(interpreter, thisArg, new NumberValue(k));
 		return new ArrayObject(result);
 	}
 

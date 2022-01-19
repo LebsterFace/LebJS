@@ -24,44 +24,7 @@ public final class StringRepresentation implements CharSequence {
 	}
 
 	public int length() {
-		return this.builder.toString()
-			.replace(ANSI.BLACK, "")
-			.replace(ANSI.RED, "")
-			.replace(ANSI.GREEN, "")
-			.replace(ANSI.YELLOW, "")
-			.replace(ANSI.BLUE, "")
-			.replace(ANSI.MAGENTA, "")
-			.replace(ANSI.CYAN, "")
-			.replace(ANSI.WHITE, "")
-			.replace(ANSI.RESET, "")
-			.replace(ANSI.BRIGHT_BLACK, "")
-			.replace(ANSI.BRIGHT_RED, "")
-			.replace(ANSI.BRIGHT_GREEN, "")
-			.replace(ANSI.BRIGHT_YELLOW, "")
-			.replace(ANSI.BRIGHT_BLUE, "")
-			.replace(ANSI.BRIGHT_MAGENTA, "")
-			.replace(ANSI.BRIGHT_CYAN, "")
-			.replace(ANSI.BRIGHT_WHITE, "")
-			.replace(ANSI.BACKGROUND_BLACK, "")
-			.replace(ANSI.BACKGROUND_RED, "")
-			.replace(ANSI.BACKGROUND_GREEN, "")
-			.replace(ANSI.BACKGROUND_YELLOW, "")
-			.replace(ANSI.BACKGROUND_BLUE, "")
-			.replace(ANSI.BACKGROUND_MAGENTA, "")
-			.replace(ANSI.BACKGROUND_CYAN, "")
-			.replace(ANSI.BACKGROUND_WHITE, "")
-			.replace(ANSI.BACKGROUND_BRIGHT_BLACK, "")
-			.replace(ANSI.BACKGROUND_BRIGHT_RED, "")
-			.replace(ANSI.BACKGROUND_BRIGHT_GREEN, "")
-			.replace(ANSI.BACKGROUND_BRIGHT_YELLOW, "")
-			.replace(ANSI.BACKGROUND_BRIGHT_BLUE, "")
-			.replace(ANSI.BACKGROUND_BRIGHT_MAGENTA, "")
-			.replace(ANSI.BACKGROUND_BRIGHT_CYAN, "")
-			.replace(ANSI.BACKGROUND_BRIGHT_WHITE, "")
-			.replace(ANSI.BOLD, "")
-			.replace(ANSI.UNDERLINE, "")
-			.replace(ANSI.REVERSED, "")
-			.length();
+		return ANSI.stripFormatting(this.builder.toString()).length();
 	}
 
 	@Override

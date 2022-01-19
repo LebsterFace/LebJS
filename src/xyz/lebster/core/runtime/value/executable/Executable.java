@@ -4,6 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
@@ -21,6 +22,15 @@ public abstract class Executable<JType> extends ObjectValue {
 		this.code = code;
 		this.put(Names.length, new NumberValue(0));
 		this.put("name", new StringValue(""));
+	}
+
+	public static Executable<?> getExecutable(Value<?> value) throws AbruptCompletion {
+		if (value instanceof final Executable<?> executable) return executable;
+
+		final var representation = new StringRepresentation();
+		value.display(representation);
+		representation.append(" is not a function");
+		throw AbruptCompletion.error(new TypeError(representation.toString()));
 	}
 
 	public Value<?> callWithContext(Interpreter interpreter, ExecutionContext frame, Value<?>... args) throws AbruptCompletion {

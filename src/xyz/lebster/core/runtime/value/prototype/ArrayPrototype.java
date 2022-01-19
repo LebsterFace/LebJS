@@ -3,7 +3,6 @@ package xyz.lebster.core.runtime.value.prototype;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
@@ -93,13 +92,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		final long len = lengthOfArrayLike(O, interpreter);
-
-		if (!(callbackfn instanceof final Executable<?> executable)) {
-			final StringRepresentation builder = new StringRepresentation();
-			callbackfn.display(builder);
-			builder.append(" is not a function");
-			throw AbruptCompletion.error(new TypeError(builder.toString()));
-		}
+		final var executable = Executable.getExecutable(callbackfn);
 
 		final Value<?>[] values = new Value<?>[(int) len];
 		for (int k = 0; k < len; k++) {

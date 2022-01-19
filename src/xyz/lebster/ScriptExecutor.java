@@ -6,6 +6,7 @@ import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
@@ -55,8 +56,11 @@ public final class ScriptExecutor {
 		final Program program = new Parser(new Lexer(source).tokenize()).parse();
 		if (options.showAST()) dumpAST(program);
 		final Value<?> lastValue = program.execute(interpreter);
-		if (options.showLastValue())
-			System.out.println(lastValue.toDisplayString());
+		if (options.showLastValue()) {
+			final var representation = new StringRepresentation();
+			lastValue.display(representation);
+			System.out.println(representation);
+		}
 	}
 
 	public static void file(Path path, CLArguments.ExecutionOptions options) {

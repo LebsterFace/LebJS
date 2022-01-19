@@ -270,7 +270,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 			final var entry = iterator.next();
 			if (!singleLine) representation.appendIndent();
 			representation.append(ANSI.BRIGHT_BLACK);
-			entry.getKey().displayObjectKey(representation);
+			entry.getKey().displayForObjectKey(representation);
 			representation.append(ANSI.RESET);
 			representation.append(": ");
 			final Value<?> value = entry.getValue();
@@ -307,7 +307,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 			super(value, type);
 		}
 
-		protected void displayObjectKey(StringRepresentation representation) {
+		protected void displayForObjectKey(StringRepresentation representation) {
 			this.display(representation);
 		}
 	}

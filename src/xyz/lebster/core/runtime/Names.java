@@ -11,4 +11,5 @@ public final class Names {
 	public static final StringValue toLocaleString = new StringValue("toLocaleString");
 	public static final StringValue length = new StringValue("length");
 	public static final StringValue prototype = new StringValue("prototype");
+	public static final StringValue forEach = new StringValue("forEach");
 }

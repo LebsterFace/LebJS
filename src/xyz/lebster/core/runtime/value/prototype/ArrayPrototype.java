@@ -22,9 +22,43 @@ public final class ArrayPrototype extends ObjectValue {
 		instance.setMethod(Names.map, ArrayPrototype::map);
 		instance.setMethod(Names.join, ArrayPrototype::join);
 		instance.setMethod(Names.toString, ArrayPrototype::toStringMethod);
+		instance.setMethod(Names.forEach, ArrayPrototype::forEach);
 	}
 
 	private ArrayPrototype() {
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.foreach")
+	private static Value<?> forEach(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
+		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
+
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(O, interpreter);
+		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
+		final Executable<?> executable = Executable.getExecutable(callbackfn);
+		// 4. Let k be 0.
+		int k = 0;
+		// 5. Repeat, while k < len,
+		while (k < len) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final var Pk = new StringValue(k);
+			// b. Let kPresent be ? HasProperty(O, Pk).
+			final boolean kPresent = O.hasProperty(Pk);
+			// c. If kPresent is true, then
+			if (kPresent) {
+				// i. Let kValue be ? Get(O, Pk).
+				final Value<?> kValue = O.get(interpreter, Pk);
+				// ii. Perform ? Call(callbackfn, thisArg, « kValue, 𝔽(k), O »).
+				executable.call(interpreter, thisArg, kValue, new NumberValue(k), O);
+			}
+			// d. Set k to k + 1.
+			k = k + 1;
+		}
+		// 6. Return undefined.
+		return UndefinedValue.instance;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tostring")

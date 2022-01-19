@@ -2,12 +2,15 @@ function C() {};
 function D() {};
 
 let o = new C();
+let p = {};
 
 expect(true, o instanceof C);
 expect(false, o instanceof D);
+expect(false, p instanceof C);
 
-// expect(true, o instanceof Object)
-// expect(true, C.prototype instanceof Object)
+expect(true, p instanceof Object)
+expect(true, o instanceof Object)
+expect(true, C.prototype instanceof Object)
 
 C.prototype = {};
 let o2 = new C();

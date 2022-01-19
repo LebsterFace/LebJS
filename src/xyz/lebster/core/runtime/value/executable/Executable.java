@@ -36,6 +36,22 @@ public abstract class Executable<JType> extends ObjectValue {
 		throw AbruptCompletion.error(new TypeError(representation.toString()));
 	}
 
+	@Override
+	public void display(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_MAGENTA);
+		representation.append("[Function: ");
+		representation.append(this.getName());
+		representation.append(']');
+		representation.append(ANSI.RESET);
+	}
+
+	protected abstract String getName();
+
+	@Override
+	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		this.display(representation);
+	}
+
 	public Value<?> callWithContext(Interpreter interpreter, ExecutionContext frame, Value<?>... args) throws AbruptCompletion {
 		interpreter.enterExecutionContext(frame);
 		try {

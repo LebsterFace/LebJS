@@ -2,6 +2,7 @@ package xyz.lebster.core.runtime.value.native_;
 
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -38,6 +39,11 @@ public final class NativeFunction extends Executable<NativeCode> {
 		representation.append(ANSI.BRIGHT_MAGENTA);
 		representation.append("[Native Function]");
 		representation.append(ANSI.RESET);
+	}
+
+	@Override
+	protected String getName() {
+		throw new ShouldNotHappen("NativeFunction#getName should not be called.");
 	}
 
 	@Override

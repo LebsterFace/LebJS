@@ -14,6 +14,11 @@ public final class FunctionPrototype extends Executable<Void> {
 	}
 
 	@Override
+	protected String getName() {
+		return "FunctionPrototype";
+	}
+
+	@Override
 	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) {
 		return UndefinedValue.instance;
 	}

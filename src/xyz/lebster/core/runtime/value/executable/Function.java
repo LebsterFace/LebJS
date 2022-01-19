@@ -1,10 +1,8 @@
 package xyz.lebster.core.runtime.value.executable;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.FunctionNode;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
@@ -13,8 +11,6 @@ import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
-
-import java.util.HashSet;
 
 public final class Function extends Constructor<FunctionNode> {
 	public final ExecutionContext context;
@@ -29,17 +25,8 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
-		representation.append(ANSI.BRIGHT_MAGENTA);
-		representation.append("[Function: ");
-		representation.append(code.name);
-		representation.append(']');
-		representation.append(ANSI.RESET);
-	}
-
-	@Override
-	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		this.display(representation);
+	protected String getName() {
+		return code.name.value();
 	}
 
 	@Override
@@ -68,7 +55,7 @@ public final class Function extends Constructor<FunctionNode> {
 
 	@Override
 	public ObjectValue construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final Value<?> prototypeProperty = this.get(interpreter, new StringValue("prototype"));
+		final Value<?> prototypeProperty = this.get(interpreter, Names.prototype);
 
 		final ObjectValue prototype = prototypeProperty instanceof ObjectValue object ? object : ObjectPrototype.instance;
 		final ObjectValue newInstance = new ObjectValue();

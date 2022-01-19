@@ -17,7 +17,6 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 
 	static {
 		instance.setMethod("of", ArrayConstructor::of);
-
 	}
 
 	private ArrayConstructor() {
@@ -40,6 +39,11 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 	@Override
 	public ArrayObject construct(Interpreter interpreter, Value<?>[] arguments) {
 		throw new NotImplemented("new Array()");
+	}
+
+	@Override
+	protected String getName() {
+		return "Array";
 	}
 
 	@Override

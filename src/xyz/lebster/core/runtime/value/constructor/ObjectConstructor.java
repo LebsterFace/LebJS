@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime.value.constructor;
 
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -57,6 +58,11 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 
 	private ObjectConstructor() {
 		super();
+	}
+
+	@Override
+	protected String getName() {
+		return "Object";
 	}
 
 	@Override

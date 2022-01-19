@@ -152,7 +152,7 @@ public abstract class Value<JType> {
 		// 1. Let O be ? ToObject(V).
 		final ObjectValue O = this.toObjectValue(interpreter);
 		// 2. Return ? O.[[Get]](P, V).
-		return O.get(P);
+		return O.get(interpreter, P);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-primitive-value")

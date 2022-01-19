@@ -95,7 +95,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 		if (!(target instanceof final Executable<?> executable))
 			throw AbruptCompletion.error(new TypeError("Not a function!"));
 		// 5. Return ? OrdinaryHasInstance(target, V).
-		return executable.ordinaryHasInstance(V);
+		return executable.ordinaryHasInstance(interpreter, V);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isstringprefix")

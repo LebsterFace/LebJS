@@ -60,7 +60,7 @@ public final class ArrayObject extends ObjectValue {
 
 		parents.add(this);
 		for (int index = 0; index < this.length; index++) {
-			final Value<?> element = this.get(new StringValue(index));
+			final Value<?> element = this.value.get(new StringValue(index));
 			if (element instanceof final ObjectValue object) {
 				if (parents.contains(object)) {
 					representation.append(ANSI.RED);

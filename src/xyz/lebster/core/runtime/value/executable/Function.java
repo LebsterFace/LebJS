@@ -24,7 +24,7 @@ public final class Function extends Constructor<FunctionNode> {
 		this.context = context;
 		final ObjectValue prototype = new ObjectValue();
 		prototype.put("constructor", this);
-		this.put("prototype", prototype);
+		this.put(new StringValue("prototype"), prototype);
 		this.put(Names.toString, new NativeFunction(new StringValue(code.toRepresentationString())));
 	}
 
@@ -68,7 +68,7 @@ public final class Function extends Constructor<FunctionNode> {
 
 	@Override
 	public ObjectValue construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final Value<?> prototypeProperty = this.get(new StringValue("prototype"));
+		final Value<?> prototypeProperty = this.get(interpreter, new StringValue("prototype"));
 
 		final ObjectValue prototype = prototypeProperty instanceof ObjectValue object ? object : ObjectPrototype.instance;
 		final ObjectValue newInstance = new ObjectValue();

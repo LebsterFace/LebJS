@@ -15,7 +15,7 @@ public record Reference(ObjectValue base, StringValue referencedName) {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getvalue")
 	public Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {
 		if (isResolvable()) {
-			return base.get(referencedName).getValue(interpreter);
+			return base.get(interpreter, referencedName);
 		} else {
 			throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
 		}

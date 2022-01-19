@@ -32,7 +32,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let array be ? ToObject(this value).
 		final ObjectValue array = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let func be ? Get(array, "join").
-		final Value<?> func = array.get(Names.join);
+		final Value<?> func = array.get(interpreter, Names.join);
 		// 3. If IsCallable(func) is false, set func to the intrinsic function %Object.prototype.toString%.
 		final Executable<?> f_Func = func instanceof Executable<?> e ? e : ObjectPrototype.toStringMethod;
 		// 4. Return ? Call(func, array).
@@ -42,14 +42,14 @@ public final class ArrayPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.join")
 	private static Value<?> join(Interpreter interpreter, Value<?>[] elements) throws AbruptCompletion {
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
-		final long len = Long.min(MAX_LENGTH, O.get(Names.length).toNumberValue(interpreter).value.longValue());
+		final long len = Long.min(MAX_LENGTH, O.get(interpreter, Names.length).toNumberValue(interpreter).value.longValue());
 		final boolean noSeparator = elements.length == 0 || elements[0].type == Type.Undefined;
 		final String sep = noSeparator ? "," : elements[0].toStringValue(interpreter).value;
 
 		final StringBuilder result = new StringBuilder();
 		for (int k = 0; k < len; k++) {
 			if (k > 0) result.append(sep);
-			final Value<?> element = O.get(new StringValue(k));
+			final Value<?> element = O.get(interpreter, new StringValue(k));
 			result.append(element.isNullish() ? "" : element.toStringValue(interpreter).value);
 		}
 
@@ -58,7 +58,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
 	private static long lengthOfArrayLike(ObjectValue O, Interpreter interpreter) throws AbruptCompletion {
-		final double number = O.get(Names.length).toNumberValue(interpreter).value;
+		final double number = O.get(interpreter, Names.length).toNumberValue(interpreter).value;
 		if (Double.isNaN(number) || number <= 0) {
 			return 0L;
 		} else {
@@ -98,7 +98,7 @@ public final class ArrayPrototype extends ObjectValue {
 		for (int k = 0; k < len; k++) {
 			final var Pk = new StringValue(k);
 			if (O.hasOwnProperty(Pk)) {
-				values[k] = executable.call(interpreter, thisArg, O.get(Pk), new NumberValue(k), O);
+				values[k] = executable.call(interpreter, thisArg, O.get(interpreter, Pk), new NumberValue(k), O);
 			}
 		}
 

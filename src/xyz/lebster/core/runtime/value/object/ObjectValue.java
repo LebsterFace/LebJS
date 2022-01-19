@@ -99,7 +99,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
 	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
 		// a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
-		final Value<?> exoticToPrim = get(SymbolValue.toPrimitive);
+		final Value<?> exoticToPrim = get(interpreter, SymbolValue.toPrimitive);
 
 		// b. If exoticToPrim is not undefined, then
 		if (exoticToPrim instanceof final Executable<?> executable) {
@@ -133,7 +133,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 		// 5. For each element name of methodNames, do
 		for (final StringValue name : methodNames) {
 			// a. Let method be ? Get(O, name).
-			final Value<?> method = get(name);
+			final Value<?> method = get(interpreter, name);
 			// b. If IsCallable(method) is true, then
 			if (method instanceof final Executable<?> executable) {
 				// i. Let result be ? Call(method, O).
@@ -191,13 +191,13 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 		this.value.put(new StringValue(name), new NativeFunction(code));
 	}
 
-	public Value<?> get(Key<?> key) {
+	public Value<?> get(Interpreter interpreter, Key<?> key) throws AbruptCompletion {
 		ObjectValue object = this;
 
 		while (object != null) {
 			if (object.value.containsKey(key)) {
 				// Property was found
-				return object.value.get(key);
+				return object.value.get(key).getValue(interpreter);
 			} else {
 				// Property does not exist on current object. Move up prototype chain
 				object = object.getPrototype();

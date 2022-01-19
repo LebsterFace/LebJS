@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime.value.executable;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
@@ -13,6 +14,8 @@ import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
+
+import java.util.HashSet;
 
 public abstract class Executable<JType> extends ObjectValue {
 	public final JType code;
@@ -60,7 +63,7 @@ public abstract class Executable<JType> extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinaryhasinstance")
-	public BooleanValue ordinaryHasInstance(Value<?> O) throws AbruptCompletion {
+	public BooleanValue ordinaryHasInstance(Interpreter interpreter, Value<?> O) throws AbruptCompletion {
 		// 1. If IsCallable(C) is false, return false.
 
 		// FIXME: BoundTargetFunction
@@ -73,7 +76,7 @@ public abstract class Executable<JType> extends ObjectValue {
 			return BooleanValue.FALSE;
 
 		// 4. Let P be ? Get(C, "prototype").
-		final Value<?> P = this.get(new StringValue("prototype"));
+		final Value<?> P = this.get(interpreter, new StringValue("prototype"));
 		// 5. If Type(P) is not Object, throw a TypeError exception.
 		if (P.type != Type.Object)
 			throw AbruptCompletion.error(new TypeError("Not an object!"));

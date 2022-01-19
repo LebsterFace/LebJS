@@ -3,16 +3,22 @@ package xyz.lebster.core.runtime.value.constructor;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.native_.NativeProperty;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.NullValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	public static final ObjectConstructor instance = new ObjectConstructor();
 
 	static {
+		// FIXME: Property descriptors
+		instance.put(Names.prototype, new NativeProperty(ObjectPrototype.instance));
+
 		instance.setMethod("setPrototypeOf", (interpreter, arguments) -> {
 			final Value<?> O = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
 			final Value<?> proto = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;

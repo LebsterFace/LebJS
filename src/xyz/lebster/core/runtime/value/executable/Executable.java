@@ -76,7 +76,7 @@ public abstract class Executable<JType> extends ObjectValue {
 			return BooleanValue.FALSE;
 
 		// 4. Let P be ? Get(C, "prototype").
-		final Value<?> P = this.get(interpreter, new StringValue("prototype"));
+		final Value<?> P = this.get(interpreter, Names.prototype);
 		// 5. If Type(P) is not Object, throw a TypeError exception.
 		if (P.type != Type.Object)
 			throw AbruptCompletion.error(new TypeError("Not an object!"));

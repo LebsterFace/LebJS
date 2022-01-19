@@ -24,7 +24,7 @@ public final class Function extends Constructor<FunctionNode> {
 		this.context = context;
 		final ObjectValue prototype = new ObjectValue();
 		prototype.put("constructor", this);
-		this.put(new StringValue("prototype"), prototype);
+		this.put(Names.prototype, prototype);
 		this.put(Names.toString, new NativeFunction(new StringValue(code.toRepresentationString())));
 	}
 

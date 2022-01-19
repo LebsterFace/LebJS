@@ -10,4 +10,5 @@ public final class Names {
 	public static final StringValue valueOf = new StringValue("valueOf");
 	public static final StringValue toLocaleString = new StringValue("toLocaleString");
 	public static final StringValue length = new StringValue("length");
+	public static final StringValue prototype = new StringValue("prototype");
 }

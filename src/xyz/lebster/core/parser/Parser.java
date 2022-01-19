@@ -23,6 +23,7 @@ import xyz.lebster.core.runtime.value.primitive.StringValue;
 import java.util.*;
 
 import static xyz.lebster.core.parser.Associativity.Left;
+import static xyz.lebster.core.parser.Associativity.Right;
 
 public final class Parser {
 	private ParserState state;
@@ -437,8 +438,7 @@ public final class Parser {
 			case Exponent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Exponent);
 
 			case Pipe, Ampersand -> throw new NotImplemented("Parsing binary bitwise expressions");
-			case QuestionMark -> throw new NotImplemented("Parsing ternary expressions");
-
+			case QuestionMark -> parseConditionalExpression(left);
 			case LParen -> parseCallExpression(left);
 
 			case StrictEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictEquals);
@@ -480,6 +480,13 @@ public final class Parser {
 
 			default -> throw new CannotParse(state.currentToken, "SecondaryExpression");
 		};
+	}
+
+	private Expression parseConditionalExpression(Expression test) throws CannotParse, SyntaxError {
+		final Expression left = parseExpression(2, Right);
+		state.require(TokenType.Colon);
+		final Expression right = parseExpression(2, Right);
+		return new ConditionalExpression(test, left, right);
 	}
 
 	private Expression parsePrimaryExpression() throws SyntaxError, CannotParse {

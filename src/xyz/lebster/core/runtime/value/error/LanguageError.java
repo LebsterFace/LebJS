@@ -11,25 +11,25 @@ public abstract class LanguageError extends ObjectValue {
 	public final String message;
 
 	public LanguageError(String message) {
-		this.message = message;
+		this.message = ANSI.stripFormatting(message);
 		put("message", new StringValue(message));
 		put("name", new StringValue(getClass().getSimpleName()));
 	}
 
 	@Override
-	public final void display(StringRepresentation builder) {
-		builder.append(ANSI.BRIGHT_CYAN);
-		builder.append("[");
-		builder.append(getClass().getSimpleName());
-		builder.append(": ");
-		builder.append(message);
-		builder.append("]");
-		builder.append(ANSI.RESET);
+	public final void display(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_CYAN);
+		representation.append("[");
+		representation.append(getClass().getSimpleName());
+		representation.append(": ");
+		representation.append(message);
+		representation.append("]");
+		representation.append(ANSI.RESET);
 	}
 
 	@Override
-	public final void displayRecursive(StringRepresentation builder, HashSet<ObjectValue> parents, boolean singleLine) {
-		this.display(builder);
+	public final void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		this.display(representation);
 	}
 
 	@Override

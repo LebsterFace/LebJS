@@ -149,10 +149,10 @@ public final class NumberValue extends PrimitiveValue<Double> {
 	}
 
 	@Override
-	public void display(StringRepresentation builder) {
-		builder.append(ANSI.BRIGHT_YELLOW);
-		builder.append(stringValueOf(value));
-		builder.append(ANSI.RESET);
+	public void display(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_YELLOW);
+		representation.append(stringValueOf(value));
+		representation.append(ANSI.RESET);
 	}
 
 	@Override

@@ -109,9 +109,9 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 	}
 
 	@Override
-	public void display(StringRepresentation builder) {
-		builder.append("Symbol(");
-		if (this.description != null) builder.append(this.description);
-		builder.append(')');
+	public void display(StringRepresentation representation) {
+		representation.append("Symbol(");
+		if (this.description != null) representation.append(this.description);
+		representation.append(')');
 	}
 }

@@ -241,65 +241,65 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 	}
 
 	@Override
-	public void display(StringRepresentation builder) {
-		final StringRepresentation singleLine = new StringRepresentation();
+	public void display(StringRepresentation representation) {
+		final var singleLine = new StringRepresentation();
 		this.displayRecursive(singleLine, new HashSet<>(), true);
 		if (singleLine.length() < 72) {
-			builder.append(singleLine);
+			representation.append(singleLine);
 			return;
 		}
 
-		this.displayRecursive(builder, new HashSet<>(), false);
+		this.displayRecursive(representation, new HashSet<>(), false);
 	}
 
 	@SuppressWarnings("unchecked")
-	public void displayRecursive(StringRepresentation builder, HashSet<ObjectValue> parents, boolean singleLine) {
-		builder.append("{ ");
+	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		representation.append("{ ");
 		if (value.isEmpty()) {
-			builder.append('}');
+			representation.append('}');
 			return;
 		}
 
 		parents.add(this);
 		if (!singleLine) {
-			builder.appendLine();
-			builder.indent();
+			representation.appendLine();
+			representation.indent();
 		}
 
 		for (var iterator = this.value.entrySet().iterator(); iterator.hasNext(); ) {
 			final var entry = iterator.next();
-			if (!singleLine) builder.appendIndent();
-			builder.append(ANSI.BRIGHT_BLACK);
-			entry.getKey().displayObjectKey(builder);
-			builder.append(ANSI.RESET);
-			builder.append(": ");
+			if (!singleLine) representation.appendIndent();
+			representation.append(ANSI.BRIGHT_BLACK);
+			entry.getKey().displayObjectKey(representation);
+			representation.append(ANSI.RESET);
+			representation.append(": ");
 			final Value<?> value = entry.getValue();
 			if (value instanceof final ObjectValue object) {
 				if (parents.contains(object)) {
-					builder.append(ANSI.RED);
-					builder.append(this == value ? "[self]" : "[parent]");
-					builder.append(ANSI.RESET);
+					representation.append(ANSI.RED);
+					representation.append(this == value ? "[self]" : "[parent]");
+					representation.append(ANSI.RESET);
 				} else {
-					object.displayRecursive(builder, (HashSet<ObjectValue>) parents.clone(), singleLine);
+					object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone(), singleLine);
 				}
 			} else {
-				value.display(builder);
+				value.display(representation);
 			}
 
-			if (iterator.hasNext()) builder.append(',');
+			if (iterator.hasNext()) representation.append(',');
 			if (singleLine) {
-				builder.append(' ');
+				representation.append(' ');
 			} else {
-				builder.appendLine();
+				representation.appendLine();
 			}
 		}
 
 		if (!singleLine) {
-			builder.unindent();
-			builder.appendIndent();
+			representation.unindent();
+			representation.appendIndent();
 		}
 
-		builder.append('}');
+		representation.append('}');
 	}
 
 	public static abstract class Key<R> extends PrimitiveValue<R> {
@@ -307,8 +307,8 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 			super(value, type);
 		}
 
-		protected void displayObjectKey(StringRepresentation builder) {
-			this.display(builder);
+		protected void displayObjectKey(StringRepresentation representation) {
+			this.display(representation);
 		}
 	}
 }

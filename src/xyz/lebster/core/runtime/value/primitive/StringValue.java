@@ -22,27 +22,27 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
-	public void display(StringRepresentation builder) {
+	public void display(StringRepresentation representation) {
+		representation.append(ANSI.GREEN);
 		final char quoteType = this.value.contains("'") ? '"' : '\'';
-		builder.append(ANSI.GREEN);
-		builder.append(quoteType);
-		builder.append(value);
-		builder.append(quoteType);
-		builder.append(ANSI.RESET);
+		representation.append(quoteType);
+		representation.append(value);
+		representation.append(quoteType);
+		representation.append(ANSI.RESET);
 	}
 
 	@Override
-	protected void displayObjectKey(StringRepresentation builder) {
+	protected void displayObjectKey(StringRepresentation representation) {
 		if (this.value.contains(" ")) {
-			this.display(builder);
+			this.display(representation);
 		} else {
-			builder.append(value);
+			representation.append(value);
 		}
 	}
 
 	@Override
-	public String toConsoleLogString() {
-		return this.value;
+	public void displayForConsoleLog(StringRepresentation representation) {
+		representation.append(this.value);
 	}
 
 	@Override

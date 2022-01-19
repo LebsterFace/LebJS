@@ -34,14 +34,14 @@ public final class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
-	public void display(StringRepresentation builder) {
-		builder.append(ANSI.BRIGHT_MAGENTA);
-		builder.append("[Native Function]");
-		builder.append(ANSI.RESET);
+	public void display(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_MAGENTA);
+		representation.append("[Native Function]");
+		representation.append(ANSI.RESET);
 	}
 
 	@Override
-	public void displayRecursive(StringRepresentation builder, HashSet<ObjectValue> parents, boolean singleLine) {
-		this.display(builder);
+	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		this.display(representation);
 	}
 }

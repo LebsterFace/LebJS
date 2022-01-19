@@ -51,10 +51,10 @@ public final class ArrayObject extends ObjectValue {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void displayRecursive(StringRepresentation builder, HashSet<ObjectValue> parents, boolean singleLine) {
-		builder.append('[');
+	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		representation.append('[');
 		if (value.isEmpty()) {
-			builder.append(']');
+			representation.append(']');
 			return;
 		}
 
@@ -63,21 +63,21 @@ public final class ArrayObject extends ObjectValue {
 			final Value<?> element = this.get(new StringValue(index));
 			if (element instanceof final ObjectValue object) {
 				if (parents.contains(object)) {
-					builder.append(ANSI.RED);
-					builder.append(this == element ? "[self]" : "[parent]");
-					builder.append(ANSI.RESET);
+					representation.append(ANSI.RED);
+					representation.append(this == element ? "[self]" : "[parent]");
+					representation.append(ANSI.RESET);
 				} else {
-					object.displayRecursive(builder, (HashSet<ObjectValue>) parents.clone(), singleLine);
+					object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone(), singleLine);
 				}
 			} else {
-				element.display(builder);
+				element.display(representation);
 			}
 
 			if (index != this.length - 1)
-				builder.append(", ");
+				representation.append(", ");
 		}
 
-		builder.append(']');
+		representation.append(']');
 	}
 
 	@Override

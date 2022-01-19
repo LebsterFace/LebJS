@@ -29,17 +29,17 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	public void display(StringRepresentation builder) {
-		builder.append(ANSI.BRIGHT_MAGENTA);
-		builder.append("[Function: ");
-		builder.append(code.name);
-		builder.append(']');
-		builder.append(ANSI.RESET);
+	public void display(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_MAGENTA);
+		representation.append("[Function: ");
+		representation.append(code.name);
+		representation.append(']');
+		representation.append(ANSI.RESET);
 	}
 
 	@Override
-	public void displayRecursive(StringRepresentation builder, HashSet<ObjectValue> parents, boolean singleLine) {
-		this.display(builder);
+	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		this.display(representation);
 	}
 
 	@Override

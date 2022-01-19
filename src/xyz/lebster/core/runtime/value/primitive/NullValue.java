@@ -25,8 +25,8 @@ public final class NullValue extends PrimitiveValue<Void> {
 	}
 
 	@Override
-	public void display(StringRepresentation builder) {
-		builder.append("null");
+	public void display(StringRepresentation representation) {
+		representation.append("null");
 	}
 
 	@Override

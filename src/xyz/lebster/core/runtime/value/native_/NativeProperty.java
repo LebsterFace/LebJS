@@ -59,9 +59,9 @@ public final class NativeProperty extends Value<NativeGetterSetter> {
 	}
 
 	@Override
-	public void display(StringRepresentation builder) {
-		builder.append(ANSI.CYAN);
-		builder.append("[Native Property]");
-		builder.append(ANSI.RESET);
+	public void display(StringRepresentation representation) {
+		representation.append(ANSI.CYAN);
+		representation.append("[Native Property]");
+		representation.append(ANSI.RESET);
 	}
 }

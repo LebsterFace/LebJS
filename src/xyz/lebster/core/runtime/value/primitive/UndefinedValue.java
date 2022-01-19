@@ -41,10 +41,10 @@ public final class UndefinedValue extends PrimitiveValue<Void> {
 	}
 
 	@Override
-	public void display(StringRepresentation builder) {
-		builder.append(ANSI.BRIGHT_BLACK);
-		builder.append("undefined");
-		builder.append(ANSI.RESET);
+	public void display(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_BLACK);
+		representation.append("undefined");
+		representation.append(ANSI.RESET);
 	}
 
 	@Override

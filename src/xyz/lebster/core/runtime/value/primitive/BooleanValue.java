@@ -21,10 +21,10 @@ public final class BooleanValue extends PrimitiveValue<Boolean> {
 	}
 
 	@Override
-	public void display(StringRepresentation builder) {
-		builder.append(ANSI.BRIGHT_YELLOW);
-		builder.append(value);
-		builder.append(ANSI.RESET);
+	public void display(StringRepresentation representation) {
+		representation.append(ANSI.BRIGHT_YELLOW);
+		representation.append(value);
+		representation.append(ANSI.RESET);
 	}
 
 	@Override

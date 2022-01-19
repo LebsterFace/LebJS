@@ -12,6 +12,7 @@ import xyz.lebster.core.runtime.value.primitive.NullValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
+@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
 public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	public static final ObjectConstructor instance = new ObjectConstructor();
 

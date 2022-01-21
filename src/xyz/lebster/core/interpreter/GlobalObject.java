@@ -11,6 +11,7 @@ import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.ArrayConstructor;
 import xyz.lebster.core.runtime.value.constructor.ObjectConstructor;
+import xyz.lebster.core.runtime.value.constructor.StringConstructor;
 import xyz.lebster.core.runtime.value.error.EvalError;
 import xyz.lebster.core.runtime.value.native_.NativeProperty;
 import xyz.lebster.core.runtime.value.object.ConsoleObject;
@@ -45,6 +46,7 @@ public final class GlobalObject extends ObjectValue {
 		put("Math", MathObject.instance);
 		put("Object", ObjectConstructor.instance);
 		put("Array", ArrayConstructor.instance);
+		put("String", StringConstructor.instance);
 
 		// Non-Standard properties
 		put("console", ConsoleObject.instance);

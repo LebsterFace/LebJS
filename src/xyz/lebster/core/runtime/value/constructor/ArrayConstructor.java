@@ -5,17 +5,23 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Executable;
+import xyz.lebster.core.runtime.value.native_.NativeProperty;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-array-constructor")
 public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 	public static final ArrayConstructor instance = new ArrayConstructor();
 
 	static {
+		// FIXME: Property Descriptors
+		// FIXME: Specialised temporary class for non-writable properties
+		instance.put(Names.prototype, new NativeProperty(ArrayPrototype.instance));
 		instance.setMethod("of", ArrayConstructor::of);
 	}
 
@@ -42,12 +48,12 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 	}
 
 	@Override
-	protected String getName() {
-		return "Array";
+	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) {
+		throw new NotImplemented("Array()");
 	}
 
 	@Override
-	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) {
-		throw new NotImplemented("Array()");
+	protected String getName() {
+		return "Array";
 	}
 }

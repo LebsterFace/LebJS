@@ -9,10 +9,7 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.primitive.BooleanValue;
-import xyz.lebster.core.runtime.value.primitive.NumberValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.SymbolValue;
+import xyz.lebster.core.runtime.value.primitive.*;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override
@@ -108,8 +105,8 @@ public record RelationalExpression(Expression left, Expression right, Relational
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-islessthan")
 	private BooleanValue isLessThan(Interpreter interpreter, Value<?> x, Value<?> y, boolean leftFirst) throws AbruptCompletion {
 		// 1. If the LeftFirst flag is true, then
-		Value<?> px = null;
-		Value<?> py = null;
+		PrimitiveValue<?> px = null;
+		PrimitiveValue<?> py = null;
 
 		if (leftFirst) {
 			// a. Let px be ? ToPrimitive(x, number).

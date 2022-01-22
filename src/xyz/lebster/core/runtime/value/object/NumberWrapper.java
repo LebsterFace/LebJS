@@ -1,11 +1,12 @@
 package xyz.lebster.core.runtime.value.object;
 
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.runtime.value.HasBuiltinTag;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.prototype.NumberPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-number-objects")
-public final class NumberWrapper extends PrimitiveWrapper<NumberValue> {
+public final class NumberWrapper extends PrimitiveWrapper<NumberValue> implements HasBuiltinTag {
 	public NumberWrapper(NumberValue s) {
 		super(s);
 	}
@@ -13,5 +14,10 @@ public final class NumberWrapper extends PrimitiveWrapper<NumberValue> {
 	@Override
 	public ObjectValue getDefaultPrototype() {
 		return NumberPrototype.instance;
+	}
+
+	@Override
+	public String getBuiltinTag() {
+		return "Number";
 	}
 }

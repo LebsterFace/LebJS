@@ -7,6 +7,7 @@ import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.Names;
+import xyz.lebster.core.runtime.value.HasBuiltinTag;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -17,7 +18,7 @@ import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 
 import java.util.HashSet;
 
-public abstract class Executable<JType> extends ObjectValue {
+public abstract class Executable<JType> extends ObjectValue implements HasBuiltinTag {
 	public final JType code;
 
 	public Executable(JType code) {
@@ -25,6 +26,11 @@ public abstract class Executable<JType> extends ObjectValue {
 		this.code = code;
 		this.put(Names.length, new NumberValue(0));
 		this.put("name", new StringValue(""));
+	}
+
+	@Override
+	public final String getBuiltinTag() {
+		return "Function";
 	}
 
 	public static Executable<?> getExecutable(Value<?> value) throws AbruptCompletion {

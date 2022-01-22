@@ -2,12 +2,13 @@ package xyz.lebster.core.runtime.value.error;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.value.HasBuiltinTag;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 import java.util.HashSet;
 
-public abstract class LanguageError extends ObjectValue {
+public abstract class LanguageError extends ObjectValue implements HasBuiltinTag {
 	public final String message;
 
 	public LanguageError(String message) {
@@ -35,5 +36,10 @@ public abstract class LanguageError extends ObjectValue {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + ": " + message;
+	}
+
+	@Override
+	public final String getBuiltinTag() {
+		return "Error";
 	}
 }

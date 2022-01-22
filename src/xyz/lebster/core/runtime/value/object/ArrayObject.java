@@ -7,6 +7,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.Names;
+import xyz.lebster.core.runtime.value.HasBuiltinTag;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.native_.NativeGetterSetter;
 import xyz.lebster.core.runtime.value.native_.NativeProperty;
@@ -17,7 +18,7 @@ import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 import java.util.HashSet;
 
 
-public final class ArrayObject extends ObjectValue {
+public final class ArrayObject extends ObjectValue implements HasBuiltinTag {
 	private int length;
 
 	public final NativeProperty LENGTH_GETTER_SETTER = new NativeProperty(new NativeGetterSetter() {
@@ -83,5 +84,10 @@ public final class ArrayObject extends ObjectValue {
 	@Override
 	public ObjectValue getDefaultPrototype() {
 		return ArrayPrototype.instance;
+	}
+
+	@Override
+	public String getBuiltinTag() {
+		return "Array";
 	}
 }

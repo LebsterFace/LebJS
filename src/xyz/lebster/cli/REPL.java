@@ -20,16 +20,16 @@ public final class REPL {
 	public void run() {
 		System.out.println("Starting REPL...");
 		while (true) {
-			final String input = this.readNextInput();
-			if (input == null || input.equals(".exit")) break;
-			if (input.isBlank()) continue;
-			if (input.equals(".clear")) {
-				System.out.print("\033[H\033[2J");
-				System.out.flush();
-				continue;
-			}
-
 			try {
+				final String input = this.readNextInput();
+				if (input == null || input.equals(".exit")) break;
+				if (input.isBlank()) continue;
+				if (input.equals(".clear")) {
+					System.out.print("\033[H\033[2J");
+					System.out.flush();
+					continue;
+				}
+
 				ScriptExecutor.executeWithoutErrorHandling(input, interpreter, options);
 			} catch (Throwable e) {
 				ScriptExecutor.error(e, System.out, options.showStackTrace());
@@ -48,7 +48,7 @@ public final class REPL {
 		return this.scanner.hasNextLine() ? this.scanner.nextLine() : null;
 	}
 
-	private String readNextInput() {
+	private String readNextInput() throws SyntaxError {
 		final StringBuilder result = new StringBuilder();
 		int indent = 0;
 
@@ -56,12 +56,7 @@ public final class REPL {
 			if (result.length() != 0) result.append('\n');
 			final String line = readLine(indent);
 			if (line == null) return null;
-			Token[] tokens;
-			try {
-				tokens = new Lexer(line).tokenize();
-			} catch (SyntaxError e) {
-				return null;
-			}
+			final Token[] tokens = new Lexer(line).tokenize();
 			for (final Token token : tokens) {
 				switch (token.type) {
 					case LParen, LBrace, LBracket -> indent++;

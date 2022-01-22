@@ -249,7 +249,8 @@ public final class Lexer {
 			final char stringType = currentChar;
 			consume();
 			// FIXME: Handle escape sequences
-			while (currentChar != stringType) collect();
+			while (!isFinished() && currentChar != stringType) collect();
+			if (isFinished()) throw new SyntaxError("Unterminated string literal (index " + index + ")");
 			consume();
 			return new Token(TokenType.StringLiteral, builder.toString(), start, index);
 		} else if (isDigit(currentChar)) {

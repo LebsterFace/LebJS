@@ -24,7 +24,8 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 	public record ExecutionOptions(
 		boolean showAST,
 		boolean showStackTrace,
-		boolean showLastValue
+		boolean showLastValue,
+		boolean hidePrompt
 	) {
 	}
 
@@ -35,12 +36,14 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private boolean showAST = false;
 		private boolean showStackTrace = true;
 		private boolean showLastValue = false;
+		private boolean hidePrompt = false;
 
 		private ExecutionOptions toExecutionOptions() {
 			return new ExecutionOptions(
 				this.showAST,
 				this.showStackTrace,
-				this.showLastValue
+				this.showLastValue,
+				this.hidePrompt
 			);
 		}
 
@@ -48,6 +51,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 			switch (flag) {
 				case "a", "ast" -> showAST = true;
 				case "h", "hide" -> showStackTrace = false;
+				case "p", "prompt" -> hidePrompt = true;
 
 				case "t", "test" -> mode = ExecutionMode.Tests;
 				case "g", "gif" -> {

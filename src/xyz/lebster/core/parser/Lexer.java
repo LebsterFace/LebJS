@@ -272,7 +272,7 @@ public final class Lexer {
 				}
 			}
 
-			throw new SyntaxError(StringEscapeUtils.escape("Invalid character '" + currentChar + " (index " + index + ")"));
+			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "' (index " + index + ")"));
 		}
 	}
 

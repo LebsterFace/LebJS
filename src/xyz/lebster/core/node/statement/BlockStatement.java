@@ -23,7 +23,7 @@ public record BlockStatement(List<Statement> children) implements Statement {
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushExecutionContext(interpreter.thisValue());
+		final ExecutionContext context = interpreter.pushLexicalEnvironment();
 		try {
 			Value<?> lastValue = UndefinedValue.instance;
 			for (ASTNode child : children)

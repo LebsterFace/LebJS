@@ -52,10 +52,22 @@ public final class Interpreter {
 		return executionContextStack[currentExecutionContext].environment();
 	}
 
-	public ExecutionContext pushExecutionContext(Value<?> thisValue) throws AbruptCompletion {
-		final LexicalEnvironment env = new LexicalEnvironment(new ObjectValue(), lexicalEnvironment());
+	public ExecutionContext pushExecutionContext(LexicalEnvironment env, Value<?> thisValue) throws AbruptCompletion {
 		final ExecutionContext context = new ExecutionContext(env, null, thisValue);
-		enterExecutionContext(context);
+		this.enterExecutionContext(context);
+		return context;
+	}
+
+	public ExecutionContext pushLexicalEnvironment(LexicalEnvironment env) throws AbruptCompletion {
+		final ExecutionContext context = new ExecutionContext(env, null, thisValue());
+		this.enterExecutionContext(context);
+		return context;
+	}
+
+	public ExecutionContext pushLexicalEnvironment() throws AbruptCompletion {
+		final LexicalEnvironment env = new LexicalEnvironment(new ObjectValue(), lexicalEnvironment());
+		final ExecutionContext context = new ExecutionContext(env, null, thisValue());
+		this.enterExecutionContext(context);
 		return context;
 	}
 }

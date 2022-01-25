@@ -13,6 +13,6 @@ public final class FunctionExpression extends FunctionNode implements Expression
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) {
-		return new Function(this, interpreter.getExecutionContext());
+		return new Function(this, interpreter.lexicalEnvironment());
 	}
 }

@@ -4,6 +4,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.declaration.FunctionNode;
+import xyz.lebster.core.runtime.LexicalEnvironment;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -12,14 +13,18 @@ import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 public final class Function extends Constructor<FunctionNode> {
-	public final ExecutionContext context;
+	public final LexicalEnvironment environment;
 
-	public Function(FunctionNode code, ExecutionContext context) {
+	public Function(FunctionNode code, LexicalEnvironment environment) {
 		super(code);
-		this.context = context;
+		this.environment = environment;
+
+		// FIXME: Do in super()
+		// 	https://tc39.es/ecma262/multipage#sec-makeconstructor
 		final ObjectValue prototype = new ObjectValue();
 		prototype.put(Names.constructor, this);
 		this.put(Names.prototype, prototype);
+
 		this.putMethod(Names.toString, ($, $$) -> new StringValue(code.toRepresentationString()));
 	}
 
@@ -28,10 +33,7 @@ public final class Function extends Constructor<FunctionNode> {
 		return code.name;
 	}
 
-	@Override
-	protected Value<?> internalCall(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		interpreter.enterExecutionContext(context);
-
+	private Value<?> executeCode(ExecutionContext context, Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// Declare passed arguments as variables
 		for (int i = 0; i < arguments.length && i < code.arguments.length; i++) {
 			interpreter.declareVariable(code.arguments[i], arguments[i]);
@@ -48,8 +50,18 @@ public final class Function extends Constructor<FunctionNode> {
 		}
 	}
 
-	public Function boundTo(Value<?> value) {
-		return new Function(code, this.context.boundTo(value));
+	@Override
+	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+		// Closures: The LexicalEnvironment of this.code; The surrounding `this` value
+		final ExecutionContext context = interpreter.pushLexicalEnvironment(environment);
+		return this.executeCode(context, interpreter, arguments);
+	}
+
+	@Override
+	public Value<?> call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) throws AbruptCompletion {
+		// Calling when `this` is bound: The LexicalEnvironment of this.code; The bound `this` value
+		final ExecutionContext context = interpreter.pushExecutionContext(environment, newThisValue);
+		return this.executeCode(context, interpreter, arguments);
 	}
 
 	@Override
@@ -60,8 +72,7 @@ public final class Function extends Constructor<FunctionNode> {
 		final ObjectValue newInstance = new ObjectValue();
 		newInstance.setPrototype(prototype);
 
-		final Function boundSelf = this.boundTo(newInstance);
-		final Value<?> returnValue = boundSelf.internalCall(interpreter, args);
+		final Value<?> returnValue = this.call(interpreter, newInstance, args);
 
 		if (returnValue instanceof final ObjectValue asObject) {
 			// TODO: Improve this as it is a little hackish

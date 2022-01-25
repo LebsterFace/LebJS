@@ -14,7 +14,7 @@ public final class FunctionDeclaration extends FunctionNode implements Declarati
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		interpreter.declareVariable(name, new Function(this, interpreter.getExecutionContext()));
+		interpreter.declareVariable(name, new Function(this, interpreter.lexicalEnvironment()));
 		return UndefinedValue.instance;
 	}
 }

@@ -11,6 +11,7 @@ import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.ArrayConstructor;
+import xyz.lebster.core.runtime.value.constructor.NumberConstructor;
 import xyz.lebster.core.runtime.value.constructor.ObjectConstructor;
 import xyz.lebster.core.runtime.value.constructor.StringConstructor;
 import xyz.lebster.core.runtime.value.error.EvalError;
@@ -46,6 +47,7 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.Object, ObjectConstructor.instance);
 		put(Names.Array, ArrayConstructor.instance);
 		put(Names.String, StringConstructor.instance);
+		put(Names.Number, NumberConstructor.instance);
 
 		// Non-Standard properties
 		putMethod("expect", GlobalObject::expect);

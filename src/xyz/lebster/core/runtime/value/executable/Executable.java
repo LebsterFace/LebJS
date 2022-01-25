@@ -28,11 +28,6 @@ public abstract class Executable<JType> extends ObjectValue implements HasBuilti
 		this.put("name", new StringValue(""));
 	}
 
-	@Override
-	public final String getBuiltinTag() {
-		return "Function";
-	}
-
 	public static Executable<?> getExecutable(Value<?> value) throws AbruptCompletion {
 		if (value instanceof final Executable<?> executable) return executable;
 
@@ -40,6 +35,11 @@ public abstract class Executable<JType> extends ObjectValue implements HasBuilti
 		value.display(representation);
 		representation.append(" is not a function");
 		throw AbruptCompletion.error(new TypeError(representation.toString()));
+	}
+
+	@Override
+	public final String getBuiltinTag() {
+		return "Function";
 	}
 
 	@Override

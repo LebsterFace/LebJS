@@ -8,7 +8,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Executable;
-import xyz.lebster.core.runtime.value.native_.NativeProperty;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
@@ -19,10 +18,8 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 	public static final ArrayConstructor instance = new ArrayConstructor();
 
 	static {
-		// FIXME: Property Descriptors
-		// FIXME: Specialised temporary class for non-writable properties
-		instance.put(Names.prototype, new NativeProperty(ArrayPrototype.instance));
-		instance.setMethod("of", ArrayConstructor::of);
+		instance.putNonWritable(Names.prototype, ArrayPrototype.instance);
+		instance.putMethod("of", ArrayConstructor::of);
 	}
 
 	private ArrayConstructor() {

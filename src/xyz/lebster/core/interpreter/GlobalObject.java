@@ -13,7 +13,6 @@ import xyz.lebster.core.runtime.value.constructor.ArrayConstructor;
 import xyz.lebster.core.runtime.value.constructor.ObjectConstructor;
 import xyz.lebster.core.runtime.value.constructor.StringConstructor;
 import xyz.lebster.core.runtime.value.error.EvalError;
-import xyz.lebster.core.runtime.value.native_.NativeProperty;
 import xyz.lebster.core.runtime.value.object.ConsoleObject;
 import xyz.lebster.core.runtime.value.object.MathObject;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -30,17 +29,16 @@ public final class GlobalObject extends ObjectValue {
 		// 19.1 Value Properties of the Global Object
 		put("globalThis", this);
 
-		// FIXME: Property descriptors
-		put("NaN", new NativeProperty(new NumberValue(Double.NaN)));
-		put("Infinity", new NativeProperty(new NumberValue(Double.POSITIVE_INFINITY)));
-		put("undefined", new NativeProperty(UndefinedValue.instance));
+		putNonWritable("NaN", new NumberValue(Double.NaN));
+		putNonWritable("Infinity", new NumberValue(Double.POSITIVE_INFINITY));
+		putNonWritable("undefined", UndefinedValue.instance);
 
 		// 19.2 Function Properties of the Global Object
-		setMethod("eval", GlobalObject::eval);
-		setMethod("isFinite", GlobalObject::isFinite);
-		setMethod("isNaN", GlobalObject::isNaN);
-		setMethod("parseFloat", GlobalObject::parseFloat);
-		setMethod("parseInt", GlobalObject::parseInt);
+		putMethod("eval", GlobalObject::eval);
+		putMethod("isFinite", GlobalObject::isFinite);
+		putMethod("isNaN", GlobalObject::isNaN);
+		putMethod("parseFloat", GlobalObject::parseFloat);
+		putMethod("parseInt", GlobalObject::parseInt);
 
 		// 19.3 Constructor Properties of the Global Object
 		put("Math", MathObject.instance);
@@ -50,9 +48,9 @@ public final class GlobalObject extends ObjectValue {
 
 		// Non-Standard properties
 		put("console", ConsoleObject.instance);
-		setMethod("expect", GlobalObject::expect);
-		setMethod("bind", GlobalObject::bind);
-		setMethod("unbind", GlobalObject::unbind);
+		putMethod("expect", GlobalObject::expect);
+		putMethod("bind", GlobalObject::bind);
+		putMethod("unbind", GlobalObject::unbind);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parseint-string-radix")

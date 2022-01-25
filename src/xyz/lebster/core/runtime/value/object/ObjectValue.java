@@ -1,6 +1,7 @@
 package xyz.lebster.core.runtime.value.object;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -19,17 +20,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
+public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Property>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
 	private final int UNIQUE_ID = ObjectValue.LAST_UNUSED_IDENTIFIER++;
 	private ObjectValue prototypeSlot = this.getDefaultPrototype();
 
-	public ObjectValue(Map<Key<?>, Value<?>> value) {
-		super(value, Type.Object);
-	}
-
 	public ObjectValue() {
-		this(new HashMap<>());
+		super(new HashMap<>(), Type.Object);
 	}
 
 	private static String getHint(Type preferredType) {
@@ -99,7 +96,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
 	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
 		// a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
-		final Value<?> exoticToPrim = get(interpreter, SymbolValue.toPrimitive);
+		final Value<?> exoticToPrim = this.get(interpreter, SymbolValue.toPrimitive);
 
 		// b. If exoticToPrim is not undefined, then
 		if (exoticToPrim instanceof final Executable<?> executable) {
@@ -133,7 +130,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 		// 5. For each element name of methodNames, do
 		for (final StringValue name : methodNames) {
 			// a. Let method be ? Get(O, name).
-			final Value<?> method = get(interpreter, name);
+			final Value<?> method = this.get(interpreter, name);
 			// b. If IsCallable(method) is true, then
 			if (method instanceof final Executable<?> executable) {
 				// i. Let result be ? Call(method, O).
@@ -168,36 +165,57 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 	}
 
 	public void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
-		if (this.value.get(key) instanceof final NativeProperty property) {
-			property.value.set(interpreter, value);
+		final Property property = this.getProperty(key);
+		if (property != null) {
+			if (property.isWritable()) {
+				property.setValue(interpreter, value);
+			} else {
+				final var representation = new StringRepresentation();
+				representation.append("Cannot assign to read-only property ");
+				key.display(representation);
+				throw AbruptCompletion.error(new TypeError(representation.toString()));
+			}
 		} else {
-			this.value.put(key, value);
+			this.value.put(key, new Property(true, value));
 		}
 	}
 
-	public void put(String key, Value<?> value) {
-		this.value.put(new StringValue(key), value);
+	public final Value<?> get(Interpreter interpreter, Key<?> key) throws AbruptCompletion {
+		final Property property = this.getProperty(key);
+		return property == null ? UndefinedValue.instance : property.getValue(interpreter);
 	}
 
 	public void put(Key<?> key, Value<?> value) {
-		this.value.put(key, value);
+		this.value.put(key, new Property(true, value));
 	}
 
-	public void setMethod(StringValue name, NativeCode code) {
-		this.value.put(name, new NativeFunction(code));
+	public void put(String key, Value<?> value) {
+		this.put(new StringValue(key), value);
 	}
 
-	public void setMethod(String name, NativeCode code) {
-		this.value.put(new StringValue(name), new NativeFunction(code));
+	public void putNonWritable(Key<?> key, Value<?> value) {
+		this.value.put(key, new Property(false, value));
 	}
 
-	public Value<?> get(Interpreter interpreter, Key<?> key) throws AbruptCompletion {
+	public void putNonWritable(String key, Value<?> value) {
+		this.putNonWritable(new StringValue(key), value);
+	}
+
+	public void putMethod(StringValue name, NativeCode code) {
+		this.value.put(name, new Property(true, new NativeFunction(code)));
+	}
+
+	public void putMethod(String name, NativeCode code) {
+		this.putMethod(new StringValue(name), code);
+	}
+
+	public Property getProperty(Key<?> key) {
 		ObjectValue object = this;
 
 		while (object != null) {
 			if (object.value.containsKey(key)) {
 				// Property was found
-				return object.value.get(key).getValue(interpreter);
+				return object.value.get(key);
 			} else {
 				// Property does not exist on current object. Move up prototype chain
 				object = object.getPrototype();
@@ -205,11 +223,11 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 		}
 
 		// End of prototype chain; property does not exist.
-		return UndefinedValue.instance;
+		return null;
 	}
 
 	public boolean hasProperty(Key<?> name) {
-		if (hasOwnProperty(name)) return true;
+		if (this.hasOwnProperty(name)) return true;
 		ObjectValue object = this;
 
 		while (object != null) {
@@ -273,7 +291,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 			entry.getKey().displayForObjectKey(representation);
 			representation.append(ANSI.RESET);
 			representation.append(": ");
-			final Value<?> value = entry.getValue();
+			final Value<?> value = entry.getValue().getRawValue();
 			if (value instanceof final ObjectValue object) {
 				if (parents.contains(object)) {
 					representation.append(ANSI.RED);
@@ -309,6 +327,45 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, Value<?>>> {
 
 		protected void displayForObjectKey(StringRepresentation representation) {
 			this.display(representation);
+		}
+	}
+
+	@NonStandard
+	public static final class Property {
+		private boolean writable;
+		private Value<?> value;
+
+		public Property(boolean writable, Value<?> value) {
+			this.writable = writable;
+			this.value = value;
+		}
+
+		private boolean isWritable() {
+			return writable;
+		}
+
+		private void setWritable(boolean writable) {
+			this.writable = writable;
+		}
+
+		private Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {
+			if (this.value instanceof final NativeProperty n) {
+				return n.value.get(interpreter);
+			} else {
+				return this.value;
+			}
+		}
+
+		private void setValue(Interpreter interpreter, Value<?> newValue) throws AbruptCompletion {
+			if (this.value instanceof final NativeProperty n) {
+				n.value.set(interpreter, newValue);
+			} else {
+				this.value = newValue;
+			}
+		}
+
+		public Value<?> getRawValue() {
+			return this.value;
 		}
 	}
 }

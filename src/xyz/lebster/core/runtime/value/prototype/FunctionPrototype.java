@@ -11,17 +11,17 @@ import java.util.Arrays;
 public final class FunctionPrototype extends Executable<Void> {
 	public static final FunctionPrototype instance = new FunctionPrototype();
 
-	private FunctionPrototype() {
-		super(null);
-	}
-
 	static {
-		instance.setMethod("call", (interpreter, arguments) -> {
+		instance.putMethod("call", (interpreter, arguments) -> {
 			final Executable<?> func = Executable.getExecutable(interpreter.thisValue());
 			final Value<?> thisArg = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
 			final Value<?>[] args = Arrays.copyOfRange(arguments, 1, arguments.length);
 			return func.call(interpreter, thisArg, args);
 		});
+	}
+
+	private FunctionPrototype() {
+		super(null);
 	}
 
 	@Override

@@ -146,7 +146,7 @@ public final class MathObject extends ObjectValue {
 		});
 
 		// () -> double
-		this.setMethod("random", (interpreter, args) -> new NumberValue(Math.random()));
+		this.putMethod("random", (interpreter, args) -> new NumberValue(Math.random()));
 
 		// https://tc39.es/ecma262/multipage#sec-math.trunc
 		addWrapper("trunc", (double n) -> {
@@ -208,14 +208,14 @@ public final class MathObject extends ObjectValue {
 	}
 
 	private void notImplemented(String methodName) {
-		this.setMethod(methodName, (interpreter, args) -> {
+		this.putMethod(methodName, (interpreter, args) -> {
 			throw new NotImplemented(methodName);
 		});
 	}
 
 	// https://tc39.es/ecma262/multipage#sec-math.hypot + sec-math.min + sec-math.max
 	private void addWrapper(String methodName, DoubleRestArgs restArgs) {
-		this.setMethod(methodName, (interpreter, args) -> {
+		this.putMethod(methodName, (interpreter, args) -> {
 			final double[] coerced = new double[args.length];
 			for (int i = 0; i < args.length; i++) {
 				coerced[i] = args[i].toNumberValue(interpreter).value;
@@ -226,14 +226,14 @@ public final class MathObject extends ObjectValue {
 	}
 
 	private void addWrapper(String methodName, DoubleUnaryOperator unaryOperator) {
-		this.setMethod(methodName, (interpreter, args) -> {
+		this.putMethod(methodName, (interpreter, args) -> {
 			final var number = getArgument(0, args, interpreter);
 			return new NumberValue(unaryOperator.applyAsDouble(number));
 		});
 	}
 
 	private void addWrapper(String methodName, DoubleBinaryOperator binaryOperator) {
-		this.setMethod(methodName, (interpreter, args) -> {
+		this.putMethod(methodName, (interpreter, args) -> {
 			final var a = getArgument(0, args, interpreter);
 			final var b = getArgument(1, args, interpreter);
 			return new NumberValue(binaryOperator.applyAsDouble(a, b));

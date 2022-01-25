@@ -20,7 +20,7 @@ public final class ObjectPrototype extends ObjectValue {
 
 	static {
 		instance.put(Names.toString, toStringMethod);
-		instance.setMethod(Names.valueOf, ObjectPrototype::valueOf);
+		instance.putMethod(Names.valueOf, ObjectPrototype::valueOf);
 	}
 
 	private ObjectPrototype() {

@@ -17,9 +17,9 @@ public final class StringPrototype extends ObjectValue {
 	public static final StringPrototype instance = new StringPrototype();
 
 	static {
-		instance.setMethod("reverse", StringPrototype::reverse);
-		instance.setMethod("slice", StringPrototype::slice);
-		instance.setMethod("charAt", StringPrototype::charAt);
+		instance.putMethod("reverse", StringPrototype::reverse);
+		instance.putMethod("slice", StringPrototype::slice);
+		instance.putMethod("charAt", StringPrototype::charAt);
 	}
 
 	private StringPrototype() {

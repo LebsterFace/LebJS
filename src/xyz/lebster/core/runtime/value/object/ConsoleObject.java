@@ -11,22 +11,22 @@ public final class ConsoleObject extends ObjectValue {
 	public static final ConsoleObject instance = new ConsoleObject();
 
 	private ConsoleObject() {
-		setMethod("log", (interpreter, data) -> {
+		putMethod("log", (interpreter, data) -> {
 			logger(LogLevel.Log, data);
 			return UndefinedValue.instance;
 		});
 
-		setMethod("warn", (interpreter, data) -> {
+		putMethod("warn", (interpreter, data) -> {
 			logger(LogLevel.Warn, data);
 			return UndefinedValue.instance;
 		});
 
-		setMethod("error", (interpreter, data) -> {
+		putMethod("error", (interpreter, data) -> {
 			logger(LogLevel.Error, data);
 			return UndefinedValue.instance;
 		});
 
-		setMethod("info", (interpreter, data) -> {
+		putMethod("info", (interpreter, data) -> {
 			logger(LogLevel.Info, data);
 			return UndefinedValue.instance;
 		});

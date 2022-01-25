@@ -17,7 +17,6 @@ import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 
 import java.util.HashSet;
 
-
 public final class ArrayObject extends ObjectValue implements HasBuiltinTag {
 	private int length;
 
@@ -61,7 +60,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag {
 
 		parents.add(this);
 		for (int index = 0; index < this.length; index++) {
-			final Value<?> element = this.value.get(new StringValue(index));
+			final Value<?> element = this.value.get(new StringValue(index)).getRawValue();
 			if (element instanceof final ObjectValue object) {
 				if (parents.contains(object)) {
 					representation.append(ANSI.RED);

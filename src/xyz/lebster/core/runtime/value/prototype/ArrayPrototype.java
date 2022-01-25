@@ -18,11 +18,11 @@ public final class ArrayPrototype extends ObjectValue {
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
 
 	static {
-		instance.setMethod(Names.push, ArrayPrototype::push);
-		instance.setMethod(Names.map, ArrayPrototype::map);
-		instance.setMethod(Names.join, ArrayPrototype::join);
-		instance.setMethod(Names.toString, ArrayPrototype::toStringMethod);
-		instance.setMethod(Names.forEach, ArrayPrototype::forEach);
+		instance.putMethod(Names.push, ArrayPrototype::push);
+		instance.putMethod(Names.map, ArrayPrototype::map);
+		instance.putMethod(Names.join, ArrayPrototype::join);
+		instance.putMethod(Names.toString, ArrayPrototype::toStringMethod);
+		instance.putMethod(Names.forEach, ArrayPrototype::forEach);
 	}
 
 	private ArrayPrototype() {

@@ -64,11 +64,9 @@ public final class Function extends Constructor<FunctionNode> {
 		final Function boundSelf = this.boundTo(newInstance);
 		final Value<?> returnValue = boundSelf.internalCall(interpreter, args);
 
-		if (returnValue instanceof final ObjectValue object) {
+		if (returnValue instanceof final ObjectValue asObject) {
 			// TODO: Improve this as it is a little hackish
-			for (var entry : object.value.entrySet()) {
-				newInstance.put(entry.getKey(), entry.getValue());
-			}
+			newInstance.value.putAll(asObject.value);
 		}
 
 		return newInstance;

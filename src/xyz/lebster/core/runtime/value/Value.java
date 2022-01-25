@@ -27,10 +27,6 @@ public abstract class Value<JType> {
 		this.display(representation);
 	}
 
-	public Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {
-		return this;
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
 	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
 		if (this instanceof PrimitiveValue) {

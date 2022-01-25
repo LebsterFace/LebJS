@@ -7,7 +7,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
-import xyz.lebster.core.runtime.value.native_.NativeProperty;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.NullValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
@@ -18,10 +17,9 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	public static final ObjectConstructor instance = new ObjectConstructor();
 
 	static {
-		// FIXME: Property descriptors
-		instance.put(Names.prototype, new NativeProperty(ObjectPrototype.instance));
+		instance.putNonWritable(Names.prototype, ObjectPrototype.instance);
 
-		instance.setMethod("setPrototypeOf", (interpreter, arguments) -> {
+		instance.putMethod("setPrototypeOf", (interpreter, arguments) -> {
 			final Value<?> O = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
 			final Value<?> proto = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
 
@@ -47,7 +45,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 			return UndefinedValue.instance;
 		});
 
-		instance.setMethod("getPrototypeOf", (interpreter, arguments) -> {
+		instance.putMethod("getPrototypeOf", (interpreter, arguments) -> {
 			final Value<?> O = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
 			// 1. Let obj be ? ToObject(O).
 			// 2. Return ? obj.[[GetPrototypeOf]]().

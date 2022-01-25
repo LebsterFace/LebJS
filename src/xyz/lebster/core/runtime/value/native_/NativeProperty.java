@@ -15,24 +15,6 @@ public final class NativeProperty extends Value<NativeGetterSetter> {
 		super(value, Type.Object);
 	}
 
-	public NativeProperty(Value<?> value) {
-		this(new NativeGetterSetter() {
-			@Override
-			public Value<?> get(Interpreter interpreter) {
-				return value;
-			}
-
-			@Override
-			public void set(Interpreter interpreter, Value<?> value) {
-			}
-		});
-	}
-
-	@Override
-	public Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {
-		return value.get(interpreter).getValue(interpreter);
-	}
-
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
 		return value.get(interpreter).toStringValue(interpreter);

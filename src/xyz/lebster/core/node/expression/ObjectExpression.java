@@ -4,9 +4,7 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,15 +16,16 @@ public record ObjectExpression(Map<Expression, Expression> entries) implements E
 
 	@Override
 	public ObjectValue execute(Interpreter interpreter) throws AbruptCompletion {
-		final var map = new HashMap<ObjectValue.Key<?>, Value<?>>();
+		final ObjectValue result = new ObjectValue();
 
 		for (final Map.Entry<Expression, Expression> entry : entries.entrySet()) {
-			final StringValue key = entry.getKey().execute(interpreter).toStringValue(interpreter);
-			final Value<?> value = entry.getValue().execute(interpreter);
-			map.put(key, value);
+			result.put(
+				entry.getKey().execute(interpreter).toStringValue(interpreter),
+				entry.getValue().execute(interpreter)
+			);
 		}
 
-		return new ObjectValue(map);
+		return result;
 	}
 
 	@Override

@@ -197,10 +197,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		this.value.put(key, new Property(false, value));
 	}
 
-	public void putNonWritable(String key, Value<?> value) {
-		this.putNonWritable(new StringValue(key), value);
-	}
-
 	public void putMethod(StringValue name, NativeCode code) {
 		this.value.put(name, new Property(true, new NativeFunction(name, code)));
 	}

@@ -6,7 +6,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.declaration.FunctionNode;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
@@ -21,12 +20,12 @@ public final class Function extends Constructor<FunctionNode> {
 		final ObjectValue prototype = new ObjectValue();
 		prototype.put(Names.constructor, this);
 		this.put(Names.prototype, prototype);
-		this.put(Names.toString, new NativeFunction(new StringValue(code.toRepresentationString())));
+		this.putMethod(Names.toString, ($, $$) -> new StringValue(code.toRepresentationString()));
 	}
 
 	@Override
 	protected String getName() {
-		return code.name.value();
+		return code.name;
 	}
 
 	@Override

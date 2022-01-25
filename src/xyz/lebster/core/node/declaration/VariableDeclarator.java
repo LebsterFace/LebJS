@@ -6,14 +6,13 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.node.expression.Identifier;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 
-public record VariableDeclarator(Identifier identifier, Expression init) implements ASTNode {
+public record VariableDeclarator(String identifier, Expression init) implements ASTNode {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpParameterized(indent, "VariableDeclarator", identifier.toString());
+		Dumper.dumpParameterized(indent, "VariableDeclarator", identifier);
 		init.dump(indent + 1);
 	}
 
@@ -26,7 +25,7 @@ public record VariableDeclarator(Identifier identifier, Expression init) impleme
 	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append("let ");
-		representation.append(identifier.value());
+		representation.append(identifier);
 		representation.append(" = ");
 		init.represent(representation);
 		representation.append(';');

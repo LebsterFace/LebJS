@@ -202,7 +202,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 	}
 
 	public void putMethod(StringValue name, NativeCode code) {
-		this.value.put(name, new Property(true, new NativeFunction(code)));
+		this.value.put(name, new Property(true, new NativeFunction(name, code)));
 	}
 
 	public void putMethod(String name, NativeCode code) {

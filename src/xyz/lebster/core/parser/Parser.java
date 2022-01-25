@@ -217,7 +217,7 @@ public final class Parser {
 		final BlockStatement body = parseBlockStatement();
 		state.require(TokenType.Catch);
 		state.require(TokenType.LParen);
-		final Identifier parameter = new Identifier(state.require(TokenType.Identifier).value);
+		final String parameter = state.require(TokenType.Identifier).value;
 		state.require(TokenType.RParen);
 		final BlockStatement catchBody = parseBlockStatement();
 		return new TryStatement(body, new CatchClause(parameter, catchBody));
@@ -264,7 +264,7 @@ public final class Parser {
 
 			final Token identifier = state.require(TokenType.Identifier);
 			final Expression value = state.accept(TokenType.Equals) == null ? null : parseExpression();
-			declarators.add(new VariableDeclarator(new Identifier(identifier.value), value));
+			declarators.add(new VariableDeclarator(identifier.value, value));
 			state.consumeAll(TokenType.Terminator);
 			if (state.currentToken.type != TokenType.Comma) break;
 			state.consume();
@@ -274,33 +274,33 @@ public final class Parser {
 		return new VariableDeclaration(kind, declarators.toArray(new VariableDeclarator[0]));
 	}
 
-	private Identifier[] parseIdentifierList() {
-		final List<Identifier> result = new ArrayList<>();
+	private String[] parseStringList() {
+		final List<String> result = new ArrayList<>();
 		while (state.currentToken.type == TokenType.Identifier) {
-			result.add(new Identifier(state.consume().value));
+			result.add(state.consume().value);
 			if (state.accept(TokenType.Comma) == null) break;
 		}
 
-		return result.toArray(new Identifier[0]);
+		return result.toArray(new String[0]);
 	}
 
-	private Identifier[] parseFunctionArguments() throws SyntaxError {
+	private String[] parseFunctionArguments() throws SyntaxError {
 		state.require(TokenType.LParen);
-		final Identifier[] arguments = parseIdentifierList();
+		final String[] arguments = parseStringList();
 		this.FAIL_FOR_UNSUPPORTED_ARG();
 		state.require(TokenType.RParen);
 		return arguments;
 	}
 
-	private Identifier[] parseArrowFunctionArguments(boolean expectParens) {
+	private String[] parseArrowFunctionArguments(boolean expectParens) {
 		if (!expectParens) {
 			final Token t = state.accept(TokenType.Identifier);
 			if (t == null) return null;
-			return new Identifier[] { new Identifier(t.value) };
+			return new String[] { t.value };
 		}
 
 
-		final Identifier[] result = parseIdentifierList();
+		final String[] result = parseStringList();
 		this.FAIL_FOR_UNSUPPORTED_ARG();
 		if (state.accept(TokenType.RParen) == null) return null;
 		return result;
@@ -317,16 +317,16 @@ public final class Parser {
 
 	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
-		final Identifier name = new Identifier(state.require(TokenType.Identifier).value);
-		final Identifier[] arguments = parseFunctionArguments();
+		final String name = state.require(TokenType.Identifier).value;
+		final String[] arguments = parseFunctionArguments();
 		return new FunctionDeclaration(parseBlockStatement(), name, arguments);
 	}
 
 	private FunctionExpression parseFunctionExpression() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
 		final Token potentialName = state.accept(TokenType.Identifier);
-		final Identifier name = potentialName == null ? null : new Identifier(potentialName.value);
-		final Identifier[] arguments = parseFunctionArguments();
+		final String name = potentialName == null ? null : potentialName.value;
+		final String[] arguments = parseFunctionArguments();
 		return new FunctionExpression(parseBlockStatement(), name, arguments);
 	}
 
@@ -513,7 +513,7 @@ public final class Parser {
 
 			case Identifier -> {
 				final FunctionExpression result = tryParseArrowFunctionExpression(false);
-				yield result != null ? result : new Identifier(state.consume().value);
+				yield result != null ? result : new IdentifierExpression(state.consume().value);
 			}
 
 			case StringLiteral -> new StringLiteral(new StringValue(state.consume().value));
@@ -550,7 +550,7 @@ public final class Parser {
 	private FunctionExpression tryParseArrowFunctionExpression(boolean expectParens) throws SyntaxError, CannotParse {
 		save();
 
-		final Identifier[] arguments = parseArrowFunctionArguments(expectParens);
+		final String[] arguments = parseArrowFunctionArguments(expectParens);
 		if (arguments == null) {
 			load();
 			return null;

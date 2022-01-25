@@ -15,13 +15,16 @@ import xyz.lebster.core.runtime.value.primitive.StringValue;
 import java.util.HashSet;
 
 public final class NativeFunction extends Executable<NativeCode> {
-	public NativeFunction(NativeCode code) {
-		super(code);
-		put(Names.toString, new NativeFunction(new StringValue("function () { [native code] }")));
+	public NativeFunction(StringValue name, NativeCode code) {
+		super(name, code);
+		this.put(Names.toString, new NativeFunction());
 	}
 
-	public NativeFunction(Value<?> value) {
-		super((interpreter, arguments) -> value);
+	/**
+	 * Only for toString
+	 */
+	private NativeFunction() {
+		super(Names.toString, (interpreter, arguments) -> new StringValue("function () { [native code] }"));
 	}
 
 	@Override

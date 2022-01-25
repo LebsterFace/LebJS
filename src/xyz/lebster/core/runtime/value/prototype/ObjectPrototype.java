@@ -16,7 +16,7 @@ import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 
 public final class ObjectPrototype extends ObjectValue {
 	public static final ObjectPrototype instance = new ObjectPrototype();
-	public static final NativeFunction toStringMethod = new NativeFunction(ObjectPrototype::toStringMethod);
+	public static final NativeFunction toStringMethod = new NativeFunction(Names.toString, ObjectPrototype::toStringMethod);
 
 	static {
 		instance.put(Names.toString, toStringMethod);

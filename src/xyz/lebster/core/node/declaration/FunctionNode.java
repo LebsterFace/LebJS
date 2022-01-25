@@ -3,39 +3,34 @@ package xyz.lebster.core.node.declaration;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
-import xyz.lebster.core.node.expression.Identifier;
 import xyz.lebster.core.node.statement.BlockStatement;
 
 public abstract class FunctionNode implements ASTNode {
-	public final Identifier name;
-	public final Identifier[] arguments;
+	public final String name;
+	public final String[] arguments;
 	public final BlockStatement body;
 
-	public FunctionNode(BlockStatement body, Identifier name, Identifier... arguments) {
+	public FunctionNode(BlockStatement body, String name, String... arguments) {
 		this.name = name;
 		this.arguments = arguments;
 		this.body = body;
 	}
 
-	public String getCallString() {
-		final StringBuilder builder = new StringBuilder(name == null ? "" : name.value());
+	@Override
+	public void dump(int indent) {
+		final StringBuilder builder = new StringBuilder(name == null ? "" : name);
 
 		builder.append('(');
 		if (arguments.length > 0) {
-			builder.append(arguments[0].value());
+			builder.append(arguments[0]);
 			for (int i = 1; i < arguments.length; i++) {
 				builder.append(", ");
-				builder.append(arguments[i].value());
+				builder.append(arguments[i]);
 			}
 		}
 		builder.append(')');
 
-		return builder.toString();
-	}
-
-	@Override
-	public void dump(int indent) {
-		Dumper.dumpParameterized(indent, getClass().getSimpleName(), getCallString());
+		Dumper.dumpParameterized(indent, getClass().getSimpleName(), builder.toString());
 		for (final ASTNode child : body.children()) {
 			child.dump(indent + 1);
 		}
@@ -44,13 +39,13 @@ public abstract class FunctionNode implements ASTNode {
 	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append("function ");
-		representation.append(name == null ? "" : name.value());
+		representation.append(name == null ? "" : name);
 		representation.append('(');
 		if (arguments.length > 0) {
-			representation.append(arguments[0].value());
+			representation.append(arguments[0]);
 			for (int i = 1; i < arguments.length; i++) {
 				representation.append(", ");
-				representation.append(arguments[i].value());
+				representation.append(arguments[i]);
 			}
 		}
 		representation.append(") ");

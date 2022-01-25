@@ -7,7 +7,7 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Function;
 
 public final class FunctionExpression extends FunctionNode implements Expression {
-	public FunctionExpression(BlockStatement body, Identifier name, Identifier... arguments) {
+	public FunctionExpression(BlockStatement body, String name, String... arguments) {
 		super(body, name, arguments);
 	}
 

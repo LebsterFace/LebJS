@@ -1,31 +1,42 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.Dumper;
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.LexicalEnvironment;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 
-public record Identifier(String value) implements LeftHandSideExpression {
+public record IdentifierExpression(String value) implements LeftHandSideExpression {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		return interpreter.getReference(this).getValue(interpreter);
+		return this.toReference(interpreter).getValue(interpreter);
 	}
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpValue(indent, "Identifier", value);
+		Dumper.dumpValue(indent, "VariableLookup", value);
 	}
 
 	@Override
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-resolvebinding")
 	public Reference toReference(Interpreter interpreter) {
-		return interpreter.getReference(this);
-	}
+		final StringValue name = new StringValue(this.value);
 
-	public StringValue stringValue() {
-		return new StringValue(toString());
+		LexicalEnvironment env = interpreter.lexicalEnvironment();
+		while (env != null) {
+			if (env.hasBinding(name)) {
+				return new Reference(env.variables(), name);
+			}
+
+			env = env.parent();
+		}
+
+		// Unresolvable reference
+		return new Reference(null, name);
 	}
 
 	@Override

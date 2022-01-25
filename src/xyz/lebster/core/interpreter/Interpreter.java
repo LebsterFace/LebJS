@@ -1,8 +1,6 @@
 package xyz.lebster.core.interpreter;
 
-import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
-import xyz.lebster.core.node.expression.Identifier;
 import xyz.lebster.core.runtime.LexicalEnvironment;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.RangeError;
@@ -22,21 +20,8 @@ public final class Interpreter {
 		this.executionContextStack[0] = new ExecutionContext(new LexicalEnvironment(globalObject, null), null, globalObject);
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-resolvebinding")
-	public Reference getReference(Identifier identifier) {
-		final StringValue name = identifier.stringValue();
-		for (LexicalEnvironment env = lexicalEnvironment(); env != null; env = env.parent()) {
-			if (env.hasBinding(name)) {
-				return new Reference(env.variables(), name);
-			}
-		}
-
-		// Unresolvable reference
-		return new Reference(null, name);
-	}
-
-	public void declareVariable(Identifier identifier, Value<?> value) throws AbruptCompletion {
-		lexicalEnvironment().setVariable(this, identifier.stringValue(), value);
+	public void declareVariable(String name, Value<?> value) throws AbruptCompletion {
+		lexicalEnvironment().setVariable(this, new StringValue(name), value);
 	}
 
 	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {

@@ -19,7 +19,7 @@ public final class Function extends Constructor<FunctionNode> {
 		super(code);
 		this.context = context;
 		final ObjectValue prototype = new ObjectValue();
-		prototype.put("constructor", this);
+		prototype.put(Names.constructor, this);
 		this.put(Names.prototype, prototype);
 		this.put(Names.toString, new NativeFunction(new StringValue(code.toRepresentationString())));
 	}

@@ -8,6 +8,7 @@ import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.ArrayConstructor;
 import xyz.lebster.core.runtime.value.constructor.ObjectConstructor;
@@ -29,9 +30,9 @@ public final class GlobalObject extends ObjectValue {
 		// 19.1 Value Properties of the Global Object
 		put("globalThis", this);
 
-		putNonWritable("NaN", new NumberValue(Double.NaN));
-		putNonWritable("Infinity", new NumberValue(Double.POSITIVE_INFINITY));
-		putNonWritable("undefined", UndefinedValue.instance);
+		putNonWritable(Names.NaN, new NumberValue(Double.NaN));
+		putNonWritable(Names.Infinity, new NumberValue(Double.POSITIVE_INFINITY));
+		putNonWritable(Names.undefined, UndefinedValue.instance);
 
 		// 19.2 Function Properties of the Global Object
 		putMethod("eval", GlobalObject::eval);
@@ -41,22 +42,22 @@ public final class GlobalObject extends ObjectValue {
 		putMethod("parseInt", GlobalObject::parseInt);
 
 		// 19.3 Constructor Properties of the Global Object
-		put("Math", MathObject.instance);
-		put("Object", ObjectConstructor.instance);
-		put("Array", ArrayConstructor.instance);
-		put("String", StringConstructor.instance);
+		put(Names.Math, MathObject.instance);
+		put(Names.Object, ObjectConstructor.instance);
+		put(Names.Array, ArrayConstructor.instance);
+		put(Names.String, StringConstructor.instance);
 
 		// Non-Standard properties
-		put("console", ConsoleObject.instance);
 		putMethod("expect", GlobalObject::expect);
-		putMethod("bind", GlobalObject::bind);
 		putMethod("unbind", GlobalObject::unbind);
+		putMethod(Names.bind, GlobalObject::bind);
+		put(Names.console, ConsoleObject.instance);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parseint-string-radix")
 	private static Value<?> parseInt(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let inputString be ? ToString(string).
-		final StringValue inputString = arguments.length > 0 ? arguments[0].toStringValue(interpreter) : new StringValue("undefined");
+		final StringValue inputString = arguments.length > 0 ? arguments[0].toStringValue(interpreter) : Names.undefined;
 		// 2. Let S be ! TrimString(inputString, start).
 		final StringBuilder S = new StringBuilder(inputString.value.stripLeading());
 		// 3. Let sign be 1.
@@ -128,7 +129,7 @@ public final class GlobalObject extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parsefloat-string")
 	private static Value<?> parseFloat(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let inputString be ? ToString(string).
-		final StringValue string = arguments.length > 0 ? arguments[0].toStringValue(interpreter) : new StringValue("undefined");
+		final StringValue string = arguments.length > 0 ? arguments[0].toStringValue(interpreter) : Names.undefined;
 		// 2. Let trimmedString be ! TrimString(inputString, start).
 		final String trimmedString = string.value.stripLeading();
 		// FIXME: Follow spec

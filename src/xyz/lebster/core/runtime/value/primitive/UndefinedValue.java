@@ -4,6 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -22,7 +23,7 @@ public final class UndefinedValue extends PrimitiveValue<Void> {
 
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) {
-		return new StringValue("undefined");
+		return Names.undefined;
 	}
 
 	@Override

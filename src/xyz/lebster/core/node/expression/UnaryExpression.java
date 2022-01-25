@@ -6,6 +6,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
@@ -24,7 +25,7 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 					if (reference.isResolvable()) {
 						yield new StringValue(reference.getValue(interpreter).typeOf(interpreter));
 					} else {
-						yield new StringValue("undefined");
+						yield Names.undefined;
 					}
 				} else {
 					yield new StringValue(expression.execute(interpreter).typeOf(interpreter));

@@ -25,7 +25,7 @@ public abstract class Executable<JType> extends ObjectValue implements HasBuilti
 		super();
 		this.code = code;
 		this.put(Names.length, new NumberValue(0));
-		this.put("name", new StringValue(""));
+		this.put(Names.name, new StringValue(""));
 	}
 
 	public static Executable<?> getExecutable(Value<?> value) throws AbruptCompletion {

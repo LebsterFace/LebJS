@@ -3,9 +3,9 @@ package xyz.lebster.core.runtime.value.object;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.SymbolValue;
 
 import java.util.function.DoubleBinaryOperator;
@@ -52,7 +52,7 @@ public final class MathObject extends ObjectValue {
 
 	@SuppressWarnings("SpellCheckingInspection")
 	private MathObject() {
-		put(SymbolValue.toStringTag, new StringValue("Math"));
+		put(SymbolValue.toStringTag, Names.Math);
 
 		put("E", new NumberValue(E));
 		put("LN2", new NumberValue(LN2));

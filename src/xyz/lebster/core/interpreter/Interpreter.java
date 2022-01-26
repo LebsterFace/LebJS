@@ -11,6 +11,7 @@ public final class Interpreter {
 	public final int stackSize;
 	private final ExecutionContext[] executionContextStack;
 	private int currentExecutionContext = 0;
+	public final boolean isStrictMode = true;
 
 	public Interpreter() {
 		this.globalObject = new GlobalObject();

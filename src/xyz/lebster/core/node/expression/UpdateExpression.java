@@ -25,7 +25,7 @@ public record UpdateExpression(LeftHandSideExpression expression, UpdateOp op) i
 			case PostDecrement, PreDecrement -> oldValue.value - 1.0;
 		});
 
-		left_reference.setValue(interpreter, newValue);
+		left_reference.putValue(interpreter, newValue);
 		return switch (op) {
 			case PostIncrement, PostDecrement -> oldValue;
 			case PreIncrement, PreDecrement -> newValue;

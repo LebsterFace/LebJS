@@ -28,7 +28,7 @@ public record AssignmentExpression(LeftHandSideExpression left, Expression right
 		return switch (op) {
 			case Assign -> {
 				final Value<?> right_value = right.execute(interpreter);
-				left_reference.setValue(interpreter, right_value);
+				left_reference.putValue(interpreter, right_value);
 				yield right_value;
 			}
 
@@ -36,7 +36,7 @@ public record AssignmentExpression(LeftHandSideExpression left, Expression right
 				final Value<?> left_value = left.execute(interpreter);
 				final Value<?> right_value = right.execute(interpreter);
 				final Value<?> result = BinaryExpression.applyOperator(interpreter, left_value, lookupBinaryOp(op), right_value);
-				left_reference.setValue(interpreter, result);
+				left_reference.putValue(interpreter, result);
 				yield result;
 			}
 		};

@@ -21,12 +21,26 @@ public record Reference(ObjectValue base, StringValue referencedName) {
 		}
 	}
 
-	public void setValue(Interpreter interpreter, Value<?> newValue) throws AbruptCompletion {
-		if (isResolvable()) {
-			this.base.set(interpreter, referencedName, newValue);
-		} else {
-			throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-putvalue")
+	public void putValue(Interpreter interpreter, Value<?> newValue) throws AbruptCompletion {
+		// 4. If IsUnresolvableReference(V) is true, then
+		if (!isResolvable()) {
+			// a. If V.[[Strict]] is true, throw a ReferenceError exception.
+			if (interpreter.isStrictMode)
+				throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
+			// b. Let globalObj be GetGlobalObject().
+			// c. Return ? Set(globalObj, V.[[ReferencedName]], W, false).
+			interpreter.globalObject.set(interpreter, referencedName, newValue);
+			return;
 		}
+
+		// FIXME: Follow spec ( 5. If IsPropertyReference(V)... )
+
+		// a. Let base be V.[[Base]].
+		// b. Assert: base is an Environment Record.
+		// c. Return ? base.SetMutableBinding(V.[[ReferencedName]], W, V.[[Strict]]) (see 9.1).
+		// FIXME: Follow spec (SetMutableBinding)
+		base.set(interpreter, referencedName, newValue);
 	}
 
 	public boolean isResolvable() {

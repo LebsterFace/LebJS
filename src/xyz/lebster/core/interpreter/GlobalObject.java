@@ -10,10 +10,7 @@ import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.constructor.ArrayConstructor;
-import xyz.lebster.core.runtime.value.constructor.NumberConstructor;
-import xyz.lebster.core.runtime.value.constructor.ObjectConstructor;
-import xyz.lebster.core.runtime.value.constructor.StringConstructor;
+import xyz.lebster.core.runtime.value.constructor.*;
 import xyz.lebster.core.runtime.value.error.EvalError;
 import xyz.lebster.core.runtime.value.object.ConsoleObject;
 import xyz.lebster.core.runtime.value.object.MathObject;
@@ -48,6 +45,7 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.Array, ArrayConstructor.instance);
 		put(Names.String, StringConstructor.instance);
 		put(Names.Number, NumberConstructor.instance);
+		put(Names.Boolean, BooleanConstructor.instance);
 
 		// Non-Standard properties
 		putMethod("expect", GlobalObject::expect);

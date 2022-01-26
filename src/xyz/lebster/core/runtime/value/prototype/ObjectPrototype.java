@@ -50,7 +50,6 @@ public final class ObjectPrototype extends ObjectValue {
 			// 7. Else if O has a [[Call]] internal method, let builtinTag be "Function".
 			// 8. Else if O has an [[ErrorData]] internal slot, let builtinTag be "Error".
 			// 9. Else if O has a [[BooleanData]] internal slot, let builtinTag be "Boolean".
-			// FIXME: BooleanWrapper Objects
 			// 10. Else if O has a [[NumberData]] internal slot, let builtinTag be "Number".
 			// 11. Else if O has a [[StringData]] internal slot, let builtinTag be "String".
 			// 12. Else if O has a [[DateValue]] internal slot, let builtinTag be "Date".

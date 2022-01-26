@@ -28,7 +28,7 @@ public class NumberConstructor extends BuiltinConstructor<NumberWrapper> {
 	}
 
 	@Override
-	protected NumberValue internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+	public NumberValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		final Value<?> v = arguments.length == 0 ? UndefinedValue.instance : arguments[0];
 		return v.toNumberValue(interpreter);
 	}

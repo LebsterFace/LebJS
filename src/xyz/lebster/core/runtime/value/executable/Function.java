@@ -3,8 +3,8 @@ package xyz.lebster.core.runtime.value.executable;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.LexicalEnvironment;
 import xyz.lebster.core.node.declaration.FunctionNode;
-import xyz.lebster.core.runtime.LexicalEnvironment;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -51,7 +51,7 @@ public final class Function extends Constructor<FunctionNode> {
 	}
 
 	@Override
-	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+	public Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		// Closures: The LexicalEnvironment of this.code; The surrounding `this` value
 		final ExecutionContext context = interpreter.pushLexicalEnvironment(environment);
 		return this.executeCode(context, interpreter, arguments);
@@ -60,7 +60,7 @@ public final class Function extends Constructor<FunctionNode> {
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) throws AbruptCompletion {
 		// Calling when `this` is bound: The LexicalEnvironment of this.code; The bound `this` value
-		final ExecutionContext context = interpreter.pushExecutionContext(environment, newThisValue);
+		final ExecutionContext context = interpreter.pushEnvironmentAndThisValue(environment, newThisValue);
 		return this.executeCode(context, interpreter, arguments);
 	}
 

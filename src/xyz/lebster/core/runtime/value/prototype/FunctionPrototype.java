@@ -30,7 +30,7 @@ public final class FunctionPrototype extends Executable<Void> {
 	}
 
 	@Override
-	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) {
+	public Value<?> call(Interpreter interpreter, Value<?>... arguments) {
 		return UndefinedValue.instance;
 	}
 

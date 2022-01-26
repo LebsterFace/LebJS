@@ -62,26 +62,16 @@ public abstract class Executable<JType> extends ObjectValue implements HasBuilti
 		this.display(representation);
 	}
 
-	public Value<?> callWithContext(Interpreter interpreter, ExecutionContext frame, Value<?>... args) throws AbruptCompletion {
-		interpreter.enterExecutionContext(frame);
-		try {
-			return this.internalCall(interpreter, args);
-		} finally {
-			interpreter.exitExecutionContext(frame);
-		}
-	}
-
 	public Value<?> call(Interpreter interpreter, Value<?> thisValue, Value<?>... args) throws AbruptCompletion {
-		final ExecutionContext context = new ExecutionContext(interpreter.lexicalEnvironment(), this, thisValue);
-		interpreter.enterExecutionContext(context);
+		final ExecutionContext context = interpreter.pushThisValue(thisValue);
 		try {
-			return this.internalCall(interpreter, args);
+			return this.call(interpreter, args);
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}
 	}
 
-	protected abstract Value<?> internalCall(final Interpreter interpreter, final Value<?>... arguments) throws AbruptCompletion;
+	public abstract Value<?> call(final Interpreter interpreter, final Value<?>[] arguments) throws AbruptCompletion;
 
 	@Override
 	public String typeOf(Interpreter interpreter) {

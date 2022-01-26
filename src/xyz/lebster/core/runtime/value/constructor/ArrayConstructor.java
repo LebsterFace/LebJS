@@ -32,7 +32,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 		final Value<?> callbackFn = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
 		final Value<?> thisArg = arguments.length > 2 ? arguments[2] : UndefinedValue.instance;
 
-		final var executable = Executable.getExecutable(callbackFn);
+		final Executable<?> executable = Executable.getExecutable(callbackFn);
 		final Value<?>[] result = new Value<?>[(int) len];
 		for (int k = 0; k < len; k++)
 			result[k] = executable.call(interpreter, thisArg, new NumberValue(k));
@@ -45,7 +45,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 	}
 
 	@Override
-	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) {
+	public Value<?> call(Interpreter interpreter, Value<?>... arguments) {
 		throw new NotImplemented("Array()");
 	}
 

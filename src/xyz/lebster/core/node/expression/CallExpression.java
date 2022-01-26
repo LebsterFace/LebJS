@@ -3,8 +3,8 @@ package xyz.lebster.core.node.expression;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Executable;
@@ -14,11 +14,18 @@ public record CallExpression(Expression callee, Expression... arguments) impleme
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function-calls-runtime-semantics-evaluation")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?>[] executedArguments = new Value[arguments.length];
-		for (int i = 0; i < arguments.length; i++) executedArguments[i] = arguments[i].execute(interpreter);
+		for (int i = 0; i < arguments.length; i++)
+			executedArguments[i] = arguments[i].execute(interpreter);
 
-		final ExecutionContext frame = callee.toExecutionContext(interpreter);
-		final var executable = Executable.getExecutable(frame.executedCallee());
-		return executable.callWithContext(interpreter, frame, executedArguments);
+		if (callee instanceof final MemberExpression memberExpression) {
+			// toReference is being used to handle executing the base, property, and lookup in one
+			final Reference reference = memberExpression.toReference(interpreter);
+			final Executable<?> executable = Executable.getExecutable(reference.getValue(interpreter));
+			return executable.call(interpreter, reference.base(), executedArguments);
+		} else {
+			final Executable<?> executable = Executable.getExecutable(callee.execute(interpreter));
+			return executable.call(interpreter, executedArguments);
+		}
 	}
 
 	@Override

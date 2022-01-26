@@ -25,7 +25,7 @@ public class StringConstructor extends BuiltinConstructor<StringWrapper> {
 	}
 
 	@Override
-	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) {
+	public Value<?> call(Interpreter interpreter, Value<?>... arguments) {
 		throw new NotImplemented("String()");
 	}
 

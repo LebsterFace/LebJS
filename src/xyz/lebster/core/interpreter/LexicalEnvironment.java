@@ -1,7 +1,5 @@
-package xyz.lebster.core.runtime;
+package xyz.lebster.core.interpreter;
 
-import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;

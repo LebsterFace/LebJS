@@ -1,7 +1,10 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.Dumper;
-import xyz.lebster.core.interpreter.*;
+import xyz.lebster.core.interpreter.AbruptCompletion;
+import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Reference;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
@@ -32,12 +35,6 @@ public record MemberExpression(Expression base, Expression property,
 		}
 
 		return new Reference(executedBase.toObjectValue(interpreter), executedProp);
-	}
-
-	@Override
-	public ExecutionContext toExecutionContext(Interpreter interpreter) throws AbruptCompletion {
-		final Reference reference = toReference(interpreter);
-		return new ExecutionContext(interpreter.lexicalEnvironment(), reference.getValue(interpreter), reference.base());
 	}
 
 	@Override

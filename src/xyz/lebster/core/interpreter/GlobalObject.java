@@ -51,8 +51,6 @@ public final class GlobalObject extends ObjectValue {
 
 		// Non-Standard properties
 		putMethod("expect", GlobalObject::expect);
-		putMethod("unbind", GlobalObject::unbind);
-		putMethod(Names.bind, GlobalObject::bind);
 		put(Names.console, ConsoleObject.instance);
 	}
 
@@ -177,28 +175,6 @@ public final class GlobalObject extends ObjectValue {
 			throw new ShouldNotHappen("Assertion failed.");
 		}
 
-		return UndefinedValue.instance;
-	}
-
-	private static Value<?> bind(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// Exit the `bind()` ExecutionContext
-		final ExecutionContext current = interpreter.getExecutionContext();
-		interpreter.exitExecutionContext(current);
-		// Enter the new ExecutionContext
-		interpreter.enterExecutionContext(new ExecutionContext(interpreter.lexicalEnvironment(), null, arguments[0]));
-		// Re-enter the `bind()` ExecutionContext
-		interpreter.enterExecutionContext(current);
-		return UndefinedValue.instance;
-	}
-
-	private static Value<?> unbind(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// Exit the `unbind()` ExecutionContext
-		final ExecutionContext current = interpreter.getExecutionContext();
-		interpreter.exitExecutionContext(current);
-		// Exit the bound ExecutionContext
-		interpreter.exitExecutionContext(interpreter.getExecutionContext());
-		// Re-enter the `unbind()` ExecutionContext
-		interpreter.enterExecutionContext(current);
 		return UndefinedValue.instance;
 	}
 }

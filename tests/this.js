@@ -1,5 +1,5 @@
 expect(globalThis, this);
-bind("Hello");
-expect(5, this.length);
-unbind();
+(function(){
+    expect(5, this.length);
+}).call("Hello");
 expect(globalThis, this);

@@ -64,7 +64,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	}
 
 	@Override
-	protected Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) {
+	public Value<?> call(Interpreter interpreter, Value<?>... arguments) {
 		throw new NotImplemented("Object()");
 	}
 

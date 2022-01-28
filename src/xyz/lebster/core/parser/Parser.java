@@ -105,10 +105,10 @@ public final class Parser {
 	}
 
 	private Statement parseLine() throws SyntaxError, CannotParse {
-		state.consumeAll(TokenType.Terminator);
+		state.consumeAll(TokenType.LineTerminator);
 		final Statement result = parseAny();
 		state.consumeAll(TokenType.Semicolon);
-		state.consumeAll(TokenType.Terminator);
+		state.consumeAll(TokenType.LineTerminator);
 		return result;
 	}
 
@@ -271,10 +271,10 @@ public final class Parser {
 			final Token identifier = state.require(TokenType.Identifier);
 			final Expression value = state.accept(TokenType.Equals) == null ? null : parseExpression();
 			declarators.add(new VariableDeclarator(identifier.value, value));
-			state.consumeAll(TokenType.Terminator);
+			state.consumeAll(TokenType.LineTerminator);
 			if (state.currentToken.type != TokenType.Comma) break;
 			state.consume();
-			state.consumeAll(TokenType.Terminator);
+			state.consumeAll(TokenType.LineTerminator);
 		}
 
 		return new VariableDeclaration(kind, declarators.toArray(new VariableDeclarator[0]));
@@ -339,17 +339,17 @@ public final class Parser {
 	private List<Expression> parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {
 		final List<Expression> result = new ArrayList<>();
 		if (expectParens) state.require(TokenType.LParen);
-		state.consumeAll(TokenType.Terminator);
+		state.consumeAll(TokenType.LineTerminator);
 
 		while (matchPrimaryExpression()) {
-			state.consumeAll(TokenType.Terminator);
+			state.consumeAll(TokenType.LineTerminator);
 			result.add(parseExpression());
-			state.consumeAll(TokenType.Terminator);
+			state.consumeAll(TokenType.LineTerminator);
 			if (state.accept(TokenType.Comma) == null) break;
-			state.consumeAll(TokenType.Terminator);
+			state.consumeAll(TokenType.LineTerminator);
 		}
 
-		state.consumeAll(TokenType.Terminator);
+		state.consumeAll(TokenType.LineTerminator);
 		if (expectParens) state.require(TokenType.RParen);
 		return result;
 	}
@@ -431,9 +431,9 @@ public final class Parser {
 	}
 
 	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws SyntaxError, CannotParse {
-		state.consumeAll(TokenType.Terminator);
+		state.consumeAll(TokenType.LineTerminator);
 		final Token token = state.consume();
-		state.consumeAll(TokenType.Terminator);
+		state.consumeAll(TokenType.LineTerminator);
 
 		return switch (token.type) {
 			case Plus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Add);
@@ -510,9 +510,9 @@ public final class Parser {
 					if (result != null) yield result;
 				}
 
-				state.consumeAll(TokenType.Terminator);
+				state.consumeAll(TokenType.LineTerminator);
 				final Expression expression = parseExpression();
-				state.consumeAll(TokenType.Terminator);
+				state.consumeAll(TokenType.LineTerminator);
 				state.require(TokenType.RParen);
 				yield expression;
 			}
@@ -590,7 +590,7 @@ public final class Parser {
 
 	private ObjectExpression parseObjectExpression() throws SyntaxError, CannotParse {
 		state.require(TokenType.LBrace);
-		state.consumeAll(TokenType.Terminator);
+		state.consumeAll(TokenType.LineTerminator);
 		final ObjectExpression result = new ObjectExpression();
 
 		// FIXME:
@@ -601,16 +601,16 @@ public final class Parser {
 		// 		- Allow all property names { 0: "hello" }
 		while (state.currentToken.type == TokenType.StringLiteral || state.currentToken.type == TokenType.Identifier) {
 			final var key = new StringLiteral(new StringValue(state.consume().value));
-			state.consumeAll(TokenType.Terminator);
+			state.consumeAll(TokenType.LineTerminator);
 			state.require(TokenType.Colon);
-			state.consumeAll(TokenType.Terminator);
+			state.consumeAll(TokenType.LineTerminator);
 			result.entries().put(key, parseExpression());
-			state.consumeAll(TokenType.Terminator);
+			state.consumeAll(TokenType.LineTerminator);
 			if (state.accept(TokenType.Comma) == null) break;
-			state.consumeAll(TokenType.Terminator);
+			state.consumeAll(TokenType.LineTerminator);
 		}
 
-		state.consumeAll(TokenType.Terminator);
+		state.consumeAll(TokenType.LineTerminator);
 		state.require(TokenType.RBrace);
 		return result;
 	}

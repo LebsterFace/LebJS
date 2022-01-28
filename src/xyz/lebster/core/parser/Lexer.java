@@ -232,7 +232,7 @@ public final class Lexer {
 
 		if (isTerminator()) {
 			while (isTerminator()) consume();
-			return new Token(TokenType.Terminator, start, index);
+			return new Token(TokenType.LineTerminator, start, index);
 		} else if (isIdentifierStart()) {
 			while (isIdentifierMiddle()) collect();
 
@@ -290,7 +290,7 @@ public final class Lexer {
 
 		while (!isFinished()) {
 			final Token token = next();
-			if (token.type == TokenType.Terminator) {
+			if (token.type == TokenType.LineTerminator) {
 				if (lastWasTerminator) {
 					continue;
 				} else {

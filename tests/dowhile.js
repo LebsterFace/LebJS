@@ -15,5 +15,3 @@ try {
     expect("ReferenceError", e.name);
     expect("foo is not defined", e.message);
 }
-
-do {} while (false) expect(true, true)

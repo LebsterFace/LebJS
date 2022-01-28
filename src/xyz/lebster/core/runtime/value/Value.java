@@ -5,8 +5,6 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.error.TypeError;
-import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.*;
 
@@ -109,9 +107,9 @@ public abstract class Value<JType> {
 	public abstract String typeOf(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-topropertykey")
-	public ObjectValue.Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {
+	public final ObjectValue.Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {
 		// 1. Let key be ? ToPrimitive(argument, string).
-		final var key = this.toPrimitive(interpreter, Value.Type.String);
+		final PrimitiveValue<?> key = this.toPrimitive(interpreter, Value.Type.String);
 		// 2. If Type(key) is Symbol, then
 		if (key instanceof final SymbolValue s)
 			// a. Return key.
@@ -127,28 +125,6 @@ public abstract class Value<JType> {
 
 	public boolean isNullish() {
 		return type == Type.Undefined || type == Type.Null;
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getmethod")
-	public Value<?> getMethod(Interpreter interpreter, ObjectValue.Key<?> P) throws AbruptCompletion {
-		// 1. Let func be ? GetV(V, P).
-		final var func = this.getV(interpreter, P);
-		// 2. If func is either undefined or null, return undefined.
-		if (func == UndefinedValue.instance || func == NullValue.instance)
-			return UndefinedValue.instance;
-		// 3. If IsCallable(func) is false, throw a TypeError exception.
-		if (!(func instanceof Executable<?>))
-			throw AbruptCompletion.error(new TypeError("Not a function!"));
-		// 4. Return func.
-		return func;
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getv")
-	private Value<?> getV(Interpreter interpreter, ObjectValue.Key<?> P) throws AbruptCompletion {
-		// 1. Let O be ? ToObject(V).
-		final ObjectValue O = this.toObjectValue(interpreter);
-		// 2. Return ? O.[[Get]](P, V).
-		return O.get(interpreter, P);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-primitive-value")

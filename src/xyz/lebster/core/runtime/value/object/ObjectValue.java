@@ -8,6 +8,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.error.CheckedError;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.native_.NativeCode;
@@ -96,14 +97,15 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
 	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
 		// a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
-		final Value<?> exoticToPrim = this.get(interpreter, SymbolValue.toPrimitive);
+		final Property exoticToPrim_property = this.getProperty(SymbolValue.toPrimitive);
 
 		// b. If exoticToPrim is not undefined, then
-		if (exoticToPrim instanceof final Executable<?> executable) {
+		if (exoticToPrim_property != null) {
+			final Executable<?> exoticToPrim = Executable.getExecutable(exoticToPrim_property.getValue(interpreter));
 			// i - iii. Get hint
 			final StringValue hint = new StringValue(getHint(preferredType));
 			// iv. Let result be ? Call(exoticToPrim, input, hint).
-			final Value<?> result = executable.call(interpreter, this, hint);
+			final Value<?> result = exoticToPrim.call(interpreter, this, hint);
 			// v. If Type(result) is not Object, return result.
 			if (result.type != Type.Object) return result.toPrimitive(interpreter);
 			// vi. Throw a TypeError exception.
@@ -180,9 +182,39 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		}
 	}
 
-	public final Value<?> get(Interpreter interpreter, Key<?> key) throws AbruptCompletion {
+	@NonStandard
+	public Value<?> getWellKnownSymbolOrUndefined(Interpreter interpreter, SymbolValue key) throws AbruptCompletion {
 		final Property property = this.getProperty(key);
 		return property == null ? UndefinedValue.instance : property.getValue(interpreter);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getmethod")
+	public Value<?> getMethod(Interpreter interpreter, SymbolValue P) throws AbruptCompletion {
+		final Value<?> func = this.getWellKnownSymbolOrUndefined(interpreter, P);
+		// 2. If func is either undefined or null, return undefined.
+		if (func == UndefinedValue.instance || func == NullValue.instance)
+			return UndefinedValue.instance;
+		// 3. If IsCallable(func) is false, throw a TypeError exception.
+		if (!(func instanceof Executable<?>))
+			throw AbruptCompletion.error(new TypeError("Not a function!"));
+		// 4. Return func.
+		return func;
+	}
+
+	public final Value<?> get(Interpreter interpreter, Key<?> key) throws AbruptCompletion {
+		final Property property = this.getProperty(key);
+		if (property == null) {
+			if (interpreter.isCheckedMode()) {
+				final var representation = new StringRepresentation();
+				representation.append("Property ");
+				key.displayForObjectKey(representation);
+				representation.append(" does not exist on object.");
+				throw AbruptCompletion.error(new CheckedError(representation.toString()));
+			} else {
+				return UndefinedValue.instance;
+			}
+		}
+		return property.getValue(interpreter);
 	}
 
 	public void put(Key<?> key, Value<?> value) {
@@ -205,7 +237,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		this.putMethod(new StringValue(name), code);
 	}
 
-	public Property getProperty(Key<?> key) {
+	private Property getProperty(Key<?> key) {
 		ObjectValue object = this;
 
 		while (object != null) {

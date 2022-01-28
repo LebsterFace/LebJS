@@ -10,14 +10,23 @@ public final class Interpreter {
 	public final GlobalObject globalObject;
 	public final int stackSize;
 	private final ExecutionContext[] executionContextStack;
+	private final Mode mode;
 	private int currentExecutionContext = 0;
-	public final boolean isStrictMode = true;
 
 	public Interpreter() {
 		this.globalObject = new GlobalObject();
 		this.stackSize = 32;
 		this.executionContextStack = new ExecutionContext[stackSize];
 		this.executionContextStack[0] = new ExecutionContext(new LexicalEnvironment(globalObject, null), globalObject);
+		this.mode = Mode.Checked;
+	}
+
+	public boolean isStrictMode() {
+		return this.mode == Mode.Checked || this.mode == Mode.Strict;
+	}
+
+	public boolean isCheckedMode() {
+		return this.mode == Mode.Checked;
 	}
 
 	public void declareVariable(String name, Value<?> value) throws AbruptCompletion {
@@ -77,4 +86,6 @@ public final class Interpreter {
 		this.enterExecutionContext(context);
 		return context;
 	}
+
+	private enum Mode { Normal, Strict, Checked; }
 }

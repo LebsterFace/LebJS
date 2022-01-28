@@ -26,7 +26,7 @@ public record Reference(ObjectValue base, StringValue referencedName) {
 		// 4. If IsUnresolvableReference(V) is true, then
 		if (!isResolvable()) {
 			// a. If V.[[Strict]] is true, throw a ReferenceError exception.
-			if (interpreter.isStrictMode)
+			if (interpreter.isStrictMode())
 				throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
 			// b. Let globalObj be GetGlobalObject().
 			// c. Return ? Set(globalObj, V.[[ReferencedName]], W, false).

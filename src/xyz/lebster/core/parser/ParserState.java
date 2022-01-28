@@ -25,6 +25,10 @@ public final class ParserState implements Cloneable {
 		throw new SyntaxError("Unexpected token " + currentToken.type + ". Expected " + t);
 	}
 
+	public void unexpected() throws SyntaxError {
+		throw new SyntaxError("Unexpected token " + currentToken.type + ".");
+	}
+
 	Token consume() {
 		final Token oldToken = currentToken;
 		if (index + 1 != tokens.length) index++;

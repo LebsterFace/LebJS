@@ -9,10 +9,7 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.primitive.NullValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.SymbolValue;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.*;
 
 public final class ObjectPrototype extends ObjectValue {
 	public static final ObjectPrototype instance = new ObjectPrototype();
@@ -21,6 +18,17 @@ public final class ObjectPrototype extends ObjectValue {
 	static {
 		instance.put(Names.toString, toStringMethod);
 		instance.putMethod(Names.valueOf, ObjectPrototype::valueOf);
+		instance.putMethod("hasOwnProperty", (interpreter, args) -> {
+			final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
+			final ObjectValue.Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
+			return BooleanValue.of(object.hasOwnProperty(property));
+		});
+
+		instance.putMethod("hasProperty", (interpreter, args) -> {
+			final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
+			final ObjectValue.Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
+			return BooleanValue.of(object.hasProperty(property));
+		});
 	}
 
 	private ObjectPrototype() {
@@ -59,7 +67,7 @@ public final class ObjectPrototype extends ObjectValue {
 			// 14. Else, let builtinTag be "Object".
 			final String builtinTag = (O instanceof final HasBuiltinTag hbt) ? hbt.getBuiltinTag() : "Object";
 			// 15. Let tag be ? Get(O, @@toStringTag).
-			final Value<?> tag = O.get(interpreter, SymbolValue.toStringTag);
+			final Value<?> tag = O.getWellKnownSymbolOrUndefined(interpreter, SymbolValue.toStringTag);
 			// 16. If Type(tag) is not String, set tag to builtinTag.
 			// 17. Return the string-concatenation of "[object ", tag, and "]".
 			if (tag instanceof final StringValue stringValue) {

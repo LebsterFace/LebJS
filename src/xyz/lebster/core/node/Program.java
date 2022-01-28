@@ -10,7 +10,7 @@ import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Program(List<Statement> children) implements ASTNode {
+public record Program(List<Statement> children) implements AppendableNode {
 	public Program() {
 		this(new ArrayList<>());
 	}

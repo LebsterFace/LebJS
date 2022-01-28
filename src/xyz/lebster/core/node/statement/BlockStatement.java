@@ -6,13 +6,14 @@ import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
+import xyz.lebster.core.node.AppendableNode;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record BlockStatement(List<Statement> children) implements Statement {
+public record BlockStatement(List<Statement> children) implements Statement, AppendableNode {
 	public BlockStatement() {
 		this(new ArrayList<>());
 	}

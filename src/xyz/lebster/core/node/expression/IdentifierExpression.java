@@ -14,7 +14,7 @@ public record IdentifierExpression(String value) implements LeftHandSideExpressi
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpValue(indent, "VariableLookup", value);
+		Dumper.dumpValue(indent, "IdentifierExpression", value);
 	}
 
 	@Override

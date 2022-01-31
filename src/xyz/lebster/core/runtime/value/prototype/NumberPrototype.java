@@ -5,6 +5,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.constructor.NumberConstructor;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.NumberWrapper;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -16,6 +17,7 @@ public final class NumberPrototype extends ObjectValue {
 	public static final NumberPrototype instance = new NumberPrototype();
 
 	static {
+		instance.put("constructor", NumberConstructor.instance);
 		instance.putMethod(Names.toString, NumberPrototype::toStringMethod);
 		instance.putMethod("toLocaleString", NumberPrototype::toLocaleString);
 	}

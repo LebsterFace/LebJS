@@ -1,0 +1,5 @@
+expect(String, String.prototype.constructor)
+expect(Number, Number.prototype.constructor)
+expect(Boolean, Boolean.prototype.constructor)
+expect(Object, Object.prototype.constructor)
+expect(Array, Array.prototype.constructor)

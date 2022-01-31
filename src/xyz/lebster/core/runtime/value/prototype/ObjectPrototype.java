@@ -6,6 +6,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.HasBuiltinTag;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.constructor.ObjectConstructor;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -16,6 +17,7 @@ public final class ObjectPrototype extends ObjectValue {
 	public static final NativeFunction toStringMethod = new NativeFunction(Names.toString, ObjectPrototype::toStringMethod);
 
 	static {
+		instance.put("constructor", ObjectConstructor.instance);
 		instance.put(Names.toString, toStringMethod);
 		instance.putMethod(Names.valueOf, ObjectPrototype::valueOf);
 		instance.putMethod("hasOwnProperty", (interpreter, args) -> {

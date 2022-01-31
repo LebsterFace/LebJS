@@ -5,6 +5,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.constructor.StringConstructor;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
@@ -17,6 +18,7 @@ public final class StringPrototype extends ObjectValue {
 	public static final StringPrototype instance = new StringPrototype();
 
 	static {
+		instance.put("constructor", StringConstructor.instance);
 		instance.putMethod("reverse", StringPrototype::reverse);
 		instance.putMethod("slice", StringPrototype::slice);
 		instance.putMethod("charAt", StringPrototype::charAt);

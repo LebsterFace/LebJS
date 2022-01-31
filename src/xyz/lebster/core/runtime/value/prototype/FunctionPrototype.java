@@ -12,6 +12,7 @@ public final class FunctionPrototype extends Executable<Void> {
 	public static final FunctionPrototype instance = new FunctionPrototype();
 
 	static {
+		// FIXME: FunctionConstructor
 		instance.putMethod("call", (interpreter, arguments) -> {
 			final Executable<?> func = Executable.getExecutable(interpreter.thisValue());
 			final Value<?> thisArg = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;

@@ -17,6 +17,7 @@ public final class Names {
 	public static final StringValue Array = new StringValue("Array");
 	public static final StringValue String = new StringValue("String");
 	public static final StringValue Number = new StringValue("Number");
+	public static final StringValue ShadowRealm = new StringValue("ShadowRealm");
 	public static final StringValue Boolean = new StringValue("Boolean");
 	public static final StringValue console = new StringValue("console");
 

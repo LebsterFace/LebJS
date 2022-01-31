@@ -46,6 +46,7 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.String, StringConstructor.instance);
 		put(Names.Number, NumberConstructor.instance);
 		put(Names.Boolean, BooleanConstructor.instance);
+		put(Names.ShadowRealm, ShadowRealmConstructor.instance);
 
 		// Non-Standard properties
 		putMethod("expect", GlobalObject::expect);

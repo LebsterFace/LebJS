@@ -18,7 +18,7 @@ public record IdentifierExpression(String value) implements LeftHandSideExpressi
 	}
 
 	@Override
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-resolvebinding")
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getidentifierreference")
 	public Reference toReference(Interpreter interpreter) {
 		final StringValue name = new StringValue(this.value);
 

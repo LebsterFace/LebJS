@@ -9,14 +9,14 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.BooleanWrapper;
 import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
-import xyz.lebster.core.runtime.value.prototype.NumberPrototype;
+import xyz.lebster.core.runtime.value.prototype.BooleanPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-constructor")
 public class BooleanConstructor extends BuiltinConstructor<BooleanWrapper> {
 	public static final BooleanConstructor instance = new BooleanConstructor();
 
 	static {
-		instance.putNonWritable(Names.prototype, NumberPrototype.instance);
+		instance.putNonWritable(Names.prototype, BooleanPrototype.instance);
 	}
 
 	private BooleanConstructor() {

@@ -11,6 +11,7 @@ import xyz.lebster.core.node.Program;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.error.EvalError;
 
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -31,8 +32,13 @@ public final class ScriptExecutor {
 			throwable instanceof final AbruptCompletion abruptCompletion &&
 			abruptCompletion.type == AbruptCompletion.Type.Throw
 		) {
-			stream.print("Uncaught ");
-			stream.print(abruptCompletion.getValue());
+			if (abruptCompletion.value instanceof final EvalError evalError) {
+				ScriptExecutor.error(evalError.wrappedThrowable, stream, false);
+				return;
+			} else {
+				stream.print("Uncaught ");
+				stream.print(abruptCompletion.getValue());
+			}
 		} else if (throwable instanceof final SyntaxError syntaxError) {
 			stream.print("Uncaught SyntaxError: ");
 			stream.print(syntaxError.getLocalizedMessage());

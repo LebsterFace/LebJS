@@ -19,7 +19,7 @@ public abstract class LanguageError extends ObjectValue implements HasBuiltinTag
 	}
 
 	@Override
-	public final void display(StringRepresentation representation) {
+	public void display(StringRepresentation representation) {
 		representation.append(ANSI.BRIGHT_CYAN);
 		representation.append("[");
 		representation.append(getClass().getSimpleName());

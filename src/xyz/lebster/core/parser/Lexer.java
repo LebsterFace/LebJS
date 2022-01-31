@@ -239,10 +239,8 @@ public final class Lexer {
 			final String value = builder.toString();
 			if (value.equals("true") || value.equals("false")) {
 				return new Token(TokenType.BooleanLiteral, value, start, index);
-			} else if (keywords.containsKey(value)) {
-				return new Token(keywords.get(value), start, index);
 			} else {
-				return new Token(TokenType.Identifier, value, start, index);
+				return new Token(keywords.getOrDefault(value, TokenType.Identifier), value, start, index);
 			}
 		} else if (currentChar == '"' || currentChar == '\'') {
 			// FIXME: Template strings

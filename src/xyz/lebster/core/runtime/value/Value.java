@@ -127,6 +127,12 @@ public abstract class Value<JType> {
 		return type == Type.Undefined || type == Type.Null;
 	}
 
+	public final String toDisplayString() {
+		final var representation = new StringRepresentation();
+		this.display(representation);
+		return representation.toString();
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-primitive-value")
 	public enum Type {
 		String,

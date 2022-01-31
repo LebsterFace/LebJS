@@ -31,11 +31,16 @@ public record ForStatement(Statement init, Expression test, Expression update, S
 	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append("for (");
-		init.represent(representation);
-		representation.append(" ");
-		test.represent(representation);
+		if (init == null)
+			representation.append(";");
+		else
+			init.represent(representation);
+		representation.append(' ');
+		if (test != null)
+			test.represent(representation);
 		representation.append("; ");
-		update.represent(representation);
+		if (update != null)
+			update.represent(representation);
 		representation.append(") ");
 		body.represent(representation);
 	}

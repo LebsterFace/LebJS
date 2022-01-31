@@ -18,13 +18,6 @@ public final class Function extends Constructor<FunctionNode> {
 	public Function(FunctionNode code, LexicalEnvironment environment) {
 		super(code);
 		this.environment = environment;
-
-		// FIXME: Do in super()
-		// 	https://tc39.es/ecma262/multipage#sec-makeconstructor
-		final ObjectValue prototype = new ObjectValue();
-		prototype.put(Names.constructor, this);
-		this.put(Names.prototype, prototype);
-
 		this.putMethod(Names.toString, ($, $$) -> new StringValue(code.toRepresentationString()));
 	}
 

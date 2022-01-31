@@ -647,9 +647,8 @@ public final class Parser {
 		// 		- Getters / Setters { get a() { return Math.random() } }
 		// 		- Computed property names { ["a" + "b"]: 123 }
 		// 		- Shorthand initializers { a, b }
-		// 		- Allow all property names { 0: "hello" }
-		while (state.currentToken.type == TokenType.StringLiteral || state.currentToken.type == TokenType.Identifier) {
-			final var key = new StringLiteral(new StringValue(state.consume().value));
+		while (state.currentToken.type != TokenType.RBrace) {
+			final Expression key = parsePropertyName();
 			consumeAllLineTerminators();
 			state.require(TokenType.Colon);
 			consumeAllLineTerminators();
@@ -662,6 +661,18 @@ public final class Parser {
 		consumeAllLineTerminators();
 		state.require(TokenType.RBrace);
 		return result;
+	}
+
+	private Expression parsePropertyName() throws SyntaxError, CannotParse {
+		final TokenType t = state.currentToken.type;
+		if (t == TokenType.NumericLiteral || t == TokenType.StringLiteral || matchIdentifierName())
+			return new StringLiteral(new StringValue(state.consume().value));
+		else {
+			state.require(TokenType.LBracket);
+			final Expression result = parseExpression();
+			state.require(TokenType.RBracket);
+			return result;
+		}
 	}
 
 	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {
@@ -710,6 +721,7 @@ public final class Parser {
 			   t == TokenType.While ||
 			   t == TokenType.With ||
 			   t == TokenType.Yield ||
+			   t == TokenType.BooleanLiteral ||
 			   t == TokenType.Identifier;
 	}
 

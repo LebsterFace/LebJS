@@ -27,6 +27,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 		super();
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.setprototypeof")
 	private static Value<?> setPrototypeOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final Value<?> O = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
 		final Value<?> proto = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
@@ -54,6 +55,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 		return O;
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getprototypeof")
 	private static Value<?> getPrototypeOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final Value<?> O = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
 		// 1. Let obj be ? ToObject(O).

@@ -29,6 +29,7 @@ import static xyz.lebster.core.parser.Associativity.Right;
 public final class Parser {
 	private ParserState state;
 	private ParserState saved = null;
+	private boolean hasConsumedSeparator = false;
 
 	public Parser(Token[] tokens) {
 		this.state = new ParserState(tokens);
@@ -130,8 +131,6 @@ public final class Parser {
 			}
 		}
 	}
-
-	private boolean hasConsumedSeparator = false;
 
 	private boolean didConsumeSeparator() {
 		if (hasConsumedSeparator) {

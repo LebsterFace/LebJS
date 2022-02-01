@@ -49,6 +49,19 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag {
 		}
 	}
 
+	@FunctionalInterface
+	public interface ForEachCallback {
+		void run(Value<?> value, int index) throws AbruptCompletion;
+	}
+
+	public void forEach(Interpreter interpreter, ForEachCallback callback) throws AbruptCompletion {
+		for (int index = 0; index < this.length; index++) {
+			final StringValue key = new StringValue(index);
+			if (this.hasProperty(key))
+				callback.run(this.get(interpreter, key), index);
+		}
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {

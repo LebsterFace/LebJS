@@ -6,6 +6,8 @@ public final class ParserState implements Cloneable {
 	public final Token[] tokens;
 	public Token currentToken;
 	public int index = -1;
+	public boolean inBreakContext = false;
+	public boolean inContinueContext = false;
 
 	public ParserState(Token[] tokens) {
 		this.tokens = tokens;

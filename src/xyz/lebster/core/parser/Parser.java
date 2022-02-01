@@ -203,18 +203,10 @@ public final class Parser {
 				yield new ReturnStatement(matchPrimaryExpression() ? parseExpression() : null);
 			}
 
-			case Break -> {
-				state.consume();
-				yield new BreakStatement();
-			}
-
-			case Continue -> {
-				state.consume();
-				yield new ContinueStatement();
-			}
+			case Break -> parseBreakStatement();
+			case Continue -> parseContinueStatement();
 
 			case Import, Export -> throw new NotImplemented("Parsing import / export statements");
-			case Continue -> throw new NotImplemented("Parsing continue statements");
 			case Switch -> throw new NotImplemented("Parsing switch statements");
 
 			case Throw -> {
@@ -230,7 +222,46 @@ public final class Parser {
 				}
 			}
 		};
+	}
 
+	private ContinueStatement parseContinueStatement() throws SyntaxError {
+		if (!state.inContinueContext)
+			throw new SyntaxError("Illegal `continue` statement");
+		state.consume();
+		return new ContinueStatement();
+	}
+
+	private BreakStatement parseBreakStatement() throws SyntaxError {
+		if (!state.inBreakContext)
+			throw new SyntaxError("Illegal `break` statement");
+		state.consume();
+		return new BreakStatement();
+	}
+
+	private BlockStatement parseFunctionBody() throws CannotParse, SyntaxError {
+		final boolean old_inBreakContext = state.inBreakContext;
+		final boolean old_inContinueContext = state.inContinueContext;
+		state.inBreakContext = false;
+		state.inContinueContext = false;
+		try {
+			return parseBlockStatement();
+		} finally {
+			state.inBreakContext = old_inBreakContext;
+			state.inContinueContext = old_inContinueContext;
+		}
+	}
+
+	private Statement parseContextualStatement(boolean inBreakContext, boolean inContinueContext) throws CannotParse, SyntaxError {
+		final boolean old_inBreakContext = state.inBreakContext;
+		final boolean old_inContinueContext = state.inContinueContext;
+		state.inBreakContext = inBreakContext;
+		state.inContinueContext = inContinueContext;
+		try {
+			return parseLine();
+		} finally {
+			state.inBreakContext = old_inBreakContext;
+			state.inContinueContext = old_inContinueContext;
+		}
 	}
 
 	private ForStatement parseForStatement() throws SyntaxError, CannotParse {
@@ -248,7 +279,7 @@ public final class Parser {
 		final Expression update = matchPrimaryExpression() ? parseExpression() : null;
 		state.require(TokenType.RParen);
 
-		final Statement body = parseLine();
+		final Statement body = parseContextualStatement(true, true);
 		return new ForStatement(init, test, update, body);
 	}
 
@@ -257,13 +288,13 @@ public final class Parser {
 		state.require(TokenType.LParen);
 		final Expression condition = parseExpression();
 		state.require(TokenType.RParen);
-		final Statement body = parseLine();
+		final Statement body = parseContextualStatement(true, true);
 		return new WhileStatement(condition, body);
 	}
 
 	private DoWhileStatement parseDoWhileStatement() throws SyntaxError, CannotParse {
 		state.require(TokenType.Do);
-		final Statement body = parseLine();
+		final Statement body = parseContextualStatement(true, true);
 		state.require(TokenType.While);
 		state.require(TokenType.LParen);
 		final Expression condition = parseExpression();
@@ -378,7 +409,7 @@ public final class Parser {
 		state.require(TokenType.Function);
 		final String name = state.require(TokenType.Identifier).value;
 		final String[] arguments = parseFunctionArguments();
-		return new FunctionDeclaration(parseBlockStatement(), name, arguments);
+		return new FunctionDeclaration(parseFunctionBody(), name, arguments);
 	}
 
 	private FunctionExpression parseFunctionExpression() throws SyntaxError, CannotParse {
@@ -386,7 +417,7 @@ public final class Parser {
 		final Token potentialName = state.accept(TokenType.Identifier);
 		final String name = potentialName == null ? null : potentialName.value;
 		final String[] arguments = parseFunctionArguments();
-		return new FunctionExpression(parseBlockStatement(), name, arguments);
+		return new FunctionExpression(parseFunctionBody(), name, arguments);
 	}
 
 	private List<Expression> parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {

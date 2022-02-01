@@ -53,6 +53,9 @@ public final class ParserState implements Cloneable {
 
 	@Override
 	public ParserState clone() {
-		return new ParserState(tokens, index, currentToken);
+		final ParserState cloned = new ParserState(tokens, index, currentToken);
+		cloned.inContinueContext = this.inContinueContext;
+		cloned.inBreakContext = this.inBreakContext;
+		return cloned;
 	}
 }

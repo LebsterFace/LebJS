@@ -1,8 +1,8 @@
 package xyz.lebster.cli;
 
-import xyz.lebster.ScriptExecutor;
+import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Realm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,14 +46,14 @@ public final class Testing {
 			System.setOut(tempStream);
 
 			try {
-				ScriptExecutor.executeWithoutErrorHandling(Files.readString(file.toPath()), new Interpreter(), options);
+				Realm.executeStatic(Files.readString(file.toPath()), options.showAST());
 				successfulTests++;
 				printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", file.getName());
 				printTestOutput(passedStream, tempOutput);
 			} catch (Throwable throwable) {
 				printTestResult(failedStream, ANSI.BRIGHT_RED, "FAILED", file.getName());
 				printTestOutput(failedStream, tempOutput);
-				ScriptExecutor.error(throwable, failedStream, options.showStackTrace());
+				Main.handleError(throwable, failedStream, options.showStackTrace());
 			}
 
 			System.setOut(stdout);

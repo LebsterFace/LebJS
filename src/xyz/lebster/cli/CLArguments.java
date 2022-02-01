@@ -24,7 +24,6 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 	public record ExecutionOptions(
 		boolean showAST,
 		boolean showStackTrace,
-		boolean showLastValue,
 		boolean hidePrompt
 	) {
 	}
@@ -35,14 +34,12 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 
 		private boolean showAST = false;
 		private boolean showStackTrace = true;
-		private boolean showLastValue = false;
 		private boolean hidePrompt = false;
 
 		private ExecutionOptions toExecutionOptions() {
 			return new ExecutionOptions(
 				this.showAST,
 				this.showStackTrace,
-				this.showLastValue,
 				this.hidePrompt
 			);
 		}
@@ -86,10 +83,6 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private CLArguments toCLIArguments() {
 			if (this.mode == null) {
 				this.mode = ExecutionMode.REPL;
-			}
-
-			if (this.mode == ExecutionMode.REPL || this.mode == ExecutionMode.GIF) {
-				this.showLastValue = true;
 			}
 
 			return new CLArguments(this.fileNameOrNull == null ? null : Path.of(this.fileNameOrNull), this.mode, this.toExecutionOptions());

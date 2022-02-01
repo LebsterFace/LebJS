@@ -1,10 +1,12 @@
 package xyz.lebster.cli;
 
-import xyz.lebster.ScriptExecutor;
+import xyz.lebster.Main;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Token;
+import xyz.lebster.core.runtime.value.Value;
 
 import java.util.Scanner;
 
@@ -19,6 +21,8 @@ public final class REPL {
 
 	public void run() {
 		System.out.println("Starting REPL...");
+		final Realm realm = new Realm(interpreter);
+
 		while (true) {
 			try {
 				final String input = this.readNextInput();
@@ -30,9 +34,10 @@ public final class REPL {
 					continue;
 				}
 
-				ScriptExecutor.executeWithoutErrorHandling(input, interpreter, options);
+				final Value<?> lastValue = realm.execute(input, options.showAST());
+				System.out.println(lastValue.toDisplayString());
 			} catch (Throwable e) {
-				ScriptExecutor.error(e, System.out, options.showStackTrace());
+				Main.handleError(e, System.out, options.showStackTrace());
 			}
 		}
 	}

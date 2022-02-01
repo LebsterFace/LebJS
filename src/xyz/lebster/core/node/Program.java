@@ -22,7 +22,8 @@ public record Program(List<Statement> children) implements AppendableNode {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		Value<?> lastValue = UndefinedValue.instance;
-		for (ASTNode child : children) lastValue = child.execute(interpreter);
+		for (final ASTNode child : children)
+			lastValue = child.execute(interpreter);
 		return lastValue;
 	}
 

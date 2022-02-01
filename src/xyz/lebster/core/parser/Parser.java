@@ -208,6 +208,11 @@ public final class Parser {
 				yield new BreakStatement();
 			}
 
+			case Continue -> {
+				state.consume();
+				yield new ContinueStatement();
+			}
+
 			case Import, Export -> throw new NotImplemented("Parsing import / export statements");
 			case Continue -> throw new NotImplemented("Parsing continue statements");
 			case Switch -> throw new NotImplemented("Parsing switch statements");

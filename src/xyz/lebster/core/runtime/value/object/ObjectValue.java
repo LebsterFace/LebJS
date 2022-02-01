@@ -381,7 +381,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		private Value<?> value;
 
 		public Property(boolean writable, Value<?> value) {
-			this.enumerable = false;
+			this.enumerable = true;
 			this.writable = writable;
 			this.value = value;
 		}

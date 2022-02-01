@@ -1,6 +1,7 @@
 package xyz.lebster.core.runtime.value.primitive;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -50,10 +51,10 @@ public final class NumberValue extends PrimitiveValue<Double> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-tostring")
-	// FIXME: Follow spec
+	@NonCompliant
 	private static String stringValueOf(Double d) {
 		if (d.isNaN()) return "NaN";
-		else if (d == 0.0) return "0";
+		else if (isPositiveZero(d)) return "0";
 		else if (d < 0.0) return "-" + stringValueOf(-d);
 		else if (d.isInfinite()) return "Infinity";
 		final String input = String.valueOf(d);

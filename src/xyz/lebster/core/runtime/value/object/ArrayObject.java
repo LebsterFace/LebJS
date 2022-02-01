@@ -39,7 +39,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag {
 		}
 	});
 
-	public ArrayObject(Value<?>[] values) {
+	public ArrayObject(Value<?>... values) {
 		this.length = values.length;
 		this.put(Names.length, LENGTH_GETTER_SETTER);
 

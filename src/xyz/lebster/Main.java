@@ -83,9 +83,6 @@ public final class Main {
 			return;
 		}
 
-		if (throwable instanceof SyntaxError || throwable instanceof CannotParse)
-			stream.print("Uncaught ");
-
 		stream.print(throwable.getClass().getSimpleName());
 		stream.print(": ");
 		stream.print(throwable.getLocalizedMessage());

@@ -11,6 +11,7 @@ import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.NullValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
@@ -27,10 +28,31 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 		instance.putMethod("keys", ObjectConstructor::keys);
 		instance.putMethod("values", ObjectConstructor::values);
 		instance.putMethod("entries", ObjectConstructor::entries);
+		instance.putMethod("fromEntries", ObjectConstructor::fromEntries);
 	}
 
 	private ObjectConstructor() {
 		super();
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.fromentries")
+	@NonCompliant
+	private static ObjectValue fromEntries(Interpreter $, Value<?>[] arguments) throws AbruptCompletion {
+		final Value<?> arg = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
+		if (!(arg instanceof ArrayObject arrayObject))
+			throw AbruptCompletion.error(new TypeError("Object.fromEntries call with non-array"));
+
+		final ObjectValue result = new ObjectValue();
+		arrayObject.forEach($, (final Value<?> value, int index) -> {
+			if (!(value instanceof final ObjectValue entry))
+				throw AbruptCompletion.error(new TypeError("Value is not an entry object"));
+
+			final ObjectValue.Key<?> entryKey = entry.get($, new StringValue("0")).toPropertyKey($);
+			final Value<?> entryValue = entry.get($, new StringValue("1"));
+			result.put(entryKey, entryValue);
+		});
+
+		return result;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.keys")

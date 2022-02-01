@@ -4,9 +4,7 @@ import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.node.Program;
-import xyz.lebster.core.parser.Lexer;
-import xyz.lebster.core.parser.Parser;
+import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.EvalError;
 import xyz.lebster.core.runtime.value.error.TypeError;
@@ -14,7 +12,7 @@ import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 import xyz.lebster.core.runtime.value.prototype.ShadowRealmPrototype;
 
 public final class ShadowRealm extends ObjectValue {
-	private final Interpreter internalInterpreter = new Interpreter();
+	private final Realm realm = new Realm(new Interpreter());
 
 	public ShadowRealm() {
 		this.putMethod("evaluate", (Interpreter interpreter, Value<?>[] arguments) -> {
@@ -36,7 +34,7 @@ public final class ShadowRealm extends ObjectValue {
 			final String name = arguments[0].toStringValue(interpreter).value;
 			final Value<?> value = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
 
-			this.internalInterpreter.declareVariable(name, value);
+			this.realm.interpreter().declareVariable(name, value);
 			return UndefinedValue.instance;
 		});
 	}
@@ -48,8 +46,7 @@ public final class ShadowRealm extends ObjectValue {
 
 	private Value<?> evaluate(String sourceText) throws AbruptCompletion {
 		try {
-			final Program program = new Parser(new Lexer(sourceText).tokenize()).parse();
-			return program.execute(internalInterpreter);
+			return this.realm.execute(sourceText, false);
 		} catch (AbruptCompletion | SyntaxError | CannotParse e) {
 			throw AbruptCompletion.error(new EvalError(e));
 		}

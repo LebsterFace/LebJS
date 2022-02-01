@@ -377,9 +377,11 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 	@NonStandard
 	public static final class Property {
 		private boolean writable;
+		private boolean enumerable;
 		private Value<?> value;
 
 		public Property(boolean writable, Value<?> value) {
+			this.enumerable = false;
 			this.writable = writable;
 			this.value = value;
 		}
@@ -390,6 +392,14 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 
 		private void setWritable(boolean writable) {
 			this.writable = writable;
+		}
+
+		public boolean isEnumerable() {
+			return enumerable;
+		}
+
+		public void setEnumerable(boolean enumerable) {
+			this.enumerable = enumerable;
 		}
 
 		private Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {

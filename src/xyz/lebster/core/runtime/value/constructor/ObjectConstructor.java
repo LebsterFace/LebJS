@@ -8,6 +8,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.NullValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
@@ -23,10 +24,31 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 		instance.putMethod("setPrototypeOf", ObjectConstructor::setPrototypeOf);
 		instance.putMethod("getPrototypeOf", ObjectConstructor::getPrototypeOf);
 		instance.putMethod("create", ObjectConstructor::create);
+		instance.putMethod("keys", ObjectConstructor::keys);
+		instance.putMethod("values", ObjectConstructor::values);
+		instance.putMethod("entries", ObjectConstructor::entries);
 	}
 
 	private ObjectConstructor() {
 		super();
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.keys")
+	private static Value<?> keys(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		final ObjectValue obj = (args.length > 0 ? args[0] : UndefinedValue.instance).toObjectValue(interpreter);
+		return new ArrayObject(obj.enumerableOwnKeys());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.values")
+	private static Value<?> values(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		final ObjectValue obj = (args.length > 0 ? args[0] : UndefinedValue.instance).toObjectValue(interpreter);
+		return new ArrayObject(obj.enumerableOwnValues(interpreter));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.entries")
+	private static Value<?> entries(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		final ObjectValue obj = (args.length > 0 ? args[0] : UndefinedValue.instance).toObjectValue(interpreter);
+		return new ArrayObject(obj.enumerableOwnEntries(interpreter));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.create")

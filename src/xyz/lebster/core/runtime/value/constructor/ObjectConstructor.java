@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime.value.constructor;
 
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -21,10 +22,19 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 
 		instance.putMethod("setPrototypeOf", ObjectConstructor::setPrototypeOf);
 		instance.putMethod("getPrototypeOf", ObjectConstructor::getPrototypeOf);
+		instance.putMethod("create", ObjectConstructor::create);
 	}
 
 	private ObjectConstructor() {
 		super();
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.create")
+	@NonCompliant
+	private static Value<?> create(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// Object.create ( O, Properties )
+		final Value<?> O = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
+		return ObjectValue.createFromPrototype(O);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.setprototypeof")

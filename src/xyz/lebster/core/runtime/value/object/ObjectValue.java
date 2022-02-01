@@ -53,6 +53,22 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		return this.prototypeSlot;
 	}
 
+	protected static ObjectValue createFromPrototype(Value<?> O) throws AbruptCompletion {
+		ObjectValue prototype;
+		if (O == NullValue.instance) {
+			prototype = null;
+		} else if (O instanceof final ObjectValue O_obj) {
+			prototype = O_obj;
+		} else {
+			// 1. If Type(O) is neither Object nor Null, throw a TypeError exception.
+			throw AbruptCompletion.error(new TypeError("Object prototype may only be an Object or null"));
+		}
+
+		final var result = new ObjectValue();
+		result.prototypeSlot = prototype;
+		return result;
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarysetprototypeof")
 	public final boolean setPrototype(ObjectValue V) {
 		// 1. Let current be O.[[Prototype]].

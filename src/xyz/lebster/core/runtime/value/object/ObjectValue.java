@@ -17,9 +17,7 @@ import xyz.lebster.core.runtime.value.native_.NativeProperty;
 import xyz.lebster.core.runtime.value.primitive.*;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Property>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
@@ -290,6 +288,77 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 
 	public boolean hasOwnProperty(Key<?> key) {
 		return this.value.containsKey(key);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
+	// The spec defines these three methods in EnumerableOwnPropertyNames
+	// They have been split for clarity
+	public StringValue[] enumerableOwnKeys() {
+		// 2. Let properties be a new empty List.
+		final List<StringValue> properties = new ArrayList<>();
+		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
+		// 3. For each element key of ownKeys, do
+		for (final Map.Entry<Key<?>, Property> entry : this.value.entrySet()) {
+			// a. If Type(key) is String, then
+			if (entry.getKey() instanceof final StringValue key_string) {
+				// i. Let desc be ? O.[[GetOwnProperty]](key).
+				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
+				if (entry.getValue().isEnumerable()) {
+					// 1. If kind is key, append key to properties.
+					properties.add(key_string);
+				}
+			}
+		}
+
+		// 4. Return properties.
+		return properties.toArray(new StringValue[0]);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
+	public Value<?>[] enumerableOwnValues(Interpreter interpreter) throws AbruptCompletion {
+		// 2. Let properties be a new empty List.
+		final List<Value<?>> properties = new ArrayList<>();
+		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
+		// 3. For each element key of ownKeys, do
+		for (final Map.Entry<Key<?>, Property> entry : this.value.entrySet()) {
+			// a. If Type(key) is String, then
+			if (entry.getKey().type == Type.String) {
+				// i. Let desc be ? O.[[GetOwnProperty]](key).
+				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
+				if (entry.getValue().isEnumerable()) {
+					// a. Let value be ? Get(O, key).
+					final Value<?> value = entry.getValue().getValue(interpreter);
+					// b. If kind is value, append value to properties.
+					properties.add(value);
+				}
+			}
+		}
+
+		// 4. Return properties.
+		return properties.toArray(new Value[0]);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
+	public ArrayObject[] enumerableOwnEntries(Interpreter interpreter) throws AbruptCompletion {
+		// 2. Let properties be a new empty List.
+		final List<ArrayObject> properties = new ArrayList<>();
+		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
+		// 3. For each element key of ownKeys, do
+		for (final Map.Entry<Key<?>, Property> entry : this.value.entrySet()) {
+			// a. If Type(key) is String, then
+			if (entry.getKey().type == Type.String) {
+				// i. Let desc be ? O.[[GetOwnProperty]](key).
+				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
+				if (entry.getValue().isEnumerable()) {
+					// ii. Let entry be ! CreateArrayFromList(« key, value »).
+					// iii. Append entry to properties.
+					properties.add(new ArrayObject(entry.getKey(), entry.getValue().getValue(interpreter)));
+				}
+			}
+		}
+
+		// 4. Return properties.
+		return properties.toArray(new ArrayObject[0]);
 	}
 
 	@Override

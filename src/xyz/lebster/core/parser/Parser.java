@@ -366,8 +366,11 @@ public final class Parser {
 
 	private String[] parseStringList() {
 		final List<String> result = new ArrayList<>();
+		consumeAllLineTerminators();
 		while (state.currentToken.type == TokenType.Identifier) {
+			consumeAllLineTerminators();
 			result.add(state.consume().value);
+			consumeAllLineTerminators();
 			if (state.accept(TokenType.Comma) == null) break;
 		}
 

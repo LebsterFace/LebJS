@@ -6,7 +6,9 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.StringConstructor;
+import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.object.StringWrapper;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
 
@@ -22,6 +24,7 @@ public final class StringPrototype extends ObjectValue {
 		instance.putMethod("reverse", StringPrototype::reverse);
 		instance.putMethod("slice", StringPrototype::slice);
 		instance.putMethod("charAt", StringPrototype::charAt);
+		instance.putMethod("valueOf", StringPrototype::valueOf);
 	}
 
 	private StringPrototype() {
@@ -94,9 +97,31 @@ public final class StringPrototype extends ObjectValue {
 		return new StringValue(S.value.substring(from, to));
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.valueof")
+	private static StringValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 1. Return ? thisStringValue(this value).
+		return thisStringValue(interpreter.thisValue());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#thisstringvalue")
+	private static StringValue thisStringValue(Value<?> value) throws AbruptCompletion {
+		// 1. If Type(value) is String, return value.
+		if (value instanceof final StringValue stringValue) return stringValue;
+		// 2. If Type(value) is Object and value has a [[StringData]] internal slot, then
+		if (value instanceof final StringWrapper stringWrapper) {
+			// a. Let s be value.[[StringData]].
+			// b. Assert: Type(s) is String.
+			// c. Return s.
+			return stringWrapper.data;
+		}
+
+		// 3. Throw a TypeError exception.
+		throw AbruptCompletion.error(new TypeError("This method requires that 'this' be a String"));
+	}
+
 	@NonStandard
 	private static StringValue reverse(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final String S = interpreter.thisValue().toStringValue(interpreter).value;
+		final String S = thisStringValue(interpreter.thisValue()).value;
 		return new StringValue(new StringBuilder(S).reverse().toString());
 	}
 }

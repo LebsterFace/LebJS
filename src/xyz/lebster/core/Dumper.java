@@ -37,7 +37,7 @@ public final class Dumper {
 
 	public static <T extends Enum<T>> void dumpEnum(int indent, T value) {
 		dumpIndent(indent);
-		System.out.printf("%s%s[%s]%s%n", ANSI.BRIGHT_RED, value.getClass().getSimpleName(), value, ANSI.RESET);
+		System.out.printf("%s%s %s%s%s%n", ANSI.BRIGHT_RED, value.getClass().getSimpleName(), ANSI.BRIGHT_YELLOW, value, ANSI.RESET);
 	}
 
 	public static <T extends Enum<T>> void dumpEnum(int indent, String indicator, T value) {

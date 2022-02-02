@@ -2,9 +2,13 @@
 expect("321", "123".reverse());
 
 // String prototype
-let sproto = Object.getPrototypeOf("123");
-expect(Object.getPrototypeOf(""), sproto);
+let StringPrototype = Object.getPrototypeOf("123");
+expect(Object.getPrototypeOf(""), StringPrototype);
+expect(String.prototype, StringPrototype);
+expect(String.prototype.reverse, "123".reverse)
+expect(String.prototype.reverse, StringPrototype.reverse)
 
 // Object prototype
-let oproto = Object.getPrototypeOf({});
-expect(oproto, Object.getPrototypeOf(sproto));
+let ObjectPrototype = Object.getPrototypeOf({});
+expect(ObjectPrototype, Object.getPrototypeOf(StringPrototype));
+expect(Object.prototype, ObjectPrototype)

@@ -8,6 +8,10 @@ import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.runtime.value.Value;
 
 public record Realm(Interpreter interpreter) {
+	public static void executeStatic(String sourceText, boolean dumpAST) throws CannotParse, AbruptCompletion, SyntaxError {
+		new Realm(new Interpreter()).execute(sourceText, dumpAST);
+	}
+
 	public Program parse(String sourceText) throws SyntaxError, CannotParse {
 		return new Parser(new Lexer(sourceText).tokenize()).parse();
 	}
@@ -20,9 +24,5 @@ public record Realm(Interpreter interpreter) {
 			System.out.println("------- END -------");
 		}
 		return program.execute(interpreter);
-	}
-
-	public static void executeStatic(String sourceText, boolean dumpAST) throws CannotParse, AbruptCompletion, SyntaxError {
-		new Realm(new Interpreter()).execute(sourceText, dumpAST);
 	}
 }

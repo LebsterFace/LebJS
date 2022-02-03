@@ -42,15 +42,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		}
 	}
 
-	public ObjectValue getDefaultPrototype() {
-		return ObjectPrototype.instance;
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarygetprototypeof")
-	public final ObjectValue getPrototype() {
-		return this.prototypeSlot;
-	}
-
 	protected static ObjectValue createFromPrototype(Value<?> O) throws AbruptCompletion {
 		ObjectValue prototype;
 		if (O == NullValue.instance) {
@@ -65,6 +56,15 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		final var result = new ObjectValue();
 		result.prototypeSlot = prototype;
 		return result;
+	}
+
+	public ObjectValue getDefaultPrototype() {
+		return ObjectPrototype.instance;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarygetprototypeof")
+	public final ObjectValue getPrototype() {
+		return this.prototypeSlot;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarysetprototypeof")

@@ -32,13 +32,13 @@ public record IdentifierExpression(String value) implements LeftHandSideExpressi
 			}
 
 			// 4. Else,
-				// a. Let outer be env.[[OuterEnv]].
+			// a. Let outer be env.[[OuterEnv]].
 			env = env.parent();
 			// (Recursive call)
 		}
 
 		// 1. If env is the value null, then
-			// a. Return the Reference Record { base: unresolvable, referencedName: name }.
+		// a. Return the Reference Record { base: unresolvable, referencedName: name }.
 		return new Reference(null, name);
 	}
 

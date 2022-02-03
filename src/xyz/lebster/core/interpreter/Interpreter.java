@@ -1,5 +1,6 @@
 package xyz.lebster.core.interpreter;
 
+import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.RangeError;
@@ -29,6 +30,8 @@ public final class Interpreter {
 		return this.mode == Mode.Checked;
 	}
 
+	@NonStandard
+	// FIXME: Environment records
 	public void declareVariable(String name, Value<?> value) throws AbruptCompletion {
 		lexicalEnvironment().setVariable(this, new StringValue(name), value);
 	}
@@ -47,10 +50,6 @@ public final class Interpreter {
 		}
 
 		executionContextStack[currentExecutionContext--] = null;
-	}
-
-	public ExecutionContext getExecutionContext() {
-		return executionContextStack[currentExecutionContext];
 	}
 
 	public Value<?> thisValue() {
@@ -87,5 +86,5 @@ public final class Interpreter {
 		return context;
 	}
 
-	private enum Mode { Normal, Strict, Checked; }
+	private enum Mode { Normal, Strict, Checked }
 }

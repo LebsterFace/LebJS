@@ -24,14 +24,21 @@ public record IdentifierExpression(String value) implements LeftHandSideExpressi
 
 		LexicalEnvironment env = interpreter.lexicalEnvironment();
 		while (env != null) {
+			// 2. Let exists be ? env.HasBinding(name).
 			if (env.hasBinding(name)) {
+				// 3. If exists is true, then
+				// a. Return the Reference Record { base: env, referencedName: name }.
 				return new Reference(env.variables(), name);
 			}
 
+			// 4. Else,
+				// a. Let outer be env.[[OuterEnv]].
 			env = env.parent();
+			// (Recursive call)
 		}
 
-		// Unresolvable reference
+		// 1. If env is the value null, then
+			// a. Return the Reference Record { base: unresolvable, referencedName: name }.
 		return new Reference(null, name);
 	}
 

@@ -19,7 +19,7 @@ public final class Interpreter {
 		this.stackSize = 32;
 		this.executionContextStack = new ExecutionContext[stackSize];
 		this.executionContextStack[0] = new ExecutionContext(new LexicalEnvironment(globalObject, null), globalObject);
-		this.mode = Mode.Checked;
+		this.mode = Mode.Strict;
 	}
 
 	public boolean isStrictMode() {

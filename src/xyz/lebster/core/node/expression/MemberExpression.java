@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
 
 public record MemberExpression(Expression base, Expression property,
 							   boolean computed) implements LeftHandSideExpression {
@@ -27,7 +27,7 @@ public record MemberExpression(Expression base, Expression property,
 	@Override
 	public Reference toReference(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> executedBase = base.execute(interpreter);
-		final StringValue executedProp = property.execute(interpreter).toStringValue(interpreter);
+		final ObjectValue.Key<?> executedProp = property.execute(interpreter).toPropertyKey(interpreter);
 
 		if (executedBase.isNullish()) {
 			final String msg = "Cannot read property '" + executedProp.value + "' of " + executedBase;

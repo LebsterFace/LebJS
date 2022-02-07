@@ -40,13 +40,14 @@ public final class GlobalObject extends ObjectValue {
 		putMethod("parseInt", GlobalObject::parseInt);
 
 		// 19.3 Constructor Properties of the Global Object
-		put(Names.Math, MathObject.instance);
-		put(Names.Object, ObjectConstructor.instance);
 		put(Names.Array, ArrayConstructor.instance);
-		put(Names.String, StringConstructor.instance);
-		put(Names.Number, NumberConstructor.instance);
 		put(Names.Boolean, BooleanConstructor.instance);
+		put(Names.Math, MathObject.instance);
+		put(Names.Number, NumberConstructor.instance);
+		put(Names.Object, ObjectConstructor.instance);
 		put(Names.ShadowRealm, ShadowRealmConstructor.instance);
+		put(Names.String, StringConstructor.instance);
+		put(Names.Symbol, SymbolConstructor.instance);
 
 		// Non-Standard properties
 		putMethod("expect", GlobalObject::expect);

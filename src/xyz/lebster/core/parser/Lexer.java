@@ -13,11 +13,10 @@ public final class Lexer {
 
 	static {
 		keywords.put("await", TokenType.Await);
-		keywords.put("let", TokenType.Let);
 		keywords.put("break", TokenType.Break);
 		keywords.put("case", TokenType.Case);
 		keywords.put("catch", TokenType.Catch);
-		keywords.put("final class", TokenType.Class);
+		keywords.put("class", TokenType.Class);
 		keywords.put("const", TokenType.Const);
 		keywords.put("continue", TokenType.Continue);
 		keywords.put("debugger", TokenType.Debugger);
@@ -25,8 +24,10 @@ public final class Lexer {
 		keywords.put("delete", TokenType.Delete);
 		keywords.put("do", TokenType.Do);
 		keywords.put("else", TokenType.Else);
+		keywords.put("enum", TokenType.Enum);
 		keywords.put("export", TokenType.Export);
 		keywords.put("extends", TokenType.Extends);
+		keywords.put("false", TokenType.False);
 		keywords.put("finally", TokenType.Finally);
 		keywords.put("for", TokenType.For);
 		keywords.put("function", TokenType.Function);
@@ -34,6 +35,7 @@ public final class Lexer {
 		keywords.put("import", TokenType.Import);
 		keywords.put("in", TokenType.In);
 		keywords.put("instanceof", TokenType.Instanceof);
+		keywords.put("let", TokenType.Let);
 		keywords.put("new", TokenType.New);
 		keywords.put("null", TokenType.Null);
 		keywords.put("return", TokenType.Return);
@@ -41,6 +43,7 @@ public final class Lexer {
 		keywords.put("switch", TokenType.Switch);
 		keywords.put("this", TokenType.This);
 		keywords.put("throw", TokenType.Throw);
+		keywords.put("true", TokenType.True);
 		keywords.put("try", TokenType.Try);
 		keywords.put("typeof", TokenType.Typeof);
 		keywords.put("var", TokenType.Var);
@@ -235,13 +238,9 @@ public final class Lexer {
 			return new Token(TokenType.LineTerminator, start, index);
 		} else if (isIdentifierStart()) {
 			while (isIdentifierMiddle()) collect();
-
 			final String value = builder.toString();
-			if (value.equals("true") || value.equals("false")) {
-				return new Token(TokenType.BooleanLiteral, value, start, index);
-			} else {
-				return new Token(keywords.getOrDefault(value, TokenType.Identifier), value, start, index);
-			}
+			final TokenType type = keywords.getOrDefault(value, TokenType.Identifier);
+			return new Token(type, value, start, index);
 		} else if (currentChar == '"' || currentChar == '\'') {
 			// FIXME: Template strings
 			final char stringType = currentChar;

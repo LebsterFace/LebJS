@@ -1,7 +1,7 @@
 package xyz.lebster.core.parser;
 
 public enum TokenType {
-	Bang, BooleanLiteral, Break, Case, Catch, Class, Comma, Const, Continue, Debugger, Default, Delete, Slash, Do, EOF,
+	Bang, Break, Case, Catch, Class, Comma, Const, Continue, Debugger, Default, Delete, Slash, Do, EOF,
 	Else, Equals, Export, Extends, Finally, For, Function, Identifier, If, Import, In, Instanceof, LBrace, LBracket,
 	LParen, Let, Minus, Star, New, NumericLiteral, Period, Plus, RBrace, RBracket, RParen, Return, Semicolon,
 	StringLiteral, Super, Switch, LineTerminator, This, Throw, Try, Typeof, Var, Void, While, With, Yield, Null, Undefined,
@@ -10,5 +10,5 @@ public enum TokenType {
 	LogicalAnd, AmpersandEquals, PercentEquals, CaretEquals, PlusPlus, PlusEquals, LeftShift, LessThanEqual, LooseEqual,
 	Arrow, GreaterThanEqual, RightShift, PipeEquals, LogicalOr, StrictNotEqual, NullishCoalescingEquals, ExponentEquals,
 	LogicalAndEquals, RightShiftEquals, UnsignedRightShift, LogicalOrEquals, Infinity, QuestionMark, Await, Colon,
-	Backslash, DotDotDot,
+	Backslash, DotDotDot, Enum, False, True
 }

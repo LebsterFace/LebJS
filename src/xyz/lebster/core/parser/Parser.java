@@ -611,7 +611,17 @@ public final class Parser {
 
 			case StringLiteral -> new StringLiteral(new StringValue(state.consume().value));
 			case NumericLiteral -> new NumericLiteral(new NumberValue(Double.parseDouble(state.consume().value)));
-			case BooleanLiteral -> new BooleanLiteral(BooleanValue.of(state.consume().value.equals("true")));
+
+			case True -> {
+				state.consume();
+				yield new BooleanLiteral(BooleanValue.TRUE);
+			}
+
+			case False -> {
+				state.consume();
+				yield new BooleanLiteral(BooleanValue.FALSE);
+			}
+
 			case Await -> throw new NotImplemented("Parsing `await` expressions");
 
 			case Function -> parseFunctionExpression();
@@ -725,6 +735,8 @@ public final class Parser {
 	private boolean matchIdentifierName() {
 		final TokenType t = state.currentToken.type;
 		return t == TokenType.Let ||
+			   t == TokenType.Identifier ||
+			   t == TokenType.Await ||
 			   t == TokenType.Break ||
 			   t == TokenType.Case ||
 			   t == TokenType.Catch ||
@@ -736,8 +748,10 @@ public final class Parser {
 			   t == TokenType.Delete ||
 			   t == TokenType.Do ||
 			   t == TokenType.Else ||
+			   t == TokenType.Enum ||
 			   t == TokenType.Export ||
 			   t == TokenType.Extends ||
+			   t == TokenType.False ||
 			   t == TokenType.Finally ||
 			   t == TokenType.For ||
 			   t == TokenType.Function ||
@@ -752,15 +766,14 @@ public final class Parser {
 			   t == TokenType.Switch ||
 			   t == TokenType.This ||
 			   t == TokenType.Throw ||
+			   t == TokenType.True ||
 			   t == TokenType.Try ||
 			   t == TokenType.Typeof ||
 			   t == TokenType.Var ||
 			   t == TokenType.Void ||
 			   t == TokenType.While ||
 			   t == TokenType.With ||
-			   t == TokenType.Yield ||
-			   t == TokenType.BooleanLiteral ||
-			   t == TokenType.Identifier;
+			   t == TokenType.Yield;
 	}
 
 	private boolean matchDeclaration() {
@@ -793,7 +806,6 @@ public final class Parser {
 			   t == TokenType.Export ||
 			   t == TokenType.Debugger ||
 			   t == TokenType.Semicolon;
-
 	}
 
 	private boolean matchPrimaryExpression() {
@@ -802,7 +814,8 @@ public final class Parser {
 			   t == TokenType.Identifier ||
 			   t == TokenType.StringLiteral ||
 			   t == TokenType.NumericLiteral ||
-			   t == TokenType.BooleanLiteral ||
+			   t == TokenType.True ||
+			   t == TokenType.False ||
 			   t == TokenType.Function ||
 			   t == TokenType.LBracket ||
 			   t == TokenType.LBrace ||

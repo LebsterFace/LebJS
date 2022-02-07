@@ -19,6 +19,6 @@ public final class Token {
 
 	@Override
 	public String toString() {
-		return value == null ? String.valueOf(type) : type + ": \"" + StringEscapeUtils.escape(value) + '"';
+		return value == null ? String.valueOf(type) : '"' + StringEscapeUtils.escape(value) + "\" (" + type + ")";
 	}
 }

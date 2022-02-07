@@ -1,7 +1,8 @@
 function expectToBeCloseTo(expected, received) {
     let difference = expected - received;
     if (difference < 0) difference = -difference;
-    expect(difference > 0.000001, false);
+    if (difference > 0.000001)
+        expect(expected, received)
 }
 
 expectToBeCloseTo(Math.E, 2.718281);

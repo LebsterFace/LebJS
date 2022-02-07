@@ -11,9 +11,6 @@ import xyz.lebster.core.runtime.value.object.ObjectValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-language-types-symbol-type")
 public final class SymbolValue extends ObjectValue.Key<Void> {
-	private static int LAST_UNUSED_IDENTIFIER = 0;
-	private final int UNIQUE_ID = LAST_UNUSED_IDENTIFIER++;
-
 	// https://tc39.es/ecma262/multipage#table-well-known-symbols
 
 	/**
@@ -79,6 +76,9 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 	 * from the with environment bindings of the associated object.
 	 */
 	public static final SymbolValue unscopables = new SymbolValue("Symbol.unscopables");
+
+	private static int LAST_UNUSED_IDENTIFIER = 0;
+	private final int UNIQUE_ID = LAST_UNUSED_IDENTIFIER++;
 	private final String description;
 
 	public SymbolValue(String description) {

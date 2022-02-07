@@ -339,7 +339,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		return properties.toArray(new Value[0]);
 	}
 
-	public record IteratorRecord(ObjectValue iterator, Value<?> nextMethod, boolean done) {}
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
 	@NonCompliant
 	public final IteratorRecord getIterator(Interpreter interpreter) throws AbruptCompletion {
@@ -356,7 +355,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		// 7. Return iteratorRecord.
 		return new IteratorRecord(iterator, nextMethod, false);
 	}
-
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
 	public ArrayObject[] enumerableOwnEntries(Interpreter interpreter) throws AbruptCompletion {
@@ -451,6 +449,9 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		}
 
 		representation.append('}');
+	}
+
+	public record IteratorRecord(ObjectValue iterator, Value<?> nextMethod, boolean done) {
 	}
 
 	public static abstract class Key<R> extends PrimitiveValue<R> {

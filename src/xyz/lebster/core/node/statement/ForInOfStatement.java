@@ -27,7 +27,8 @@ public record ForInOfStatement(LeftHandSideExpression left, Expression right, St
 
 		while (true) {
 			final Value<?> nextResult = Executable.getExecutable(record.nextMethod()).call(interpreter, record.iterator());
-			if (!(nextResult instanceof ObjectValue next)) throw AbruptCompletion.error(new TypeError("Iterator result is not an object"));
+			if (!(nextResult instanceof ObjectValue next))
+				throw AbruptCompletion.error(new TypeError("Iterator result is not an object"));
 			if (next.get(interpreter, Names.done).toBooleanValue(interpreter).value) break;
 
 			left_reference.putValue(interpreter, next.get(interpreter, Names.value));

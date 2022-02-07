@@ -1,6 +1,7 @@
 package xyz.lebster.core.runtime.value.object;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -337,6 +338,25 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		// 4. Return properties.
 		return properties.toArray(new Value[0]);
 	}
+
+	public record IteratorRecord(ObjectValue iterator, Value<?> nextMethod, boolean done) {}
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
+	@NonCompliant
+	public final IteratorRecord getIterator(Interpreter interpreter) throws AbruptCompletion {
+		// b. Otherwise, set method to ? GetMethod(obj, @@iterator).
+		final Value<?> method = this.get(interpreter, SymbolValue.iterator);
+		// 3. Let iterator be ? Call(method, obj).
+		final Value<?> iterator_V = Executable.getExecutable(method).call(interpreter, this);
+		// 4. If Type(iterator) is not Object, throw a TypeError exception.
+		if (!(iterator_V instanceof final ObjectValue iterator))
+			throw AbruptCompletion.error(new TypeError("Result of the Symbol.iterator method is not an object"));
+		// 5. Let nextMethod be ? GetV(iterator, "next").
+		final Value<?> nextMethod = iterator.get(interpreter, Names.next);
+		// 6. Let iteratorRecord be the Record { [[Iterator]]: iterator, [[NextMethod]]: nextMethod, [[Done]]: false }.
+		// 7. Return iteratorRecord.
+		return new IteratorRecord(iterator, nextMethod, false);
+	}
+
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
 	public ArrayObject[] enumerableOwnEntries(Interpreter interpreter) throws AbruptCompletion {

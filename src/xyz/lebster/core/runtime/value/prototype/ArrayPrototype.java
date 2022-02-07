@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime.value.prototype;
 
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -8,11 +9,10 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.ArrayConstructor;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Executable;
+import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.primitive.NumberValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.*;
 
 public final class ArrayPrototype extends ObjectValue {
 	public static final ArrayPrototype instance = new ArrayPrototype();
@@ -25,9 +25,19 @@ public final class ArrayPrototype extends ObjectValue {
 		instance.putMethod(Names.join, ArrayPrototype::join);
 		instance.putMethod(Names.toString, ArrayPrototype::toStringMethod);
 		instance.putMethod("forEach", ArrayPrototype::forEach);
+
+		final var values = new NativeFunction(Names.values, ArrayPrototype::values);
+		instance.put(Names.values, values);
+		instance.put(SymbolValue.iterator, values);
 	}
 
 	private ArrayPrototype() {
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.values")
+	@NonCompliant
+	private static Value<?> values(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		return new ArrayIterator(interpreter);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.foreach")
@@ -139,5 +149,23 @@ public final class ArrayPrototype extends ObjectValue {
 		}
 
 		return new ArrayObject(values);
+	}
+
+	private static class ArrayIterator extends ObjectValue {
+		private final ObjectValue O;
+		private final long len;
+		private int index;
+
+		public ArrayIterator(Interpreter $) throws AbruptCompletion {
+			this.O = $.thisValue().toObjectValue($);
+			this.len = lengthOfArrayLike(O, $);
+			this.index = 0;
+			this.putMethod(Names.next, (__, ___) -> {
+				final ObjectValue result = new ObjectValue();
+				result.put(Names.value, index > len ? UndefinedValue.instance : O.get($, new StringValue(index++)));
+				result.put(Names.done, BooleanValue.of(index > len));
+				return result;
+			});
+		}
 	}
 }

@@ -18,7 +18,8 @@ public record VariableDeclarator(String identifier, Expression init) implements 
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		interpreter.declareVariable(identifier, init.execute(interpreter));
+		final Value<?> value = init == null ? UndefinedValue.instance : init.execute(interpreter);
+		interpreter.declareVariable(identifier, value);
 		return UndefinedValue.instance;
 	}
 

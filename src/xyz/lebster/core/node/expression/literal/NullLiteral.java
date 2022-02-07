@@ -2,12 +2,12 @@ package xyz.lebster.core.node.expression.literal;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.primitive.NullValue;
+import xyz.lebster.core.runtime.value.primitive.Null;
 
-public final class NullLiteral implements Literal<NullValue> {
+public final class NullLiteral implements Literal<Null> {
 	@Override
-	public NullValue value() {
-		return NullValue.instance;
+	public Null value() {
+		return Null.instance;
 	}
 
 	@Override

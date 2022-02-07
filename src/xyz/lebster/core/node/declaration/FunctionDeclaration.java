@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Function;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 public final class FunctionDeclaration extends FunctionNode implements Declaration {
 	public FunctionDeclaration(BlockStatement body, String name, String... arguments) {
@@ -15,6 +15,6 @@ public final class FunctionDeclaration extends FunctionNode implements Declarati
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		interpreter.declareVariable(name, new Function(this, interpreter.lexicalEnvironment()));
-		return UndefinedValue.instance;
+		return Undefined.instance;
 	}
 }

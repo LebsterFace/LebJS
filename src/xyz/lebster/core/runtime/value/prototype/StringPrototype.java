@@ -10,7 +10,7 @@ import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.StringWrapper;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import static xyz.lebster.core.runtime.value.prototype.NumberPrototype.toIntegerOrInfinity;
 import static xyz.lebster.core.runtime.value.prototype.ObjectPrototype.requireObjectCoercible;
@@ -33,7 +33,7 @@ public final class StringPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charat")
 	private static StringValue charAt(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		// String.prototype.charAt ( pos )
-		final Value<?> pos = args.length > 0 ? args[0] : UndefinedValue.instance;
+		final Value<?> pos = args.length > 0 ? args[0] : Undefined.instance;
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.charAt");
 		// 2. Let S be ? ToString(O).
@@ -52,8 +52,8 @@ public final class StringPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.slice")
 	private static StringValue slice(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		// String.prototype.slice ( start, end )
-		final Value<?> start = args.length > 0 ? args[0] : UndefinedValue.instance;
-		final Value<?> end = args.length > 1 ? args[1] : UndefinedValue.instance;
+		final Value<?> start = args.length > 0 ? args[0] : Undefined.instance;
+		final Value<?> end = args.length > 1 ? args[1] : Undefined.instance;
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.slice");
 		// 2. Let S be ? ToString(O).
@@ -76,7 +76,7 @@ public final class StringPrototype extends ObjectValue {
 			from = Math.min(intStart, len);
 		}
 		// 8. If end is undefined, let intEnd be len; else let intEnd be ? ToIntegerOrInfinity(end).
-		final int intEnd = end == UndefinedValue.instance ? len : toIntegerOrInfinity(interpreter, end);
+		final int intEnd = end == Undefined.instance ? len : toIntegerOrInfinity(interpreter, end);
 		// 9. If intEnd is -∞, let `to` be 0.
 		final int to;
 		if (intEnd == Integer.MIN_VALUE) {

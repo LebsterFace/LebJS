@@ -6,13 +6,13 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 public record ForStatement(Statement init, Expression test, Expression update, Statement body) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		if (init != null) init.execute(interpreter);
-		final Value<?> result = UndefinedValue.instance;
+		final Value<?> result = Undefined.instance;
 
 		while (test.execute(interpreter).isTruthy(interpreter)) {
 			try {

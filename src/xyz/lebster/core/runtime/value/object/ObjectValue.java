@@ -45,7 +45,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 
 	protected static ObjectValue createFromPrototype(Value<?> O) throws AbruptCompletion {
 		ObjectValue prototype;
-		if (O == NullValue.instance) {
+		if (O == Null.instance) {
 			prototype = null;
 		} else if (O instanceof final ObjectValue O_obj) {
 			prototype = O_obj;
@@ -200,15 +200,15 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 	@NonStandard
 	public Value<?> getWellKnownSymbolOrUndefined(Interpreter interpreter, SymbolValue key) throws AbruptCompletion {
 		final Property property = this.getProperty(key);
-		return property == null ? UndefinedValue.instance : property.getValue(interpreter);
+		return property == null ? Undefined.instance : property.getValue(interpreter);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getmethod")
 	public Value<?> getMethod(Interpreter interpreter, SymbolValue P) throws AbruptCompletion {
 		final Value<?> func = this.getWellKnownSymbolOrUndefined(interpreter, P);
 		// 2. If func is either undefined or null, return undefined.
-		if (func == UndefinedValue.instance || func == NullValue.instance)
-			return UndefinedValue.instance;
+		if (func == Undefined.instance || func == Null.instance)
+			return Undefined.instance;
 		// 3. If IsCallable(func) is false, throw a TypeError exception.
 		if (!(func instanceof Executable<?>))
 			throw AbruptCompletion.error(new TypeError("Not a function!"));
@@ -226,7 +226,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 				representation.append(" does not exist on object.");
 				throw AbruptCompletion.error(new CheckedError(representation.toString()));
 			} else {
-				return UndefinedValue.instance;
+				return Undefined.instance;
 			}
 		}
 		return property.getValue(interpreter);

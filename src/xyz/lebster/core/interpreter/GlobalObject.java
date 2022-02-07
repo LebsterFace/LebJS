@@ -18,7 +18,7 @@ import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
 public final class GlobalObject extends ObjectValue {
@@ -30,7 +30,7 @@ public final class GlobalObject extends ObjectValue {
 
 		putNonWritable(Names.NaN, new NumberValue(Double.NaN));
 		putNonWritable(Names.Infinity, new NumberValue(Double.POSITIVE_INFINITY));
-		putNonWritable(Names.undefined, UndefinedValue.instance);
+		putNonWritable(Names.undefined, Undefined.instance);
 
 		// 19.2 Function Properties of the Global Object
 		putMethod("eval", GlobalObject::eval);
@@ -69,7 +69,7 @@ public final class GlobalObject extends ObjectValue {
 			// remove the first code unit from S.
 			S.deleteCharAt(0);
 		// 6. Let R be ℝ(? ToInt32(radix)).
-		final Value<?> radix = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
+		final Value<?> radix = arguments.length > 1 ? arguments[1] : Undefined.instance;
 		int R = radix.toNumberValue(interpreter).toInt32();
 		// 7. Let stripPrefix be true.
 		boolean stripPrefix = true;
@@ -175,6 +175,6 @@ public final class GlobalObject extends ObjectValue {
 			throw new ShouldNotHappen("Assertion failed.");
 		}
 
-		return UndefinedValue.instance;
+		return Undefined.instance;
 	}
 }

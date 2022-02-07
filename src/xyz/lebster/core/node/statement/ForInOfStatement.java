@@ -14,7 +14,7 @@ import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.ObjectValue.IteratorRecord;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 public record ForInOfStatement(LeftHandSideExpression left, Expression right, Statement body) implements Statement {
 	@Override
@@ -23,7 +23,7 @@ public record ForInOfStatement(LeftHandSideExpression left, Expression right, St
 		final Reference left_reference = left.toReference(interpreter);
 		final Value<?> right_value = right.execute(interpreter);
 		final IteratorRecord record = right_value.toObjectValue(interpreter).getIterator(interpreter);
-		Value<?> lastValue = UndefinedValue.instance;
+		Value<?> lastValue = Undefined.instance;
 
 		while (true) {
 			final Value<?> nextResult = Executable.getExecutable(record.nextMethod()).call(interpreter, record.iterator());

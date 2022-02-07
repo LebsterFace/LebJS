@@ -42,8 +42,8 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.foreach")
 	private static Value<?> forEach(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
-		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
+		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : Undefined.instance;
+		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : Undefined.instance;
 
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
@@ -70,7 +70,7 @@ public final class ArrayPrototype extends ObjectValue {
 			k = k + 1;
 		}
 		// 6. Return undefined.
-		return UndefinedValue.instance;
+		return Undefined.instance;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tostring")
@@ -133,8 +133,8 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.map")
 	private static Value<?> map(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
-		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
+		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : Undefined.instance;
+		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : Undefined.instance;
 
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		final long len = lengthOfArrayLike(O, interpreter);
@@ -162,7 +162,7 @@ public final class ArrayPrototype extends ObjectValue {
 			this.index = 0;
 			this.putMethod(Names.next, (__, ___) -> {
 				final ObjectValue result = new ObjectValue();
-				result.put(Names.value, index > len ? UndefinedValue.instance : O.get($, new StringValue(index++)));
+				result.put(Names.value, index > len ? Undefined.instance : O.get($, new StringValue(index++)));
 				result.put(Names.done, BooleanValue.of(index > len));
 				return result;
 			});

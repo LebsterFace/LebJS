@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.EvalError;
 import xyz.lebster.core.runtime.value.error.TypeError;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.ShadowRealmPrototype;
 
 public final class ShadowRealm extends ObjectValue {
@@ -17,7 +17,7 @@ public final class ShadowRealm extends ObjectValue {
 	public ShadowRealm() {
 		this.putMethod("evaluate", (Interpreter interpreter, Value<?>[] arguments) -> {
 			if (arguments.length == 0)
-				return UndefinedValue.instance;
+				return Undefined.instance;
 
 			final Value<?>[] results = new Value[arguments.length];
 			for (int i = 0; i < arguments.length; i++) {
@@ -32,10 +32,10 @@ public final class ShadowRealm extends ObjectValue {
 				throw AbruptCompletion.error(new TypeError("Missing variable name"));
 
 			final String name = arguments[0].toStringValue(interpreter).value;
-			final Value<?> value = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
+			final Value<?> value = arguments.length > 1 ? arguments[1] : Undefined.instance;
 
 			this.realm.interpreter().declareVariable(name, value);
-			return UndefinedValue.instance;
+			return Undefined.instance;
 		});
 	}
 

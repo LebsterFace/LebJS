@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.AppendableNode;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public record BlockStatement(List<Statement> children) implements Statement, App
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
 		try {
-			Value<?> lastValue = UndefinedValue.instance;
+			Value<?> lastValue = Undefined.instance;
 			for (ASTNode child : children)
 				lastValue = child.execute(interpreter);
 			return lastValue;

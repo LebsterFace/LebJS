@@ -9,7 +9,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op) implements Expression {
 	@Override
@@ -39,7 +39,7 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 				// 2. Perform ? GetValue(expr).
 				expression.execute(interpreter);
 				// 3. Return undefined.
-				yield UndefinedValue.instance;
+				yield Undefined.instance;
 			}
 
 			case Delete -> throw new NotImplemented("The `delete` operator");

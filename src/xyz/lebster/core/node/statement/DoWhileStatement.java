@@ -7,14 +7,14 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 
 public record DoWhileStatement(Statement body, Expression condition) implements Statement {
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-do-while-statement")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> result = UndefinedValue.instance;
+		final Value<?> result = Undefined.instance;
 
 		do {
 			try {

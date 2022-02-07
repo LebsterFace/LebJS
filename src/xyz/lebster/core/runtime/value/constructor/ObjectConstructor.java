@@ -10,9 +10,9 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.primitive.NullValue;
+import xyz.lebster.core.runtime.value.primitive.Null;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
@@ -38,7 +38,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.fromentries")
 	@NonCompliant
 	private static ObjectValue fromEntries(Interpreter $, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> arg = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
+		final Value<?> arg = arguments.length > 0 ? arguments[0] : Undefined.instance;
 		if (!(arg instanceof ArrayObject arrayObject))
 			throw AbruptCompletion.error(new TypeError("Object.fromEntries call with non-array"));
 
@@ -57,19 +57,19 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.keys")
 	private static Value<?> keys(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final ObjectValue obj = (args.length > 0 ? args[0] : UndefinedValue.instance).toObjectValue(interpreter);
+		final ObjectValue obj = (args.length > 0 ? args[0] : Undefined.instance).toObjectValue(interpreter);
 		return new ArrayObject(obj.enumerableOwnKeys());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.values")
 	private static Value<?> values(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final ObjectValue obj = (args.length > 0 ? args[0] : UndefinedValue.instance).toObjectValue(interpreter);
+		final ObjectValue obj = (args.length > 0 ? args[0] : Undefined.instance).toObjectValue(interpreter);
 		return new ArrayObject(obj.enumerableOwnValues(interpreter));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.entries")
 	private static Value<?> entries(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final ObjectValue obj = (args.length > 0 ? args[0] : UndefinedValue.instance).toObjectValue(interpreter);
+		final ObjectValue obj = (args.length > 0 ? args[0] : Undefined.instance).toObjectValue(interpreter);
 		return new ArrayObject(obj.enumerableOwnEntries(interpreter));
 	}
 
@@ -77,14 +77,14 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	@NonCompliant
 	private static Value<?> create(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// Object.create ( O, Properties )
-		final Value<?> O = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
+		final Value<?> O = arguments.length > 0 ? arguments[0] : Undefined.instance;
 		return ObjectValue.createFromPrototype(O);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.setprototypeof")
 	private static Value<?> setPrototypeOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> O = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
-		final Value<?> proto = arguments.length > 1 ? arguments[1] : UndefinedValue.instance;
+		final Value<?> O = arguments.length > 0 ? arguments[0] : Undefined.instance;
+		final Value<?> proto = arguments.length > 1 ? arguments[1] : Undefined.instance;
 
 		// 1. Set O to ? RequireObjectCoercible(O).
 		if (O.isNullish())
@@ -94,7 +94,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 		ObjectValue proto_objectValue = null;
 		if (proto instanceof final ObjectValue p) {
 			proto_objectValue = p;
-		} else if (proto != NullValue.instance) {
+		} else if (proto != Null.instance) {
 			throw AbruptCompletion.error(new TypeError("Object prototype may only be an Object or null"));
 		}
 
@@ -111,11 +111,11 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getprototypeof")
 	private static Value<?> getPrototypeOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> O = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
+		final Value<?> O = arguments.length > 0 ? arguments[0] : Undefined.instance;
 		// 1. Let obj be ? ToObject(O).
 		// 2. Return ? obj.[[GetPrototypeOf]]().
 		final ObjectValue prototype = O.toObjectValue(interpreter).getPrototype();
-		return prototype == null ? NullValue.instance : prototype;
+		return prototype == null ? Null.instance : prototype;
 	}
 
 	@Override

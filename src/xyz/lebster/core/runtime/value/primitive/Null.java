@@ -7,10 +7,10 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
-public final class NullValue extends PrimitiveValue<Void> {
-	public static final NullValue instance = new NullValue();
+public final class Null extends PrimitiveValue<Void> {
+	public static final Null instance = new Null();
 
-	private NullValue() {
+	private Null() {
 		super(null, Value.Type.Null);
 	}
 

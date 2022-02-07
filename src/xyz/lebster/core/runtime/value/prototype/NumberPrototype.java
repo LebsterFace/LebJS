@@ -11,7 +11,7 @@ import xyz.lebster.core.runtime.value.object.NumberWrapper;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 public final class NumberPrototype extends ObjectValue {
 	public static final NumberPrototype instance = new NumberPrototype();
@@ -70,7 +70,7 @@ public final class NumberPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tostring")
 	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> radix = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
+		final Value<?> radix = arguments.length > 0 ? arguments[0] : Undefined.instance;
 		// 1. Let x be ? thisNumberValue(this value).
 		final NumberValue x = thisNumberValue(interpreter.thisValue());
 		// 2. If radix is undefined, let radixMV be 10.

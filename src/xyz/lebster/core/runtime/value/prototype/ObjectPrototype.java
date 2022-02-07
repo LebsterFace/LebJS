@@ -48,9 +48,9 @@ public final class ObjectPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tostring")
 	public static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. If the `this` value is undefined, return "[object Undefined]".
-		if (interpreter.thisValue() == UndefinedValue.instance) {
+		if (interpreter.thisValue() == Undefined.instance) {
 			return new StringValue("[object Undefined]");
-		} else if (interpreter.thisValue() == NullValue.instance) {
+		} else if (interpreter.thisValue() == Null.instance) {
 			return new StringValue("[object Null]");
 		} else {// 3. Let O be ! ToObject(this value).
 			final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);

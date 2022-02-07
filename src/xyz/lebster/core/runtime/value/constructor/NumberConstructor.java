@@ -8,7 +8,7 @@ import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.NumberWrapper;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.NumberPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-constructor")
@@ -29,7 +29,7 @@ public class NumberConstructor extends BuiltinConstructor<NumberWrapper> {
 
 	@Override
 	public NumberValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
-		final Value<?> v = arguments.length == 0 ? UndefinedValue.instance : arguments[0];
+		final Value<?> v = arguments.length == 0 ? Undefined.instance : arguments[0];
 		return v.toNumberValue(interpreter);
 	}
 

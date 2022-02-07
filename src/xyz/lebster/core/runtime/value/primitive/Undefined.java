@@ -9,10 +9,10 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
-public final class UndefinedValue extends PrimitiveValue<Void> {
-	public static final UndefinedValue instance = new UndefinedValue();
+public final class Undefined extends PrimitiveValue<Void> {
+	public static final Undefined instance = new Undefined();
 
-	private UndefinedValue() {
+	private Undefined() {
 		super(null, Value.Type.Undefined);
 	}
 

@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.statement.Statement;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public record Program(List<Statement> children) implements AppendableNode {
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		Value<?> lastValue = UndefinedValue.instance;
+		Value<?> lastValue = Undefined.instance;
 		for (final ASTNode child : children)
 			lastValue = child.execute(interpreter);
 		return lastValue;

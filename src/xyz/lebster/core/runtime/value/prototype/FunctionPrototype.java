@@ -4,7 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Executable;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import java.util.Arrays;
 
@@ -15,7 +15,7 @@ public final class FunctionPrototype extends Executable<Void> {
 		// FIXME: FunctionConstructor
 		instance.putMethod("call", (interpreter, arguments) -> {
 			final Executable<?> func = Executable.getExecutable(interpreter.thisValue());
-			final Value<?> thisArg = arguments.length > 0 ? arguments[0] : UndefinedValue.instance;
+			final Value<?> thisArg = arguments.length > 0 ? arguments[0] : Undefined.instance;
 			final Value<?>[] args = Arrays.copyOfRange(arguments, 1, arguments.length);
 			return func.call(interpreter, thisArg, args);
 		});
@@ -32,7 +32,7 @@ public final class FunctionPrototype extends Executable<Void> {
 
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?>... arguments) {
-		return UndefinedValue.instance;
+		return Undefined.instance;
 	}
 
 	@Override

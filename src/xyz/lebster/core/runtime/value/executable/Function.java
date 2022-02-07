@@ -9,7 +9,7 @@ import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 public final class Function extends Constructor<FunctionNode> {
@@ -34,7 +34,7 @@ public final class Function extends Constructor<FunctionNode> {
 
 		try {
 			code.body.execute(interpreter);
-			return UndefinedValue.instance;
+			return Undefined.instance;
 		} catch (AbruptCompletion e) {
 			if (e.type != AbruptCompletion.Type.Return) throw e;
 			return e.value;

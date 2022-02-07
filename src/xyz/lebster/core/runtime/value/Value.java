@@ -72,9 +72,9 @@ public abstract class Value<JType> {
 	public boolean sameValueNonNumeric(Value<?> y) {
 		// 1. Assert: Type(x) is the same as Type(y).
 		// 2. If Type(x) is Undefined, return true.
-		if (this == UndefinedValue.instance) return true;
+		if (this == Undefined.instance) return true;
 		// 3. If Type(x) is Null, return true.
-		if (this == NullValue.instance) return true;
+		if (this == Null.instance) return true;
 
 		if (this.type == Value.Type.String)
 			// 4. If Type(x) is String, then

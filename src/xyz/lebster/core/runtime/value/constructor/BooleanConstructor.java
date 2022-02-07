@@ -8,7 +8,7 @@ import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.BooleanWrapper;
 import xyz.lebster.core.runtime.value.primitive.BooleanValue;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.BooleanPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-constructor")
@@ -29,7 +29,7 @@ public class BooleanConstructor extends BuiltinConstructor<BooleanWrapper> {
 
 	@Override
 	public BooleanValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
-		final Value<?> v = arguments.length == 0 ? UndefinedValue.instance : arguments[0];
+		final Value<?> v = arguments.length == 0 ? Undefined.instance : arguments[0];
 		return v.toBooleanValue(interpreter);
 	}
 

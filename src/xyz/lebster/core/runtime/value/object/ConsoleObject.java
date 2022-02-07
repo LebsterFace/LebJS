@@ -4,7 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 @SpecificationURL("https://console.spec.whatwg.org/")
 public final class ConsoleObject extends ObjectValue {
@@ -13,22 +13,22 @@ public final class ConsoleObject extends ObjectValue {
 	private ConsoleObject() {
 		putMethod("log", (interpreter, data) -> {
 			logger(LogLevel.Log, data);
-			return UndefinedValue.instance;
+			return Undefined.instance;
 		});
 
 		putMethod("warn", (interpreter, data) -> {
 			logger(LogLevel.Warn, data);
-			return UndefinedValue.instance;
+			return Undefined.instance;
 		});
 
 		putMethod("error", (interpreter, data) -> {
 			logger(LogLevel.Error, data);
-			return UndefinedValue.instance;
+			return Undefined.instance;
 		});
 
 		putMethod("info", (interpreter, data) -> {
 			logger(LogLevel.Info, data);
-			return UndefinedValue.instance;
+			return Undefined.instance;
 		});
 	}
 

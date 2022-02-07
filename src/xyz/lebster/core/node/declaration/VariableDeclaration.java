@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.CheckedError;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 public record VariableDeclaration(Kind kind, VariableDeclarator... declarations) implements Declaration {
 	@Override
@@ -25,7 +25,7 @@ public record VariableDeclaration(Kind kind, VariableDeclarator... declarations)
 
 		for (VariableDeclarator declarator : declarations)
 			declarator.execute(interpreter);
-		return UndefinedValue.instance;
+		return Undefined.instance;
 	}
 
 	@Override

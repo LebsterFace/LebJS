@@ -6,12 +6,12 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.UndefinedValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 public record ReturnStatement(Expression value) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> valueToReturn = value == null ? UndefinedValue.instance : value.execute(interpreter);
+		final Value<?> valueToReturn = value == null ? Undefined.instance : value.execute(interpreter);
 		throw new AbruptCompletion(valueToReturn, AbruptCompletion.Type.Return);
 	}
 

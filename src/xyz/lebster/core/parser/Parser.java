@@ -264,13 +264,50 @@ public final class Parser {
 		}
 	}
 
-	private ForStatement parseForStatement() throws SyntaxError, CannotParse {
-		// FIXME: For .. of & For .. in
+	private ForInOfStatement parseForOfStatement(VariableDeclaration declaration) throws SyntaxError, CannotParse {
+		// for ( LetOrConst ForBinding of AssignmentExpression ) Statement
+		if (declaration.declarations().length != 1)
+			throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.");
+		final VariableDeclarator declarator = declaration.declarations()[0];
+		if (declarator.init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.");
+		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), declarator.identifier());
+
+		state.require(TokenType.Identifier, "of");
+		final Expression expression = parseExpression();
+		state.require(TokenType.RParen);
+		final Statement body = parseContextualStatement(true, true);
+		return new ForInOfStatement(bindingPattern, expression, body);
+	}
+
+	private ForInOfStatement parseForOfStatement(Expression left_expression) throws SyntaxError, CannotParse {
+		// for ( LeftHandSideExpression of AssignmentExpression ) Statement
+		final LeftHandSideExpression lhs = ensureLHS(left_expression, "Invalid left-hand side in for-loop");
+		state.require(TokenType.Identifier, "of");
+		final Expression expression = parseExpression();
+		state.require(TokenType.RParen);
+		final Statement body = parseContextualStatement(true, true);
+		return new ForInOfStatement(lhs, expression, body);
+	}
+
+	private Statement parseForStatement() throws SyntaxError, CannotParse {
 		state.require(TokenType.For);
 		state.require(TokenType.LParen);
 
 		Statement init = null;
-		if (matchPrimaryExpression() || matchDeclaration()) init = parseAny();
+		if (state.currentToken.type != TokenType.Semicolon) {
+			if (matchVariableDeclaration()) {
+				// TODO: for_loop_variable_declaration
+				final var declaration = parseVariableDeclaration(/* true */);
+				if (state.match(TokenType.Identifier, "of")) return parseForOfStatement(declaration);
+				else init = declaration;
+			} else if (matchPrimaryExpression()) {
+				final var expression = parseExpression();
+				if (state.match(TokenType.Identifier, "of")) return parseForOfStatement(expression);
+				else init = new ExpressionStatement(expression);
+			} else {
+				state.unexpected();
+			}
+		}
 		state.require(TokenType.Semicolon);
 
 		final Expression test = matchPrimaryExpression() ? parseExpression() : null;
@@ -307,7 +344,7 @@ public final class Parser {
 		final BlockStatement body = parseBlockStatement();
 		state.require(TokenType.Catch);
 		state.require(TokenType.LParen);
-		final String parameter = state.require(TokenType.Identifier).value;
+		final String parameter = state.require(TokenType.Identifier);
 		state.require(TokenType.RParen);
 		final BlockStatement catchBody = parseBlockStatement();
 		return new TryStatement(body, new CatchClause(parameter, catchBody));
@@ -338,6 +375,7 @@ public final class Parser {
 	}
 
 	private VariableDeclaration parseVariableDeclaration() throws SyntaxError, CannotParse {
+		// TODO: Missing init in 'const' declaration
 		final var kind = switch (state.currentToken.type) {
 			case Var -> VariableDeclaration.Kind.Var;
 			case Let -> VariableDeclaration.Kind.Let;
@@ -352,9 +390,9 @@ public final class Parser {
 			if (state.currentToken.type == TokenType.LBrace || state.currentToken.type == TokenType.LBracket)
 				throw new NotImplemented("Parsing destructuring assignment");
 
-			final Token identifier = state.require(TokenType.Identifier);
+			final String identifier = state.require(TokenType.Identifier);
 			final Expression value = state.accept(TokenType.Equals) == null ? null : parseExpression();
-			declarators.add(new VariableDeclarator(identifier.value, value));
+			declarators.add(new VariableDeclarator(identifier, value));
 			consumeAllLineTerminators();
 			if (state.currentToken.type != TokenType.Comma) break;
 			state.consume();
@@ -410,7 +448,7 @@ public final class Parser {
 
 	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
-		final String name = state.require(TokenType.Identifier).value;
+		final String name = state.require(TokenType.Identifier);
 		final String[] arguments = parseFunctionArguments();
 		return new FunctionDeclaration(parseFunctionBody(), name, arguments);
 	}
@@ -882,5 +920,12 @@ public final class Parser {
 			   t == TokenType.Typeof ||
 			   t == TokenType.Void ||
 			   t == TokenType.Delete;
+	}
+
+	private boolean matchVariableDeclaration() {
+		final TokenType t = state.currentToken.type;
+		return t == TokenType.Var ||
+			   t == TokenType.Let ||
+			   t == TokenType.Const;
 	}
 }

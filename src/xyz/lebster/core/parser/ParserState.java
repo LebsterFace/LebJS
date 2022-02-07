@@ -19,16 +19,16 @@ public final class ParserState implements Cloneable {
 		this.index = index;
 	}
 
-	public void expected(TokenType t) throws SyntaxError {
-		throw new SyntaxError("Unexpected token " + currentToken.type + ". Expected " + t);
+	public void expected(TokenType type) throws SyntaxError {
+		throw new SyntaxError("Unexpected token " + currentToken + ". Expected " + type);
 	}
 
-	public void expected(String t) throws SyntaxError {
-		throw new SyntaxError("Unexpected token " + currentToken.type + ". Expected " + t);
+	public void expected(String value) throws SyntaxError {
+		throw new SyntaxError("Unexpected token " + currentToken + ". Expected '" + value + "'");
 	}
 
 	public void unexpected() throws SyntaxError {
-		throw new SyntaxError("Unexpected token " + currentToken.type + ".");
+		throw new SyntaxError("Unexpected token " + currentToken + ".");
 	}
 
 	Token consume() {
@@ -38,13 +38,23 @@ public final class ParserState implements Cloneable {
 		return oldToken;
 	}
 
-	Token require(TokenType t) throws SyntaxError {
-		if (currentToken.type != t) expected(t);
-		return consume();
+	String require(TokenType type) throws SyntaxError {
+		if (currentToken.type != type) expected(type);
+		return consume().value;
 	}
 
-	Token accept(TokenType t) {
-		return currentToken.type == t ? consume() : null;
+	void require(TokenType type, String value) throws SyntaxError {
+		if (currentToken.type != type) expected(type);
+		if (!currentToken.value.equals(value)) expected(value);
+		consume();
+	}
+
+	Token accept(TokenType type) {
+		return currentToken.type == type ? consume() : null;
+	}
+
+	boolean match(TokenType type, String value) {
+		return currentToken.type == type && currentToken.value.equals(value);
 	}
 
 	void consumeAll(TokenType t) {

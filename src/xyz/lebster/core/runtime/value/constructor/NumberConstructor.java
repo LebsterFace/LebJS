@@ -6,6 +6,8 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.object.NumberRange;
 import xyz.lebster.core.runtime.value.object.NumberWrapper;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
@@ -17,6 +19,24 @@ public class NumberConstructor extends BuiltinConstructor<NumberWrapper> {
 
 	static {
 		instance.putNonWritable(Names.prototype, NumberPrototype.instance);
+		instance.putMethod(Names.range, (interpreter, args) -> {
+			if (args.length == 0) throw AbruptCompletion.error(new TypeError("No end value was provided"));
+
+			final double first = args[0].toNumberValue(interpreter).value;
+			if (Double.isNaN(first))
+				throw AbruptCompletion.error(new TypeError("NaN passed as first argument of Number.range"));
+			if (args.length == 1) return new NumberRange(first);
+
+			final double second = args[1].toNumberValue(interpreter).value;
+			if (Double.isNaN(second))
+				throw AbruptCompletion.error(new TypeError("NaN passed as second argument of Number.range"));
+			if (args.length == 2) return new NumberRange(first, second);
+
+			final double third = args[2].toNumberValue(interpreter).value;
+			if (Double.isNaN(third))
+				throw AbruptCompletion.error(new TypeError("NaN passed as third argument of Number.range"));
+			return new NumberRange(first, second, third);
+		});
 	}
 
 	private NumberConstructor() {

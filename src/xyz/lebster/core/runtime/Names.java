@@ -13,6 +13,7 @@ public final class Names {
 	public static final StringValue name = new StringValue("name");
 	public static final StringValue next = new StringValue("next");
 	public static final StringValue prototype = new StringValue("prototype");
+	public static final StringValue range = new StringValue("range");
 	public static final StringValue toString = new StringValue("toString");
 	public static final StringValue value = new StringValue("value");
 	public static final StringValue valueOf = new StringValue("valueOf");

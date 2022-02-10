@@ -264,7 +264,7 @@ public final class Parser {
 		}
 	}
 
-	private ForInOfStatement parseForOfStatement(VariableDeclaration declaration) throws SyntaxError, CannotParse {
+	private ForOfStatement parseForOfStatement(VariableDeclaration declaration) throws SyntaxError, CannotParse {
 		// for ( LetOrConst ForBinding of AssignmentExpression ) Statement
 		if (declaration.declarations().length != 1)
 			throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.");
@@ -276,20 +276,21 @@ public final class Parser {
 		final Expression expression = parseExpression();
 		state.require(TokenType.RParen);
 		final Statement body = parseContextualStatement(true, true);
-		return new ForInOfStatement(bindingPattern, expression, body);
+		return new ForOfStatement(bindingPattern, expression, body);
 	}
 
-	private ForInOfStatement parseForOfStatement(Expression left_expression) throws SyntaxError, CannotParse {
+	private ForOfStatement parseForOfStatement(Expression left_expression) throws SyntaxError, CannotParse {
 		// for ( LeftHandSideExpression of AssignmentExpression ) Statement
 		final LeftHandSideExpression lhs = ensureLHS(left_expression, "Invalid left-hand side in for-loop");
 		state.require(TokenType.Identifier, "of");
 		final Expression expression = parseExpression();
 		state.require(TokenType.RParen);
 		final Statement body = parseContextualStatement(true, true);
-		return new ForInOfStatement(lhs, expression, body);
+		return new ForOfStatement(lhs, expression, body);
 	}
 
 	private Statement parseForStatement() throws SyntaxError, CannotParse {
+		// TODO: `for .. in`
 		state.require(TokenType.For);
 		state.require(TokenType.LParen);
 

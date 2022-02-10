@@ -63,7 +63,7 @@ public final class REPL {
 			if (result.length() != 0) result.append('\n');
 			final String line = readLine(indent);
 			if (line == null) return null;
-			final Token[] tokens = new Lexer(line).tokenize();
+			final Token[] tokens = new Lexer(line, false).tokenize();
 			for (final Token token : tokens) {
 				switch (token.type) {
 					case LParen, LBrace, LBracket -> indent++;

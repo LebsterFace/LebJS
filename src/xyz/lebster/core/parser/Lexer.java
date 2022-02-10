@@ -130,11 +130,25 @@ public final class Lexer {
 	private final int length;
 	private int index = -1;
 	private char currentChar = '\0';
+	private final boolean showOutput;
 
 	public Lexer(String source) {
 		this.source = source;
 		this.length = source.length();
+		this.showOutput = true;
 		consume();
+	}
+
+	public Lexer(String source, boolean showOutput) {
+		this.source = source;
+		this.length = source.length();
+		this.showOutput = showOutput;
+		consume();
+	}
+
+	private void output(String s) {
+		if (this.showOutput)
+			System.err.println(s);
 	}
 
 	public boolean isFinished() {
@@ -177,6 +191,11 @@ public final class Lexer {
 
 	private void collect() {
 		builder.append(consume());
+	}
+
+	private void append(char special) {
+		consume();
+		builder.append(special);
 	}
 
 	private void consumeWhitespace() {
@@ -245,9 +264,37 @@ public final class Lexer {
 			// FIXME: Template strings
 			final char stringType = currentChar;
 			consume();
-			// FIXME: Handle escape sequences
-			while (!isFinished() && currentChar != stringType) collect();
-			if (isFinished()) throw new SyntaxError("Unterminated string literal (index " + index + ")");
+
+			boolean escaped = false;
+			while (true) {
+				if (isFinished())
+					throw new SyntaxError("Unterminated string literal (index " + index + ")");
+
+				if (escaped) {
+					escaped = false;
+					switch (currentChar) {
+						case 'b' -> append('\b');
+						case 'n' -> append('\n');
+						case 't' -> append('\t');
+						case 'f' -> append('\f');
+						case 'r' -> append('\r');
+						case '\\' -> append('\\');
+
+						default -> {
+							output("Unnecessary escape '\\" + StringEscapeUtils.escape(Character.toString(currentChar)) + '\'');
+							collect();
+						}
+					}
+				} else if (currentChar == '\\') {
+					escaped = true;
+					consume();
+				} else if (currentChar == stringType) {
+					break;
+				} else {
+					collect();
+				}
+			}
+
 			consume();
 			return new Token(TokenType.StringLiteral, builder.toString(), start, index);
 		} else if (isDigit(currentChar)) {

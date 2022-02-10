@@ -7,6 +7,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Executable;
 
 public record CallExpression(Expression callee, Expression... arguments) implements Expression {
@@ -20,12 +21,22 @@ public record CallExpression(Expression callee, Expression... arguments) impleme
 		if (callee instanceof final MemberExpression memberExpression) {
 			// toReference is being used to handle executing the base, property, and lookup in one
 			final Reference reference = memberExpression.toReference(interpreter);
-			final Executable<?> executable = Executable.getExecutable(reference.getValue(interpreter));
+			final Executable<?> executable = getExecutable(reference.getValue(interpreter));
 			return executable.call(interpreter, reference.base(), executedArguments);
 		} else {
-			final Executable<?> executable = Executable.getExecutable(callee.execute(interpreter));
+			final Executable<?> executable = getExecutable(callee.execute(interpreter));
 			return executable.call(interpreter, executedArguments);
 		}
+	}
+
+	private Executable<?> getExecutable(Value<?> value) throws AbruptCompletion {
+		if (value instanceof final Executable<?> executable)
+			return executable;
+
+		final var representation = new StringRepresentation();
+		callee.represent(representation);
+		representation.append(" is not a function");
+		throw AbruptCompletion.error(new TypeError(representation.toString()));
 	}
 
 	@Override

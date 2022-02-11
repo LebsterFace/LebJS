@@ -534,6 +534,7 @@ public final class Parser {
 
 	private Expression parseExpression(int minPrecedence, Associativity assoc, Set<TokenType> forbidden) throws SyntaxError, CannotParse {
 		Expression latestExpr = parsePrimaryExpression();
+		consumeAllLineTerminators();
 
 		while (matchSecondaryExpression(forbidden)) {
 			final int newPrecedence = precedenceForTokenType(state.currentToken.type);

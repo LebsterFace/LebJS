@@ -37,7 +37,7 @@ public final class Main {
 				case File -> file(arguments);
 				case GIF -> gif();
 				case REPL -> new REPL(arguments.options()).run();
-				case Tests -> Testing.test(arguments.options());
+				case Tests -> Testing.test(arguments);
 			}
 		} catch (Throwable e) {
 			handleError(e, System.out, arguments.options().showStackTrace());

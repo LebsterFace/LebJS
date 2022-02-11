@@ -27,8 +27,9 @@ public final class Testing {
 			printStream.println(baos);
 	}
 
-	public static void test(CLArguments.ExecutionOptions options) {
-		final File[] files = new File("tests/").listFiles();
+	public static void test(CLArguments arguments) {
+		final File testingDirectory = arguments.filePathOrNull() == null ? new File("tests/") : arguments.filePathOrNull().toFile();
+		final File[] files = testingDirectory.listFiles();
 		if (files == null) throw new Error("Test directory not found!");
 
 		for (final File file : files) {
@@ -46,14 +47,14 @@ public final class Testing {
 			System.setOut(tempStream);
 
 			try {
-				Realm.executeStatic(Files.readString(file.toPath()), options.showAST());
+				Realm.executeStatic(Files.readString(file.toPath()), arguments.options().showAST());
 				successfulTests++;
 				printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", file.getName());
 				printTestOutput(passedStream, tempOutput);
 			} catch (Throwable throwable) {
 				printTestResult(failedStream, ANSI.BRIGHT_RED, "FAILED", file.getName());
 				printTestOutput(failedStream, tempOutput);
-				Main.handleError(throwable, failedStream, options.showStackTrace());
+				Main.handleError(throwable, failedStream, arguments.options().showStackTrace());
 			}
 
 			System.setOut(stdout);

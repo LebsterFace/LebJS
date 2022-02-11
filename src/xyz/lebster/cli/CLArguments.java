@@ -50,13 +50,21 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				case "h", "hide" -> showStackTrace = false;
 				case "p", "prompt" -> hidePrompt = true;
 
-				case "t", "test" -> mode = ExecutionMode.Tests;
+				case "t", "test" -> setMode(ExecutionMode.Tests);
 				case "g", "gif" -> {
-					mode = ExecutionMode.GIF;
+					setMode(ExecutionMode.GIF);
 					showAST = true;
 				}
 
 				default -> throw new CLArgumentException("Unknown flag '" + flag + "'");
+			}
+		}
+
+		private void setMode(ExecutionMode newMode) throws CLArgumentException {
+			if (this.mode == null) {
+				this.mode = newMode;
+			} else {
+				throw new CLArgumentException("Mode was specified twice");
 			}
 		}
 
@@ -70,14 +78,14 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 			if (this.mode != null) {
 				if (this.mode == ExecutionMode.File) {
 					throw new CLArgumentException("File name was specified twice");
-				} else {
-					throw new CLArgumentException("File name should not be specified for mode " + mode.name());
+				} else if (this.mode == ExecutionMode.GIF) {
+					throw new CLArgumentException("File name should not be specified for mode GIF");
 				}
 			}
 
 			this.fileNameOrNull = argument;
-			this.mode = ExecutionMode.File;
-
+			if (this.mode == null)
+				this.mode = ExecutionMode.File;
 		}
 
 		private CLArguments toCLIArguments() {

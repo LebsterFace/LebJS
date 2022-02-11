@@ -1,4 +1,4 @@
 .idea
 out
 *.iml
-/*.bat
+real-tests

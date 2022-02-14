@@ -411,6 +411,13 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 
 	@SuppressWarnings("unchecked")
 	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		if (this.getClass() != ObjectValue.class) {
+			representation.append(ANSI.BRIGHT_CYAN);
+			representation.append(this.getClass().getSimpleName());
+			representation.append(ANSI.RESET);
+			representation.append(' ');
+		}
+
 		representation.append("{ ");
 		if (value.isEmpty()) {
 			representation.append('}');

@@ -20,6 +20,12 @@ public record ForOfStatement(LeftHandSideExpression left, Expression right, Stat
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Reference left_reference = left.toReference(interpreter);
 		final IteratorRecord record = right.execute(interpreter).toObjectValue(interpreter).getIterator(interpreter);
+		if (record == null) {
+			final var representation = new StringRepresentation();
+			right.represent(representation);
+			representation.append(" is not iterable");
+			throw AbruptCompletion.error(new TypeError(representation.toString()));
+		}
 
 		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
 		try {

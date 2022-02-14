@@ -115,6 +115,26 @@ public final class Parser {
 		}
 	}
 
+	private Statement[] parseStatementsList(TokenType end) throws CannotParse, SyntaxError {
+		boolean isFirstStatement = true;
+		final List<Statement> statementList = new ArrayList<>();
+		while (state.index < state.tokens.length) {
+			if (isFirstStatement) {
+				isFirstStatement = false;
+				consumeAllSeparators();
+			} else if (didConsumeSeparator()) {
+				consumeAllSeparators();
+			} else {
+				requireAtLeastOneSeparator();
+			}
+
+			if (state.currentToken.type == end) break;
+			statementList.add(parseAny());
+		}
+
+		return statementList.toArray(new Statement[0]);
+	}
+
 	private void requireAtLeastOneSeparator() throws SyntaxError {
 		boolean done = false;
 		while (state.currentToken.type != TokenType.EOF) {
@@ -196,6 +216,7 @@ public final class Parser {
 			case For -> parseForStatement();
 			case If -> parseIfStatement();
 			case Try -> parseTryStatement();
+			case Switch -> parseSwitchStatement();
 
 			case Return -> {
 				state.consume();
@@ -207,7 +228,6 @@ public final class Parser {
 			case Continue -> parseContinueStatement();
 
 			case Import, Export -> throw new NotImplemented("Parsing import / export statements");
-			case Switch -> throw new NotImplemented("Parsing switch statements");
 
 			case Throw -> {
 				state.consume();
@@ -222,6 +242,70 @@ public final class Parser {
 				}
 			}
 		};
+	}
+
+	private Statement parseSwitchStatement() throws SyntaxError, CannotParse {
+		state.require(TokenType.Switch);
+		state.require(TokenType.LParen);
+		final Expression expression = parseExpression();
+		state.require(TokenType.RParen);
+		state.require(TokenType.LBrace);
+		final boolean old_inBreakContext = state.inBreakContext;
+		state.inBreakContext = true;
+		try {
+			return new SwitchStatement(expression, parseSwitchCases());
+		} finally {
+			state.inBreakContext = old_inBreakContext;
+		}
+	}
+
+	private SwitchCase[] parseSwitchCases() throws SyntaxError, CannotParse {
+		final List<SwitchCase> cases = new ArrayList<>();
+		while (
+			state.currentToken.type != TokenType.RBrace &&
+			state.currentToken.type != TokenType.EOF
+		) {
+			consumeAllLineTerminators();
+			if (state.currentToken.type == TokenType.Default) {
+				state.consume();
+				state.require(TokenType.Colon);
+				cases.add(new SwitchCase(null, parseSwitchCaseStatements()));
+			} else if (state.currentToken.type == TokenType.Case) {
+				state.consume();
+				final Expression test = parseExpression();
+				state.require(TokenType.Colon);
+				cases.add(new SwitchCase(test, parseSwitchCaseStatements()));
+			} else {
+				state.expected(TokenType.Case);
+			}
+
+			consumeAllSeparators();
+		}
+
+		state.require(TokenType.RBrace);
+		return cases.toArray(new SwitchCase[0]);
+	}
+
+	private Statement[] parseSwitchCaseStatements() throws CannotParse, SyntaxError {
+		boolean isFirstStatement = true;
+		final List<Statement> statementList = new ArrayList<>();
+		while (true) {
+			if (isFirstStatement) {
+				isFirstStatement = false;
+				consumeAllSeparators();
+			} else if (didConsumeSeparator()) {
+				consumeAllSeparators();
+			} else {
+				requireAtLeastOneSeparator();
+			}
+
+			if (state.is(TokenType.Case, TokenType.Default, TokenType.RBrace, TokenType.EOF))
+				break;
+
+			statementList.add(parseAny());
+		}
+
+		return statementList.toArray(new Statement[0]);
 	}
 
 	private ContinueStatement parseContinueStatement() throws SyntaxError {

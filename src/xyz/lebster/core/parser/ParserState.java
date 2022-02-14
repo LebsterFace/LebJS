@@ -57,8 +57,21 @@ public final class ParserState implements Cloneable {
 		return currentToken.type == type && currentToken.value.equals(value);
 	}
 
+	boolean is(TokenType... types) {
+		for (final TokenType type : types) {
+			if (currentToken.type == type)
+				return true;
+		}
+
+		return false;
+	}
+
 	void consumeAll(TokenType t) {
 		while (currentToken.type == t) consume();
+	}
+
+	boolean isFinished() {
+		return index >= tokens.length;
 	}
 
 	@Override

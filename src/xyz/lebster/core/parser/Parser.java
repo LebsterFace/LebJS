@@ -817,14 +817,29 @@ public final class Parser {
 		// FIXME:
 		// 		- Methods { a() { alert(1) } }
 		// 		- Getters / Setters { get a() { return Math.random() } }
-		// 		- Computed property names { ["a" + "b"]: 123 }
-		// 		- Shorthand initializers { a, b }
 		while (state.currentToken.type != TokenType.RBrace) {
-			final Expression key = parsePropertyName();
+			Expression key;
+			String propertyName = null;
+			boolean isIdentifier = matchIdentifierName();
+
+			if (isIdentifier || state.is(TokenType.NumericLiteral, TokenType.StringLiteral)) {
+				propertyName = state.consume().value;
+				key = new StringLiteral(new StringValue(propertyName));
+			} else {
+				state.require(TokenType.LBracket);
+				key = parseExpression();
+				state.require(TokenType.RBracket);
+			}
+
 			consumeAllLineTerminators();
-			state.require(TokenType.Colon);
-			consumeAllLineTerminators();
-			result.entries().put(key, parseExpression());
+			if (isIdentifier && state.currentToken.type != TokenType.Colon) {
+				result.entries().put(key, new IdentifierExpression(propertyName));
+			} else {
+				state.require(TokenType.Colon);
+				consumeAllLineTerminators();
+				result.entries().put(key, parseExpression());
+			}
+
 			consumeAllLineTerminators();
 			if (state.accept(TokenType.Comma) == null) break;
 			consumeAllLineTerminators();
@@ -833,18 +848,6 @@ public final class Parser {
 		consumeAllLineTerminators();
 		state.require(TokenType.RBrace);
 		return result;
-	}
-
-	private Expression parsePropertyName() throws SyntaxError, CannotParse {
-		final TokenType t = state.currentToken.type;
-		if (t == TokenType.NumericLiteral || t == TokenType.StringLiteral || matchIdentifierName())
-			return new StringLiteral(new StringValue(state.consume().value));
-		else {
-			state.require(TokenType.LBracket);
-			final Expression result = parseExpression();
-			state.require(TokenType.RBracket);
-			return result;
-		}
 	}
 
 	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {

@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime.value.prototype;
 
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -10,8 +11,12 @@ import xyz.lebster.core.runtime.value.constructor.StringConstructor;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.StringWrapper;
+import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.runtime.value.primitive.SymbolValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
+
+import java.util.PrimitiveIterator;
 
 import static xyz.lebster.core.runtime.value.prototype.NumberPrototype.toIntegerOrInfinity;
 import static xyz.lebster.core.runtime.value.prototype.ObjectPrototype.requireObjectCoercible;
@@ -27,6 +32,7 @@ public final class StringPrototype extends ObjectValue {
 		instance.putMethod("charAt", StringPrototype::charAt);
 		instance.putMethod(Names.valueOf, StringPrototype::valueOf);
 		instance.putMethod(Names.toString, StringPrototype::toStringMethod);
+		instance.putMethod(SymbolValue.iterator, StringIterator::new);
 	}
 
 	private StringPrototype() {
@@ -45,8 +51,7 @@ public final class StringPrototype extends ObjectValue {
 		// 4. Let size be the length of S.
 		final int size = S.value.length();
 		// 5. If position < 0 or position ≥ size, return the empty String.
-		if (position < 0 || position >= size)
-			return new StringValue("");
+		if (position < 0 || position >= size) return new StringValue("");
 		// 6. Return the substring of S from position to position + 1.
 		return new StringValue(S.value.substring(position, position + 1));
 	}
@@ -93,8 +98,7 @@ public final class StringPrototype extends ObjectValue {
 			to = Math.min(intEnd, len);
 		}
 		// 12. If `from` ≥ `to`, return the empty String.
-		if (from >= to)
-			return new StringValue("");
+		if (from >= to) return new StringValue("");
 		// 13. Return the substring of S from `from` to `to`.
 		return new StringValue(S.value.substring(from, to));
 	}
@@ -131,5 +135,30 @@ public final class StringPrototype extends ObjectValue {
 	private static StringValue reverse(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		final String S = thisStringValue(interpreter.thisValue()).value;
 		return new StringValue(new StringBuilder(S).reverse().toString());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype-@@iterator")
+	private static class StringIterator extends ObjectValue {
+		private final PrimitiveIterator.OfInt primitiveIterator;
+
+		@NonCompliant
+		public StringIterator(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+			final String value = thisStringValue(interpreter.thisValue()).value;
+			this.primitiveIterator = value.codePoints().iterator();
+			this.putMethod(Names.next, this::next);
+		}
+
+		private ObjectValue next(Interpreter interpreter, Value<?>[] arguments) {
+			final ObjectValue result = new ObjectValue();
+			if (!primitiveIterator.hasNext()) {
+				result.put(Names.done, BooleanValue.TRUE);
+				result.put(Names.value, Undefined.instance);
+				return result;
+			}
+
+			result.put(Names.done, BooleanValue.FALSE);
+			result.put(Names.value, new StringValue(new String(new int[] { primitiveIterator.nextInt() }, 0, 1)));
+			return result;
+		}
 	}
 }

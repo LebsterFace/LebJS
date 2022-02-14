@@ -30,12 +30,74 @@ public final class StringPrototype extends ObjectValue {
 		instance.putMethod("reverse", StringPrototype::reverse);
 		instance.putMethod("slice", StringPrototype::slice);
 		instance.putMethod("charAt", StringPrototype::charAt);
+		instance.putMethod("trim", StringPrototype::trim);
+		instance.putMethod("trimStart", StringPrototype::trimStart);
+		instance.putMethod("trimEnd", StringPrototype::trimEnd);
+		instance.putMethod("toUpperCase", StringPrototype::toUpperCase);
+		instance.putMethod("toLowerCase", StringPrototype::toLowerCase);
 		instance.putMethod(Names.valueOf, StringPrototype::valueOf);
 		instance.putMethod(Names.toString, StringPrototype::toStringMethod);
 		instance.putMethod(SymbolValue.iterator, StringIterator::new);
 	}
 
 	private StringPrototype() {
+	}
+
+	private static Value<?> toLowerCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.toLowerCase");
+		// 2. Let S be ? ToString(O).
+		final StringValue S = O.toStringValue(interpreter);
+		// 3. Let sText be ! StringToCodePoints(S).
+		// 4. Let lowerText be the result of toLowercase(sText), according to the Unicode Default Case Conversion algorithm.
+		// 5. Let L be ! CodePointsToString(lowerText).
+		// 6. Return L.
+		return new StringValue(S.value.toLowerCase());
+	}
+
+	private static Value<?> toUpperCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.toUpperCase");
+		// 2. Let S be ? ToString(O).
+		final StringValue S = O.toStringValue(interpreter);
+		// 3. Let sText be ! StringToCodePoints(S).
+		// 4. Let lowerText be the result of toLowercase(sText), according to the Unicode Default Case Conversion algorithm.
+		// 5. Let L be ! CodePointsToString(lowerText).
+		// 6. Return L.
+		return new StringValue(S.value.toUpperCase());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.trimend")
+	private static StringValue trimEnd(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 1. Let str be ? RequireObjectCoercible(string).
+		final Value<?> str = requireObjectCoercible(interpreter.thisValue(), "String.prototype.trimEnd");
+		// 2. Let S be ? ToString(str).
+		final StringValue S = str.toStringValue(interpreter);
+		// let T be the String value that is a copy of S with trailing white space removed.
+		// 6. Return T.
+		return new StringValue(S.value.stripTrailing());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.trimstart")
+	private static StringValue trimStart(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 1. Let str be ? RequireObjectCoercible(string).
+		final Value<?> str = requireObjectCoercible(interpreter.thisValue(), "String.prototype.trimStart");
+		// 2. Let S be ? ToString(str).
+		final StringValue S = str.toStringValue(interpreter);
+		// let T be the String value that is a copy of S with leading white space removed.
+		// 6. Return T.
+		return new StringValue(S.value.stripLeading());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.trim")
+	private static StringValue trim(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 1. Let str be ? RequireObjectCoercible(string).
+		final Value<?> str = requireObjectCoercible(interpreter.thisValue(), "String.prototype.trim");
+		// 2. Let S be ? ToString(str).
+		final StringValue S = str.toStringValue(interpreter);
+		// b. Let T be the String value that is a copy of S with both leading and trailing white space removed.
+		// 6. Return T.
+		return new StringValue(S.value.strip());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charat")

@@ -1,8 +1,11 @@
 package xyz.lebster.core.runtime.value.prototype;
 
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.constructor.FunctionConstructor;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 
@@ -12,17 +15,19 @@ public final class FunctionPrototype extends Executable<Void> {
 	public static final FunctionPrototype instance = new FunctionPrototype();
 
 	static {
-		// FIXME: FunctionConstructor
-		instance.putMethod("call", (interpreter, arguments) -> {
-			final Executable<?> func = Executable.getExecutable(interpreter.thisValue());
-			final Value<?> thisArg = arguments.length > 0 ? arguments[0] : Undefined.instance;
-			final Value<?>[] args = Arrays.copyOfRange(arguments, 1, arguments.length);
-			return func.call(interpreter, thisArg, args);
-		});
+		instance.putMethod("call", FunctionPrototype::callMethod);
+		instance.put(Names.constructor, FunctionConstructor.instance);
 	}
 
 	private FunctionPrototype() {
 		super(null);
+	}
+
+	private static Value<?> callMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		final Executable<?> func = Executable.getExecutable(interpreter.thisValue());
+		final Value<?> thisArg = arguments.length > 0 ? arguments[0] : Undefined.instance;
+		final Value<?>[] args = Arrays.copyOfRange(arguments, 1, arguments.length);
+		return func.call(interpreter, thisArg, args);
 	}
 
 	@Override

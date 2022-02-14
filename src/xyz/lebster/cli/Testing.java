@@ -2,6 +2,7 @@ package xyz.lebster.cli;
 
 import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Realm;
 
 import java.io.ByteArrayOutputStream;
@@ -47,7 +48,13 @@ public final class Testing {
 			System.setOut(tempStream);
 
 			try {
-				Realm.executeStatic(Files.readString(file.toPath()), arguments.options().showAST());
+				try {
+					Realm.executeStatic(Files.readString(file.toPath()), arguments.options().showAST());
+				} catch (AbruptCompletion completion) {
+					if (arguments.options().parseOnly() && completion.type != AbruptCompletion.Type.Throw) {
+						throw completion;
+					}
+				}
 				successfulTests++;
 				printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", file.getName());
 				printTestOutput(passedStream, tempOutput);

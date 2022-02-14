@@ -4,6 +4,7 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.StringConstructor;
 import xyz.lebster.core.runtime.value.error.TypeError;
@@ -24,7 +25,8 @@ public final class StringPrototype extends ObjectValue {
 		instance.putMethod("reverse", StringPrototype::reverse);
 		instance.putMethod("slice", StringPrototype::slice);
 		instance.putMethod("charAt", StringPrototype::charAt);
-		instance.putMethod("valueOf", StringPrototype::valueOf);
+		instance.putMethod(Names.valueOf, StringPrototype::valueOf);
+		instance.putMethod(Names.toString, StringPrototype::toStringMethod);
 	}
 
 	private StringPrototype() {
@@ -99,6 +101,12 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.valueof")
 	private static StringValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 1. Return ? thisStringValue(this value).
+		return thisStringValue(interpreter.thisValue());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tostring")
+	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Return ? thisStringValue(this value).
 		return thisStringValue(interpreter.thisValue());
 	}

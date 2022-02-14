@@ -397,8 +397,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		return "object";
 	}
 
-	@Override
-	public void display(StringRepresentation representation) {
+	public final void objectValue__display(StringRepresentation representation) {
 		final var singleLine = new StringRepresentation();
 		this.displayRecursive(singleLine, new HashSet<>(), true);
 		if (singleLine.length() < 72) {
@@ -410,9 +409,9 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 	}
 
 	@SuppressWarnings("unchecked")
-	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+	public final void objectValue__displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
 		if (this.getClass() != ObjectValue.class) {
-			representation.append(ANSI.BRIGHT_CYAN);
+			representation.append(ANSI.CYAN);
 			representation.append(this.getClass().getSimpleName());
 			representation.append(ANSI.RESET);
 			representation.append(' ');
@@ -464,6 +463,15 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		}
 
 		representation.append('}');
+	}
+
+	@Override
+	public void display(StringRepresentation representation) {
+		this.objectValue__display(representation);
+	}
+
+	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		this.objectValue__displayRecursive(representation, parents, singleLine);
 	}
 
 	public record IteratorRecord(ObjectValue iterator, Value<?> nextMethod, boolean done) {

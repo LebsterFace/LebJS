@@ -18,12 +18,16 @@ public final class Function extends Constructor<FunctionNode> {
 	public Function(FunctionNode code, LexicalEnvironment environment) {
 		super(code);
 		this.environment = environment;
-		this.putMethod(Names.toString, ($, $$) -> new StringValue(code.toRepresentationString()));
 	}
 
 	@Override
 	protected String getName() {
 		return code.name;
+	}
+
+	@Override
+	public StringValue toStringMethod() {
+		return new StringValue(code.toRepresentationString());
 	}
 
 	private Value<?> executeCode(ExecutionContext context, Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {

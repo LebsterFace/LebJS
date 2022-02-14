@@ -10,6 +10,7 @@ import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.HasBuiltinTag;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
@@ -48,14 +49,19 @@ public abstract class Executable<JType> extends ObjectValue implements HasBuilti
 
 	@Override
 	public void display(StringRepresentation representation) {
+		representation.append(ANSI.MAGENTA);
+		representation.append("ƒ ");
 		representation.append(ANSI.BRIGHT_MAGENTA);
-		representation.append("[Function: ");
 		representation.append(this.getName());
-		representation.append(']');
+		representation.append("()");
 		representation.append(ANSI.RESET);
 	}
 
 	protected abstract String getName();
+
+	public StringValue toStringMethod() {
+		return NativeFunction.toStringForName(this.getName());
+	}
 
 	@Override
 	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
@@ -88,14 +94,12 @@ public abstract class Executable<JType> extends ObjectValue implements HasBuilti
 		// b. Return ? InstanceofOperator(O, BC).
 
 		// 3. If Type(O) is not Object, return false.
-		if (!(O instanceof ObjectValue object))
-			return BooleanValue.FALSE;
+		if (!(O instanceof ObjectValue object)) return BooleanValue.FALSE;
 
 		// 4. Let P be ? Get(C, "prototype").
 		final Value<?> P = this.get(interpreter, Names.prototype);
 		// 5. If Type(P) is not Object, throw a TypeError exception.
-		if (P.type != Type.Object)
-			throw AbruptCompletion.error(new TypeError("Not an object!"));
+		if (P.type != Type.Object) throw AbruptCompletion.error(new TypeError("Not an object!"));
 
 		// 6. Repeat,
 		while (true) {

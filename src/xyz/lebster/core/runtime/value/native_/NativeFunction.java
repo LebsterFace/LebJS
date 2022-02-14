@@ -1,12 +1,9 @@
 package xyz.lebster.core.runtime.value.native_;
 
 
-import xyz.lebster.core.ANSI;
-import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -16,20 +13,15 @@ import xyz.lebster.core.runtime.value.primitive.SymbolValue;
 import java.util.HashSet;
 
 public final class NativeFunction extends Executable<NativeCode> {
+	private final String name;
+
 	public NativeFunction(StringValue name, NativeCode code) {
 		super(name, code);
-		this.put(Names.toString, new NativeFunction());
+		this.name = name.value;
 	}
 
 	public NativeFunction(SymbolValue nameSymbol, NativeCode code) {
 		this(nameSymbol.toFunctionName(), code);
-	}
-
-	/**
-	 * Only for toString
-	 */
-	private NativeFunction() {
-		super(Names.toString, (interpreter, arguments) -> new StringValue("function () { [native code] }"));
 	}
 
 	@Override
@@ -42,16 +34,13 @@ public final class NativeFunction extends Executable<NativeCode> {
 		}
 	}
 
-	@Override
-	public void display(StringRepresentation representation) {
-		representation.append(ANSI.BRIGHT_MAGENTA);
-		representation.append("[Native Function]");
-		representation.append(ANSI.RESET);
+	public static StringValue toStringForName(String name) {
+		return new StringValue("function " + name + "() { [native code] }");
 	}
 
 	@Override
 	protected String getName() {
-		throw new ShouldNotHappen("NativeFunction#getName should not be called.");
+		return this.name;
 	}
 
 	@Override

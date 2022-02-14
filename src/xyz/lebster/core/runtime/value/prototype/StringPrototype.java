@@ -38,6 +38,28 @@ public final class StringPrototype extends ObjectValue {
 		instance.putMethod(Names.valueOf, StringPrototype::valueOf);
 		instance.putMethod(Names.toString, StringPrototype::toStringMethod);
 		instance.putMethod(SymbolValue.iterator, StringIterator::new);
+		// instance.putMethod("charCodeAt", StringPrototype::charCodeAt);
+		// instance.putMethod("codePointAt", StringPrototype::codePointAt);
+		// instance.putMethod("concat", StringPrototype::concat);
+		// instance.putMethod("endsWith", StringPrototype::endsWith);
+		// instance.putMethod("includes", StringPrototype::includes);
+		// instance.putMethod("indexOf", StringPrototype::indexOf);
+		// instance.putMethod("lastIndexOf", StringPrototype::lastIndexOf);
+		// instance.putMethod("localeCompare", StringPrototype::localeCompare);
+		// instance.putMethod("match", StringPrototype::match);
+		// instance.putMethod("matchAll", StringPrototype::matchAll);
+		// instance.putMethod("normalize", StringPrototype::normalize);
+		// instance.putMethod("padEnd", StringPrototype::padEnd);
+		// instance.putMethod("padStart", StringPrototype::padStart);
+		// instance.putMethod("repeat", StringPrototype::repeat);
+		// instance.putMethod("replace", StringPrototype::replace);
+		// instance.putMethod("replaceAll", StringPrototype::replaceAll);
+		// instance.putMethod("search", StringPrototype::search);
+		// instance.putMethod("split", StringPrototype::split);
+		// instance.putMethod("startsWith", StringPrototype::startsWith);
+		// instance.putMethod("substring", StringPrototype::substring);
+		// instance.putMethod("toLocaleLowerCase", StringPrototype::toLocaleLowerCase);
+		// instance.putMethod("toLocaleUpperCase", StringPrototype::toLocaleUpperCase);
 	}
 
 	private StringPrototype() {

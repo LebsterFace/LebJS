@@ -11,6 +11,7 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.runtime.value.primitive.SymbolValue;
 
 import java.util.HashSet;
 
@@ -18,6 +19,10 @@ public final class NativeFunction extends Executable<NativeCode> {
 	public NativeFunction(StringValue name, NativeCode code) {
 		super(name, code);
 		this.put(Names.toString, new NativeFunction());
+	}
+
+	public NativeFunction(SymbolValue nameSymbol, NativeCode code) {
+		this(nameSymbol.toFunctionName(), code);
 	}
 
 	/**

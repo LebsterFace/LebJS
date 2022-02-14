@@ -248,6 +248,10 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		this.value.put(name, new Property(true, new NativeFunction(name, code)));
 	}
 
+	public void putMethod(SymbolValue name, NativeCode code) {
+		this.value.put(name, new Property(true, new NativeFunction(name, code)));
+	}
+
 	public void putMethod(String name, NativeCode code) {
 		this.putMethod(new StringValue(name), code);
 	}

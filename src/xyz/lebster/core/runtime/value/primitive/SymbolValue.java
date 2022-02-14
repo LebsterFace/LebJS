@@ -86,6 +86,13 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 		this.description = description;
 	}
 
+	/**
+	 * @return {@link StringValue} representing this symbol as the '{@code name}' property of a function
+	 */
+	public StringValue toFunctionName() {
+		return new StringValue('[' + this.description + ']');
+	}
+
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert a Symbol value to a string"));

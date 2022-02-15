@@ -44,7 +44,7 @@ public final class FunctionPrototype extends Executable<Void> {
 
 	@Override
 	protected String getName() {
-		return "FunctionPrototype";
+		return "";
 	}
 
 	@Override

@@ -408,12 +408,16 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		this.displayRecursive(representation, new HashSet<>(), false);
 	}
 
+	public final void representClassName(StringRepresentation representation) {
+		representation.append(ANSI.CYAN);
+		representation.append(this.getClass().getSimpleName());
+		representation.append(ANSI.RESET);
+	}
+
 	@SuppressWarnings("unchecked")
 	public final void objectValue__displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
 		if (this.getClass() != ObjectValue.class) {
-			representation.append(ANSI.CYAN);
-			representation.append(this.getClass().getSimpleName());
-			representation.append(ANSI.RESET);
+			this.representClassName(representation);
 			representation.append(' ');
 		}
 
@@ -440,7 +444,15 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 			if (value instanceof final ObjectValue object) {
 				if (parents.contains(object)) {
 					representation.append(ANSI.RED);
-					representation.append(this == value ? "[self]" : "[parent]");
+
+					if (object.getClass() != ObjectValue.class) {
+						object.representClassName(representation);
+					} else if (this == value) {
+						representation.append("[self]");
+					} else {
+						representation.append("[parent]");
+					}
+
 					representation.append(ANSI.RESET);
 				} else {
 					object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone(), singleLine);

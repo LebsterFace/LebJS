@@ -16,8 +16,6 @@ import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 
-import java.util.HashSet;
-
 public abstract class Executable<JType> extends ObjectValue implements HasBuiltinTag {
 	public final JType code;
 
@@ -50,10 +48,11 @@ public abstract class Executable<JType> extends ObjectValue implements HasBuilti
 	@Override
 	public void display(StringRepresentation representation) {
 		representation.append(ANSI.MAGENTA);
-		representation.append("ƒ ");
+		representation.append("[Function: ");
 		representation.append(ANSI.BRIGHT_MAGENTA);
 		representation.append(this.getName());
-		representation.append("()");
+		representation.append(ANSI.MAGENTA);
+		representation.append(']');
 		representation.append(ANSI.RESET);
 	}
 
@@ -61,11 +60,6 @@ public abstract class Executable<JType> extends ObjectValue implements HasBuilti
 
 	public StringValue toStringMethod() {
 		return NativeFunction.toStringForName(this.getName());
-	}
-
-	@Override
-	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		this.display(representation);
 	}
 
 	public Value<?> call(Interpreter interpreter, Value<?> thisValue, Value<?>... args) throws AbruptCompletion {

@@ -55,3 +55,13 @@ function recursive(x, n) {
 expect(4, recursive(2, 2))
 expect(8, recursive(2, 3))
 expect(16, recursive(2, 4))
+
+function example(a, b, c, d) {
+    return a + b + c + d;
+}
+
+expect("1234", example("1", "2", "3", "4"))
+expect("123undefined", example("1", "2", "3"))
+expect("12undefinedundefined", example("1", "2"))
+expect("1undefinedundefinedundefined", example("1"))
+expect(true, isNaN(example()))

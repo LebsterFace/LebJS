@@ -34,11 +34,13 @@ public final class Function extends Constructor<FunctionNode> {
 		return new StringValue(code.toRepresentationString());
 	}
 
-	private Value<?> executeCode(ExecutionContext context, Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private Value<?> executeCode(ExecutionContext context, Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
 		// Declare passed arguments as variables
-		for (int i = 0; i < arguments.length && i < code.arguments.length; i++) {
-			interpreter.declareVariable(code.arguments[i], arguments[i]);
-		}
+		int i = 0;
+		for (; i < code.arguments.length && i < passedArguments.length; i++)
+			interpreter.declareVariable(code.arguments[i], passedArguments[i]);
+		for (; i < code.arguments.length; i++)
+			interpreter.declareVariable(code.arguments[i], Undefined.instance);
 
 		try {
 			code.body.execute(interpreter);

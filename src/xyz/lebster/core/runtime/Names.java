@@ -18,6 +18,7 @@ public final class Names {
 	public static final StringValue value = new StringValue("value");
 	public static final StringValue valueOf = new StringValue("valueOf");
 	public static final StringValue values = new StringValue("values");
+	public static final StringValue filter = new StringValue("filter");
 
 	// Globals
 	public static final StringValue Infinity = new StringValue("Infinity");

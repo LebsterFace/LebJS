@@ -19,7 +19,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 
 	static {
 		instance.putNonWritable(Names.prototype, ArrayPrototype.instance);
-		instance.putMethod("of", ArrayConstructor::of);
+		instance.putMethod(Names.of, ArrayConstructor::of);
 	}
 
 	private ArrayConstructor() {

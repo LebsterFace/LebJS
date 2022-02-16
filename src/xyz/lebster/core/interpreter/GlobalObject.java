@@ -26,18 +26,18 @@ public final class GlobalObject extends ObjectValue {
 		super();
 
 		// 19.1 Value Properties of the Global Object
-		put("globalThis", this);
+		put(Names.globalThis, this);
 
 		putNonWritable(Names.NaN, new NumberValue(Double.NaN));
 		putNonWritable(Names.Infinity, new NumberValue(Double.POSITIVE_INFINITY));
 		putNonWritable(Names.undefined, Undefined.instance);
 
 		// 19.2 Function Properties of the Global Object
-		putMethod("eval", GlobalObject::eval);
-		putMethod("isFinite", GlobalObject::isFinite);
-		putMethod("isNaN", GlobalObject::isNaN);
-		putMethod("parseFloat", GlobalObject::parseFloat);
-		putMethod("parseInt", GlobalObject::parseInt);
+		putMethod(Names.eval, GlobalObject::eval);
+		putMethod(Names.isFinite, GlobalObject::isFinite);
+		putMethod(Names.isNaN, GlobalObject::isNaN);
+		putMethod(Names.parseFloat, GlobalObject::parseFloat);
+		putMethod(Names.parseInt, GlobalObject::parseInt);
 
 		// 19.3 Constructor Properties of the Global Object
 		put(Names.Array, ArrayConstructor.instance);
@@ -51,7 +51,7 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.Function, FunctionConstructor.instance);
 
 		// Non-Standard properties
-		putMethod("expect", GlobalObject::expect);
+		putMethod(Names.expect, GlobalObject::expect);
 		put(Names.console, ConsoleObject.instance);
 	}
 

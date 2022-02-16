@@ -22,13 +22,13 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	static {
 		instance.putNonWritable(Names.prototype, ObjectPrototype.instance);
 
-		instance.putMethod("setPrototypeOf", ObjectConstructor::setPrototypeOf);
-		instance.putMethod("getPrototypeOf", ObjectConstructor::getPrototypeOf);
-		instance.putMethod("create", ObjectConstructor::create);
-		instance.putMethod("keys", ObjectConstructor::keys);
-		instance.putMethod("values", ObjectConstructor::values);
-		instance.putMethod("entries", ObjectConstructor::entries);
-		instance.putMethod("fromEntries", ObjectConstructor::fromEntries);
+		instance.putMethod(Names.setPrototypeOf, ObjectConstructor::setPrototypeOf);
+		instance.putMethod(Names.getPrototypeOf, ObjectConstructor::getPrototypeOf);
+		instance.putMethod(Names.create, ObjectConstructor::create);
+		instance.putMethod(Names.keys, ObjectConstructor::keys);
+		instance.putMethod(Names.values, ObjectConstructor::values);
+		instance.putMethod(Names.entries, ObjectConstructor::entries);
+		instance.putMethod(Names.fromEntries, ObjectConstructor::fromEntries);
 	}
 
 	private ObjectConstructor() {

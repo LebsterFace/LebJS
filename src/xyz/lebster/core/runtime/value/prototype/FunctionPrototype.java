@@ -17,7 +17,7 @@ public final class FunctionPrototype extends Executable<Void> {
 	public static final FunctionPrototype instance = new FunctionPrototype();
 
 	static {
-		instance.putMethod("call", FunctionPrototype::callMethod);
+		instance.putMethod(Names.call, FunctionPrototype::callMethod);
 		instance.putMethod(Names.toString, FunctionPrototype::toStringMethod);
 		instance.put(Names.constructor, FunctionConstructor.instance);
 	}

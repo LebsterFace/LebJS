@@ -3,6 +3,7 @@ package xyz.lebster.core.runtime.value.object;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 
@@ -11,22 +12,22 @@ public final class ConsoleObject extends ObjectValue {
 	public static final ConsoleObject instance = new ConsoleObject();
 
 	private ConsoleObject() {
-		putMethod("log", (interpreter, data) -> {
+		putMethod(Names.log, (interpreter, data) -> {
 			logger(LogLevel.Log, data);
 			return Undefined.instance;
 		});
 
-		putMethod("warn", (interpreter, data) -> {
+		putMethod(Names.warn, (interpreter, data) -> {
 			logger(LogLevel.Warn, data);
 			return Undefined.instance;
 		});
 
-		putMethod("error", (interpreter, data) -> {
+		putMethod(Names.error, (interpreter, data) -> {
 			logger(LogLevel.Error, data);
 			return Undefined.instance;
 		});
 
-		putMethod("info", (interpreter, data) -> {
+		putMethod(Names.info, (interpreter, data) -> {
 			logger(LogLevel.Info, data);
 			return Undefined.instance;
 		});

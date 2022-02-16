@@ -17,16 +17,16 @@ public final class ObjectPrototype extends ObjectValue {
 	public static final NativeFunction toStringMethod = new NativeFunction(Names.toString, ObjectPrototype::toStringMethod);
 
 	static {
-		instance.put("constructor", ObjectConstructor.instance);
+		instance.put(Names.constructor, ObjectConstructor.instance);
 		instance.put(Names.toString, toStringMethod);
 		instance.putMethod(Names.valueOf, ObjectPrototype::valueOf);
-		instance.putMethod("hasOwnProperty", (interpreter, args) -> {
+		instance.putMethod(Names.hasOwnProperty, (interpreter, args) -> {
 			final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
 			final ObjectValue.Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
 			return BooleanValue.of(object.hasOwnProperty(property));
 		});
 
-		instance.putMethod("hasProperty", (interpreter, args) -> {
+		instance.putMethod(Names.hasProperty, (interpreter, args) -> {
 			final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
 			final ObjectValue.Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
 			return BooleanValue.of(object.hasProperty(property));

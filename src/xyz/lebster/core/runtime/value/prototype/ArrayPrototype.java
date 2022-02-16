@@ -21,13 +21,13 @@ public final class ArrayPrototype extends ObjectValue {
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
 
 	static {
-		instance.put("constructor", ArrayConstructor.instance);
-		instance.putMethod("push", ArrayPrototype::push);
-		instance.putMethod("map", ArrayPrototype::map);
+		instance.put(Names.constructor, ArrayConstructor.instance);
+		instance.putMethod(Names.push, ArrayPrototype::push);
+		instance.putMethod(Names.map, ArrayPrototype::map);
 		instance.putMethod(Names.filter, ArrayPrototype::filter);
 		instance.putMethod(Names.join, ArrayPrototype::join);
 		instance.putMethod(Names.toString, ArrayPrototype::toStringMethod);
-		instance.putMethod("forEach", ArrayPrototype::forEach);
+		instance.putMethod(Names.forEach, ArrayPrototype::forEach);
 
 		final var values = new NativeFunction(Names.values, ArrayPrototype::values);
 		instance.put(Names.values, values);

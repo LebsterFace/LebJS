@@ -2,6 +2,7 @@ package xyz.lebster.core.runtime.value.prototype;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.ShadowRealmConstructor;
 import xyz.lebster.core.runtime.value.error.TypeError;
@@ -14,9 +15,9 @@ public final class ShadowRealmPrototype extends ObjectValue {
 	public static final ShadowRealmPrototype instance = new ShadowRealmPrototype();
 
 	static {
-		instance.put("constructor", ShadowRealmConstructor.instance);
-		instance.putMethod("evaluate", ShadowRealmPrototype::evaluate);
-		instance.putMethod("declare", ShadowRealmPrototype::declare);
+		instance.put(Names.constructor, ShadowRealmConstructor.instance);
+		instance.putMethod(Names.evaluate, ShadowRealmPrototype::evaluate);
+		instance.putMethod(Names.declare, ShadowRealmPrototype::declare);
 	}
 
 	private ShadowRealmPrototype() {

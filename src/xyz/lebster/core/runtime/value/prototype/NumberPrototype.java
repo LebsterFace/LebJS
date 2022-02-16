@@ -17,9 +17,9 @@ public final class NumberPrototype extends ObjectValue {
 	public static final NumberPrototype instance = new NumberPrototype();
 
 	static {
-		instance.put("constructor", NumberConstructor.instance);
+		instance.put(Names.constructor, NumberConstructor.instance);
 		instance.putMethod(Names.toString, NumberPrototype::toStringMethod);
-		instance.putMethod("toLocaleString", NumberPrototype::toLocaleString);
+		instance.putMethod(Names.toLocaleString, NumberPrototype::toLocaleString);
 	}
 
 	private NumberPrototype() {

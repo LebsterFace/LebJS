@@ -16,6 +16,20 @@ public final class NumberRange extends ObjectValue {
 		this.step = 1;
 	}
 
+	public NumberRange(double start, double end) {
+		this.initialise();
+		this.current = start;
+		this.end = end;
+		this.step = 1;
+	}
+
+	public NumberRange(double start, double end, double step) {
+		this.initialise();
+		this.current = start;
+		this.end = end;
+		this.step = step;
+	}
+
 	private void initialise() {
 		this.put(SymbolValue.iterator, new NativeFunction(new StringValue("[Symbol.iterator]"), ($, $$) -> this));
 		this.putMethod(Names.next, (interpreter, arguments) -> {
@@ -31,19 +45,5 @@ public final class NumberRange extends ObjectValue {
 
 			return result;
 		});
-	}
-
-	public NumberRange(double start, double end) {
-		this.initialise();
-		this.current = start;
-		this.end = end;
-		this.step = 1;
-	}
-
-	public NumberRange(double start, double end, double step) {
-		this.initialise();
-		this.current = start;
-		this.end = end;
-		this.step = step;
 	}
 }

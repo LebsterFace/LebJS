@@ -24,6 +24,10 @@ public final class NativeFunction extends Executable<NativeCode> {
 		this(nameSymbol.toFunctionName(), code);
 	}
 
+	public static StringValue toStringForName(String name) {
+		return new StringValue("function " + name + "() { [native code] }");
+	}
+
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		try {
@@ -32,10 +36,6 @@ public final class NativeFunction extends Executable<NativeCode> {
 			if (e.type != AbruptCompletion.Type.Return) throw e;
 			return e.value;
 		}
-	}
-
-	public static StringValue toStringForName(String name) {
-		return new StringValue("function " + name + "() { [native code] }");
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package xyz.lebster.core.runtime.value.constructor;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
-import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
@@ -26,7 +25,7 @@ public class FunctionConstructor extends BuiltinConstructor<Function> {
 	}
 
 	@Override
-	public Function call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+	public Function call(Interpreter interpreter, Value<?>... arguments) {
 		throw new NotImplemented("Function()");
 	}
 

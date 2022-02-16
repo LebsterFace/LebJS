@@ -30,16 +30,16 @@ public final class FunctionPrototype extends Executable<Void> {
 		return Executable.getExecutable(interpreter.thisValue()).toStringMethod();
 	}
 
-	@Override
-	public StringValue toStringMethod() {
-		return NativeFunction.toStringForName("");
-	}
-
 	private static Value<?> callMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final Executable<?> func = Executable.getExecutable(interpreter.thisValue());
 		final Value<?> thisArg = arguments.length > 0 ? arguments[0] : Undefined.instance;
 		final Value<?>[] args = Arrays.copyOfRange(arguments, 1, arguments.length);
 		return func.call(interpreter, thisArg, args);
+	}
+
+	@Override
+	public StringValue toStringMethod() {
+		return NativeFunction.toStringForName("");
 	}
 
 	@Override

@@ -20,7 +20,7 @@ public final class ShadowRealmConstructor extends BuiltinConstructor<ShadowRealm
 	}
 
 	@Override
-	public ShadowRealm construct(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	public ShadowRealm construct(Interpreter interpreter, Value<?>[] arguments) {
 		return new ShadowRealm();
 	}
 

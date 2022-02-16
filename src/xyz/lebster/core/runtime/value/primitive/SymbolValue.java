@@ -103,17 +103,17 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 	}
 
 	@Override
-	public BooleanValue toBooleanValue(Interpreter interpreter) throws AbruptCompletion {
+	public BooleanValue toBooleanValue(Interpreter interpreter) {
 		return BooleanValue.TRUE;
 	}
 
 	@Override
-	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectValue toObjectValue(Interpreter interpreter) {
 		throw new NotImplemented("SymbolWrapper");
 	}
 
 	@Override
-	public String typeOf(Interpreter interpreter) throws AbruptCompletion {
+	public String typeOf(Interpreter interpreter) {
 		return "symbol";
 	}
 

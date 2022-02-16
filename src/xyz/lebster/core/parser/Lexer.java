@@ -128,9 +128,9 @@ public final class Lexer {
 	private final String source;
 	private final StringBuilder builder = new StringBuilder();
 	private final int length;
+	private final boolean showOutput;
 	private int index = -1;
 	private char currentChar = '\0';
-	private final boolean showOutput;
 
 	public Lexer(String source) {
 		this.source = source;

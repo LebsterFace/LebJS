@@ -2,7 +2,6 @@ package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.exception.ShouldNotHappen;
-import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -29,7 +28,7 @@ public record BindingPattern(VariableDeclaration.Kind kind, String identifier) i
 	}
 
 	@Override
-	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
+	public Value<?> execute(Interpreter interpreter) {
 		throw new ShouldNotHappen("Call of BindingPattern#execute");
 	}
 

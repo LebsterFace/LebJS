@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.value.Value;
 
 public interface NativeGetterSetter {
-	Value<?> get(Interpreter interpreter) throws AbruptCompletion;
+	Value<?> get(Interpreter interpreter);
 
 	void set(Interpreter interpreter, Value<?> value) throws AbruptCompletion;
 }

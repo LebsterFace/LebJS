@@ -23,8 +23,8 @@ public abstract class Value<JType> {
 		this.display(representation);
 	}
 
+	public enum PreferredType { String, Number }
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
-	public enum PreferredType { String, Number };
 	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, PreferredType preferredType) throws AbruptCompletion {
 		if (this instanceof PrimitiveValue) {
 			return (PrimitiveValue<JType>) this;
@@ -85,13 +85,15 @@ public abstract class Value<JType> {
 
 		if (this instanceof StringValue)
 			// 4. If Type(x) is String, then
+			// a. If x and y are exactly the same sequence of code units
+			//    (same length and same code units at corresponding indices),
+			//    return true; otherwise, return false.
 			return this.value.equals(y.value);
-		// a. If x and y are exactly the same sequence of code units (same length and same code units at corresponding indices), return true; otherwise, return false.
 
 		// 5. If Type(x) is Boolean, then
-		// a. If x and y are both true or both false, return true; otherwise, return false.
+			// a. return (x and y are both true or both false)
 		// 6. If Type(x) is Symbol, then
-		// a. If x and y are both the same Symbol value, return true; otherwise, return false.
+			// a. return (x and y are both the same Symbol value)
 		// 7. If x and y are the same Object value, return true. Otherwise, return false.
 
 		return this == y;

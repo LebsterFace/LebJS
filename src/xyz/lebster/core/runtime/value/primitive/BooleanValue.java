@@ -2,7 +2,6 @@ package xyz.lebster.core.runtime.value.primitive;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.NotImplemented;
-import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -27,7 +26,7 @@ public final class BooleanValue extends PrimitiveValue<Boolean> {
 	}
 
 	@Override
-	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
+	public StringValue toStringValue(Interpreter interpreter) {
 		return new StringValue(value.toString());
 	}
 

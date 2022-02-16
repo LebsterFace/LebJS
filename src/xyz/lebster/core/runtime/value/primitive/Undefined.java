@@ -5,7 +5,6 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.Names;
-import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
@@ -13,7 +12,7 @@ public final class Undefined extends PrimitiveValue<Void> {
 	public static final Undefined instance = new Undefined();
 
 	private Undefined() {
-		super(null, Value.Type.Undefined);
+		super(null);
 	}
 
 	@Override

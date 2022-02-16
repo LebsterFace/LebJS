@@ -3,7 +3,6 @@ package xyz.lebster.core.runtime.value.primitive;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
@@ -11,7 +10,7 @@ public final class Null extends PrimitiveValue<Void> {
 	public static final Null instance = new Null();
 
 	private Null() {
-		super(null, Value.Type.Null);
+		super(null);
 	}
 
 	@Override

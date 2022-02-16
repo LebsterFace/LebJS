@@ -5,7 +5,6 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
 public final class BooleanValue extends PrimitiveValue<Boolean> {
@@ -13,7 +12,7 @@ public final class BooleanValue extends PrimitiveValue<Boolean> {
 	public static final BooleanValue FALSE = new BooleanValue(Boolean.FALSE);
 
 	private BooleanValue(boolean value) {
-		super(value, Value.Type.Boolean);
+		super(value);
 	}
 
 	public static BooleanValue of(boolean b) {

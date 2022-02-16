@@ -7,7 +7,7 @@ import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 public record BooleanLiteral(BooleanValue value) implements Literal<BooleanValue> {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpValue(indent, value.type.name(), value == BooleanValue.TRUE ? "true" : "false");
+		Dumper.dumpValue(indent, "Boolean", value == BooleanValue.TRUE ? "true" : "false");
 	}
 
 	@Override

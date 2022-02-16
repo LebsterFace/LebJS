@@ -170,9 +170,9 @@ public final class GlobalObject extends ObjectValue {
 
 		if (!expected.equals(received)) {
 			Dumper.dumpIndicator(0, "Expected");
-			Dumper.dumpValue(0, expected.type.name(), expected.toDisplayString());
+			Dumper.dumpValue(0, expected.getClass().getSimpleName(), expected.toDisplayString());
 			Dumper.dumpIndicator(0, "Received");
-			Dumper.dumpValue(0, received.type.name(), received.toDisplayString());
+			Dumper.dumpValue(0, received.getClass().getSimpleName(), received.toDisplayString());
 			throw new ShouldNotHappen("Assertion failed.");
 		}
 

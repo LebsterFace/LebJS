@@ -110,17 +110,17 @@ public record RelationalExpression(Expression left, Expression right, Relational
 
 		if (leftFirst) {
 			// a. Let px be ? ToPrimitive(x, number).
-			px = x.toPrimitive(interpreter, Value.Type.Number);
+			px = x.toPrimitive(interpreter, Value.PreferredType.Number);
 			// b. Let py be ? ToPrimitive(y, number).
-			py = y.toPrimitive(interpreter, Value.Type.Number);
+			py = y.toPrimitive(interpreter, Value.PreferredType.Number);
 		}
 		// 2. Else,
 		else {
 			// a. NOTE: The order of evaluation needs to be reversed to preserve left to right evaluation.
 			// b. Let py be ? ToPrimitive(y, number).
-			py = y.toPrimitive(interpreter, Value.Type.Number);
+			py = y.toPrimitive(interpreter, Value.PreferredType.Number);
 			// c. Let px be ? ToPrimitive(x, number).
-			px = x.toPrimitive(interpreter, Value.Type.Number);
+			px = x.toPrimitive(interpreter, Value.PreferredType.Number);
 		}
 
 
@@ -157,9 +157,9 @@ public record RelationalExpression(Expression left, Expression right, Relational
 
 			// c. NOTE: Because px and py are primitive values, evaluation order is not important.
 			// d. Let nx be ? ToNumeric(px).
-			final NumberValue nx = px.toPrimitive(interpreter, Value.Type.Number).toNumberValue(interpreter);
+			final NumberValue nx = px.toPrimitive(interpreter, Value.PreferredType.Number).toNumberValue(interpreter);
 			// e. Let ny be ? ToNumeric(py).
-			final NumberValue ny = py.toPrimitive(interpreter, Value.Type.Number).toNumberValue(interpreter);
+			final NumberValue ny = py.toPrimitive(interpreter, Value.PreferredType.Number).toNumberValue(interpreter);
 
 			// 1. Return Number::lessThan(nx, ny).
 			return nx.lessThan(ny);

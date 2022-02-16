@@ -56,6 +56,11 @@ public final class Names {
 	public static final StringValue values = new StringValue("values");
 	public static final StringValue warn = new StringValue("warn");
 
+	// Values
+	public static final StringValue default_ = new StringValue("default");
+	public static final StringValue string = new StringValue("string");
+	public static final StringValue number = new StringValue("number");
+
 	// Globals
 	public static final StringValue Infinity = new StringValue("Infinity");
 	public static final StringValue NaN = new StringValue("NaN");

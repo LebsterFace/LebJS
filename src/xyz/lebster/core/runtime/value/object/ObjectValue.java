@@ -26,21 +26,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 	private ObjectValue prototypeSlot = this.getDefaultPrototype();
 
 	public ObjectValue() {
-		super(new HashMap<>(), Type.Object);
-	}
-
-	private static String getHint(Type preferredType) {
-		// i. If preferredType is not present, let hint be "default".
-		if (preferredType == null) return "default";
-		// ii. Else if preferredType is string, let hint be "string".
-		if (preferredType == Value.Type.String) return "string";
-			// iii. Else,
-		else {
-			// 1. Assert: preferredType is number.
-			assert preferredType == Value.Type.Number;
-			// 2. Let hint be "number".
-			return "number";
-		}
+		super(new HashMap<>());
 	}
 
 	protected static ObjectValue createFromPrototype(Value<?> O) throws AbruptCompletion {
@@ -110,36 +96,36 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
-	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
+	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, PreferredType preferredType) throws AbruptCompletion {
 		// a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
 		final Property exoticToPrim_property = this.getProperty(SymbolValue.toPrimitive);
 
 		// b. If exoticToPrim is not undefined, then
 		if (exoticToPrim_property != null) {
 			final Executable<?> exoticToPrim = Executable.getExecutable(exoticToPrim_property.getValue(interpreter));
-			// i - iii. Get hint
-			final StringValue hint = new StringValue(getHint(preferredType));
+			final StringValue hint = preferredType == null ? Names.default_ :
+				preferredType == PreferredType.String ? Names.string : Names.number;
 			// iv. Let result be ? Call(exoticToPrim, input, hint).
 			final Value<?> result = exoticToPrim.call(interpreter, this, hint);
 			// v. If Type(result) is not Object, return result.
-			if (result.type != Type.Object) return result.toPrimitive(interpreter);
+			if (!(result instanceof ObjectValue)) return result.toPrimitive(interpreter);
 			// vi. Throw a TypeError exception.
 			throw AbruptCompletion.error(new TypeError("Cannot convert object to primitive value"));
 		}
 
 		// c. If preferredType is not present, let preferredType be number.
 		// d. Return ? OrdinaryToPrimitive(input, preferredType).
-		return ordinaryToPrimitive(interpreter, preferredType == null ? Value.Type.Number : preferredType);
+		return ordinaryToPrimitive(interpreter, preferredType == null ? PreferredType.Number : preferredType);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-ordinarytoprimitive")
-	private PrimitiveValue<?> ordinaryToPrimitive(Interpreter interpreter, Type hint) throws AbruptCompletion {
+	private PrimitiveValue<?> ordinaryToPrimitive(Interpreter interpreter, PreferredType hint) throws AbruptCompletion {
 		// 1. Assert: Type(O) is Object.
 		// 2. Assert: hint is either string or number.
-		assert hint == Value.Type.String || hint == Value.Type.Number;
+		assert hint == PreferredType.String || hint == PreferredType.Number;
 
 		// 3. If hint is string, then Let methodNames be "toString", "valueOf".
-		final StringValue[] methodNames = hint == Value.Type.String ?
+		final StringValue[] methodNames = hint == PreferredType.String ?
 			new StringValue[] { Names.toString, Names.valueOf } :
 			// 4. Else, Let methodNames be "valueOf", "toString".
 			new StringValue[] { Names.valueOf, Names.toString };
@@ -153,7 +139,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 				// i. Let result be ? Call(method, O).
 				final Value<?> result = executable.call(interpreter, this);
 				// ii. If Type(result) is not Object, return result.
-				if (result.type != Type.Object) return (PrimitiveValue<?>) result;
+				if (result instanceof final PrimitiveValue<?> P) return P;
 			}
 		}
 
@@ -163,12 +149,12 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
-		return toPrimitive(interpreter, Value.Type.String).toStringValue(interpreter);
+		return toPrimitive(interpreter, PreferredType.String).toStringValue(interpreter);
 	}
 
 	@Override
 	public NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion {
-		return toPrimitive(interpreter, Value.Type.Number).toNumberValue(interpreter);
+		return toPrimitive(interpreter, PreferredType.Number).toNumberValue(interpreter);
 	}
 
 	@Override
@@ -323,7 +309,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		// 3. For each element key of ownKeys, do
 		for (final Map.Entry<Key<?>, Property> entry : this.value.entrySet()) {
 			// a. If Type(key) is String, then
-			if (entry.getKey().type == Type.String) {
+			if (entry.getKey() instanceof StringValue) {
 				// i. Let desc be ? O.[[GetOwnProperty]](key).
 				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
 				if (entry.getValue().isEnumerable()) {
@@ -368,7 +354,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		// 3. For each element key of ownKeys, do
 		for (final Map.Entry<Key<?>, Property> entry : this.value.entrySet()) {
 			// a. If Type(key) is String, then
-			if (entry.getKey().type == Type.String) {
+			if (entry.getKey() instanceof StringValue) {
 				// i. Let desc be ? O.[[GetOwnProperty]](key).
 				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
 				if (entry.getValue().isEnumerable()) {
@@ -486,8 +472,8 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 	}
 
 	public static abstract class Key<R> extends PrimitiveValue<R> {
-		public Key(R value, Type type) {
-			super(value, type);
+		public Key(R value) {
+			super(value);
 		}
 
 		protected void displayForObjectKey(StringRepresentation representation) {

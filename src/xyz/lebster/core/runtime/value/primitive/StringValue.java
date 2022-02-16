@@ -3,17 +3,16 @@ package xyz.lebster.core.runtime.value.primitive;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.StringWrapper;
 
 public final class StringValue extends ObjectValue.Key<String> {
 	public StringValue(String value) {
-		super(value, Value.Type.String);
+		super(value);
 	}
 
 	public StringValue(Object value) {
-		super(String.valueOf(value), Value.Type.String);
+		super(String.valueOf(value));
 	}
 
 	@Override

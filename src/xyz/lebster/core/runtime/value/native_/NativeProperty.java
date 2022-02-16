@@ -12,7 +12,7 @@ import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 public final class NativeProperty extends Value<NativeGetterSetter> {
 	public NativeProperty(NativeGetterSetter value) {
-		super(value, Type.Object);
+		super(value);
 	}
 
 	@Override

@@ -15,7 +15,7 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 		if (op == BinaryOp.Add) {
 			final Value<?> left_primitive = left_value.toPrimitive(interpreter);
 			final Value<?> right_primitive = right_value.toPrimitive(interpreter);
-			if (left_primitive.type == Value.Type.String || right_primitive.type == Value.Type.String) {
+			if (left_primitive instanceof StringValue || right_primitive instanceof StringValue) {
 				final StringValue left_string = left_primitive.toStringValue(interpreter);
 				final StringValue right_string = right_primitive.toStringValue(interpreter);
 				return new StringValue(left_string.value + right_string.value);

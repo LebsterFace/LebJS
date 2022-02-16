@@ -12,11 +12,9 @@ import java.util.Objects;
 
 public abstract class Value<JType> {
 	public final JType value;
-	public final Type type;
 
-	public Value(JType value, Type type) {
+	public Value(JType value) {
 		this.value = value;
-		this.type = type;
 	}
 
 	public abstract void display(StringRepresentation representation);
@@ -26,11 +24,12 @@ public abstract class Value<JType> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
-	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, Type preferredType) throws AbruptCompletion {
+	public enum PreferredType { String, Number };
+	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, PreferredType preferredType) throws AbruptCompletion {
 		if (this instanceof PrimitiveValue) {
 			return (PrimitiveValue<JType>) this;
 		} else {
-			throw new NotImplemented("A non-primitive value's toPrimitive method");
+			throw new NotImplemented(this.getClass().getSimpleName() + "#toPrimitive");
 		}
 	}
 
@@ -50,10 +49,18 @@ public abstract class Value<JType> {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toobject")
 	public abstract ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion;
 
+	public final boolean sameType(Value<?> y) {
+		if (this instanceof ObjectValue) {
+			return y instanceof ObjectValue;
+		} else {
+			return this.getClass() == y.getClass();
+		}
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevalue")
-	public boolean sameValue(Value<?> y) {
+	public final boolean sameValue(Value<?> y) {
 		// 1. If Type(x) is different from Type(y), return false.
-		if (this.type != y.type) return false;
+		if (!this.sameType(y)) return false;
 
 		// 2. If Type(x) is Number, then
 		if (this instanceof final NumberValue x_n)
@@ -76,7 +83,7 @@ public abstract class Value<JType> {
 		// 3. If Type(x) is Null, return true.
 		if (this == Null.instance) return true;
 
-		if (this.type == Value.Type.String)
+		if (this instanceof StringValue)
 			// 4. If Type(x) is String, then
 			return this.value.equals(y.value);
 		// a. If x and y are exactly the same sequence of code units (same length and same code units at corresponding indices), return true; otherwise, return false.
@@ -93,14 +100,13 @@ public abstract class Value<JType> {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof Value<?> value1)) return false;
-		if (!Objects.equals(value, value1.value)) return false;
-		return type == value1.type;
+		if (o == null || getClass() != o.getClass()) return false;
+		return Objects.equals(value, ((Value<?>) o).value);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(value, type);
+		return value == null ? 0 : value.hashCode();
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#table-typeof-operator-results")
@@ -109,7 +115,7 @@ public abstract class Value<JType> {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-topropertykey")
 	public final ObjectValue.Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {
 		// 1. Let key be ? ToPrimitive(argument, string).
-		final PrimitiveValue<?> key = this.toPrimitive(interpreter, Value.Type.String);
+		final PrimitiveValue<?> key = this.toPrimitive(interpreter, PreferredType.String);
 		// 2. If Type(key) is Symbol, then
 		if (key instanceof final SymbolValue s)
 			// a. Return key.
@@ -124,24 +130,12 @@ public abstract class Value<JType> {
 	}
 
 	public final boolean isNullish() {
-		return type == Type.Undefined || type == Type.Null;
+		return this == Undefined.instance || this == Null.instance;
 	}
 
 	public final String toDisplayString() {
 		final var representation = new StringRepresentation();
 		this.display(representation);
 		return representation.toString();
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-primitive-value")
-	public enum Type {
-		String,
-		Symbol,
-		// TODO: BigInt
-		Number,
-		Boolean,
-		Object,
-		Null,
-		Undefined
 	}
 }

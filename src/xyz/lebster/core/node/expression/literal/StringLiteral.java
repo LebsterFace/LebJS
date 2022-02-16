@@ -7,7 +7,7 @@ import xyz.lebster.core.runtime.value.primitive.StringValue;
 public record StringLiteral(StringValue value) implements Literal<StringValue> {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpValue(indent, value.type.name(), value.value);
+		Dumper.dumpValue(indent, "String", value.value);
 	}
 
 	@Override

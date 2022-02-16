@@ -7,7 +7,7 @@ import xyz.lebster.core.runtime.value.primitive.NumberValue;
 public record NumericLiteral(NumberValue value) implements Literal<NumberValue> {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpValue(indent, value.type.name(), value.stringValueOf());
+		Dumper.dumpValue(indent, "Number", value.stringValueOf());
 	}
 
 	@Override

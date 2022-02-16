@@ -5,7 +5,6 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
@@ -82,7 +81,7 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 	private final String description;
 
 	public SymbolValue(String description) {
-		super(null, Value.Type.Symbol);
+		super(null);
 		this.description = description;
 	}
 

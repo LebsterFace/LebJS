@@ -139,7 +139,7 @@ public final class ArrayPrototype extends ObjectValue {
 	private static StringValue join(Interpreter interpreter, Value<?>[] elements) throws AbruptCompletion {
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		final long len = Long.min(MAX_LENGTH, O.get(interpreter, Names.length).toNumberValue(interpreter).value.longValue());
-		final boolean noSeparator = elements.length == 0 || elements[0].type == Type.Undefined;
+		final boolean noSeparator = elements.length == 0 || elements[0] == Undefined.instance;
 		final String sep = noSeparator ? "," : elements[0].toStringValue(interpreter).value;
 
 		final StringBuilder result = new StringBuilder();

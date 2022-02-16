@@ -12,7 +12,7 @@ public record ConditionalExpression(Expression test, Expression left, Expression
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-conditional-operator-runtime-semantics-evaluation")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final boolean result = test.execute(interpreter).toBooleanValue(interpreter).value;
+		final boolean result = test.execute(interpreter).isTruthy(interpreter);
 		return (result ? left : right).execute(interpreter);
 	}
 

@@ -119,11 +119,11 @@ public abstract class Value<JType> {
 		return key.toStringValue(interpreter);
 	}
 
-	public boolean isTruthy(Interpreter interpreter) throws AbruptCompletion {
+	public final boolean isTruthy(Interpreter interpreter) throws AbruptCompletion {
 		return this.toBooleanValue(interpreter).value;
 	}
 
-	public boolean isNullish() {
+	public final boolean isNullish() {
 		return type == Type.Undefined || type == Type.Null;
 	}
 

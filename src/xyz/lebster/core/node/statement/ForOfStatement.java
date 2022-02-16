@@ -48,7 +48,7 @@ public record ForOfStatement(LeftHandSideExpression left, Expression right, Stat
 				throw AbruptCompletion.error(new TypeError("Iterator result is not an object"));
 
 			// Stop if .done = true
-			if (next.get($, Names.done).toBooleanValue($).value) break;
+			if (next.get($, Names.done).isTruthy($)) break;
 
 			// Store .value in the left reference
 			left.putValue($, next.get($, Names.value));

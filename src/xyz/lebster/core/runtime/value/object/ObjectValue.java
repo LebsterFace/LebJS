@@ -14,13 +14,14 @@ import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.native_.NativeCode;
 import xyz.lebster.core.runtime.value.native_.NativeFunction;
-import xyz.lebster.core.runtime.value.native_.NativeProperty;
+import xyz.lebster.core.runtime.value.object.property.DataDescriptor;
+import xyz.lebster.core.runtime.value.object.property.PropertyDescriptor;
 import xyz.lebster.core.runtime.value.primitive.*;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 import java.util.*;
 
-public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Property>> {
+public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescriptor>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
 	private final int UNIQUE_ID = ObjectValue.LAST_UNUSED_IDENTIFIER++;
 	private ObjectValue prototypeSlot = this.getDefaultPrototype();
@@ -95,14 +96,24 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 	}
 
 	@Override
+	public int hashCode() {
+		return UNIQUE_ID;
+	}
+
+	@Override
+	public String typeOf(Interpreter interpreter) {
+		return "object";
+	}
+
+	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
 	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, PreferredType preferredType) throws AbruptCompletion {
 		// a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
-		final Property exoticToPrim_property = this.getProperty(SymbolValue.toPrimitive);
+		final PropertyDescriptor exoticToPrim_property = this.getProperty(SymbolValue.toPrimitive);
 
 		// b. If exoticToPrim is not undefined, then
 		if (exoticToPrim_property != null) {
-			final Executable<?> exoticToPrim = Executable.getExecutable(exoticToPrim_property.getValue(interpreter));
+			final Executable<?> exoticToPrim = Executable.getExecutable(exoticToPrim_property.get(interpreter, this));
 			final StringValue hint = preferredType == null ? Names.default_ :
 				preferredType == PreferredType.String ? Names.string : Names.number;
 			// iv. Let result be ? Call(exoticToPrim, input, hint).
@@ -167,92 +178,12 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		return this;
 	}
 
-	public void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
-		final Property property = this.getProperty(key);
-		if (property != null) {
-			if (property.isWritable()) {
-				property.setValue(interpreter, value);
-			} else {
-				final var representation = new StringRepresentation();
-				representation.append("Cannot assign to read-only property ");
-				key.display(representation);
-				throw AbruptCompletion.error(new TypeError(representation.toString()));
-			}
-		} else {
-			this.value.put(key, new Property(true, value));
-		}
+	public boolean hasOwnProperty(Key<?> key) {
+		return this.value.containsKey(key);
 	}
 
-	@NonStandard
-	public Value<?> getWellKnownSymbolOrUndefined(Interpreter interpreter, SymbolValue key) throws AbruptCompletion {
-		final Property property = this.getProperty(key);
-		return property == null ? Undefined.instance : property.getValue(interpreter);
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getmethod")
-	public Value<?> getMethod(Interpreter interpreter, SymbolValue P) throws AbruptCompletion {
-		final Value<?> func = this.getWellKnownSymbolOrUndefined(interpreter, P);
-		// 2. If func is either undefined or null, return undefined.
-		if (func == Undefined.instance || func == Null.instance)
-			return Undefined.instance;
-		// 3. If IsCallable(func) is false, throw a TypeError exception.
-		if (!(func instanceof Executable<?>))
-			throw AbruptCompletion.error(new TypeError("Not a function!"));
-		// 4. Return func.
-		return func;
-	}
-
-	public final Value<?> get(Interpreter interpreter, Key<?> key) throws AbruptCompletion {
-		final Property property = this.getProperty(key);
-		if (property == null) {
-			if (interpreter.isCheckedMode()) {
-				final var representation = new StringRepresentation();
-				representation.append("Property ");
-				key.displayForObjectKey(representation);
-				representation.append(" does not exist on object.");
-				throw AbruptCompletion.error(new CheckedError(representation.toString()));
-			} else {
-				return Undefined.instance;
-			}
-		}
-		return property.getValue(interpreter);
-	}
-
-	public void put(Key<?> key, Value<?> value) {
-		this.value.put(key, new Property(true, value));
-	}
-
-	public void put(String key, Value<?> value) {
-		this.put(new StringValue(key), value);
-	}
-
-	public void putNonWritable(Key<?> key, Value<?> value) {
-		this.value.put(key, new Property(false, value));
-	}
-
-	public void putMethod(StringValue name, NativeCode code) {
-		this.value.put(name, new Property(true, new NativeFunction(name, code)));
-	}
-
-	public void putMethod(SymbolValue name, NativeCode code) {
-		this.value.put(name, new Property(true, new NativeFunction(name, code)));
-	}
-
-	private Property getProperty(Key<?> key) {
-		ObjectValue object = this;
-
-		while (object != null) {
-			if (object.value.containsKey(key)) {
-				// Property was found
-				return object.value.get(key);
-			} else {
-				// Property does not exist on current object. Move up prototype chain
-				object = object.getPrototype();
-			}
-		}
-
-		// End of prototype chain; property does not exist.
-		return null;
+	public PropertyDescriptor getOwnProperty(Key<?> key) {
+		return this.value.get(key);
 	}
 
 	public boolean hasProperty(Key<?> name) {
@@ -273,8 +204,95 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		return false;
 	}
 
-	public boolean hasOwnProperty(Key<?> key) {
-		return this.value.containsKey(key);
+	private PropertyDescriptor getProperty(Key<?> key) {
+		ObjectValue object = this;
+
+		while (object != null) {
+			if (object.value.containsKey(key)) {
+				// Property was found
+				return object.value.get(key);
+			} else {
+				// Property does not exist on current object. Move up prototype chain
+				object = object.getPrototype();
+			}
+		}
+
+		// End of prototype chain; property does not exist.
+		return null;
+	}
+
+	@NonCompliant
+	public void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
+		final PropertyDescriptor property = this.getProperty(key);
+		if (property == null) {
+			this.value.put(key, new DataDescriptor(value, true, true, true));
+			return;
+		}
+
+		if (property.isWritable()) {
+			property.set(interpreter, this, value);
+		} else {
+			final var representation = new StringRepresentation();
+			representation.append("Cannot assign to read-only property ");
+			key.display(representation);
+			throw AbruptCompletion.error(new TypeError(representation.toString()));
+		}
+	}
+
+	@NonStandard
+	public Value<?> getWellKnownSymbolOrUndefined(Interpreter interpreter, SymbolValue key) throws AbruptCompletion {
+		final PropertyDescriptor property = this.getProperty(key);
+		return property == null ? Undefined.instance : property.get(interpreter, this);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getmethod")
+	public Value<?> getMethod(Interpreter interpreter, SymbolValue P) throws AbruptCompletion {
+		final Value<?> func = this.getWellKnownSymbolOrUndefined(interpreter, P);
+		// 2. If func is either undefined or null, return undefined.
+		if (func == Undefined.instance || func == Null.instance)
+			return Undefined.instance;
+		// 3. If IsCallable(func) is false, throw a TypeError exception.
+		if (!(func instanceof Executable<?>))
+			throw AbruptCompletion.error(new TypeError("Not a function!"));
+		// 4. Return func.
+		return func;
+	}
+
+	public final Value<?> get(Interpreter interpreter, Key<?> key) throws AbruptCompletion {
+		final PropertyDescriptor property = this.getProperty(key);
+		if (property == null) {
+			if (interpreter.isCheckedMode()) {
+				final var representation = new StringRepresentation();
+				representation.append("Property ");
+				key.displayForObjectKey(representation);
+				representation.append(" does not exist on object.");
+				throw AbruptCompletion.error(new CheckedError(representation.toString()));
+			} else {
+				return Undefined.instance;
+			}
+		}
+
+		return property.get(interpreter, this);
+	}
+
+	public void put(Key<?> key, Value<?> value) {
+		this.value.put(key, new DataDescriptor(value, true, true, true));
+	}
+
+	public void put(String key, Value<?> value) {
+		this.value.put(new StringValue(key), new DataDescriptor(value, true, true, true));
+	}
+
+	public void putNonWritable(Key<?> key, Value<?> value) {
+		this.value.put(key, new DataDescriptor(value, false, true, true));
+	}
+
+	public void putMethod(StringValue name, NativeCode code) {
+		this.value.put(name, new DataDescriptor(new NativeFunction(name, code), true, true, true));
+	}
+
+	public void putMethod(SymbolValue name, NativeCode code) {
+		this.value.put(name, new DataDescriptor(new NativeFunction(name, code), true, true, true));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
@@ -285,7 +303,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		final List<StringValue> properties = new ArrayList<>();
 		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
 		// 3. For each element key of ownKeys, do
-		for (final Map.Entry<Key<?>, Property> entry : this.value.entrySet()) {
+		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : this.value.entrySet()) {
 			// a. If Type(key) is String, then
 			if (entry.getKey() instanceof final StringValue key_string) {
 				// i. Let desc be ? O.[[GetOwnProperty]](key).
@@ -307,14 +325,14 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		final List<Value<?>> properties = new ArrayList<>();
 		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
 		// 3. For each element key of ownKeys, do
-		for (final Map.Entry<Key<?>, Property> entry : this.value.entrySet()) {
+		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : this.value.entrySet()) {
 			// a. If Type(key) is String, then
 			if (entry.getKey() instanceof StringValue) {
 				// i. Let desc be ? O.[[GetOwnProperty]](key).
 				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
 				if (entry.getValue().isEnumerable()) {
 					// a. Let value be ? Get(O, key).
-					final Value<?> value = entry.getValue().getValue(interpreter);
+					final Value<?> value = entry.getValue().get(interpreter, this);
 					// b. If kind is value, append value to properties.
 					properties.add(value);
 				}
@@ -325,9 +343,30 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		return properties.toArray(new Value[0]);
 	}
 
-	/**
-	 * @return An {@link IteratorRecord} for the Object, or {@code null} if the object is not iterable.
-	 */
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
+	public ArrayObject[] enumerableOwnEntries(Interpreter interpreter) throws AbruptCompletion {
+		// 2. Let properties be a new empty List.
+		final List<ArrayObject> properties = new ArrayList<>();
+		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
+		// 3. For each element key of ownKeys, do
+		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : this.value.entrySet()) {
+			// a. If Type(key) is String, then
+			if (entry.getKey() instanceof StringValue) {
+				// i. Let desc be ? O.[[GetOwnProperty]](key).
+				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
+				if (entry.getValue().isEnumerable()) {
+					// ii. Let entry be ! CreateArrayFromList(« key, value »).
+					// iii. Append entry to properties.
+					properties.add(new ArrayObject(entry.getKey(), entry.getValue().get(interpreter, this)));
+				}
+			}
+		}
+
+		// 4. Return properties.
+		return properties.toArray(new ArrayObject[0]);
+	}
+
+	/** @return An {@link IteratorRecord} for the Object, or {@code null} if the object is not iterable. */
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
 	@NonCompliant
 	public final IteratorRecord getIterator(Interpreter interpreter) throws AbruptCompletion {
@@ -344,39 +383,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 		// 6. Let iteratorRecord be the Record { [[Iterator]]: iterator, [[NextMethod]]: nextMethod, [[Done]]: false }.
 		// 7. Return iteratorRecord.
 		return new IteratorRecord(iterator, nextMethod, false);
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
-	public ArrayObject[] enumerableOwnEntries(Interpreter interpreter) throws AbruptCompletion {
-		// 2. Let properties be a new empty List.
-		final List<ArrayObject> properties = new ArrayList<>();
-		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
-		// 3. For each element key of ownKeys, do
-		for (final Map.Entry<Key<?>, Property> entry : this.value.entrySet()) {
-			// a. If Type(key) is String, then
-			if (entry.getKey() instanceof StringValue) {
-				// i. Let desc be ? O.[[GetOwnProperty]](key).
-				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
-				if (entry.getValue().isEnumerable()) {
-					// ii. Let entry be ! CreateArrayFromList(« key, value »).
-					// iii. Append entry to properties.
-					properties.add(new ArrayObject(entry.getKey(), entry.getValue().getValue(interpreter)));
-				}
-			}
-		}
-
-		// 4. Return properties.
-		return properties.toArray(new ArrayObject[0]);
-	}
-
-	@Override
-	public int hashCode() {
-		return UNIQUE_ID;
-	}
-
-	@Override
-	public String typeOf(Interpreter interpreter) {
-		return "object";
 	}
 
 	public final void objectValue__display(StringRepresentation representation) {
@@ -422,25 +428,29 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 			entry.getKey().displayForObjectKey(representation);
 			representation.append(ANSI.RESET);
 			representation.append(": ");
-			final Value<?> value = entry.getValue().getRawValue();
-			if (value instanceof final ObjectValue object) {
-				if (parents.contains(object)) {
-					representation.append(ANSI.RED);
+			if (entry.getValue() instanceof final DataDescriptor dataDescriptor) {
+				final Value<?> value = dataDescriptor.getRawValue();
+				if (value instanceof final ObjectValue object) {
+					if (parents.contains(object)) {
+						representation.append(ANSI.RED);
 
-					if (object.getClass() != ObjectValue.class) {
-						object.representClassName(representation);
-					} else if (this == value) {
-						representation.append("[self]");
+						if (object.getClass() != ObjectValue.class) {
+							object.representClassName(representation);
+						} else {
+							representation.append(value == this ? "[self]" : "[parent]");
+						}
+
+						representation.append(ANSI.RESET);
 					} else {
-						representation.append("[parent]");
+						object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone(), singleLine);
 					}
-
-					representation.append(ANSI.RESET);
 				} else {
-					object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone(), singleLine);
+					value.display(representation);
 				}
 			} else {
-				value.display(representation);
+				representation.append(ANSI.CYAN);
+				representation.append("[Getter/Setter]");
+				representation.append(ANSI.RESET);
 			}
 
 			if (iterator.hasNext()) representation.append(',');
@@ -478,55 +488,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, ObjectValue.Prope
 
 		protected void displayForObjectKey(StringRepresentation representation) {
 			this.display(representation);
-		}
-	}
-
-	@NonStandard
-	public static final class Property {
-		private boolean writable;
-		private boolean enumerable;
-		private Value<?> value;
-
-		public Property(boolean writable, Value<?> value) {
-			this.enumerable = true;
-			this.writable = writable;
-			this.value = value;
-		}
-
-		private boolean isWritable() {
-			return writable;
-		}
-
-		private void setWritable(boolean writable) {
-			this.writable = writable;
-		}
-
-		public boolean isEnumerable() {
-			return enumerable;
-		}
-
-		public void setEnumerable(boolean enumerable) {
-			this.enumerable = enumerable;
-		}
-
-		private Value<?> getValue(Interpreter interpreter) throws AbruptCompletion {
-			if (this.value instanceof final NativeProperty n) {
-				return n.value.get(interpreter);
-			} else {
-				return this.value;
-			}
-		}
-
-		private void setValue(Interpreter interpreter, Value<?> newValue) throws AbruptCompletion {
-			if (this.value instanceof final NativeProperty n) {
-				n.value.set(interpreter, newValue);
-			} else {
-				this.value = newValue;
-			}
-		}
-
-		public Value<?> getRawValue() {
-			return this.value;
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package xyz.lebster.core.parser;
 
+import xyz.lebster.Main;
 import xyz.lebster.core.exception.SyntaxError;
 
 import java.util.ArrayList;
@@ -128,27 +129,13 @@ public final class Lexer {
 	private final String source;
 	private final StringBuilder builder = new StringBuilder();
 	private final int length;
-	private final boolean showOutput;
 	private int index = -1;
 	private char currentChar = '\0';
 
 	public Lexer(String source) {
 		this.source = source;
 		this.length = source.length();
-		this.showOutput = true;
 		consume();
-	}
-
-	public Lexer(String source, boolean showOutput) {
-		this.source = source;
-		this.length = source.length();
-		this.showOutput = showOutput;
-		consume();
-	}
-
-	private void output(String s) {
-		if (this.showOutput)
-			System.err.println(s);
 	}
 
 	public boolean isFinished() {
@@ -279,11 +266,7 @@ public final class Lexer {
 						case 'f' -> append('\f');
 						case 'r' -> append('\r');
 						case '\\' -> append('\\');
-
-						default -> {
-							output("Unnecessary escape '\\" + StringEscapeUtils.escape(Character.toString(currentChar)) + '\'');
-							collect();
-						}
+						default -> collect();
 					}
 				} else if (currentChar == '\\') {
 					escaped = true;

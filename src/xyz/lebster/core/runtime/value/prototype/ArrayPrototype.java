@@ -163,22 +163,33 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.push")
-	private static NumberValue push(Interpreter interpreter, Value<?>[] elements) throws AbruptCompletion {
+	private static NumberValue push(Interpreter interpreter, Value<?>[] items) throws AbruptCompletion {
+		// 23.1.3.21 Array.prototype.push ( ...items )
+		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
-		final long len = lengthOfArrayLike(O, interpreter);
-
-		if ((len + elements.length) > MAX_LENGTH) {
-			final String message = "Pushing " + elements.length + " elements on an array-like of length " + len +
-								   " is disallowed, as the total surpasses 2^53-1";
-			throw AbruptCompletion.error(new TypeError(message));
+		// 2. Let len be ? LengthOfArrayLike(O).
+		long len = lengthOfArrayLike(O, interpreter);
+		// 3. Let argCount be the number of elements in items.
+		final int argCount = items.length;
+		// 4. If len + argCount > 2^53 - 1, throw a TypeError exception.
+		if (len + argCount > MAX_LENGTH) {
+			throw AbruptCompletion.error(new TypeError("Pushing " + argCount + " elements on an array-like of length " +
+													   len + " is disallowed, as the total surpasses 2^53-1"));
 		}
 
-		for (final Value<?> E : elements)
+		// 5. For each element E of items, do
+		for (final Value<?> E : items) {
+			// a. Perform ? Set(O, ! ToString(𝔽(len)), E, true).
 			O.set(interpreter, new StringValue(len), E);
+			// b. Set len to len + 1.
+			len += 1;
+		}
 
-		final NumberValue newLength = new NumberValue(len + elements.length);
-		O.set(interpreter, Names.length, newLength);
-		return newLength;
+		// 6. Perform ? Set(O, "length", 𝔽(len), true).
+		final var newLen = new NumberValue(len);
+		O.set(interpreter, Names.length, newLen);
+		// 7. Return 𝔽(len).
+		return newLen;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.map")

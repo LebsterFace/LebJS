@@ -1,6 +1,12 @@
 package xyz.lebster.core.runtime.value.object.property;
 
 public abstract class NativeAccessorDescriptor implements PropertyDescriptor {
+	private boolean configurable;
+
+	public NativeAccessorDescriptor(boolean configurable) {
+		this.configurable = configurable;
+	}
+
 	@Override
 	public boolean isWritable() {
 		return true;
@@ -21,10 +27,11 @@ public abstract class NativeAccessorDescriptor implements PropertyDescriptor {
 
 	@Override
 	public boolean isConfigurable() {
-		return true;
+		return configurable;
 	}
 
 	@Override
 	public void setConfigurable(boolean configurable) {
+		this.configurable = configurable;
 	}
 }

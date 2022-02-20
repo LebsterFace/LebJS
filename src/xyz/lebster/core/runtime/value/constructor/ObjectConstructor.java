@@ -43,14 +43,14 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 			throw AbruptCompletion.error(new TypeError("Object.fromEntries call with non-array"));
 
 		final ObjectValue result = new ObjectValue();
-		arrayObject.forEach($, (final Value<?> value, int index) -> {
+		for (final Value<?> value : arrayObject) {
 			if (!(value instanceof final ObjectValue entry))
 				throw AbruptCompletion.error(new TypeError("Value is not an entry object"));
 
 			final ObjectValue.Key<?> entryKey = entry.get($, new StringValue("0")).toPropertyKey($);
 			final Value<?> entryValue = entry.get($, new StringValue("1"));
 			result.put(entryKey, entryValue);
-		});
+		}
 
 		return result;
 	}

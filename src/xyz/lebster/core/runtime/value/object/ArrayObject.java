@@ -16,8 +16,9 @@ import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 
-public final class ArrayObject extends ObjectValue implements HasBuiltinTag {
+public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Iterable<Value<?>> {
 	private final ArrayList<Value<?>> arrayValues;
 
 	public ArrayObject(Value<?>... initialValues) {
@@ -87,5 +88,10 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag {
 	@Override
 	public String getBuiltinTag() {
 		return "Array";
+	}
+
+	@Override
+	public Iterator<Value<?>> iterator() {
+		return arrayValues.iterator();
 	}
 }

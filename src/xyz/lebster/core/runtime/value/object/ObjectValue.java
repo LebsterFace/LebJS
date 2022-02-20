@@ -186,7 +186,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return this.value.get(key);
 	}
 
-	public boolean hasProperty(Key<?> name) {
+	public final boolean hasProperty(Key<?> name) {
 		if (this.hasOwnProperty(name)) return true;
 		ObjectValue object = this;
 
@@ -208,9 +208,9 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		ObjectValue object = this;
 
 		while (object != null) {
-			if (object.value.containsKey(key)) {
+			if (object.hasOwnProperty(key)) {
 				// Property was found
-				return object.value.get(key);
+				return object.getOwnProperty(key);
 			} else {
 				// Property does not exist on current object. Move up prototype chain
 				object = object.getPrototype();

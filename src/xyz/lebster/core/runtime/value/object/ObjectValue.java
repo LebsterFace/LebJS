@@ -366,7 +366,9 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return properties.toArray(new ArrayObject[0]);
 	}
 
-	/** @return An {@link IteratorRecord} for the Object, or {@code null} if the object is not iterable. */
+	/**
+	 * @return An {@link IteratorRecord} for the Object, or {@code null} if the object is not iterable.
+	 */
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
 	@NonCompliant
 	public final IteratorRecord getIterator(Interpreter interpreter) throws AbruptCompletion {

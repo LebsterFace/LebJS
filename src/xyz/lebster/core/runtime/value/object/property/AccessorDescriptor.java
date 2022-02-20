@@ -7,8 +7,8 @@ import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
 public final class AccessorDescriptor implements PropertyDescriptor {
-	private Executable<?> getter;
-	private Executable<?> setter;
+	private final Executable<?> getter;
+	private final Executable<?> setter;
 	private boolean enumerable;
 	private boolean configurable;
 

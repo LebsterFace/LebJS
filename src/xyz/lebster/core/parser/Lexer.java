@@ -1,6 +1,5 @@
 package xyz.lebster.core.parser;
 
-import xyz.lebster.Main;
 import xyz.lebster.core.exception.SyntaxError;
 
 import java.util.ArrayList;

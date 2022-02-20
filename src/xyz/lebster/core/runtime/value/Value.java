@@ -23,7 +23,6 @@ public abstract class Value<JType> {
 		this.display(representation);
 	}
 
-	public enum PreferredType { String, Number }
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
 	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, PreferredType preferredType) throws AbruptCompletion {
 		if (this instanceof PrimitiveValue) {
@@ -91,9 +90,9 @@ public abstract class Value<JType> {
 			return this.value.equals(y.value);
 
 		// 5. If Type(x) is Boolean, then
-			// a. return (x and y are both true or both false)
+		// a. return (x and y are both true or both false)
 		// 6. If Type(x) is Symbol, then
-			// a. return (x and y are both the same Symbol value)
+		// a. return (x and y are both the same Symbol value)
 		// 7. If x and y are the same Object value, return true. Otherwise, return false.
 
 		return this == y;
@@ -140,4 +139,6 @@ public abstract class Value<JType> {
 		this.display(representation);
 		return representation.toString();
 	}
+
+	public enum PreferredType { String, Number }
 }

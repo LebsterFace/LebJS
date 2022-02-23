@@ -24,6 +24,7 @@ public final class Names {
 	public static final StringValue hasOwnProperty = new StringValue("hasOwnProperty");
 	public static final StringValue hasProperty = new StringValue("hasProperty");
 	public static final StringValue info = new StringValue("info");
+	public static final StringValue input = new StringValue("input");
 	public static final StringValue isFinite = new StringValue("isFinite");
 	public static final StringValue isNaN = new StringValue("isNaN");
 	public static final StringValue join = new StringValue("join");

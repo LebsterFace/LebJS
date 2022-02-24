@@ -13,6 +13,8 @@ import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import java.util.Arrays;
 
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
+
 public final class FunctionPrototype extends Executable<Void> {
 	public static final FunctionPrototype instance = new FunctionPrototype();
 
@@ -32,7 +34,7 @@ public final class FunctionPrototype extends Executable<Void> {
 
 	private static Value<?> callMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final Executable<?> func = Executable.getExecutable(interpreter.thisValue());
-		final Value<?> thisArg = arguments.length > 0 ? arguments[0] : Undefined.instance;
+		final Value<?> thisArg = argument(0, arguments);
 		final Value<?>[] args = Arrays.copyOfRange(arguments, 1, arguments.length);
 		return func.call(interpreter, thisArg, args);
 	}

@@ -8,7 +8,7 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.SymbolValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import java.util.HashSet;
 
@@ -22,6 +22,26 @@ public final class NativeFunction extends Executable<NativeCode> {
 
 	public static StringValue toStringForName(String name) {
 		return new StringValue("function " + name + "() { [native code] }");
+	}
+
+	public static Value<?> argument(int index, Value<?>[] arguments) {
+		if (arguments.length <= index) return Undefined.instance;
+		return arguments[index];
+	}
+
+	public static String argumentString(int index, String defaultValue, Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		if (arguments.length <= index || arguments[index] == Undefined.instance) return defaultValue;
+		return arguments[index].toStringValue(interpreter).value;
+	}
+
+	public static double argumentDouble(int index, Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		if (arguments.length <= index || arguments[index] == Undefined.instance) return Double.NaN;
+		return arguments[index].toNumberValue(interpreter).value;
+	}
+
+	public static int argumentInt(int index, int defaultValue, Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		if (arguments.length <= index || arguments[index] == Undefined.instance) return defaultValue;
+		return arguments[index].toNumberValue(interpreter).value.intValue();
 	}
 
 	@Override

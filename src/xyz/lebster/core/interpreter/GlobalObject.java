@@ -1,6 +1,7 @@
 package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.Dumper;
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.ShouldNotHappen;
@@ -19,6 +20,8 @@ import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
+
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.*;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
 public final class GlobalObject extends ObjectValue {
@@ -56,11 +59,14 @@ public final class GlobalObject extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parseint-string-radix")
-	private static Value<?> parseInt(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static NumberValue parseInt(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		if (arguments.length == 0) return NumberValue.NaN;
+		final Value<?> radix = argument(1, arguments);
+
 		// 1. Let inputString be ? ToString(string).
-		final StringValue inputString = arguments.length > 0 ? arguments[0].toStringValue(interpreter) : Names.undefined;
+		final String inputString = arguments[0].toStringValue(interpreter).value;
 		// 2. Let S be ! TrimString(inputString, start).
-		final StringBuilder S = new StringBuilder(inputString.value.stripLeading());
+		final StringBuilder S = new StringBuilder(inputString.stripLeading());
 		// 3. Let sign be 1.
 		int sign = 1;
 		// 4. If S is not empty and the first code unit of S is the code unit 0x002D (HYPHEN-MINUS), set sign to -1.
@@ -70,7 +76,6 @@ public final class GlobalObject extends ObjectValue {
 			// remove the first code unit from S.
 			S.deleteCharAt(0);
 		// 6. Let R be ℝ(? ToInt32(radix)).
-		final Value<?> radix = arguments.length > 1 ? arguments[1] : Undefined.instance;
 		int R = radix.toNumberValue(interpreter).toInt32();
 		// 7. Let stripPrefix be true.
 		boolean stripPrefix = true;
@@ -128,9 +133,11 @@ public final class GlobalObject extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parsefloat-string")
-	private static Value<?> parseFloat(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static NumberValue parseFloat(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		if (arguments.length == 0) return NumberValue.NaN;
+
 		// 1. Let inputString be ? ToString(string).
-		final StringValue string = arguments.length > 0 ? arguments[0].toStringValue(interpreter) : Names.undefined;
+		final StringValue string = arguments[0].toStringValue(interpreter);
 		// 2. Let trimmedString be ! TrimString(inputString, start).
 		final String trimmedString = string.value.stripLeading();
 		// FIXME: Follow spec
@@ -138,20 +145,23 @@ public final class GlobalObject extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isfinite-number")
-	private static Value<?> isFinite(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static BooleanValue isFinite(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		if (arguments.length == 0) return BooleanValue.FALSE;
+
 		// 1. Let num be ? ToNumber(number).
-		final double num = arguments.length > 0 ? arguments[0].toNumberValue(interpreter).value : Double.NaN;
+		final double num = arguments[0].toNumberValue(interpreter).value;
 		// 2. If num is NaN, +∞𝔽, or -∞𝔽, return false.
 		// 3. Otherwise, return true.
 		return BooleanValue.of(!(Double.isNaN(num) || Double.isInfinite(num)));
 	}
 
-	// FIXME: Follow spec
+	@NonCompliant
 	private static Value<?> eval(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final String source = arguments.length > 0 ? arguments[0].toStringValue(interpreter).value : "undefined";
+		if (arguments.length == 0) return Undefined.instance;
+		final String sourceText = arguments[0].toStringValue(interpreter).value;
+
 		try {
-			final Program program = new Parser(new Lexer(source).tokenize()).parse();
-			return program.execute(interpreter);
+			return Realm.executeWith(sourceText, interpreter);
 		} catch (CannotParse | SyntaxError e) {
 			throw AbruptCompletion.error(new EvalError(e));
 		}
@@ -159,12 +169,12 @@ public final class GlobalObject extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isnan-number")
 	// This method behaves the same as the specification, but does not follow it directly
-	private static Value<?> isNaN(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static BooleanValue isNaN(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		if (arguments.length == 0) return BooleanValue.FALSE;
 		return BooleanValue.of(arguments[0].toNumberValue(interpreter).value.isNaN());
 	}
 
-	private static Value<?> expect(Interpreter interpreter, Value<?>[] arguments) {
+	private static Undefined expect(Interpreter interpreter, Value<?>[] arguments) {
 		final Value<?> expected = arguments[0];
 		final Value<?> received = arguments[1];
 

@@ -10,8 +10,10 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
-import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
+
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argumentInt;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-array-constructor")
 public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
@@ -28,12 +30,12 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 
 	@NonStandard
 	private static Value<?> of(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final int len = arguments.length > 0 ? arguments[0].toNumberValue(interpreter).value.intValue() : 0;
-		final Value<?> callbackFn = arguments.length > 1 ? arguments[1] : Undefined.instance;
-		final Value<?> thisArg = arguments.length > 2 ? arguments[2] : Undefined.instance;
+		final int len = argumentInt(0, 0, interpreter, arguments);
+		final Value<?> callbackFn = argument(1, arguments);
+		final Value<?> thisArg = argument(2, arguments);
 
 		final Executable<?> executable = Executable.getExecutable(callbackFn);
-		final Value<?>[] result = new Value<?>[(int) len];
+		final Value<?>[] result = new Value<?>[len];
 		for (int k = 0; k < len; k++)
 			result[k] = executable.call(interpreter, thisArg, new NumberValue(k));
 		return new ArrayObject(result);

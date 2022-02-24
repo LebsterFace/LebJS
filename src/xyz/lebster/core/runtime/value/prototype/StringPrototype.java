@@ -18,6 +18,7 @@ import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import java.util.PrimitiveIterator;
 
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 import static xyz.lebster.core.runtime.value.prototype.NumberPrototype.toIntegerOrInfinity;
 import static xyz.lebster.core.runtime.value.prototype.ObjectPrototype.requireObjectCoercible;
 
@@ -123,9 +124,9 @@ public final class StringPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charat")
-	private static StringValue charAt(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+	private static StringValue charAt(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// String.prototype.charAt ( pos )
-		final Value<?> pos = args.length > 0 ? args[0] : Undefined.instance;
+		final Value<?> pos = argument(0, arguments);
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.charAt");
 		// 2. Let S be ? ToString(O).
@@ -141,10 +142,10 @@ public final class StringPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.slice")
-	private static StringValue slice(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+	private static StringValue slice(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// String.prototype.slice ( start, end )
-		final Value<?> start = args.length > 0 ? args[0] : Undefined.instance;
-		final Value<?> end = args.length > 1 ? args[1] : Undefined.instance;
+		final Value<?> start = argument(0, arguments);
+		final Value<?> end = argument(1, arguments);
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.slice");
 		// 2. Let S be ? ToString(O).

@@ -1,10 +1,7 @@
 package xyz.lebster.core.runtime.value.object;
 
 import xyz.lebster.core.exception.NotImplemented;
-import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
-import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.SymbolValue;
@@ -12,6 +9,7 @@ import xyz.lebster.core.runtime.value.primitive.SymbolValue;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
 
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argumentDouble;
 import static xyz.lebster.core.runtime.value.primitive.NumberValue.isNegativeZero;
 import static xyz.lebster.core.runtime.value.primitive.NumberValue.isPositiveZero;
 
@@ -200,14 +198,6 @@ public final class MathObject extends ObjectValue {
 		notImplemented("fround");
 	}
 
-	private double getArgument(int index, Value<?>[] arguments, Interpreter interpreter) throws AbruptCompletion {
-		if (arguments.length > index) {
-			return arguments[index].toNumberValue(interpreter).value;
-		} else {
-			return Double.NaN;
-		}
-	}
-
 	private void notImplemented(String methodName) {
 		this.putMethod(new StringValue(methodName), (interpreter, args) -> {
 			throw new NotImplemented(methodName);
@@ -228,15 +218,15 @@ public final class MathObject extends ObjectValue {
 
 	private void addWrapper(String methodName, DoubleUnaryOperator unaryOperator) {
 		this.putMethod(new StringValue(methodName), (interpreter, args) -> {
-			final var number = getArgument(0, args, interpreter);
+			final var number = argumentDouble(0, interpreter, args);
 			return new NumberValue(unaryOperator.applyAsDouble(number));
 		});
 	}
 
 	private void addWrapper(String methodName, DoubleBinaryOperator binaryOperator) {
 		this.putMethod(new StringValue(methodName), (interpreter, args) -> {
-			final var a = getArgument(0, args, interpreter);
-			final var b = getArgument(1, args, interpreter);
+			final var a = argumentDouble(0, interpreter, args);
+			final var b = argumentDouble(1, interpreter, args);
 			return new NumberValue(binaryOperator.applyAsDouble(a, b));
 		});
 	}

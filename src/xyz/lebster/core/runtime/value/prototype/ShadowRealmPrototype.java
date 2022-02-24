@@ -11,6 +11,8 @@ import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.ShadowRealm;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
+
 public final class ShadowRealmPrototype extends ObjectValue {
 	public static final ShadowRealmPrototype instance = new ShadowRealmPrototype();
 
@@ -39,14 +41,13 @@ public final class ShadowRealmPrototype extends ObjectValue {
 	}
 
 	private static Value<?> declare(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		if (!(interpreter.thisValue() instanceof final ShadowRealm shadowRealm)) {
-			throw AbruptCompletion.error(new TypeError("ShadowRealm.prototype.declare requires that 'this' be a ShadowRealm"));
-		}
-
-		if (arguments.length < 1) throw AbruptCompletion.error(new TypeError("Missing variable name"));
+		if (!(interpreter.thisValue() instanceof final ShadowRealm shadowRealm))
+			throw AbruptCompletion.error(new TypeError("ShadowRealm.prototype.declare requires that `this` be a ShadowRealm"));
+		if (arguments.length < 1)
+			throw AbruptCompletion.error(new TypeError("Missing variable name"));
 
 		final String name = arguments[0].toStringValue(interpreter).value;
-		final Value<?> value = arguments.length > 1 ? arguments[1] : Undefined.instance;
+		final Value<?> value = argument(1, arguments);
 
 		shadowRealm.declare(name, value);
 		return value;

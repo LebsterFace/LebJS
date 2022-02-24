@@ -14,6 +14,8 @@ import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import java.util.Scanner;
 
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argumentString;
+
 @SpecificationURL("https://console.spec.whatwg.org/")
 public final class ConsoleObject extends ObjectValue {
 	public static final ConsoleObject instance = new ConsoleObject();
@@ -45,11 +47,8 @@ public final class ConsoleObject extends ObjectValue {
 	private static final Scanner scanner = new Scanner(System.in);
 	@NonStandard
 	private static Value<?> input(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		if (args.length > 0) {
-			System.out.print(args[0].toStringValue(interpreter).value);
-		}
-
-		final String inputType = args.length > 1 ? args[1].toStringValue(interpreter).value : "";
+		System.out.print(argumentString(0, "", interpreter, args));
+		final String inputType = argumentString(1, "", interpreter, args);
 		final String input = scanner.nextLine();
 
 		return switch (inputType.toUpperCase()) {

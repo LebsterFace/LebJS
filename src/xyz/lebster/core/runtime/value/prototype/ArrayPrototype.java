@@ -16,6 +16,9 @@ import xyz.lebster.core.runtime.value.primitive.*;
 
 import java.util.Arrays;
 
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argumentString;
+
 public final class ArrayPrototype extends ObjectValue {
 	public static final ArrayPrototype instance = new ArrayPrototype();
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
@@ -40,8 +43,8 @@ public final class ArrayPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.filter")
 	private static ArrayObject filter(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.8 Array.prototype.filter ( callbackfn [ , thisArg ] )
-		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : Undefined.instance;
-		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : Undefined.instance;
+		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
 
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
@@ -92,8 +95,8 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.foreach")
 	private static Undefined forEach(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : Undefined.instance;
-		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : Undefined.instance;
+		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
 
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
@@ -124,7 +127,7 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tostring")
-	private static Value<?> toStringMethod(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
+	private static Value<?> toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let array be ? ToObject(this value).
 		final ObjectValue array = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let func be ? Get(array, "join").
@@ -136,11 +139,13 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.join")
-	private static StringValue join(Interpreter interpreter, Value<?>[] elements) throws AbruptCompletion {
+	private static StringValue join(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.16 Array.prototype.join ( separator )
+		final String sep = argumentString(0, ",", interpreter, arguments);
+
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
-		final long len = Long.min(MAX_LENGTH, O.get(interpreter, Names.length).toNumberValue(interpreter).value.longValue());
-		final boolean noSeparator = elements.length == 0 || elements[0] == Undefined.instance;
-		final String sep = noSeparator ? "," : elements[0].toStringValue(interpreter).value;
+		final NumberValue lengthProperty = O.get(interpreter, Names.length).toNumberValue(interpreter);
+		final long len = Long.min(MAX_LENGTH, lengthProperty.value.longValue());
 
 		final StringBuilder result = new StringBuilder();
 		for (int k = 0; k < len; k++) {
@@ -194,12 +199,12 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.map")
 	private static ArrayObject map(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> callbackfn = arguments.length > 0 ? arguments[0] : Undefined.instance;
-		final Value<?> thisArg = arguments.length > 1 ? arguments[1] : Undefined.instance;
+		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
 
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		final long len = lengthOfArrayLike(O, interpreter);
-		final var executable = Executable.getExecutable(callbackfn);
+		final Executable<?> executable = Executable.getExecutable(callbackfn);
 
 		final Value<?>[] values = new Value<?>[(int) len];
 		for (int k = 0; k < len; k++) {

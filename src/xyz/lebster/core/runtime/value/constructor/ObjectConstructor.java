@@ -8,12 +8,15 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
+import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.Null;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
+
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
 public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
@@ -38,7 +41,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.fromentries")
 	@NonCompliant
 	private static ObjectValue fromEntries(Interpreter $, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> arg = arguments.length > 0 ? arguments[0] : Undefined.instance;
+		final Value<?> arg = NativeFunction.argument(0, arguments);
 		if (!(arg instanceof ArrayObject arrayObject))
 			throw AbruptCompletion.error(new TypeError("Object.fromEntries call with non-array"));
 
@@ -57,19 +60,19 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.keys")
 	private static Value<?> keys(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final ObjectValue obj = (args.length > 0 ? args[0] : Undefined.instance).toObjectValue(interpreter);
+		final ObjectValue obj = argument(0, args).toObjectValue(interpreter);
 		return new ArrayObject(obj.enumerableOwnKeys());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.values")
 	private static Value<?> values(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final ObjectValue obj = (args.length > 0 ? args[0] : Undefined.instance).toObjectValue(interpreter);
+		final ObjectValue obj = argument(0, args).toObjectValue(interpreter);
 		return new ArrayObject(obj.enumerableOwnValues(interpreter));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.entries")
 	private static Value<?> entries(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final ObjectValue obj = (args.length > 0 ? args[0] : Undefined.instance).toObjectValue(interpreter);
+		final ObjectValue obj = argument(0, args).toObjectValue(interpreter);
 		return new ArrayObject(obj.enumerableOwnEntries(interpreter));
 	}
 
@@ -77,14 +80,15 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	@NonCompliant
 	private static Value<?> create(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// Object.create ( O, Properties )
-		final Value<?> O = arguments.length > 0 ? arguments[0] : Undefined.instance;
+		final Value<?> O = argument(0, arguments);
 		return ObjectValue.createFromPrototype(O);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.setprototypeof")
 	private static Value<?> setPrototypeOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> O = arguments.length > 0 ? arguments[0] : Undefined.instance;
-		final Value<?> proto = arguments.length > 1 ? arguments[1] : Undefined.instance;
+		// 20.1.2.22 Object.setPrototypeOf ( O, proto )
+		final Value<?> O = argument(0, arguments);
+		final Value<?> proto = argument(1, arguments);
 
 		// 1. Set O to ? RequireObjectCoercible(O).
 		if (O.isNullish())
@@ -111,7 +115,8 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getprototypeof")
 	private static Value<?> getPrototypeOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> O = arguments.length > 0 ? arguments[0] : Undefined.instance;
+		// 20.1.2.12 Object.getPrototypeOf ( O )
+		final Value<?> O = argument(0, arguments);
 		// 1. Let obj be ? ToObject(O).
 		// 2. Return ? obj.[[GetPrototypeOf]]().
 		final ObjectValue prototype = O.toObjectValue(interpreter).getPrototype();

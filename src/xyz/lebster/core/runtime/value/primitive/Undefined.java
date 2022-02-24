@@ -27,7 +27,7 @@ public final class Undefined extends PrimitiveValue<Void> {
 
 	@Override
 	public NumberValue toNumberValue(Interpreter interpreter) {
-		return new NumberValue(Double.NaN);
+		return NumberValue.NaN;
 	}
 
 	@Override

@@ -28,7 +28,7 @@ public final class GlobalObject extends ObjectValue {
 		// 19.1 Value Properties of the Global Object
 		put(Names.globalThis, this);
 
-		putNonWritable(Names.NaN, new NumberValue(Double.NaN));
+		putNonWritable(Names.NaN, NumberValue.NaN);
 		putNonWritable(Names.Infinity, new NumberValue(Double.POSITIVE_INFINITY));
 		putNonWritable(Names.undefined, Undefined.instance);
 
@@ -77,7 +77,7 @@ public final class GlobalObject extends ObjectValue {
 		// 8. If R ≠ 0, then
 		if (R != 0) {
 			// a. If R < 2 or R > 36, return NaN.
-			if (R < 2 || R > 36) return new NumberValue(Double.NaN);
+			if (R < 2 || R > 36) return NumberValue.NaN;
 			// b. If R ≠ 16, set stripPrefix to false.
 			if (R != 16) stripPrefix = false;
 		} else {
@@ -107,7 +107,7 @@ public final class GlobalObject extends ObjectValue {
 		// 12. Let Z be the substring of S from 0 to end.
 		final String Z = S.substring(0, end);
 		// 13. If Z is empty, return NaN.
-		if (Z.isEmpty()) return new NumberValue(Double.NaN);
+		if (Z.isEmpty()) return NumberValue.NaN;
 
 		// 14. Let mathInt be the integer value that is represented by Z in radix-R notation, using the letters
 		// A-Z and a-z for digits with values 10 through 35. (However, if R is 10 and Z contains more than 20

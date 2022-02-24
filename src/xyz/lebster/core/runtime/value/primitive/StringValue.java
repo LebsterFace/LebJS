@@ -58,7 +58,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 		try {
 			return new NumberValue(Double.parseDouble(value));
 		} catch (NumberFormatException e) {
-			return new NumberValue(Double.NaN);
+			return NumberValue.NaN;
 		}
 	}
 

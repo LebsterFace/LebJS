@@ -12,7 +12,11 @@ public record Realm(Interpreter interpreter) {
 		new Realm(new Interpreter()).execute(sourceText, dumpAST);
 	}
 
-	public Program parse(String sourceText) throws SyntaxError, CannotParse {
+	public static Value<?> executeWith(String sourceText, Interpreter interpreter) throws CannotParse, AbruptCompletion, SyntaxError {
+		return parse(sourceText).execute(interpreter);
+	}
+
+	public static Program parse(String sourceText) throws SyntaxError, CannotParse {
 		return new Parser(new Lexer(sourceText).tokenize()).parse();
 	}
 

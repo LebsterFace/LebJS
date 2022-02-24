@@ -62,6 +62,16 @@ public final class Names {
 	public static final StringValue string = new StringValue("string");
 	public static final StringValue number = new StringValue("number");
 
+	// Math constants
+	public static final StringValue E = new StringValue("E");
+	public static final StringValue LN2 = new StringValue("LN2");
+	public static final StringValue LN10 = new StringValue("LN10");
+	public static final StringValue LOG2E = new StringValue("LOG2E");
+	public static final StringValue LOG10E = new StringValue("LOG10E");
+	public static final StringValue PI = new StringValue("PI");
+	public static final StringValue SQRT1_2 = new StringValue("SQRT1_2");
+	public static final StringValue SQRT2 = new StringValue("SQRT2");
+
 	// Globals
 	public static final StringValue Infinity = new StringValue("Infinity");
 	public static final StringValue NaN = new StringValue("NaN");

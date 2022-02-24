@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime.value.object;
 
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
@@ -13,54 +14,23 @@ import static xyz.lebster.core.runtime.value.native_.NativeFunction.argumentDoub
 import static xyz.lebster.core.runtime.value.primitive.NumberValue.isNegativeZero;
 import static xyz.lebster.core.runtime.value.primitive.NumberValue.isPositiveZero;
 
+@SpecificationURL("https://tc39.es/ecma262/multipage#sec-math-object")
 public final class MathObject extends ObjectValue {
 	public static final MathObject instance = new MathObject();
-
-	/**
-	 * Euler's number, the base of natural logarithms, e
-	 */
-	private static final double E = Math.E;
-	/**
-	 * The ratio of the circumference of a circle to its diameter
-	 */
-	private static final double PI = Math.PI;
-	/**
-	 * The natural logarithm of 2
-	 */
-	private static final double LN2 = 0.6931471805599453D;
-	/**
-	 * The natural logarithm of 10
-	 */
-	private static final double LN10 = 2.302585092994046D;
-	/**
-	 * The base 2 logarithm of e
-	 */
-	private static final double LOG2E = 1.4426950408889634D;
-	/**
-	 * The base 10 logarithm of e
-	 */
-	private static final double LOG10E = 0.4342944819032518D;
-	/**
-	 * The square root of 1/2
-	 */
-	private static final double SQRT1_2 = 0.7071067811865476D;
-	/**
-	 * The square root of 2
-	 */
-	private static final double SQRT2 = 1.4142135623730951D;
 
 	@SuppressWarnings("SpellCheckingInspection")
 	private MathObject() {
 		put(SymbolValue.toStringTag, Names.Math);
 
-		put("E", new NumberValue(E));
-		put("LN2", new NumberValue(LN2));
-		put("LN10", new NumberValue(LN10));
-		put("LOG2E", new NumberValue(LOG2E));
-		put("LOG10E", new NumberValue(LOG10E));
-		put("PI", new NumberValue(PI));
-		put("SQRT1_2", new NumberValue(SQRT1_2));
-		put("SQRT2", new NumberValue(SQRT2));
+		// 21.3.1 Value Properties of the Math Object
+		this.putFrozen(Names.E, new NumberValue(2.7182818284590452354D)); // e, the base of the natural logarithms
+		this.putFrozen(Names.LN10, new NumberValue(2.302585092994046D)); // the natural logarithm of 10
+		this.putFrozen(Names.LN2, new NumberValue(0.6931471805599453D)); // the natural logarithm of 2
+		this.putFrozen(Names.LOG10E, new NumberValue(0.4342944819032518D)); // the base-10 logarithm of e, the base of the natural logarithms
+		this.putFrozen(Names.LOG2E, new NumberValue(1.4426950408889634D)); // the base-2 logarithm of e, the base of the natural logarithms
+		this.putFrozen(Names.PI, new NumberValue(3.1415926535897932D)); // π, the ratio of the circumference of a circle to its diameter
+		this.putFrozen(Names.SQRT1_2, new NumberValue(0.7071067811865476D)); // the square root of ½
+		this.putFrozen(Names.SQRT2, new NumberValue(1.4142135623730951D)); // the square root of 2
 
 		// (double) -> double
 		addWrapper("abs", (DoubleUnaryOperator) Math::abs);
@@ -177,7 +147,7 @@ public final class MathObject extends ObjectValue {
 				return x;
 
 			if (absX > 268435456) // |x| > 2^28
-				w = Math.log(absX) + LN2;
+				w = Math.log(absX) + 0.6931471805599453D;
 
 			else if (absX > 2) // 2^28 >= |x| > 2
 				w = Math.log(2 * absX + 1 / (Math.sqrt(x * x + 1) + absX));
@@ -189,7 +159,7 @@ public final class MathObject extends ObjectValue {
 			return x > 0 ? w : -w;
 		});
 
-		addWrapper("log2", (double x) -> Math.log(x) / LN2);
+		addWrapper("log2", (double x) -> Math.log(x) / 0.6931471805599453D);
 		addWrapper("acosh", (double x) -> Math.log(x + Math.sqrt(x * x - 1)));
 		addWrapper("atanh", (double x) -> Math.log((1 + x) / (1 - x)) / 2);
 

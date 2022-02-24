@@ -15,13 +15,9 @@ import java.util.HashSet;
 public final class NativeFunction extends Executable<NativeCode> {
 	private final String name;
 
-	public NativeFunction(StringValue name, NativeCode code) {
-		super(name, code);
-		this.name = name.value;
-	}
-
-	public NativeFunction(SymbolValue nameSymbol, NativeCode code) {
-		this(nameSymbol.toFunctionName(), code);
+	public NativeFunction(ObjectValue.Key<?> name, NativeCode code) {
+		super(name.toFunctionName(), code);
+		this.name = name.toFunctionName().value;
 	}
 
 	public static StringValue toStringForName(String name) {

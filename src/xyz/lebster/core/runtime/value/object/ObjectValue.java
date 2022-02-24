@@ -287,11 +287,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		this.value.put(key, new DataDescriptor(value, false, true, true));
 	}
 
-	public void putMethod(StringValue name, NativeCode code) {
-		this.value.put(name, new DataDescriptor(new NativeFunction(name, code), true, true, true));
-	}
-
-	public void putMethod(SymbolValue name, NativeCode code) {
+	public void putMethod(ObjectValue.Key<?> name, NativeCode code) {
 		this.value.put(name, new DataDescriptor(new NativeFunction(name, code), true, true, true));
 	}
 
@@ -491,5 +487,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		protected void displayForObjectKey(StringRepresentation representation) {
 			this.display(representation);
 		}
+
+		public abstract StringValue toFunctionName();
 	}
 }

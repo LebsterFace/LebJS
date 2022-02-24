@@ -85,9 +85,7 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 		this.description = description;
 	}
 
-	/**
-	 * @return {@link StringValue} representing this symbol as the '{@code name}' property of a function
-	 */
+	@Override
 	public StringValue toFunctionName() {
 		return new StringValue('[' + this.description + ']');
 	}

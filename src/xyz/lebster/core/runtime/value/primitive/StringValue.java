@@ -21,6 +21,11 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
+	public StringValue toFunctionName() {
+		return this;
+	}
+
+	@Override
 	public void display(StringRepresentation representation) {
 		representation.append(ANSI.GREEN);
 		final char quoteType = this.value.contains("'") ? '"' : '\'';

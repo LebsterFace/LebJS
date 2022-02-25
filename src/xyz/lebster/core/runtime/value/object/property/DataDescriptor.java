@@ -72,8 +72,12 @@ public final class DataDescriptor implements PropertyDescriptor {
 
 	@Override
 	public void display(StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
-		if (!(this.value instanceof final ObjectValue object)) {
-			this.value.display(representation);
+		DataDescriptor.display(this.value, representation, parent, parents, singleLine);
+	}
+
+	public static void display(Value<?> value, StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
+		if (!(value instanceof final ObjectValue object)) {
+			value.display(representation);
 			return;
 		}
 
@@ -84,7 +88,7 @@ public final class DataDescriptor implements PropertyDescriptor {
 				object.representClassName(representation);
 			} else {
 				// TODO: <ref *1>
-				representation.append(this.value == parent ? "[self]" : "[parent]");
+				representation.append(value == parent ? "[self]" : "[parent]");
 			}
 
 			representation.append(ANSI.RESET);

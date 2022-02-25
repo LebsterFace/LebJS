@@ -393,16 +393,16 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		representation.append(ANSI.RESET);
 	}
 
-	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine, char open, char close, boolean showKeys) {
+	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
 		if (objectValue.getClass() != ObjectValue.class) {
 			objectValue.representClassName(representation);
 			representation.append(' ');
 		}
 
-		representation.append(open);
+		representation.append('{');
 		representation.append(' ');
 		if (objectValue.value.isEmpty()) {
-			representation.append(close);
+			representation.append('}');
 			return;
 		}
 
@@ -416,12 +416,10 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		while (iterator.hasNext()) {
 			final Map.Entry<Key<?>, PropertyDescriptor> entry = iterator.next();
 			if (!singleLine) representation.appendIndent();
-			if (showKeys) {
-				representation.append(ANSI.BRIGHT_BLACK);
-				entry.getKey().displayForObjectKey(representation);
-				representation.append(ANSI.RESET);
-				representation.append(": ");
-			}
+			representation.append(ANSI.BRIGHT_BLACK);
+			entry.getKey().displayForObjectKey(representation);
+			representation.append(ANSI.RESET);
+			representation.append(": ");
 
 			entry.getValue().display(representation, objectValue, (HashSet<ObjectValue>) parents.clone(), singleLine);
 			if (iterator.hasNext()) representation.append(',');
@@ -434,7 +432,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			representation.appendIndent();
 		}
 
-		representation.append(close);
+		representation.append('}');
 	}
 
 	@Override
@@ -450,7 +448,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	}
 
 	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		ObjectValue.staticDisplayRecursive(this, representation, parents, singleLine, '{', '}', true);
+		ObjectValue.staticDisplayRecursive(this, representation, parents, singleLine);
 	}
 
 	public record IteratorRecord(ObjectValue iterator, Value<?> nextMethod, boolean done) {

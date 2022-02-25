@@ -1,8 +1,10 @@
 package xyz.lebster.core.runtime.value.object;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.HasBuiltinTag;
 import xyz.lebster.core.runtime.value.Value;
@@ -13,10 +15,7 @@ import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Iterable<Value<?>> {
 	private final ArrayList<Value<?>> arrayValues;
@@ -93,5 +92,53 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 	@Override
 	public Iterator<Value<?>> iterator() {
 		return arrayValues.iterator();
+	}
+
+	@Override
+	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		representation.append("[ ");
+
+		parents.add(this);
+		if (!singleLine) {
+			representation.appendLine();
+			representation.indent();
+		}
+
+		this.representValues(representation, parents, singleLine);
+
+		if (!singleLine) {
+			representation.unindent();
+			representation.appendIndent();
+		}
+
+		representation.append(']');
+	}
+
+	private void representValues(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		final Iterator<Value<?>> iterator = ArrayObject.this.arrayValues.iterator();
+		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> mapIterator = ArrayObject.this.value.entrySet().iterator();
+
+		while (iterator.hasNext()) {
+			if (!singleLine) representation.appendIndent();
+			DataDescriptor.display(iterator.next(), representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
+			if (iterator.hasNext() || mapIterator.hasNext()) representation.append(',');
+			if (singleLine) representation.append(' ');
+			else representation.appendLine();
+		}
+
+
+		while (mapIterator.hasNext()) {
+			final Map.Entry<Key<?>, PropertyDescriptor> entry = mapIterator.next();
+			if (!singleLine) representation.appendIndent();
+			representation.append(ANSI.BRIGHT_BLACK);
+			entry.getKey().displayForObjectKey(representation);
+			representation.append(ANSI.RESET);
+			representation.append(": ");
+
+			entry.getValue().display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
+			if (iterator.hasNext()) representation.append(',');
+			if (singleLine) representation.append(' ');
+			else representation.appendLine();
+		}
 	}
 }

@@ -1,10 +1,14 @@
 package xyz.lebster.core.runtime.value.object.property;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
+
+import java.util.HashSet;
 
 public final class AccessorDescriptor implements PropertyDescriptor {
 	private final Executable<?> getter;
@@ -56,5 +60,12 @@ public final class AccessorDescriptor implements PropertyDescriptor {
 	@Override
 	public void set(Interpreter interpreter, ObjectValue thisValue, Value<?> newValue) throws AbruptCompletion {
 		this.setter.call(interpreter, thisValue, newValue);
+	}
+
+	@Override
+	public void display(StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
+		representation.append(ANSI.CYAN);
+		representation.append("[Getter/Setter]");
+		representation.append(ANSI.RESET);
 	}
 }

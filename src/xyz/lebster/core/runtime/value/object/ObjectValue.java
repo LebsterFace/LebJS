@@ -387,7 +387,58 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return new IteratorRecord(iterator, nextMethod, false);
 	}
 
-	public final void objectValue__display(StringRepresentation representation) {
+	public final void representClassName(StringRepresentation representation) {
+		representation.append(ANSI.CYAN);
+		representation.append(this.getClass().getSimpleName());
+		representation.append(ANSI.RESET);
+	}
+
+	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine, char open, char close, boolean showKeys) {
+		if (objectValue.getClass() != ObjectValue.class) {
+			objectValue.representClassName(representation);
+			representation.append(' ');
+		}
+
+		representation.append(open);
+		representation.append(' ');
+		if (objectValue.value.isEmpty()) {
+			representation.append(close);
+			return;
+		}
+
+		parents.add(objectValue);
+		if (!singleLine) {
+			representation.appendLine();
+			representation.indent();
+		}
+
+		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> iterator = objectValue.value.entrySet().iterator();
+		while (iterator.hasNext()) {
+			final Map.Entry<Key<?>, PropertyDescriptor> entry = iterator.next();
+			if (!singleLine) representation.appendIndent();
+			if (showKeys) {
+				representation.append(ANSI.BRIGHT_BLACK);
+				entry.getKey().displayForObjectKey(representation);
+				representation.append(ANSI.RESET);
+				representation.append(": ");
+			}
+
+			entry.getValue().display(representation, objectValue, (HashSet<ObjectValue>) parents.clone(), singleLine);
+			if (iterator.hasNext()) representation.append(',');
+			if (singleLine) representation.append(' ');
+			else representation.appendLine();
+		}
+
+		if (!singleLine) {
+			representation.unindent();
+			representation.appendIndent();
+		}
+
+		representation.append(close);
+	}
+
+	@Override
+	public void display(StringRepresentation representation) {
 		final var singleLine = new StringRepresentation();
 		this.displayRecursive(singleLine, new HashSet<>(), true);
 		if (singleLine.length() < 72) {
@@ -398,86 +449,8 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		this.displayRecursive(representation, new HashSet<>(), false);
 	}
 
-	public final void representClassName(StringRepresentation representation) {
-		representation.append(ANSI.CYAN);
-		representation.append(this.getClass().getSimpleName());
-		representation.append(ANSI.RESET);
-	}
-
-	@SuppressWarnings("unchecked")
-	public final void objectValue__displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		if (this.getClass() != ObjectValue.class) {
-			this.representClassName(representation);
-			representation.append(' ');
-		}
-
-		representation.append("{ ");
-		if (value.isEmpty()) {
-			representation.append('}');
-			return;
-		}
-
-		parents.add(this);
-		if (!singleLine) {
-			representation.appendLine();
-			representation.indent();
-		}
-
-		for (var iterator = this.value.entrySet().iterator(); iterator.hasNext(); ) {
-			final var entry = iterator.next();
-			if (!singleLine) representation.appendIndent();
-			representation.append(ANSI.BRIGHT_BLACK);
-			entry.getKey().displayForObjectKey(representation);
-			representation.append(ANSI.RESET);
-			representation.append(": ");
-			if (entry.getValue() instanceof final DataDescriptor dataDescriptor) {
-				final Value<?> value = dataDescriptor.getRawValue();
-				if (value instanceof final ObjectValue object) {
-					if (parents.contains(object)) {
-						representation.append(ANSI.RED);
-
-						if (object.getClass() != ObjectValue.class) {
-							object.representClassName(representation);
-						} else {
-							representation.append(value == this ? "[self]" : "[parent]");
-						}
-
-						representation.append(ANSI.RESET);
-					} else {
-						object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone(), singleLine);
-					}
-				} else {
-					value.display(representation);
-				}
-			} else {
-				representation.append(ANSI.CYAN);
-				representation.append("[Getter/Setter]");
-				representation.append(ANSI.RESET);
-			}
-
-			if (iterator.hasNext()) representation.append(',');
-			if (singleLine) {
-				representation.append(' ');
-			} else {
-				representation.appendLine();
-			}
-		}
-
-		if (!singleLine) {
-			representation.unindent();
-			representation.appendIndent();
-		}
-
-		representation.append('}');
-	}
-
-	@Override
-	public void display(StringRepresentation representation) {
-		this.objectValue__display(representation);
-	}
-
 	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		this.objectValue__displayRecursive(representation, parents, singleLine);
+		ObjectValue.staticDisplayRecursive(this, representation, parents, singleLine, '{', '}', true);
 	}
 
 	public record IteratorRecord(ObjectValue iterator, Value<?> nextMethod, boolean done) {

@@ -1,5 +1,11 @@
 package xyz.lebster.core.runtime.value.object.property;
 
+import xyz.lebster.core.ANSI;
+import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
+
+import java.util.HashSet;
+
 public abstract class NativeAccessorDescriptor implements PropertyDescriptor {
 	private boolean configurable;
 
@@ -33,5 +39,12 @@ public abstract class NativeAccessorDescriptor implements PropertyDescriptor {
 	@Override
 	public void setConfigurable(boolean configurable) {
 		this.configurable = configurable;
+	}
+
+	@Override
+	public final void display(StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
+		representation.append(ANSI.MAGENTA);
+		representation.append("[Getter/Setter]");
+		representation.append(ANSI.RESET);
 	}
 }

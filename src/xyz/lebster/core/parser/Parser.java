@@ -546,14 +546,20 @@ public final class Parser {
 		return new FunctionExpression(parseFunctionBody(), name, arguments);
 	}
 
-	private List<Expression> parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {
-		final List<Expression> result = new ArrayList<>();
+	private ExpressionList parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {
+		final ExpressionList result = new ExpressionList();
 		if (expectParens) state.require(TokenType.LParen);
 		consumeAllLineTerminators();
 
-		while (matchPrimaryExpression()) {
+		while (matchPrimaryExpression() || state.currentToken.type == TokenType.DotDotDot) {
 			consumeAllLineTerminators();
-			result.add(parseExpression());
+			if (state.currentToken.type == TokenType.DotDotDot) {
+				state.consume();
+				result.addSpreadExpression(parseExpression());
+			} else {
+				result.addSingleExpression(parseExpression());
+			}
+
 			consumeAllLineTerminators();
 			if (state.accept(TokenType.Comma) == null) break;
 			consumeAllLineTerminators();
@@ -565,11 +571,9 @@ public final class Parser {
 	}
 
 	private CallExpression parseCallExpression(Expression left) throws SyntaxError, CannotParse {
-		final List<Expression> arguments = parseExpressionList(false);
-		if (state.currentToken.type == TokenType.DotDotDot)
-			throw new NotImplemented("Parsing spread arguments (`fn(...p)`)");
+		final ExpressionList arguments = parseExpressionList(false);
 		state.require(TokenType.RParen);
-		return new CallExpression(left, arguments.toArray(new Expression[0]));
+		return new CallExpression(left, arguments);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-UnaryExpression")
@@ -766,8 +770,9 @@ public final class Parser {
 				final TokenType n = state.consume().type;
 				// https://tc39.es/ecma262/multipage#sec-new-operator
 				final Expression constructExpr = parseExpression(precedenceForTokenType(n), associativityForTokenType(n), Collections.singleton(TokenType.LParen));
-				final List<Expression> arguments = state.currentToken.type == TokenType.LParen ? parseExpressionList(true) : Collections.emptyList();
-				yield new NewExpression(constructExpr, arguments.toArray(new Expression[0]));
+				final boolean hasArguments = state.currentToken.type == TokenType.LParen;
+				final ExpressionList arguments = hasArguments ? parseExpressionList(true) : new ExpressionList(); // TODO: Perhaps `null`?
+				yield new NewExpression(constructExpr, arguments);
 			}
 
 			default -> throw new CannotParse(state.currentToken, "PrimaryExpression");
@@ -850,31 +855,9 @@ public final class Parser {
 		return result;
 	}
 
-	private ExpressionList parseExpressionListForArrayExpression() throws SyntaxError, CannotParse {
-		final ExpressionList result = new ExpressionList();
-		consumeAllLineTerminators();
-
-		while (matchPrimaryExpression() || state.currentToken.type == TokenType.DotDotDot) {
-			consumeAllLineTerminators();
-			if (state.currentToken.type == TokenType.DotDotDot) {
-				state.consume();
-				result.addSpreadExpression(parseExpression());
-			} else {
-				result.addSingleExpression(parseExpression());
-			}
-
-			consumeAllLineTerminators();
-			if (state.accept(TokenType.Comma) == null) break;
-			consumeAllLineTerminators();
-		}
-
-		consumeAllLineTerminators();
-		return result;
-	}
-
 	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {
 		state.require(TokenType.LBracket);
-		final ExpressionList elements = parseExpressionListForArrayExpression();
+		final ExpressionList elements = parseExpressionList(false);
 		state.require(TokenType.RBracket);
 		return new ArrayExpression(elements);
 	}

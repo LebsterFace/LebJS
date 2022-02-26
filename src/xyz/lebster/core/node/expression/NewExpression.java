@@ -9,17 +9,13 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Constructor;
 
-public record NewExpression(Expression constructExpr, Expression... arguments) implements Expression {
+public record NewExpression(Expression constructExpr, ExpressionList arguments) implements Expression {
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-evaluatenew")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final var value = constructExpr.execute(interpreter);
-
-		final Value<?>[] argList = new Value[arguments.length];
-		for (int i = 0; i < arguments.length; i++)
-			argList[i] = arguments[i].execute(interpreter);
-
-		return getConstructor(value).construct(interpreter, argList);
+		final Value<?> value = constructExpr.execute(interpreter);
+		final Value<?>[] executedArguments = arguments.executeAll(interpreter).toArray(new Value[0]);
+		return getConstructor(value).construct(interpreter, executedArguments);
 	}
 
 	private Constructor<?> getConstructor(Value<?> exprValue) throws AbruptCompletion {
@@ -36,9 +32,9 @@ public record NewExpression(Expression constructExpr, Expression... arguments) i
 	@Override
 	public void dump(int indent) {
 		Dumper.dumpName(indent, "NewExpression");
-		Dumper.dumpIndicated(indent + 1, "constructExpr", constructExpr);
-		Dumper.dumpIndicator(indent + 1, "arguments");
-		for (final Expression argument : arguments) argument.dump(indent + 2);
+		Dumper.dumpIndicated(indent + 1, "Construct Expression", constructExpr);
+		Dumper.dumpIndicator(indent + 1, arguments.isEmpty() ? "No Arguments" : "Arguments");
+		arguments.dumpWithoutIndices(indent + 1);
 	}
 
 	@Override
@@ -46,13 +42,7 @@ public record NewExpression(Expression constructExpr, Expression... arguments) i
 		representation.append("new ");
 		constructExpr.represent(representation);
 		representation.append('(');
-		if (arguments.length > 0) {
-			arguments[0].represent(representation);
-			for (int i = 1; i < arguments.length; i++) {
-				representation.append(", ");
-				arguments[i].represent(representation);
-			}
-		}
+		arguments.represent(representation);
 		representation.append(')');
 	}
 }

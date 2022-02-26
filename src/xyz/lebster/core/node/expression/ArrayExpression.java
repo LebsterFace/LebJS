@@ -15,7 +15,7 @@ public record ArrayExpression(ExpressionList expressionList) implements Expressi
 	@Override
 	public void dump(int indent) {
 		Dumper.dumpName(indent, "ArrayExpression");
-		expressionList.dump(indent + 1);
+		expressionList.dumpWithIndices(indent + 1);
 	}
 
 	@Override

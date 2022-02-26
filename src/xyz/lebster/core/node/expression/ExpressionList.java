@@ -68,10 +68,16 @@ public final class ExpressionList {
 		return result;
 	}
 
-	public void dump(int indent) {
+	public void dumpWithIndices(int indent) {
 		for (int i = 0; i < backingList.size(); i++) {
 			Dumper.dumpIndicator(indent, String.valueOf(i));
 			backingList.get(i).dump(indent + 1);
+		}
+	}
+
+	public void dumpWithoutIndices(int indent) {
+		for (final ExpressionNode node : backingList) {
+			node.dump(indent + 1);
 		}
 	}
 
@@ -82,6 +88,10 @@ public final class ExpressionList {
 			element.represent(representation);
 			if (iterator.hasNext()) representation.append(", ");
 		}
+	}
+
+	public boolean isEmpty() {
+		return backingList.isEmpty();
 	}
 
 	private record ExpressionNode(Expression expression, Type type) {

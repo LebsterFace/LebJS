@@ -34,10 +34,8 @@ public abstract class Executable<JType> extends ObjectValue implements HasBuilti
 	public static Executable<?> getExecutable(Value<?> value) throws AbruptCompletion {
 		if (value instanceof final Executable<?> executable) return executable;
 
-		final var representation = new StringRepresentation();
-		value.display(representation);
-		representation.append(" is not a function");
-		throw AbruptCompletion.error(new TypeError(representation.toString()));
+		final String message = ANSI.stripFormatting(value.toDisplayString()) + " is not a function";
+		throw AbruptCompletion.error(new TypeError(message));
 	}
 
 	@Override

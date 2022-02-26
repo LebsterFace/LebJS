@@ -1,5 +1,6 @@
 package xyz.lebster.core.node.expression;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -31,10 +32,8 @@ public record CallExpression(Expression callee, ExpressionList arguments) implem
 		if (value instanceof final Executable<?> executable)
 			return executable;
 
-		final var representation = new StringRepresentation();
-		callee.represent(representation);
-		representation.append(" is not a function");
-		throw AbruptCompletion.error(new TypeError(representation.toString()));
+		final String message = ANSI.stripFormatting(callee.toRepresentationString()) + " is not a function";
+		throw AbruptCompletion.error(new TypeError(message));
 	}
 
 	@Override

@@ -4,40 +4,24 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 
-import java.util.Iterator;
-import java.util.List;
-
-public record ArrayExpression(List<Expression> elements) implements Expression {
+public record ArrayExpression(ExpressionList expressionList) implements Expression {
 	@Override
 	public ArrayObject execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?>[] results = new Value[elements.size()];
-		for (int i = 0; i < elements.size(); i++)
-			results[i] = elements.get(i).execute(interpreter);
-
-		return new ArrayObject(results);
+		return new ArrayObject(expressionList.executeAll(interpreter));
 	}
 
 	@Override
 	public void dump(int indent) {
 		Dumper.dumpName(indent, "ArrayExpression");
-		for (int i = 0; i < elements.size(); i++) {
-			Dumper.dumpIndicated(indent + 1, String.valueOf(i), elements.get(i));
-		}
+		expressionList.dump(indent + 1);
 	}
 
 	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append('[');
-
-		for (Iterator<Expression> iterator = this.elements.iterator(); iterator.hasNext(); ) {
-			final Expression element = iterator.next();
-			element.represent(representation);
-			if (iterator.hasNext()) representation.append(", ");
-		}
-
+		expressionList.represent(representation);
 		representation.append(']');
 	}
 }

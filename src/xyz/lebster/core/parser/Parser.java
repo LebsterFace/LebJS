@@ -850,11 +850,31 @@ public final class Parser {
 		return result;
 	}
 
+	private ExpressionList parseExpressionListForArrayExpression() throws SyntaxError, CannotParse {
+		final ExpressionList result = new ExpressionList();
+		consumeAllLineTerminators();
+
+		while (matchPrimaryExpression() || state.currentToken.type == TokenType.DotDotDot) {
+			consumeAllLineTerminators();
+			if (state.currentToken.type == TokenType.DotDotDot) {
+				state.consume();
+				result.addSpreadExpression(parseExpression());
+			} else {
+				result.addSingleExpression(parseExpression());
+			}
+
+			consumeAllLineTerminators();
+			if (state.accept(TokenType.Comma) == null) break;
+			consumeAllLineTerminators();
+		}
+
+		consumeAllLineTerminators();
+		return result;
+	}
+
 	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {
 		state.require(TokenType.LBracket);
-		final List<Expression> elements = parseExpressionList(false);
-		if (state.currentToken.type == TokenType.DotDotDot)
-			throw new NotImplemented("Parsing spread syntax `[...a]`");
+		final ExpressionList elements = parseExpressionListForArrayExpression();
 		state.require(TokenType.RBracket);
 		return new ArrayExpression(elements);
 	}

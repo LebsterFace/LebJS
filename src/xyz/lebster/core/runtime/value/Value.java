@@ -111,7 +111,7 @@ public abstract class Value<JType> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#table-typeof-operator-results")
-	public abstract String typeOf(Interpreter interpreter) throws AbruptCompletion;
+	public abstract String typeOf(Interpreter interpreter);
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-topropertykey")
 	public final ObjectValue.Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {

@@ -46,6 +46,48 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return result;
 	}
 
+	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		if (objectValue.getClass() != ObjectValue.class) {
+			objectValue.representClassName(representation);
+			representation.append(' ');
+		}
+
+		representation.append('{');
+		representation.append(' ');
+		if (objectValue.value.isEmpty()) {
+			representation.append('}');
+			return;
+		}
+
+		parents.add(objectValue);
+		if (!singleLine) {
+			representation.appendLine();
+			representation.indent();
+		}
+
+		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> iterator = objectValue.value.entrySet().iterator();
+		while (iterator.hasNext()) {
+			final Map.Entry<Key<?>, PropertyDescriptor> entry = iterator.next();
+			if (!singleLine) representation.appendIndent();
+			representation.append(ANSI.BRIGHT_BLACK);
+			entry.getKey().displayForObjectKey(representation);
+			representation.append(ANSI.RESET);
+			representation.append(": ");
+
+			entry.getValue().display(representation, objectValue, (HashSet<ObjectValue>) parents.clone(), singleLine);
+			if (iterator.hasNext()) representation.append(',');
+			if (singleLine) representation.append(' ');
+			else representation.appendLine();
+		}
+
+		if (!singleLine) {
+			representation.unindent();
+			representation.appendIndent();
+		}
+
+		representation.append('}');
+	}
+
 	public ObjectValue getDefaultPrototype() {
 		return ObjectPrototype.instance;
 	}
@@ -391,48 +433,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		representation.append(ANSI.CYAN);
 		representation.append(this.getClass().getSimpleName());
 		representation.append(ANSI.RESET);
-	}
-
-	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		if (objectValue.getClass() != ObjectValue.class) {
-			objectValue.representClassName(representation);
-			representation.append(' ');
-		}
-
-		representation.append('{');
-		representation.append(' ');
-		if (objectValue.value.isEmpty()) {
-			representation.append('}');
-			return;
-		}
-
-		parents.add(objectValue);
-		if (!singleLine) {
-			representation.appendLine();
-			representation.indent();
-		}
-
-		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> iterator = objectValue.value.entrySet().iterator();
-		while (iterator.hasNext()) {
-			final Map.Entry<Key<?>, PropertyDescriptor> entry = iterator.next();
-			if (!singleLine) representation.appendIndent();
-			representation.append(ANSI.BRIGHT_BLACK);
-			entry.getKey().displayForObjectKey(representation);
-			representation.append(ANSI.RESET);
-			representation.append(": ");
-
-			entry.getValue().display(representation, objectValue, (HashSet<ObjectValue>) parents.clone(), singleLine);
-			if (iterator.hasNext()) representation.append(',');
-			if (singleLine) representation.append(' ');
-			else representation.appendLine();
-		}
-
-		if (!singleLine) {
-			representation.unindent();
-			representation.appendIndent();
-		}
-
-		representation.append('}');
 	}
 
 	@Override

@@ -30,15 +30,18 @@ public final class NumberConstructor extends BuiltinConstructor<NumberWrapper> {
 		if (args.length == 0) throw AbruptCompletion.error(new TypeError("No end value was provided"));
 
 		final double first = args[0].toNumberValue(interpreter).value;
-		if (Double.isNaN(first)) throw AbruptCompletion.error(new TypeError("NaN passed as first argument of Number.range"));
+		if (Double.isNaN(first))
+			throw AbruptCompletion.error(new TypeError("NaN passed as first argument of Number.range"));
 		if (args.length == 1) return new NumberRange(first);
 
 		final double second = args[1].toNumberValue(interpreter).value;
-		if (Double.isNaN(second)) throw AbruptCompletion.error(new TypeError("NaN passed as second argument of Number.range"));
+		if (Double.isNaN(second))
+			throw AbruptCompletion.error(new TypeError("NaN passed as second argument of Number.range"));
 		if (args.length == 2) return new NumberRange(first, second);
 
 		final double third = args[2].toNumberValue(interpreter).value;
-		if (Double.isNaN(third)) throw AbruptCompletion.error(new TypeError("NaN passed as third argument of Number.range"));
+		if (Double.isNaN(third))
+			throw AbruptCompletion.error(new TypeError("NaN passed as third argument of Number.range"));
 		return new NumberRange(first, second, third);
 	}
 

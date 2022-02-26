@@ -1,6 +1,7 @@
 package xyz.lebster.core.runtime.value.primitive;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -50,6 +51,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
+	@NonCompliant
 	public NumberValue toNumberValue(Interpreter interpreter) {
 		// FIXME: Follow spec
 		if (value.isBlank())

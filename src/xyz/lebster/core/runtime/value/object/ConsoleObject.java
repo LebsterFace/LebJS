@@ -19,6 +19,7 @@ import static xyz.lebster.core.runtime.value.native_.NativeFunction.argumentStri
 @SpecificationURL("https://console.spec.whatwg.org/")
 public final class ConsoleObject extends ObjectValue {
 	public static final ConsoleObject instance = new ConsoleObject();
+	private static final Scanner scanner = new Scanner(System.in);
 
 	private ConsoleObject() {
 		this.putMethod(Names.log, (interpreter, data) -> {
@@ -44,7 +45,6 @@ public final class ConsoleObject extends ObjectValue {
 		this.putMethod(Names.input, ConsoleObject::input);
 	}
 
-	private static final Scanner scanner = new Scanner(System.in);
 	@NonStandard
 	private static Value<?> input(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		System.out.print(argumentString(0, "", interpreter, args));

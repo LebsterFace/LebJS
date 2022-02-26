@@ -12,5 +12,5 @@ abstract class BuiltinConstructor<T extends ObjectValue> extends Constructor<Voi
 	}
 
 	@Override
-	public abstract T construct(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion;
+	public abstract T construct(Interpreter interpreter, Value<?>[] arguments);
 }

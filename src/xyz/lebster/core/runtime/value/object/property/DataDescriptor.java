@@ -22,6 +22,29 @@ public final class DataDescriptor implements PropertyDescriptor {
 		this.configurable = configurable;
 	}
 
+	public static void display(Value<?> value, StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
+		if (!(value instanceof final ObjectValue object)) {
+			value.display(representation);
+			return;
+		}
+
+		if (parents.contains(object)) {
+			representation.append(ANSI.RED);
+
+			if (object.getClass() != parent.getClass()) {
+				object.representClassName(representation);
+			} else {
+				// TODO: <ref *1>
+				representation.append(value == parent ? "[self]" : "[parent]");
+			}
+
+			representation.append(ANSI.RESET);
+			return;
+		}
+
+		object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone(), singleLine);
+	}
+
 	@Override
 	public boolean isWritable() {
 		return writable;
@@ -53,12 +76,12 @@ public final class DataDescriptor implements PropertyDescriptor {
 	}
 
 	@Override
-	public Value<?> get(Interpreter interpreter, ObjectValue thisValue) throws AbruptCompletion {
+	public Value<?> get(Interpreter interpreter, ObjectValue thisValue) {
 		return this.value;
 	}
 
 	@Override
-	public void set(Interpreter interpreter, ObjectValue thisValue, Value<?> newValue) throws AbruptCompletion {
+	public void set(Interpreter interpreter, ObjectValue thisValue, Value<?> newValue) {
 		this.value = newValue;
 	}
 
@@ -73,28 +96,5 @@ public final class DataDescriptor implements PropertyDescriptor {
 	@Override
 	public void display(StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
 		DataDescriptor.display(this.value, representation, parent, parents, singleLine);
-	}
-
-	public static void display(Value<?> value, StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
-		if (!(value instanceof final ObjectValue object)) {
-			value.display(representation);
-			return;
-		}
-
-		if (parents.contains(object)) {
-			representation.append(ANSI.RED);
-
-			if (object.getClass() != parent.getClass()) {
-				object.representClassName(representation);
-			} else {
-				// TODO: <ref *1>
-				representation.append(value == parent ? "[self]" : "[parent]");
-			}
-
-			representation.append(ANSI.RESET);
-			return;
-		}
-
-		object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone(), singleLine);
 	}
 }

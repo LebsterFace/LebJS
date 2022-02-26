@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime.value.prototype;
 
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -11,7 +12,6 @@ import xyz.lebster.core.runtime.value.object.NumberWrapper;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
@@ -65,12 +65,15 @@ public final class NumberPrototype extends ObjectValue {
 	}
 
 	// FIXME: Follow spec
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tolocalestring")
+	@NonCompliant
 	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
 		final NumberValue x = thisNumberValue(interpreter.thisValue());
 		return new StringValue(x.toLocaleString());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tostring")
+	@NonCompliant
 	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final Value<?> radix = argument(0, arguments);
 		// 1. Let x be ? thisNumberValue(this value).

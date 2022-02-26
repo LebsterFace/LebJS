@@ -105,8 +105,8 @@ public record RelationalExpression(Expression left, Expression right, Relational
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-islessthan")
 	private BooleanValue isLessThan(Interpreter interpreter, Value<?> x, Value<?> y, boolean leftFirst) throws AbruptCompletion {
 		// 1. If the LeftFirst flag is true, then
-		PrimitiveValue<?> px = null;
-		PrimitiveValue<?> py = null;
+		PrimitiveValue<?> px;
+		PrimitiveValue<?> py;
 
 		if (leftFirst) {
 			// a. Let px be ? ToPrimitive(x, number).

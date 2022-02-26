@@ -6,9 +6,6 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
-import xyz.lebster.core.node.Program;
-import xyz.lebster.core.parser.Lexer;
-import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.*;
@@ -21,7 +18,7 @@ import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 
-import static xyz.lebster.core.runtime.value.native_.NativeFunction.*;
+import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
 public final class GlobalObject extends ObjectValue {

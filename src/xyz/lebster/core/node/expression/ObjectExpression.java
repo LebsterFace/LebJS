@@ -20,7 +20,7 @@ public record ObjectExpression(Map<Expression, Expression> entries) implements E
 
 		for (final Map.Entry<Expression, Expression> entry : entries.entrySet()) {
 			result.put(
-				entry.getKey().execute(interpreter).toStringValue(interpreter),
+				entry.getKey().execute(interpreter).toPropertyKey(interpreter),
 				entry.getValue().execute(interpreter)
 			);
 		}

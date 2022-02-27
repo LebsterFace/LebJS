@@ -10,6 +10,10 @@ import xyz.lebster.core.runtime.value.object.NumberWrapper;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
 public final class NumberValue extends PrimitiveValue<Double> {
+	public static final long TWO_TO_THE_31 = 2147483648L;
+	public static final long TWO_TO_THE_32 = 4294967296L;
+	public static final long UINT32_LIMIT = TWO_TO_THE_32 - 1;
+
 	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;
 	public static final long POSITIVE_ZERO_BITS = 0;
 	public static final NumberValue NaN = new NumberValue(Double.NaN);
@@ -189,9 +193,9 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		// and whose magnitude is floor(abs(ℝ(number))).
 		long int_ = ((long) Math.floor(Math.abs(value))) * (long) Math.signum(value);
 		// 4. Let int32bit be int modulo 2^32.
-		long int32bit = int_ % 4294967296L;
+		long int32bit = int_ % TWO_TO_THE_32;
 		// 5. If int32bit ≥ 2^31, return 𝔽(int32bit - 2^32);
-		if (int32bit >= 2147483648L) return (int) (int32bit - 4294967296L);
+		if (int32bit >= TWO_TO_THE_31) return (int) (int32bit - TWO_TO_THE_32);
 		// otherwise return 𝔽(int32bit).
 		return (int) int32bit;
 	}
@@ -206,7 +210,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		long int_ = ((long) Math.floor(Math.abs(value))) * (long) Math.signum(value);
 		// 4. Let int32bit be int modulo 2^32.
 		// 5. Return 𝔽(int32bit).
-		return int_ % 4294967296L;
+		return int_ % TWO_TO_THE_32;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-lessThan")

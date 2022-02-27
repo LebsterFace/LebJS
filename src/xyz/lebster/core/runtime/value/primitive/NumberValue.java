@@ -201,10 +201,12 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		// 1. Let number be ? ToNumber(argument).
 		// 2. If number is NaN, +0𝔽, -0𝔽, +∞𝔽, or -∞𝔽, return +0𝔽.
 		if (value.isNaN() || value == 0.0 || value.isInfinite()) return 0;
-		// 3. Let int be the mathematical value whose sign is the sign of number and whose magnitude is floor(abs(ℝ(number))).
+		// 3. Let int be the mathematical value whose sign is the sign of number
+		// and whose magnitude is floor(abs(ℝ(number))).
+		long int_ = ((long) Math.floor(Math.abs(value))) * (long) Math.signum(value);
 		// 4. Let int32bit be int modulo 2^32.
 		// 5. Return 𝔽(int32bit).
-		return ((long) Math.floor(Math.abs(value))) % 4294967296L;
+		return int_ % 4294967296L;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-lessThan")

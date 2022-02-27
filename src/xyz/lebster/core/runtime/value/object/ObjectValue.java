@@ -246,7 +246,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return false;
 	}
 
-	private PropertyDescriptor getProperty(Key<?> key) {
+	public PropertyDescriptor getProperty(Key<?> key) {
 		ObjectValue object = this;
 
 		while (object != null) {

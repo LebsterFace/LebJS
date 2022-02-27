@@ -61,7 +61,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		if (d.isNaN()) return "NaN";
 		else if (d < 0.0) return "-" + stringValueOf(-d);
 		else if (d.isInfinite()) return "Infinity";
-		final String input = String.valueOf(d);
+		final String input = String.valueOf(d).toLowerCase();
 		int decimalPosition = -1;
 		int firstZeros = -1;
 		for (int i = 0; i < input.length(); i++) {

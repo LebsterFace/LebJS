@@ -81,6 +81,7 @@ public record AssignmentExpression(LeftHandSideExpression left, Expression right
 		ExponentAssign("**=");
 
 		private final String str;
+
 		AssignmentOp(String s) {
 			this.str = s;
 		}

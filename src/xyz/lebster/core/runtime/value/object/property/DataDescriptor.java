@@ -1,7 +1,6 @@
 package xyz.lebster.core.runtime.value.object.property;
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.value.Value;

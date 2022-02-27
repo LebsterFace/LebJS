@@ -21,10 +21,17 @@ public final class NumberPrototype extends ObjectValue {
 	static {
 		instance.put(Names.constructor, NumberConstructor.instance);
 		instance.putMethod(Names.toString, NumberPrototype::toStringMethod);
+		instance.putMethod(Names.valueOf, NumberPrototype::valueOf);
 		instance.putMethod(Names.toLocaleString, NumberPrototype::toLocaleString);
 	}
 
 	private NumberPrototype() {
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.valueof")
+	private static NumberValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 1. Return ? thisNumberValue(this value).
+		return thisNumberValue(interpreter.thisValue());
 	}
 
 	private static NumberValue thisNumberValue(Value<?> value) throws AbruptCompletion {

@@ -46,8 +46,8 @@ public record AssignmentExpression(LeftHandSideExpression left, Expression right
 	public void represent(StringRepresentation representation) {
 		left.represent(representation);
 		representation.append(' ');
-		representation.append(op == AssignmentOp.Assign ? "" : lookupBinaryOp(op).str);
-		representation.append("= ");
+		representation.append(op.str);
+		representation.append(' ');
 		right.represent(representation);
 	}
 
@@ -57,17 +57,32 @@ public record AssignmentExpression(LeftHandSideExpression left, Expression right
 			case MinusAssign -> BinaryExpression.BinaryOp.Subtract;
 			case MultiplyAssign -> BinaryExpression.BinaryOp.Multiply;
 			case DivideAssign -> BinaryExpression.BinaryOp.Divide;
-			case ExponentAssign -> BinaryExpression.BinaryOp.Exponent;
-			case Assign -> throw new NotImplemented("BinaryOp for AssignmentOp.Assign");
+			case ExponentAssign -> BinaryExpression.BinaryOp.Exponentiate;
+			default -> throw new NotImplemented("BinaryOp pairing for " + op);
 		};
 	}
 
 	public enum AssignmentOp {
-		Assign,
-		PlusAssign,
-		MultiplyAssign,
-		DivideAssign,
-		MinusAssign,
-		ExponentAssign
+		Assign("="),
+		LogicalAndAssign("&&="),
+		LogicalOrAssign("||="),
+		NullishCoalesceAssign("??="),
+		MultiplyAssign("*="),
+		DivideAssign("/="),
+		RemainderAssign("%="),
+		PlusAssign("+="),
+		MinusAssign("-="),
+		LeftShiftAssign("<<="),
+		RightShiftAssign(">>="),
+		UnsignedRightShiftAssign(">>>="),
+		BitwiseAndAssign("&="),
+		BitwiseExclusiveOrAssign("^="),
+		BitwiseOrAssign("|="),
+		ExponentAssign("**=");
+
+		private final String str;
+		AssignmentOp(String s) {
+			this.str = s;
+		}
 	}
 }

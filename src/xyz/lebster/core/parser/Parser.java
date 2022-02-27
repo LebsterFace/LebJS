@@ -656,9 +656,15 @@ public final class Parser {
 			case Star -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Multiply);
 			case Slash -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Divide);
 			case Percent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Remainder);
-			case Exponent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Exponent);
+			case Exponent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Exponentiate);
 
-			case Pipe, Ampersand -> throw new NotImplemented("Parsing binary bitwise expressions");
+			case Pipe -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseOR);
+			case Ampersand -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseAND);
+			case Caret -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseXOR);
+			case LeftShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.LeftShift);
+			case RightShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.SignedRightShift);
+			case UnsignedRightShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.UnsignedRightShift);
+
 			case QuestionMark -> parseConditionalExpression(left);
 			case LParen -> parseCallExpression(left);
 
@@ -699,7 +705,7 @@ public final class Parser {
 				yield new MemberExpression(left, prop, true);
 			}
 
-			default -> throw new CannotParse(state.currentToken, "SecondaryExpression");
+			default -> throw new CannotParse(token, "SecondaryExpression");
 		};
 	}
 
@@ -967,6 +973,10 @@ public final class Parser {
 			   t == TokenType.Star ||
 			   t == TokenType.Slash ||
 			   t == TokenType.Percent ||
+			   t == TokenType.LeftShift ||
+			   t == TokenType.RightShift ||
+			   t == TokenType.UnsignedRightShift ||
+			   t == TokenType.Caret ||
 			   t == TokenType.QuestionMark ||
 			   t == TokenType.Exponent ||
 			   t == TokenType.StrictEqual ||

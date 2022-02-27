@@ -185,9 +185,11 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		// 1. Let number be ? ToNumber(argument).
 		// 2. If number is NaN, +0𝔽, -0𝔽, +∞𝔽, or -∞𝔽, return +0𝔽.
 		if (value.isNaN() || value == 0.0 || value.isInfinite()) return 0;
-		// 3. Let int be the mathematical value whose sign is the sign of number and whose magnitude is floor(abs(ℝ(number))).
+		// 3. Let int be the mathematical value whose sign is the sign of number
+		// and whose magnitude is floor(abs(ℝ(number))).
+		long int_ = ((long) Math.floor(Math.abs(value))) * (long) Math.signum(value);
 		// 4. Let int32bit be int modulo 2^32.
-		long int32bit = ((long) Math.floor(Math.abs(value))) % 4294967296L;
+		long int32bit = int_ % 4294967296L;
 		// 5. If int32bit ≥ 2^31, return 𝔽(int32bit - 2^32);
 		if (int32bit >= 2147483648L) return (int) (int32bit - 4294967296L);
 		// otherwise return 𝔽(int32bit).

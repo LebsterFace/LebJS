@@ -408,27 +408,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return properties.toArray(new ArrayObject[0]);
 	}
 
-	/**
-	 * @return An {@link IteratorRecord} for the Object, or {@code null} if the object is not iterable.
-	 */
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
-	@NonCompliant
-	public final IteratorRecord getIterator(Interpreter interpreter) throws AbruptCompletion {
-		// b. Otherwise, set method to ? GetMethod(obj, @@iterator).
-		final Value<?> method = this.get(interpreter, SymbolValue.iterator);
-		// 3. Let iterator be ? Call(method, obj).
-		if (!(method instanceof final Executable<?> result)) return null;
-		final Value<?> iterator_V = result.call(interpreter, this);
-		// 4. If Type(iterator) is not Object, throw a TypeError exception.
-		if (!(iterator_V instanceof final ObjectValue iterator))
-			throw AbruptCompletion.error(new TypeError("Result of the Symbol.iterator method is not an object"));
-		// 5. Let nextMethod be ? GetV(iterator, "next").
-		final Value<?> nextMethod = iterator.get(interpreter, Names.next);
-		// 6. Let iteratorRecord be the Record { [[Iterator]]: iterator, [[NextMethod]]: nextMethod, [[Done]]: false }.
-		// 7. Return iteratorRecord.
-		return new IteratorRecord(iterator, nextMethod, false);
-	}
-
 	public final void representClassName(StringRepresentation representation) {
 		representation.append(ANSI.CYAN);
 		representation.append(this.getClass().getSimpleName());
@@ -449,9 +428,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
 		ObjectValue.staticDisplayRecursive(this, representation, parents, singleLine);
-	}
-
-	public record IteratorRecord(ObjectValue iterator, Value<?> nextMethod, boolean done) {
 	}
 
 	public static abstract class Key<R> extends PrimitiveValue<R> {

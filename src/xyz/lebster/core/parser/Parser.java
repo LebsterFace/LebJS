@@ -82,7 +82,7 @@ public final class Parser {
 	}
 
 	private void save() {
-		this.saved = state.clone();
+		this.saved = state.copy();
 	}
 
 	private void load() {
@@ -738,6 +738,7 @@ public final class Parser {
 				yield expression;
 			}
 
+			// TODO: Assume non-arrow function by default
 			case Identifier -> {
 				final FunctionExpression result = tryParseArrowFunctionExpression(false);
 				yield result != null ? result : new IdentifierExpression(state.consume().value);

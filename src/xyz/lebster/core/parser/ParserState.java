@@ -2,7 +2,9 @@ package xyz.lebster.core.parser;
 
 import xyz.lebster.core.exception.SyntaxError;
 
-public final class ParserState implements Cloneable {
+import java.beans.ParameterDescriptor;
+
+public final class ParserState {
 	public final Token[] tokens;
 	public Token currentToken;
 	public int index = -1;
@@ -74,8 +76,7 @@ public final class ParserState implements Cloneable {
 		return index >= tokens.length;
 	}
 
-	@Override
-	public ParserState clone() {
+	public ParserState copy() {
 		final ParserState cloned = new ParserState(tokens, index, currentToken);
 		cloned.inContinueContext = this.inContinueContext;
 		cloned.inBreakContext = this.inBreakContext;

@@ -10,5 +10,5 @@ public enum TokenType {
 	LogicalAnd, AmpersandEquals, PercentEquals, CaretEquals, PlusPlus, PlusEquals, LeftShift, LessThanEqual, LooseEqual,
 	Arrow, GreaterThanEqual, RightShift, PipeEquals, LogicalOr, StrictNotEqual, NullishCoalescingEquals, ExponentEquals,
 	LogicalAndEquals, RightShiftEquals, UnsignedRightShift, LogicalOrEquals, Infinity, QuestionMark, Await, Colon,
-	Backslash, DotDotDot, Enum, False, True
+	Backslash, DotDotDot, Enum, False, At, Hashtag, True
 }

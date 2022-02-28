@@ -118,6 +118,8 @@ public final class Lexer {
 		symbols_length_1.put("-", TokenType.Minus);
 		symbols_length_1.put(":", TokenType.Colon);
 		symbols_length_1.put("\\", TokenType.Backslash);
+		symbols_length_1.put("@", TokenType.At);
+		symbols_length_1.put("#", TokenType.Hashtag);
 
 		symbols.add(symbols_length_4);
 		symbols.add(symbols_length_3);

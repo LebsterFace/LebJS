@@ -100,7 +100,7 @@ public final class Parser {
 
 	private <T extends AppendableNode> void populateAppendableNode(T root, TokenType end) throws CannotParse, SyntaxError {
 		boolean isFirstStatement = true;
-		while (state.index < state.tokens.length) {
+		while (state.index < state.tokens.length && state.currentToken.type != end) {
 			if (isFirstStatement) {
 				isFirstStatement = false;
 				consumeAllSeparators();

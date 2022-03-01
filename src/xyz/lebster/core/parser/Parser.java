@@ -533,7 +533,11 @@ public final class Parser {
 
 	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
-		final String name = state.require(TokenType.Identifier);
+		if (state.currentToken.type != TokenType.Identifier) {
+			throw new SyntaxError("Function declarations require a function name");
+		}
+
+		final String name = state.consume().value;
 		final String[] arguments = parseFunctionArguments();
 		return new FunctionDeclaration(parseFunctionBody(), name, arguments);
 	}

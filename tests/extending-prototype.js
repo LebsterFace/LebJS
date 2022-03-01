@@ -17,5 +17,5 @@ String.prototype.append = function(value) {
 
 expect("hello", "hell".append("o"));
 
-Number.prototype.multiply = (x) => x * this;
+Number.prototype.multiply = function(x) { return x * this };
 expect(15, (3).multiply(5));

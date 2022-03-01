@@ -23,7 +23,7 @@ public final class NumberConstructor extends BuiltinConstructor<NumberWrapper> {
 	}
 
 	private NumberConstructor() {
-		super();
+		super(Names.Number);
 	}
 
 	private static Value<?> range(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
@@ -53,10 +53,5 @@ public final class NumberConstructor extends BuiltinConstructor<NumberWrapper> {
 	public NumberValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		final Value<?> v = arguments.length == 0 ? Undefined.instance : arguments[0];
 		return v.toNumberValue(interpreter);
-	}
-
-	@Override
-	protected String getName() {
-		return "Number";
 	}
 }

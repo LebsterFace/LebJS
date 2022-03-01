@@ -60,6 +60,11 @@ public final class Interpreter {
 		return executionContextStack[currentExecutionContext].environment();
 	}
 
+	public ExecutionContext executionContext() {
+		return executionContextStack[currentExecutionContext];
+	}
+
+
 	public ExecutionContext pushEnvironmentAndThisValue(LexicalEnvironment env, Value<?> thisValue) throws AbruptCompletion {
 		final ExecutionContext context = new ExecutionContext(env, thisValue);
 		this.enterExecutionContext(context);

@@ -25,7 +25,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 	}
 
 	private ArrayConstructor() {
-		super();
+		super(Names.Array);
 	}
 
 	@NonStandard
@@ -34,7 +34,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 		final Value<?> callbackFn = argument(1, arguments);
 		final Value<?> thisArg = argument(2, arguments);
 
-		final Executable<?> executable = Executable.getExecutable(callbackFn);
+		final Executable executable = Executable.getExecutable(callbackFn);
 		final Value<?>[] result = new Value<?>[len];
 		for (int k = 0; k < len; k++)
 			result[k] = executable.call(interpreter, thisArg, new NumberValue(k));
@@ -49,10 +49,5 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?>... arguments) {
 		throw new NotImplemented("Array()");
-	}
-
-	@Override
-	protected String getName() {
-		return "Array";
 	}
 }

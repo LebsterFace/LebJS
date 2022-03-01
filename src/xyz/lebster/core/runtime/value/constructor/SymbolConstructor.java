@@ -7,13 +7,16 @@ import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.executable.Constructor;
+import xyz.lebster.core.runtime.value.executable.Executable;
+import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.SymbolValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.SymbolPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol-constructor")
-public final class SymbolConstructor extends Constructor<Void> {
+public final class SymbolConstructor extends Executable {
 	public static final SymbolConstructor instance = new SymbolConstructor();
 
 	static {
@@ -34,12 +37,12 @@ public final class SymbolConstructor extends Constructor<Void> {
 	}
 
 	private SymbolConstructor() {
-		super(null);
+		super(Names.Symbol);
 	}
 
 	@Override
-	public ObjectValue construct(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError("Symbol is not a constructor"));
+	public StringValue toStringMethod() {
+		return NativeFunction.toStringForName(Names.Symbol.value);
 	}
 
 	@Override
@@ -53,10 +56,5 @@ public final class SymbolConstructor extends Constructor<Void> {
 		final String descString = description == Undefined.instance ? null : description.toStringValue(interpreter).value;
 		// 4. Return a new unique Symbol value whose [[Description]] value is descString.
 		return new SymbolValue(descString);
-	}
-
-	@Override
-	protected String getName() {
-		return "Symbol";
 	}
 }

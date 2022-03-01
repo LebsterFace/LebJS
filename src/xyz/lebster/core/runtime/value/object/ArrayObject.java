@@ -114,6 +114,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		representation.append(']');
 	}
 
+	@SuppressWarnings("unchecked")
 	private void representValues(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
 		final Iterator<Value<?>> iterator = ArrayObject.this.arrayValues.iterator();
 		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> mapIterator = ArrayObject.this.value.entrySet().iterator();

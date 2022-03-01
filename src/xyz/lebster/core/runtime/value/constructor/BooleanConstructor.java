@@ -20,7 +20,7 @@ public class BooleanConstructor extends BuiltinConstructor<BooleanWrapper> {
 	}
 
 	private BooleanConstructor() {
-		super();
+		super(Names.Boolean);
 	}
 
 	public BooleanWrapper construct(Interpreter interpreter, Value<?>[] arguments) {
@@ -31,10 +31,5 @@ public class BooleanConstructor extends BuiltinConstructor<BooleanWrapper> {
 	public BooleanValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		final Value<?> v = arguments.length == 0 ? Undefined.instance : arguments[0];
 		return v.toBooleanValue(interpreter);
-	}
-
-	@Override
-	protected String getName() {
-		return "Boolean";
 	}
 }

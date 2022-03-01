@@ -20,7 +20,7 @@ public class StringConstructor extends BuiltinConstructor<StringWrapper> {
 	}
 
 	private StringConstructor() {
-		super();
+		super(Names.String);
 	}
 
 	public StringWrapper construct(Interpreter interpreter, Value<?>[] arguments) {
@@ -31,10 +31,5 @@ public class StringConstructor extends BuiltinConstructor<StringWrapper> {
 	public StringValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		final Value<?> v = arguments.length == 0 ? Undefined.instance : arguments[0];
 		return v.toStringValue(interpreter);
-	}
-
-	@Override
-	protected String getName() {
-		return "String";
 	}
 }

@@ -727,7 +727,7 @@ public final class Parser {
 			case LParen -> {
 				state.consume();
 				if (state.currentToken.type == TokenType.RParen || state.currentToken.type == TokenType.Identifier) {
-					final FunctionExpression result = tryParseArrowFunctionExpression(true);
+					final ArrowFunctionExpression result = tryParseArrowFunctionExpression(true);
 					if (result != null) yield result;
 				}
 
@@ -740,7 +740,7 @@ public final class Parser {
 
 			// TODO: Assume non-arrow function by default
 			case Identifier -> {
-				final FunctionExpression result = tryParseArrowFunctionExpression(false);
+				final ArrowFunctionExpression result = tryParseArrowFunctionExpression(false);
 				yield result != null ? result : new IdentifierExpression(state.consume().value);
 			}
 
@@ -786,7 +786,7 @@ public final class Parser {
 		};
 	}
 
-	private FunctionExpression tryParseArrowFunctionExpression(boolean expectParens) throws SyntaxError, CannotParse {
+	private ArrowFunctionExpression tryParseArrowFunctionExpression(boolean expectParens) throws SyntaxError, CannotParse {
 		save();
 
 		final String[] arguments = parseArrowFunctionArguments(expectParens);
@@ -800,23 +800,13 @@ public final class Parser {
 			return null;
 		}
 
-		final BlockStatement body = parseArrowFunctionBody();
-		if (body == null) {
-			load();
-			return null;
-		}
-
-		return new FunctionExpression(body, null, arguments);
-	}
-
-	private BlockStatement parseArrowFunctionBody() throws CannotParse, SyntaxError {
 		if (state.currentToken.type == TokenType.LBrace) {
-			return parseBlockStatement();
+			BlockStatement body = parseBlockStatement();
+			return new ArrowFunctionExpression(body, arguments);
 		} else if (matchPrimaryExpression()) {
-			final BlockStatement body = new BlockStatement();
-			body.append(new ReturnStatement(parseExpression()));
-			return body;
+			return new ArrowFunctionExpression(parseExpression(), arguments);
 		} else {
+			load();
 			return null;
 		}
 	}

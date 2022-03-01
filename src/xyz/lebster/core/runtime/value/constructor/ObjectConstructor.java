@@ -34,7 +34,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	}
 
 	private ObjectConstructor() {
-		super();
+		super(Names.Object);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.fromentries")
@@ -120,11 +120,6 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 		// 2. Return ? obj.[[GetPrototypeOf]]().
 		final ObjectValue prototype = O.toObjectValue(interpreter).getPrototype();
 		return prototype == null ? Null.instance : prototype;
-	}
-
-	@Override
-	protected String getName() {
-		return "Object";
 	}
 
 	@Override

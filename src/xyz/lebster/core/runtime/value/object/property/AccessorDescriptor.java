@@ -11,12 +11,12 @@ import xyz.lebster.core.runtime.value.object.ObjectValue;
 import java.util.HashSet;
 
 public final class AccessorDescriptor implements PropertyDescriptor {
-	private final Executable<?> getter;
-	private final Executable<?> setter;
+	private final Executable getter;
+	private final Executable setter;
 	private boolean enumerable;
 	private boolean configurable;
 
-	public AccessorDescriptor(Executable<?> getter, Executable<?> setter, boolean enumerable, boolean configurable) {
+	public AccessorDescriptor(Executable getter, Executable setter, boolean enumerable, boolean configurable) {
 		this.getter = getter;
 		this.setter = setter;
 		this.enumerable = enumerable;

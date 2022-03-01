@@ -51,7 +51,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let len be ? LengthOfArrayLike(O).
 		final long len = lengthOfArrayLike(O, interpreter);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
-		final Executable<?> executable = Executable.getExecutable(callbackfn);
+		final Executable executable = Executable.getExecutable(callbackfn);
 		// 4. Let A be ? ArraySpeciesCreate(O, 0).
 		final Value<?>[] A = new Value<?>[(int) len];
 		// 5. Let k be 0.
@@ -103,7 +103,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let len be ? LengthOfArrayLike(O).
 		final long len = lengthOfArrayLike(O, interpreter);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
-		final Executable<?> executable = Executable.getExecutable(callbackfn);
+		final Executable executable = Executable.getExecutable(callbackfn);
 		// 4. Let k be 0.
 		int k = 0;
 		// 5. Repeat, while k < len,
@@ -133,7 +133,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let func be ? Get(array, "join").
 		final Value<?> func = array.get(interpreter, Names.join);
 		// 3. If IsCallable(func) is false, set func to the intrinsic function %Object.prototype.toString%.
-		final Executable<?> f_Func = func instanceof Executable<?> e ? e : ObjectPrototype.toStringMethod;
+		final Executable f_Func = func instanceof Executable e ? e : ObjectPrototype.toStringMethod;
 		// 4. Return ? Call(func, array).
 		return f_Func.call(interpreter, array);
 	}
@@ -204,7 +204,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		final long len = lengthOfArrayLike(O, interpreter);
-		final Executable<?> executable = Executable.getExecutable(callbackfn);
+		final Executable executable = Executable.getExecutable(callbackfn);
 
 		final Value<?>[] values = new Value<?>[(int) len];
 		for (int k = 0; k < len; k++) {

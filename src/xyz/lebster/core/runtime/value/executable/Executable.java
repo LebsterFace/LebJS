@@ -16,23 +16,17 @@ import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 
-public abstract class Executable<JType> extends ObjectValue implements HasBuiltinTag {
-	public final JType code;
+public abstract class Executable extends ObjectValue implements HasBuiltinTag {
+	public final StringValue name;
 
-	public Executable(StringValue name, JType code) {
+	public Executable(StringValue name) {
 		super();
-		this.code = code;
+		this.name = name;
 		this.put(Names.name, name);
 	}
 
-	public Executable(JType code) {
-		super();
-		this.code = code;
-		this.put(Names.name, new StringValue(this.getName()));
-	}
-
-	public static Executable<?> getExecutable(Value<?> value) throws AbruptCompletion {
-		if (value instanceof final Executable<?> executable) return executable;
+	public static Executable getExecutable(Value<?> value) throws AbruptCompletion {
+		if (value instanceof final Executable executable) return executable;
 
 		final String message = ANSI.stripFormatting(value.toDisplayString()) + " is not a function";
 		throw AbruptCompletion.error(new TypeError(message));
@@ -48,17 +42,13 @@ public abstract class Executable<JType> extends ObjectValue implements HasBuilti
 		representation.append(ANSI.MAGENTA);
 		representation.append("[Function: ");
 		representation.append(ANSI.BRIGHT_MAGENTA);
-		representation.append(this.getName());
+		representation.append(this.name.value);
 		representation.append(ANSI.MAGENTA);
 		representation.append(']');
 		representation.append(ANSI.RESET);
 	}
 
-	protected abstract String getName();
-
-	public StringValue toStringMethod() {
-		return NativeFunction.toStringForName(this.getName());
-	}
+	public abstract StringValue toStringMethod();
 
 	public Value<?> call(Interpreter interpreter, Value<?> thisValue, Value<?>... args) throws AbruptCompletion {
 		final ExecutionContext context = interpreter.pushThisValue(thisValue);

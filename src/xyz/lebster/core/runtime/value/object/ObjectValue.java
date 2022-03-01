@@ -46,6 +46,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
 		if (objectValue.getClass() != ObjectValue.class) {
 			objectValue.representClassName(representation);
@@ -155,7 +156,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 		// b. If exoticToPrim is not undefined, then
 		if (exoticToPrim_property != null) {
-			final Executable<?> exoticToPrim = Executable.getExecutable(exoticToPrim_property.get(interpreter, this));
+			final Executable exoticToPrim = Executable.getExecutable(exoticToPrim_property.get(interpreter, this));
 			final StringValue hint = preferredType == null ? Names.default_ :
 				preferredType == PreferredType.String ? Names.string : Names.number;
 			// iv. Let result be ? Call(exoticToPrim, input, hint).
@@ -188,7 +189,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			// a. Let method be ? Get(O, name).
 			final Value<?> method = this.get(interpreter, name);
 			// b. If IsCallable(method) is true, then
-			if (method instanceof final Executable<?> executable) {
+			if (method instanceof final Executable executable) {
 				// i. Let result be ? Call(method, O).
 				final Value<?> result = executable.call(interpreter, this);
 				// ii. If Type(result) is not Object, return result.
@@ -294,7 +295,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		if (func == Undefined.instance || func == Null.instance)
 			return Undefined.instance;
 		// 3. If IsCallable(func) is false, throw a TypeError exception.
-		if (!(func instanceof Executable<?>))
+		if (!(func instanceof Executable))
 			throw AbruptCompletion.error(new TypeError("Not a function!"));
 		// 4. Return func.
 		return func;
@@ -334,7 +335,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	}
 
 	public void putMethod(ObjectValue.Key<?> name, NativeCode code) {
-		this.value.put(name, new DataDescriptor(new NativeFunction(name, code), true, true, true));
+		this.value.put(name, new DataDescriptor(new NativeFunction(name.toFunctionName(), code), true, true, true));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")

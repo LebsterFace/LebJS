@@ -12,12 +12,12 @@ import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import java.util.HashSet;
 
-public final class NativeFunction extends Executable<NativeCode> {
-	private final String name;
+public final class NativeFunction extends Executable {
+	private final NativeCode code;
 
-	public NativeFunction(ObjectValue.Key<?> name, NativeCode code) {
-		super(name.toFunctionName(), code);
-		this.name = name.toFunctionName().value;
+	public NativeFunction(StringValue name, NativeCode code) {
+		super(name);
+		this.code = code;
 	}
 
 	public static StringValue toStringForName(String name) {
@@ -45,6 +45,11 @@ public final class NativeFunction extends Executable<NativeCode> {
 	}
 
 	@Override
+	public StringValue toStringMethod() {
+		return NativeFunction.toStringForName(this.name.value);
+	}
+
+	@Override
 	public Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		try {
 			return code.execute(interpreter, arguments);
@@ -52,11 +57,6 @@ public final class NativeFunction extends Executable<NativeCode> {
 			if (e.type != AbruptCompletion.Type.Return) throw e;
 			return e.value;
 		}
-	}
-
-	@Override
-	protected String getName() {
-		return this.name;
 	}
 
 	@Override

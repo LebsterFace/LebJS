@@ -17,7 +17,7 @@ public class FunctionConstructor extends BuiltinConstructor<Function> {
 	}
 
 	private FunctionConstructor() {
-		super();
+		super(Names.Function);
 	}
 
 	public Function construct(Interpreter interpreter, Value<?>[] arguments) {
@@ -27,10 +27,5 @@ public class FunctionConstructor extends BuiltinConstructor<Function> {
 	@Override
 	public Function call(Interpreter interpreter, Value<?>... arguments) {
 		throw new NotImplemented("Function()");
-	}
-
-	@Override
-	protected String getName() {
-		return "Function";
 	}
 }

@@ -2,8 +2,6 @@ package xyz.lebster.core.parser;
 
 import xyz.lebster.core.exception.SyntaxError;
 
-import java.beans.ParameterDescriptor;
-
 public final class ParserState {
 	public final Token[] tokens;
 	public Token currentToken;

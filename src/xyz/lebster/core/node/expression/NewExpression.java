@@ -18,8 +18,8 @@ public record NewExpression(Expression constructExpr, ExpressionList arguments) 
 		return getConstructor(value).construct(interpreter, executedArguments);
 	}
 
-	private Constructor<?> getConstructor(Value<?> exprValue) throws AbruptCompletion {
-		if (exprValue instanceof final Constructor<?> constructor) {
+	private Constructor getConstructor(Value<?> exprValue) throws AbruptCompletion {
+		if (exprValue instanceof final Constructor constructor) {
 			return constructor;
 		} else {
 			final var representation = new StringRepresentation();

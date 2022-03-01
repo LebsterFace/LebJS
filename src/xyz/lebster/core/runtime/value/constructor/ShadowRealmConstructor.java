@@ -16,7 +16,7 @@ public final class ShadowRealmConstructor extends BuiltinConstructor<ShadowRealm
 	}
 
 	private ShadowRealmConstructor() {
-		super();
+		super(Names.ShadowRealm);
 	}
 
 	@Override
@@ -27,10 +27,5 @@ public final class ShadowRealmConstructor extends BuiltinConstructor<ShadowRealm
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("ShadowRealm constructor must be called with `new`"));
-	}
-
-	@Override
-	protected String getName() {
-		return "ShadowRealm";
 	}
 }

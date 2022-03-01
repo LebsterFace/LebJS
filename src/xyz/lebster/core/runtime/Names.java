@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 public final class Names {
@@ -103,4 +104,7 @@ public final class Names {
 	public static final StringValue toPrimitive = new StringValue("toPrimitive");
 	public static final StringValue toStringTag = new StringValue("toStringTag");
 	public static final StringValue unscopables = new StringValue("unscopables");
+
+	public static final StringValue EMPTY = new StringValue("");
+	public static final StringValue anonymous = new StringValue("(anonymous)");
 }

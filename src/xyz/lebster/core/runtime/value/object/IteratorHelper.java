@@ -32,7 +32,7 @@ public final class IteratorHelper {
 		if (iteratorProperty == null)
 			throw error(new TypeError(obj + " is not iterable (does not contain a `Symbol.iterator` property)"));
 
-		if (!(iteratorProperty.get(interpreter, objectValue) instanceof final Executable<?> iteratorMethod))
+		if (!(iteratorProperty.get(interpreter, objectValue) instanceof final Executable iteratorMethod))
 			throw error(new TypeError(obj + "[Symbol.iterator] is not a function"));
 
 		if (!(iteratorMethod.call(interpreter, objectValue) instanceof final ObjectValue iterator))
@@ -42,7 +42,7 @@ public final class IteratorHelper {
 		if (nextProperty == null)
 			throw error(new TypeError(obj + "[Symbol.iterator]() returned an object which does not contain a `next` property"));
 
-		if (!(nextProperty.get(interpreter, iterator) instanceof final Executable<?> executable))
+		if (!(nextProperty.get(interpreter, iterator) instanceof final Executable executable))
 			throw error(new TypeError(obj + "[Symbol.iterator]().next is not a function"));
 
 		return new ObjectIterator(interpreter, iterator, executable, obj);
@@ -51,10 +51,10 @@ public final class IteratorHelper {
 	public static final class ObjectIterator {
 		private final Interpreter interpreter;
 		private final ObjectValue iteratorObject;
-		private final Executable<?> nextMethod;
+		private final Executable nextMethod;
 		private final String errorString;
 
-		private ObjectIterator(Interpreter interpreter, ObjectValue iteratorObject, Executable<?> nextMethod, String errorString) {
+		private ObjectIterator(Interpreter interpreter, ObjectValue iteratorObject, Executable nextMethod, String errorString) {
 			this.interpreter = interpreter;
 			this.iteratorObject = iteratorObject;
 			this.nextMethod = nextMethod;

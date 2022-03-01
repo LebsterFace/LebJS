@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
-public final class FunctionPrototype extends Executable<Void> {
+public final class FunctionPrototype extends Executable {
 	public static final FunctionPrototype instance = new FunctionPrototype();
 
 	static {
@@ -25,7 +25,7 @@ public final class FunctionPrototype extends Executable<Void> {
 	}
 
 	private FunctionPrototype() {
-		super(null);
+		super(Names.EMPTY);
 	}
 
 	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
@@ -33,7 +33,7 @@ public final class FunctionPrototype extends Executable<Void> {
 	}
 
 	private static Value<?> callMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Executable<?> func = Executable.getExecutable(interpreter.thisValue());
+		final Executable func = Executable.getExecutable(interpreter.thisValue());
 		final Value<?> thisArg = argument(0, arguments);
 		final Value<?>[] args = Arrays.copyOfRange(arguments, 1, arguments.length);
 		return func.call(interpreter, thisArg, args);
@@ -42,11 +42,6 @@ public final class FunctionPrototype extends Executable<Void> {
 	@Override
 	public StringValue toStringMethod() {
 		return NativeFunction.toStringForName("");
-	}
-
-	@Override
-	protected String getName() {
-		return "";
 	}
 
 	@Override

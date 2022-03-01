@@ -1,7 +1,7 @@
 package xyz.lebster.core.runtime.value.executable;
 
 import xyz.lebster.core.interpreter.*;
-import xyz.lebster.core.node.declaration.FunctionNode;
+import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
@@ -11,17 +11,14 @@ import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 import java.util.HashSet;
 
-public final class Function extends Constructor<FunctionNode> {
-	public final LexicalEnvironment environment;
+public final class Function extends Constructor {
+	private final LexicalEnvironment environment;
+	private final FunctionNode code;
 
 	public Function(FunctionNode code, LexicalEnvironment environment) {
-		super(code);
+		super(new StringValue(code.name()));
+		this.code = code;
 		this.environment = environment;
-	}
-
-	@Override
-	protected String getName() {
-		return code.name;
 	}
 
 	@Override
@@ -37,13 +34,13 @@ public final class Function extends Constructor<FunctionNode> {
 	private Value<?> executeCode(ExecutionContext context, Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
 		// Declare passed arguments as variables
 		int i = 0;
-		for (; i < code.arguments.length && i < passedArguments.length; i++)
-			interpreter.declareVariable(code.arguments[i], passedArguments[i]);
-		for (; i < code.arguments.length; i++)
-			interpreter.declareVariable(code.arguments[i], Undefined.instance);
+		for (; i < code.arguments().length && i < passedArguments.length; i++)
+			interpreter.declareVariable(code.arguments()[i], passedArguments[i]);
+		for (; i < code.arguments().length; i++)
+			interpreter.declareVariable(code.arguments()[i], Undefined.instance);
 
 		try {
-			code.body.execute(interpreter);
+			code.body().execute(interpreter);
 			return Undefined.instance;
 		} catch (AbruptCompletion e) {
 			if (e.type != AbruptCompletion.Type.Return) throw e;

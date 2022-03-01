@@ -11,6 +11,7 @@ import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.object.property.PropertyDescriptor;
 import xyz.lebster.core.runtime.value.primitive.Null;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
@@ -45,7 +46,9 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 			throw AbruptCompletion.error(new TypeError("Object.fromEntries call with non-array"));
 
 		final ObjectValue result = new ObjectValue();
-		for (final Value<?> value : arrayObject) {
+		for (final PropertyDescriptor descriptor : arrayObject) {
+			final Value<?> value = descriptor.get($, arrayObject);
+
 			if (!(value instanceof final ObjectValue entry))
 				throw AbruptCompletion.error(new TypeError("Value is not an entry object"));
 

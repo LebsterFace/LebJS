@@ -1,7 +1,9 @@
 package xyz.lebster.core.runtime.value.object;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -13,19 +15,20 @@ import xyz.lebster.core.runtime.value.object.property.NativeAccessorDescriptor;
 import xyz.lebster.core.runtime.value.object.property.PropertyDescriptor;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 
 import java.util.*;
 
-public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Iterable<Value<?>> {
-	private final ArrayList<Value<?>> arrayValues;
+public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Iterable<PropertyDescriptor> {
+	private final ArrayList<PropertyDescriptor> arrayValues;
 
 	public ArrayObject(Value<?>... initialValues) {
-		this(new ArrayList<>(Arrays.asList(initialValues)));
-	}
+		this.arrayValues = new ArrayList<>(initialValues.length);
+		for (final Value<?> value : initialValues) {
+			this.arrayValues.add(new DataDescriptor(value));
+		}
 
-	public ArrayObject(ArrayList<Value<?>> arrayValues) {
-		this.arrayValues = arrayValues;
 		this.value.put(Names.length, new NativeAccessorDescriptor(false) {
 			@Override
 			public Value<?> get(Interpreter interpreter, ObjectValue thisValue) {
@@ -34,13 +37,15 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 			@Override
 			@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-arraysetlength")
-			public void set(Interpreter interpreter, ObjectValue thisValue, Value<?> value) throws AbruptCompletion {
-				final int newLen = (int) Math.floor(value.toNumberValue(interpreter).value);
+			public void set(Interpreter interpreter, ObjectValue thisValue, Value<?> value1) throws AbruptCompletion {
+				final int newLen = (int) Math.floor(value1.toNumberValue(interpreter).value);
 				if (newLen == arrayValues.size()) return;
 
 				if (newLen > arrayValues.size()) {
 					final int delta = newLen - arrayValues.size();
-					arrayValues.addAll(Collections.nCopies(delta, null));
+					for (int i = 0; i < delta; i++) {
+						arrayValues.add(new DataDescriptor(Undefined.instance));
+					}
 				} else {
 					arrayValues.subList(newLen, arrayValues.size()).clear();
 				}
@@ -48,35 +53,64 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		});
 	}
 
-	private Value<?> getArrayValueOrNull(Key<?> key) {
-		if (!(key instanceof StringValue stringValue)) return null;
-		if (stringValue.value.length() == 0) return null;
+	public ArrayObject(ArrayList<Value<?>> arrayValues) {
+		this(arrayValues.toArray(new Value[0]));
+	}
+
+	private PropertyDescriptor getArrayPropertyOrNull(Key<?> key) {
+		final int index = getArrayIndex(key);
+		if (index == -1 || index >= arrayValues.size()) return null;
+		return arrayValues.get(index);
+	}
+
+	private static int getArrayIndex(Key<?> key) {
+		if (!(key instanceof StringValue stringValue)) return -1;
+		if (stringValue.value.length() == 0) return -1;
 
 		int index = 0;
 		for (int i = 0; i < stringValue.value.length(); i++) {
 			final char c = stringValue.value.charAt(i);
-			if (c < '0' || c > '9') return null;
+			if (c < '0' || c > '9') return -1;
 
 			index *= 10;
 			index += c - '0';
-			if (index >= arrayValues.size()) return null;
 		}
 
-		return arrayValues.get(index);
+		return index;
+	}
+
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array-exotic-objects-defineownproperty-p-desc")
+	@Override
+	@NonCompliant
+	public boolean defineOwnProperty(Interpreter interpreter, Key<?> P, PropertyDescriptor Desc) throws AbruptCompletion {
+		final int arrayIndex = getArrayIndex(P);
+		if (arrayIndex != -1) {
+			final long indexLong = P.toNumberValue(interpreter).toUint32();
+			if (indexLong > Integer.MAX_VALUE) throw new NotImplemented("Arrays longer than 2^31-1");
+			final int index = (int) indexLong;
+			final int delta = (index + 1) - arrayValues.size();
+			for (int i = 0; i < delta; i++) arrayValues.add(new DataDescriptor(Undefined.instance));
+
+			arrayValues.set(index, Desc);
+
+			// k. Return true.
+			return true;
+		}
+
+		return super.defineOwnProperty(interpreter, P, Desc);
 	}
 
 	@Override
 	public PropertyDescriptor getOwnProperty(Key<?> key) {
 		final PropertyDescriptor fromMap = this.value.get(key);
 		if (fromMap != null) return fromMap;
-		final Value<?> arrayValue = getArrayValueOrNull(key);
-		if (arrayValue == null) return null;
-		return new DataDescriptor(arrayValue, true, true, true);
+		return getArrayPropertyOrNull(key);
 	}
 
 	@Override
 	public boolean hasOwnProperty(Key<?> key) {
-		return this.value.containsKey(key) || getArrayValueOrNull(key) != null;
+		return this.value.containsKey(key) || getArrayPropertyOrNull(key) != null;
 	}
 
 	@Override
@@ -90,7 +124,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 	}
 
 	@Override
-	public Iterator<Value<?>> iterator() {
+	public Iterator<PropertyDescriptor> iterator() {
 		return arrayValues.iterator();
 	}
 
@@ -116,17 +150,22 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 	@SuppressWarnings("unchecked")
 	private void representValues(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		final Iterator<Value<?>> iterator = ArrayObject.this.arrayValues.iterator();
-		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> mapIterator = ArrayObject.this.value.entrySet().iterator();
+		final Iterator<PropertyDescriptor> iterator = arrayValues.iterator();
+		final ArrayList<Map.Entry<Key<?>, PropertyDescriptor>> nonLengthMapIterator = new ArrayList<>();
+		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : value.entrySet()) {
+			if (entry.getKey() == Names.length) continue;
+			nonLengthMapIterator.add(entry);
+		}
+
+		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> mapIterator = nonLengthMapIterator.iterator();
 
 		while (iterator.hasNext()) {
 			if (!singleLine) representation.appendIndent();
-			DataDescriptor.display(iterator.next(), representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
+			iterator.next().display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
 			if (iterator.hasNext() || mapIterator.hasNext()) representation.append(',');
 			if (singleLine) representation.append(' ');
 			else representation.appendLine();
 		}
-
 
 		while (mapIterator.hasNext()) {
 			final Map.Entry<Key<?>, PropertyDescriptor> entry = mapIterator.next();

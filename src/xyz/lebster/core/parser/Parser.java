@@ -115,26 +115,6 @@ public final class Parser {
 		}
 	}
 
-	private Statement[] parseStatementsList(TokenType end) throws CannotParse, SyntaxError {
-		boolean isFirstStatement = true;
-		final List<Statement> statementList = new ArrayList<>();
-		while (state.index < state.tokens.length) {
-			if (isFirstStatement) {
-				isFirstStatement = false;
-				consumeAllSeparators();
-			} else if (didConsumeSeparator()) {
-				consumeAllSeparators();
-			} else {
-				requireAtLeastOneSeparator();
-			}
-
-			if (state.currentToken.type == end) break;
-			statementList.add(parseAny());
-		}
-
-		return statementList.toArray(new Statement[0]);
-	}
-
 	private void requireAtLeastOneSeparator() throws SyntaxError {
 		boolean done = false;
 		while (state.currentToken.type != TokenType.EOF) {

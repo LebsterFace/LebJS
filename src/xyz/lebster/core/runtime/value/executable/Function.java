@@ -16,7 +16,7 @@ public final class Function extends Constructor {
 	private final FunctionNode code;
 
 	public Function(FunctionNode code, LexicalEnvironment environment) {
-		super(new StringValue(code.name()));
+		super(code.name() == null ? Names.EMPTY : new StringValue(code.name()));
 		this.code = code;
 		this.environment = environment;
 	}

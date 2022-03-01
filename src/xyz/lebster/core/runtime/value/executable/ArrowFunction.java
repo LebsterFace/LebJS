@@ -20,7 +20,7 @@ public final class ArrowFunction extends Executable {
 	public ArrowFunction(ArrowFunctionExpression expression, ExecutionContext context) {
 		// TODO: Automatic function names for arrow & non-arrow functions
 		//		e.g. ' let k = () => {} ' should be given the name 'k'
-		super(Names.anonymous);
+		super(Names.EMPTY);
 		this.expression = expression;
 		this.context = context;
 	}

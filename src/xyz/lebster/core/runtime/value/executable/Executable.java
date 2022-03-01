@@ -42,7 +42,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		representation.append(ANSI.MAGENTA);
 		representation.append("[Function: ");
 		representation.append(ANSI.BRIGHT_MAGENTA);
-		representation.append(this.name.value);
+		representation.append(this.name.value.isEmpty() ? "(anonymous)" : this.name.value);
 		representation.append(ANSI.MAGENTA);
 		representation.append(']');
 		representation.append(ANSI.RESET);

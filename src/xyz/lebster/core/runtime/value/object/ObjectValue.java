@@ -264,11 +264,18 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return null;
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarydefineownproperty")
+	@NonCompliant
+	public boolean defineOwnProperty(Interpreter interpreter, Key<?> key, PropertyDescriptor descriptor) throws AbruptCompletion {
+		this.value.put(key, descriptor);
+		return true;
+	}
+
 	@NonCompliant
 	public void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
 		final PropertyDescriptor property = this.getProperty(key);
 		if (property == null) {
-			this.value.put(key, new DataDescriptor(value, true, true, true));
+			this.defineOwnProperty(interpreter, key, new DataDescriptor(value));
 			return;
 		}
 
@@ -319,11 +326,11 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	}
 
 	public void put(Key<?> key, Value<?> value) {
-		this.value.put(key, new DataDescriptor(value, true, true, true));
+		this.value.put(key, new DataDescriptor(value));
 	}
 
 	public void put(String key, Value<?> value) {
-		this.value.put(new StringValue(key), new DataDescriptor(value, true, true, true));
+		this.value.put(new StringValue(key), new DataDescriptor(value));
 	}
 
 	public void putNonWritable(Key<?> key, Value<?> value) {
@@ -335,7 +342,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	}
 
 	public void putMethod(ObjectValue.Key<?> name, NativeCode code) {
-		this.value.put(name, new DataDescriptor(new NativeFunction(name.toFunctionName(), code), true, true, true));
+		this.value.put(name, new DataDescriptor(new NativeFunction(name.toFunctionName(), code)));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")

@@ -71,7 +71,6 @@ public final class NumberPrototype extends ObjectValue {
 		return integer;
 	}
 
-	// FIXME: Follow spec
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tolocalestring")
 	@NonCompliant
 	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {

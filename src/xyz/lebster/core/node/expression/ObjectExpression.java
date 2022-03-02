@@ -4,6 +4,9 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.Names;
+import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
 import java.util.HashMap;
@@ -19,10 +22,17 @@ public record ObjectExpression(Map<Expression, Expression> entries) implements E
 		final ObjectValue result = new ObjectValue();
 
 		for (final Map.Entry<Expression, Expression> entry : entries.entrySet()) {
-			result.put(
-				entry.getKey().execute(interpreter).toPropertyKey(interpreter),
-				entry.getValue().execute(interpreter)
-			);
+			final ObjectValue.Key<?> key = entry.getKey().execute(interpreter).toPropertyKey(interpreter);
+			final Value<?> value = entry.getValue().execute(interpreter);
+
+			if (Executable.isAnonymousFunctionExpression(entry.getValue())) {
+				if (value instanceof final Executable function) {
+					function.set(interpreter, Names.name, key);
+					function.updateName(key.toStringValue(interpreter));
+				}
+			}
+
+			result.put(key, value);
 		}
 
 		return result;

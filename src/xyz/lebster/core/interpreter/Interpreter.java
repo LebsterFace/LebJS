@@ -36,6 +36,12 @@ public final class Interpreter {
 		lexicalEnvironment().setVariable(this, new StringValue(name), value);
 	}
 
+	@NonStandard
+	// FIXME: Environment records
+	public void declareVariable(StringValue name, Value<?> value) throws AbruptCompletion {
+		lexicalEnvironment().setVariable(this, name, value);
+	}
+
 	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {
 		if (currentExecutionContext + 1 == stackSize) {
 			throw AbruptCompletion.error(new RangeError("Maximum call stack size exceeded"));

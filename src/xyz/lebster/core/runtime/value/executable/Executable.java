@@ -6,6 +6,9 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.FunctionNode;
+import xyz.lebster.core.node.expression.ArrowFunctionExpression;
+import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.HasBuiltinTag;
 import xyz.lebster.core.runtime.value.Value;
@@ -17,7 +20,7 @@ import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 
 public abstract class Executable extends ObjectValue implements HasBuiltinTag {
-	public final StringValue name;
+	public StringValue name;
 
 	public Executable(StringValue name) {
 		super();
@@ -30,6 +33,15 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 
 		final String message = ANSI.stripFormatting(value.toDisplayString()) + " is not a function";
 		throw AbruptCompletion.error(new TypeError(message));
+	}
+
+	public static boolean isAnonymousFunctionExpression(Expression expression) {
+		return expression instanceof ArrowFunctionExpression ||
+			   (expression instanceof final FunctionNode functionNode && functionNode.name() == null);
+	}
+
+	public final void updateName(StringValue newName) {
+		this.name = newName;
 	}
 
 	@Override

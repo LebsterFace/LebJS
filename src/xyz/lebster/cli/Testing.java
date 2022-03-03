@@ -28,44 +28,56 @@ public final class Testing {
 			printStream.println(baos);
 	}
 
-	public static void test(CLArguments arguments) {
-		final File testingDirectory = arguments.filePathOrNull() == null ? new File("tests/") : arguments.filePathOrNull().toFile();
-		final File[] files = testingDirectory.listFiles();
+	private static void runTestFile(CLArguments arguments, File file, String prefix) {
+		final String fileName = prefix + file.getName();
+		totalTests++;
+
+		if (file.getName().endsWith(".js.skip")) {
+			printTestResult(failedStream, ANSI.YELLOW, "SKIPPED", fileName);
+			return;
+		}
+
+		final ByteArrayOutputStream tempOutput = new ByteArrayOutputStream();
+		final PrintStream tempStream = new PrintStream(tempOutput);
+		final PrintStream stdout = System.out;
+		System.setOut(tempStream);
+
+		try {
+			try {
+				Realm.executeStatic(Files.readString(file.toPath()), arguments.options().showAST());
+			} catch (AbruptCompletion completion) {
+				if (arguments.options().parseOnly() && completion.type != AbruptCompletion.Type.Throw) {
+					throw completion;
+				}
+			}
+			successfulTests++;
+			printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", fileName);
+			printTestOutput(passedStream, tempOutput);
+		} catch (Throwable throwable) {
+			printTestResult(failedStream, ANSI.BRIGHT_RED, "FAILED", fileName);
+			printTestOutput(failedStream, tempOutput);
+			Main.handleError(throwable, failedStream, arguments.options().showStackTrace());
+		}
+
+		System.setOut(stdout);
+	}
+
+	private static void runTestDirectory(CLArguments arguments, File directory, String prefix) {
+		final File[] files = directory.listFiles();
 		if (files == null) throw new Error("Test directory not found!");
 
 		for (final File file : files) {
-			if (!file.isFile()) continue;
-			totalTests++;
-
-			if (file.getName().endsWith(".js.skip")) {
-				printTestResult(failedStream, ANSI.YELLOW, "SKIPPED", file.getName());
-				continue;
+			if (file.isFile()) {
+				runTestFile(arguments, file, prefix);
+			} else {
+				runTestDirectory(arguments, file, prefix + file.getName() + "/");
 			}
-
-			final ByteArrayOutputStream tempOutput = new ByteArrayOutputStream();
-			final PrintStream tempStream = new PrintStream(tempOutput);
-			final PrintStream stdout = System.out;
-			System.setOut(tempStream);
-
-			try {
-				try {
-					Realm.executeStatic(Files.readString(file.toPath()), arguments.options().showAST());
-				} catch (AbruptCompletion completion) {
-					if (arguments.options().parseOnly() && completion.type != AbruptCompletion.Type.Throw) {
-						throw completion;
-					}
-				}
-				successfulTests++;
-				printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", file.getName());
-				printTestOutput(passedStream, tempOutput);
-			} catch (Throwable throwable) {
-				printTestResult(failedStream, ANSI.BRIGHT_RED, "FAILED", file.getName());
-				printTestOutput(failedStream, tempOutput);
-				Main.handleError(throwable, failedStream, arguments.options().showStackTrace());
-			}
-
-			System.setOut(stdout);
 		}
+	}
+
+	public static void test(CLArguments arguments) {
+		final File testingDirectory = arguments.filePathOrNull() == null ? new File("tests/") : arguments.filePathOrNull().toFile();
+		runTestDirectory(arguments, testingDirectory, "");
 
 		passedStream.close();
 		failedStream.close();

@@ -1,0 +1,20 @@
+let s = "hello friends";
+expect(6, s.indexOf("friends"));
+expect(-1, s.indexOf("enemies"));
+expect(6, s.indexOf("friends", 0));
+expect(-1, s.indexOf("enemies", 0));
+expect(6, s.indexOf("friends", 4));
+expect(6, s.indexOf("friends", 6));
+expect(-1, s.indexOf("friends", 7));
+expect(-1, s.indexOf("friends", 8));
+expect(-1, s.indexOf("enemies", 2));
+expect(-1, s.indexOf("enemies", 7));
+expect(1, s.indexOf("e"));
+expect(1, s.indexOf("e", 0));
+expect(9, s.indexOf("e", 2));
+
+s = "😀";
+expect(0, s.indexOf("😀"));
+expect(0, s.indexOf("\ud83d"));
+expect(1, s.indexOf("\ude00"));
+expect(-1, s.indexOf("a"));

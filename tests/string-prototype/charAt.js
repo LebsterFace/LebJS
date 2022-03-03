@@ -1,0 +1,16 @@
+let s = "foobar";
+expect("f", s.charAt(0));
+expect("o", s.charAt(1));
+expect("o", s.charAt(2));
+expect("b", s.charAt(3));
+expect("a", s.charAt(4));
+expect("r", s.charAt(5));
+expect("", s.charAt(6));
+expect("f", s.charAt());
+expect("f", s.charAt(NaN));
+expect("f", s.charAt("foo"));
+expect("f", s.charAt(undefined));
+s = "😀";
+expect("\ud83d", s.charAt(0));
+expect("\ude00", s.charAt(1));
+expect("", s.charAt(2));

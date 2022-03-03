@@ -43,9 +43,8 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 				if (newLen > arrayValues.size()) {
 					final int delta = newLen - arrayValues.size();
-					for (int i = 0; i < delta; i++) {
+					for (int i = 0; i < delta; i++)
 						arrayValues.add(new DataDescriptor(Undefined.instance));
-					}
 				} else {
 					arrayValues.subList(newLen, arrayValues.size()).clear();
 				}
@@ -90,11 +89,9 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 			if (indexLong > Integer.MAX_VALUE) throw new NotImplemented("Arrays longer than 2^31-1");
 			final int index = (int) indexLong;
 			final int delta = (index + 1) - arrayValues.size();
-			for (int i = 0; i < delta; i++) arrayValues.add(new DataDescriptor(Undefined.instance));
-
+			for (int i = 0; i < delta; i++)
+				arrayValues.add(new DataDescriptor(Undefined.instance));
 			arrayValues.set(index, Desc);
-
-			// k. Return true.
 			return true;
 		}
 

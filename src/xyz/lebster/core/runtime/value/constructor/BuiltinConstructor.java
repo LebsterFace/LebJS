@@ -1,5 +1,6 @@
 package xyz.lebster.core.runtime.value.constructor;
 
+import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Constructor;
@@ -18,5 +19,5 @@ abstract class BuiltinConstructor<T extends ObjectValue> extends Constructor {
 	}
 
 	@Override
-	public abstract T construct(Interpreter interpreter, Value<?>[] arguments);
+	public abstract T construct(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion;
 }

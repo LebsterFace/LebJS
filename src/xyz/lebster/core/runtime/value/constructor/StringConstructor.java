@@ -29,7 +29,7 @@ public class StringConstructor extends BuiltinConstructor<StringWrapper> {
 
 	@Override
 	public StringValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
-		final Value<?> v = arguments.length == 0 ? Undefined.instance : arguments[0];
-		return v.toStringValue(interpreter);
+		if (arguments.length == 0) return StringValue.EMPTY;
+		return arguments[0].toStringValue(interpreter);
 	}
 }

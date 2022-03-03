@@ -8,6 +8,8 @@ import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.StringWrapper;
 
 public final class StringValue extends ObjectValue.Key<String> {
+	public static final StringValue EMPTY = new StringValue("");
+
 	public StringValue(String value) {
 		super(value);
 	}

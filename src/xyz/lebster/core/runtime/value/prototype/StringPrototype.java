@@ -3,6 +3,7 @@ package xyz.lebster.core.runtime.value.prototype;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
@@ -11,10 +12,7 @@ import xyz.lebster.core.runtime.value.constructor.StringConstructor;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.StringWrapper;
-import xyz.lebster.core.runtime.value.primitive.BooleanValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.SymbolValue;
-import xyz.lebster.core.runtime.value.primitive.Undefined;
+import xyz.lebster.core.runtime.value.primitive.*;
 
 import java.util.PrimitiveIterator;
 
@@ -28,7 +26,9 @@ public final class StringPrototype extends ObjectValue {
 
 	static {
 		instance.put(Names.constructor, StringConstructor.instance);
+
 		instance.putMethod(Names.reverse, StringPrototype::reverse);
+
 		instance.putMethod(Names.slice, StringPrototype::slice);
 		instance.putMethod(Names.charAt, StringPrototype::charAt);
 		instance.putMethod(Names.trim, StringPrototype::trim);
@@ -39,33 +39,292 @@ public final class StringPrototype extends ObjectValue {
 		instance.putMethod(Names.valueOf, StringPrototype::valueOf);
 		instance.putMethod(Names.toString, StringPrototype::toStringMethod);
 		instance.putMethod(SymbolValue.iterator, StringIterator::new);
-		// instance.putMethod(Names.charCodeAt, StringPrototype::charCodeAt);
-		// instance.putMethod(Names.codePointAt, StringPrototype::codePointAt);
-		// instance.putMethod(Names.concat, StringPrototype::concat);
-		// instance.putMethod(Names.endsWith, StringPrototype::endsWith);
-		// instance.putMethod(Names.includes, StringPrototype::includes);
-		// instance.putMethod(Names.indexOf, StringPrototype::indexOf);
-		// instance.putMethod(Names.lastIndexOf, StringPrototype::lastIndexOf);
-		// instance.putMethod(Names.localeCompare, StringPrototype::localeCompare);
-		// instance.putMethod(Names.match, StringPrototype::match);
-		// instance.putMethod(Names.matchAll, StringPrototype::matchAll);
-		// instance.putMethod(Names.normalize, StringPrototype::normalize);
-		// instance.putMethod(Names.padEnd, StringPrototype::padEnd);
-		// instance.putMethod(Names.padStart, StringPrototype::padStart);
-		// instance.putMethod(Names.repeat, StringPrototype::repeat);
-		// instance.putMethod(Names.replace, StringPrototype::replace);
-		// instance.putMethod(Names.replaceAll, StringPrototype::replaceAll);
-		// instance.putMethod(Names.search, StringPrototype::search);
-		// instance.putMethod(Names.split, StringPrototype::split);
-		// instance.putMethod(Names.startsWith, StringPrototype::startsWith);
-		// instance.putMethod(Names.substring, StringPrototype::substring);
-		// instance.putMethod(Names.toLocaleLowerCase, StringPrototype::toLocaleLowerCase);
-		// instance.putMethod(Names.toLocaleUpperCase, StringPrototype::toLocaleUpperCase);
+		instance.putMethod(Names.charCodeAt, StringPrototype::charCodeAt);
+		instance.putMethod(Names.codePointAt, StringPrototype::codePointAt);
+		instance.putMethod(Names.concat, StringPrototype::concat);
+		instance.putMethod(Names.endsWith, StringPrototype::endsWith);
+		instance.putMethod(Names.includes, StringPrototype::includes);
+		instance.putMethod(Names.indexOf, StringPrototype::indexOf);
+		instance.putMethod(Names.lastIndexOf, StringPrototype::lastIndexOf);
+		instance.putMethod(Names.localeCompare, StringPrototype::localeCompare);
+		instance.putMethod(Names.match, StringPrototype::match);
+		instance.putMethod(Names.matchAll, StringPrototype::matchAll);
+		instance.putMethod(Names.normalize, StringPrototype::normalize);
+		instance.putMethod(Names.padEnd, StringPrototype::padEnd);
+		instance.putMethod(Names.padStart, StringPrototype::padStart);
+		instance.putMethod(Names.repeat, StringPrototype::repeat);
+		instance.putMethod(Names.replace, StringPrototype::replace);
+		instance.putMethod(Names.replaceAll, StringPrototype::replaceAll);
+		instance.putMethod(Names.search, StringPrototype::search);
+		instance.putMethod(Names.split, StringPrototype::split);
+		instance.putMethod(Names.startsWith, StringPrototype::startsWith);
+		instance.putMethod(Names.substring, StringPrototype::substring);
+		instance.putMethod(Names.toLocaleLowerCase, StringPrototype::toLocaleLowerCase);
+		instance.putMethod(Names.toLocaleUpperCase, StringPrototype::toLocaleUpperCase);
 	}
 
 	private StringPrototype() {
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charcodeat")
+	private static NumberValue charCodeAt(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.3 String.prototype.charCodeAt ( pos )
+		final Value<?> pos = argument(0, arguments);
+
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.charCodeAt");
+		// 2. Let S be ? ToString(O).
+		final String S = O.toStringValue(interpreter).value;
+		// 3. Let position be ? ToIntegerOrInfinity(pos).
+		final int position = toIntegerOrInfinity(interpreter, pos);
+		// 4. Let size be the length of S.
+		final int size = S.length();
+		// 5. If position < 0 or position ≥ size, return NaN.
+		if (position < 0 || position >= size) return NumberValue.NaN;
+		// 6. Return the Number value for the numeric value of the code unit at index position within the String S.
+		return new NumberValue(S.charAt(position));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.codepointat")
+	private static Value<?> codePointAt(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.4 String.prototype.codePointAt ( pos )
+		final Value<?> pos = argument(0, arguments);
+
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.codePointAt");
+		// 2. Let S be ? ToString(O).
+		final String S = O.toStringValue(interpreter).value;
+		// 3. Let position be ? ToIntegerOrInfinity(pos).
+		final int position = toIntegerOrInfinity(interpreter, pos);
+		// 4. Let size be the length of S.
+		final int size = S.length();
+		// 5. If position < 0 or position ≥ size, return undefined.
+		if (position < 0 || position >= size) return Undefined.instance;
+		// 6. Let cp be CodePointAt(S, position).
+		// 7. Return 𝔽(cp.[[CodePoint]]).
+		return new NumberValue(S.codePointAt(position));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.concat")
+	private static StringValue concat(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		// 22.1.3.5 String.prototype.concat ( ...args )
+
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.concat");
+		// 2. Let S be ? ToString(O).
+		final String S = O.toStringValue(interpreter).value;
+		// 3. Let R be S.
+		final StringBuilder R = new StringBuilder(S);
+		// 4. For each element next of args, do
+		for (final Value<?> next : args) {
+			// a. Let nextString be ? ToString(next).
+			final String nextString = next.toStringValue(interpreter).value;
+			// b. Set R to the string-concatenation of R and nextString.
+			R.append(nextString);
+		}
+		// 5. Return R.
+		return new StringValue(R.toString());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.endswith")
+	@NonCompliant
+	// TODO: Use java.lang.String#endsWith
+	private static BooleanValue endsWith(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.7 String.prototype.endsWith ( searchString [ , endPosition ] )
+		final Value<?> searchString = argument(0, arguments);
+		final Value<?> endPosition = argument(1, arguments);
+
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.endsWith");
+		// 2. Let S be ? ToString(O).
+		final String S = O.toStringValue(interpreter).value;
+
+		// FIXME: 3. Let isRegExp be ? IsRegExp(searchString).
+		//        4. If isRegExp is true, throw a TypeError exception.
+
+		// 5. Let searchStr be ? ToString(searchString).
+		final String searchStr = searchString.toStringValue(interpreter).value;
+		// 6. Let len be the length of S.
+		final int len = S.length();
+		// 7. If endPosition is undefined, let pos be len; else let pos be ? ToIntegerOrInfinity(endPosition).
+		int pos = endPosition == Undefined.instance ? len : toIntegerOrInfinity(interpreter, endPosition);
+		// 8. Let end be the result of clamping pos between 0 and len.
+		final int end = Math.max(0, Math.min(pos, len));
+		// 9. Let searchLength be the length of searchStr.
+		final int searchLength = searchStr.length();
+		// 10. If searchLength = 0, return true.
+		if (searchLength == 0) return BooleanValue.TRUE;
+		// 11. Let start be end - searchLength.
+		final int start = end - searchLength;
+		// 12. If start < 0, return false.
+		if (start < 0) return BooleanValue.FALSE;
+		// 13. Let substring be the substring of S from start to end.
+		final String substring = S.substring(start, end);
+		// 14. Return SameValueNonNumeric(substring, searchStr).
+		return BooleanValue.of(substring.equals(searchStr));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.includes")
+	@NonCompliant
+	private static BooleanValue includes(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.8 String.prototype.includes ( searchString [ , position ] )
+		final Value<?> searchString = argument(0, arguments);
+		final Value<?> position = argument(1, arguments);
+
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.includes");
+		// 2. Let S be ? ToString(O).
+		final String S = O.toStringValue(interpreter).value;
+
+		// FIXME: 3. Let isRegExp be ? IsRegExp(searchString).
+		//        4. If isRegExp is true, throw a TypeError exception.
+
+		// 5. Let searchStr be ? ToString(searchString).
+		final String searchStr = searchString.toStringValue(interpreter).value;
+		// 6. Let pos be ? ToIntegerOrInfinity(position).
+		final int pos = toIntegerOrInfinity(interpreter, position);
+		// 7. Assert: If position is undefined, then pos is 0.
+		// 8. Let len be the length of S.
+		final int len = S.length();
+		// 9. Let start be the result of clamping pos between 0 and len.
+		final int start = Math.max(0, Math.min(pos, len));
+		// 10. Let index be StringIndexOf(S, searchStr, start).
+		final int index = S.indexOf(searchStr, start);
+		// 11. If index is not -1, return true.
+		// 12. Return false.
+		return BooleanValue.of(index != -1);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.indexof")
+	private static NumberValue indexOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.9 String.prototype.indexOf ( searchString [ , position ] )
+		final Value<?> searchString = argument(0, arguments);
+		final Value<?> position = argument(1, arguments);
+
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.indexOf");
+		// 2. Let S be ? ToString(O).
+		final String S = O.toStringValue(interpreter).value;
+		// 3. Let searchStr be ? ToString(searchString).
+		final String searchStr = searchString.toStringValue(interpreter).value;
+		// 4. Let pos be ? ToIntegerOrInfinity(position).
+		final int pos = toIntegerOrInfinity(interpreter, position);
+		// 5. Assert: If position is undefined, then pos is 0.
+		// 6. Let len be the length of S.
+		final int len = S.length();
+		// 7. Let start be the result of clamping pos between 0 and len.
+		final int start = Math.max(0, Math.min(pos, len));
+		// 8. Return 𝔽(StringIndexOf(S, searchStr, start)).
+		return new NumberValue(S.indexOf(searchStr, start));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.lastindexof")
+	private static NumberValue lastIndexOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.10 String.prototype.lastIndexOf ( searchString [ , position ] )
+		final Value<?> searchString = argument(0, arguments);
+		final Value<?> position = argument(1, arguments);
+
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.lastIndexOf");
+		// 2. Let S be ? ToString(O).
+		final String S = O.toStringValue(interpreter).value;
+		// 3. Let searchStr be ? ToString(searchString).
+		final String searchStr = searchString.toStringValue(interpreter).value;
+		// 4. Let numPos be ? ToNumber(position).
+		final NumberValue numPos = position.toNumberValue(interpreter);
+		// 5. Assert: If position is undefined, then numPos is NaN.
+		// 6. If numPos is NaN, let pos be +∞; otherwise, let pos be ! ToIntegerOrInfinity(numPos).
+		final int pos = numPos.value.isNaN() ? Integer.MAX_VALUE : toIntegerOrInfinity(interpreter, numPos);
+		// 7. Let len be the length of S.
+		final int len = S.length();
+		// 8. Let start be the result of clamping pos between 0 and len.
+		final int start = Math.max(0, Math.min(pos, len));
+		// 9. If searchStr is the empty String, return 𝔽(start).
+		if (searchStr.isEmpty()) return new NumberValue(start);
+		// 10. Let searchLen be the length of searchStr.
+		// 11. For each non-negative integer i starting with start such that i ≤ len - searchLen, in descending order, do
+		// a. Let candidate be the substring of S from i to i + searchLen.
+		// b. If candidate is the same sequence of code units as searchStr, return 𝔽(i).
+		// 12. Return -1𝔽.
+		return new NumberValue(S.lastIndexOf(searchStr, pos));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.localecompare")
+	private static Value<?> localeCompare(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.localeCompare");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.match")
+	private static Value<?> match(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.match");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.matchall")
+	private static Value<?> matchAll(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.matchAll");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.normalize")
+	private static Value<?> normalize(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.normalize");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.padend")
+	private static Value<?> padEnd(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.padEnd");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.padstart")
+	private static Value<?> padStart(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.padStart");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.repeat")
+	private static Value<?> repeat(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.repeat");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.replace")
+	private static Value<?> replace(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.replace");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.replaceall")
+	private static Value<?> replaceAll(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.replaceAll");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.search")
+	private static Value<?> search(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.search");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.split")
+	private static Value<?> split(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.split");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.startswith")
+	private static Value<?> startsWith(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.startsWith");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.substring")
+	private static Value<?> substring(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.substring");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tolocalelowercase")
+	private static Value<?> toLocaleLowerCase(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.toLocaleLowerCase");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tolocaleuppercase")
+	private static Value<?> toLocaleUpperCase(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("String.prototype.toLocaleUpperCase");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tolowercase")
 	private static Value<?> toLowerCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.toLowerCase");
@@ -78,6 +337,7 @@ public final class StringPrototype extends ObjectValue {
 		return new StringValue(S.value.toLowerCase());
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.touppercase")
 	private static Value<?> toUpperCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.toUpperCase");

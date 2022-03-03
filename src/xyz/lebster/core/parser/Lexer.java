@@ -181,7 +181,7 @@ public final class Lexer {
 		builder.append(consume());
 	}
 
-	private void append(char special) {
+	private void consumeThenAppend(char special) {
 		consume();
 		builder.append(special);
 	}
@@ -261,12 +261,44 @@ public final class Lexer {
 				if (escaped) {
 					escaped = false;
 					switch (currentChar) {
-						case 'b' -> append('\b');
-						case 'n' -> append('\n');
-						case 't' -> append('\t');
-						case 'f' -> append('\f');
-						case 'r' -> append('\r');
-						case '\\' -> append('\\');
+						case '"' -> consumeThenAppend('"');
+						case '0' -> consumeThenAppend('\0');
+						case '\'' -> consumeThenAppend('\'');
+						case '\\' -> consumeThenAppend('\\');
+						case 'b' -> consumeThenAppend('\b');
+						case 'f' -> consumeThenAppend('\f');
+						case 'n' -> consumeThenAppend('\n');
+						case 'r' -> consumeThenAppend('\r');
+						case 't' -> consumeThenAppend('\t');
+						case 'v' -> consumeThenAppend('\13');
+						case 'u' -> {
+							consume();
+							if (this.currentChar == '{') {
+								consume();
+								if (this.currentChar == '}') throw new SyntaxError("Invalid Unicode escape sequence");
+								int result = 0;
+								for (int i = 0; i < 6 && this.currentChar != '}'; i++) {
+									result *= 16;
+									result += Character.digit(consumeHexDigit(), 16);
+								}
+
+								if (consume() != '}') throw new SyntaxError("Invalid Unicode escape sequence");
+								this.builder.append((char) result);
+							} else {
+								int result = 0;
+								for (int i = 0; i < 4; i++) {
+									result *= 16;
+									result += Character.digit(consumeHexDigit(), 16);
+								}
+								this.builder.append((char) result);
+							}
+						}
+
+						case 'x' -> consumeThenAppend((char) (
+							Character.digit(consumeHexDigit(), 16) * 16 +
+							Character.digit(consumeHexDigit(), 16)
+						));
+
 						default -> collect();
 					}
 				} else if (currentChar == '\\') {
@@ -302,6 +334,13 @@ public final class Lexer {
 
 			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "' (index " + index + ")"));
 		}
+	}
+
+	private char consumeHexDigit() throws SyntaxError {
+		final char c = consume();
+		if ((c < 'a' || c > 'f') && (c < 'A' || c > 'F') && (c < '0' || c > '9'))
+			throw new SyntaxError("Invalid Unicode escape sequence");
+		return c;
 	}
 
 	private void consumeComment() {

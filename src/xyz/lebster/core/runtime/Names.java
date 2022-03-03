@@ -1,6 +1,7 @@
 package xyz.lebster.core.runtime;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 public final class Names {
@@ -57,6 +58,23 @@ public final class Names {
 	public static final StringValue valueOf = new StringValue("valueOf");
 	public static final StringValue values = new StringValue("values");
 	public static final StringValue warn = new StringValue("warn");
+	public static final StringValue normalize = new StringValue("normalize");
+	public static final StringValue charCodeAt = new StringValue("charCodeAt");
+	public static final StringValue codePointAt = new StringValue("codePointAt");
+	public static final StringValue concat = new StringValue("concat");
+	public static final StringValue endsWith = new StringValue("endsWith");
+	public static final StringValue includes = new StringValue("includes");
+	public static final StringValue indexOf = new StringValue("indexOf");
+	public static final StringValue lastIndexOf = new StringValue("lastIndexOf");
+	public static final StringValue localeCompare = new StringValue("localeCompare");
+	public static final StringValue padEnd = new StringValue("padEnd");
+	public static final StringValue padStart = new StringValue("padStart");
+	public static final StringValue repeat = new StringValue("repeat");
+	public static final StringValue replaceAll = new StringValue("replaceAll");
+	public static final StringValue startsWith = new StringValue("startsWith");
+	public static final StringValue substring = new StringValue("substring");
+	public static final StringValue toLocaleLowerCase = new StringValue("toLocaleLowerCase");
+	public static final StringValue toLocaleUpperCase = new StringValue("toLocaleUpperCase");
 
 	// Values
 	public static final StringValue default_ = new StringValue("default");
@@ -106,5 +124,4 @@ public final class Names {
 	public static final StringValue unscopables = new StringValue("unscopables");
 
 	public static final StringValue EMPTY = new StringValue("");
-	public static final StringValue anonymous = new StringValue("(anonymous)");
 }

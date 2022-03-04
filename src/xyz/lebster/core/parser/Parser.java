@@ -488,20 +488,6 @@ public final class Parser {
 		return arguments;
 	}
 
-	private String[] parseArrowFunctionArguments(boolean expectParens) {
-		if (!expectParens) {
-			final Token t = state.accept(TokenType.Identifier);
-			if (t == null) return null;
-			return new String[] { t.value };
-		}
-
-
-		final String[] result = parseStringList();
-		this.FAIL_FOR_UNSUPPORTED_ARG();
-		if (state.accept(TokenType.RParen) == null) return null;
-		return result;
-	}
-
 	private void FAIL_FOR_UNSUPPORTED_ARG() {
 		if (state.currentToken.type == TokenType.DotDotDot)
 			throw new NotImplemented("Parsing rest (`...`) arguments");
@@ -711,7 +697,7 @@ public final class Parser {
 			case LParen -> {
 				state.consume();
 				if (state.currentToken.type == TokenType.RParen || state.currentToken.type == TokenType.Identifier) {
-					final ArrowFunctionExpression result = tryParseArrowFunctionExpression(true);
+					final ArrowFunctionExpression result = tryParseArrowFunctionExpression();
 					if (result != null) yield result;
 				}
 
@@ -722,10 +708,16 @@ public final class Parser {
 				yield expression;
 			}
 
-			// TODO: Assume non-arrow function by default
 			case Identifier -> {
-				final ArrowFunctionExpression result = tryParseArrowFunctionExpression(false);
-				yield result != null ? result : new IdentifierExpression(state.consume().value);
+				final String identifier = state.consume().value;
+				if (state.currentToken.type == TokenType.Arrow) {
+					state.consume();
+					final ArrowFunctionExpression arrowFunction = parseArrowFunctionBody(identifier);
+					if (arrowFunction == null) state.unexpected();
+					yield arrowFunction;
+				} else {
+					yield new IdentifierExpression(identifier);
+				}
 			}
 
 			case StringLiteral -> new StringLiteral(new StringValue(state.consume().value));
@@ -770,27 +762,37 @@ public final class Parser {
 		};
 	}
 
-	private ArrowFunctionExpression tryParseArrowFunctionExpression(boolean expectParens) throws SyntaxError, CannotParse {
+	private ArrowFunctionExpression tryParseArrowFunctionExpression() throws SyntaxError, CannotParse {
 		save();
 
-		final String[] arguments = parseArrowFunctionArguments(expectParens);
-		if (arguments == null) {
+		final String[] arguments = parseStringList();
+		this.FAIL_FOR_UNSUPPORTED_ARG();
+		if (state.currentToken.type != TokenType.RParen) {
 			load();
 			return null;
 		}
 
+		state.consume();
 		if (state.accept(TokenType.Arrow) == null) {
 			load();
 			return null;
 		}
 
+		final ArrowFunctionExpression result = parseArrowFunctionBody(arguments);
+		if (result == null) {
+			load();
+			return null;
+		} else {
+			return result;
+		}
+	}
+
+	private ArrowFunctionExpression parseArrowFunctionBody(String... arguments) throws CannotParse, SyntaxError {
 		if (state.currentToken.type == TokenType.LBrace) {
-			BlockStatement body = parseBlockStatement();
-			return new ArrowFunctionExpression(body, arguments);
+			return new ArrowFunctionExpression(parseBlockStatement(), arguments);
 		} else if (matchPrimaryExpression()) {
 			return new ArrowFunctionExpression(parseExpression(), arguments);
 		} else {
-			load();
 			return null;
 		}
 	}

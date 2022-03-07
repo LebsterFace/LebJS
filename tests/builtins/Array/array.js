@@ -27,9 +27,3 @@ arr.push(6, 7, 8, 9);
 expect(9, arr.length);
 expect(6, arr["5"])
 expect(9, arr[arr.length - 1])
-
-expect("1,2,3,4,5,6,7,8,9", arr.join())
-expect("1|2|3|4|5|6|7|8|9", arr.join("|"))
-
-expect("2,4,6,8,10,12,14,16,18", arr.map(n => n * 2).toString())
-expect("2,4,6,8", arr.filter(n => n % 2 === 0).toString())

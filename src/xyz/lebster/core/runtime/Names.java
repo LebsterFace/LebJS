@@ -54,6 +54,7 @@ public final class Names {
 	public static final StringValue push = new StringValue("push");
 	public static final StringValue random = new StringValue("random");
 	public static final StringValue range = new StringValue("range");
+	public static final StringValue reduce = new StringValue("reduce");
 	public static final StringValue repeat = new StringValue("repeat");
 	public static final StringValue replaceAll = new StringValue("replaceAll");
 	public static final StringValue reverse = new StringValue("reverse");

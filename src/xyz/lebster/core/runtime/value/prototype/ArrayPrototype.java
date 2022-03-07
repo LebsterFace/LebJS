@@ -27,6 +27,7 @@ public final class ArrayPrototype extends ObjectValue {
 		instance.put(Names.constructor, ArrayConstructor.instance);
 		instance.putMethod(Names.push, ArrayPrototype::push);
 		instance.putMethod(Names.map, ArrayPrototype::map);
+		instance.putMethod(Names.reduce, ArrayPrototype::reduce);
 		instance.putMethod(Names.filter, ArrayPrototype::filter);
 		instance.putMethod(Names.join, ArrayPrototype::join);
 		instance.putMethod(Names.toString, ArrayPrototype::toStringMethod);
@@ -215,6 +216,76 @@ public final class ArrayPrototype extends ObjectValue {
 		}
 
 		return new ArrayObject(values);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reduce")
+	private static Value<?> reduce(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.22 Array.prototype.reduce ( callbackfn [ , initialValue ] )
+		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> initialValue = argument(1, arguments);
+
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(O, interpreter);
+		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
+		final Executable callback = Executable.getExecutable(callbackfn);
+		// 4. If len = 0 and initialValue is not present, throw a TypeError exception.
+		if (len == 0 && arguments.length == 1)
+			throw AbruptCompletion.error(new TypeError("Reduce of empty array with no initial value"));
+
+		// 5. Let k be 0.
+		int k = 0;
+		// 6. Let accumulator be undefined.
+		Value<?> accumulator = Undefined.instance;
+		// 7. If initialValue is present, then
+		if (arguments.length > 1) {
+			// a. Set accumulator to initialValue.
+			accumulator = initialValue;
+		}
+		// 8. Else,
+		else {
+			// a. Let kPresent be false.
+			boolean kPresent = false;
+			// b. Repeat, while kPresent is false and k < len,
+			while (!kPresent && k < len) {
+				// i. Let Pk be ! ToString(𝔽(k)).
+				final StringValue Pk = new StringValue(k);
+				// ii. Set kPresent to ? HasProperty(O, Pk).
+				kPresent = O.hasProperty(Pk);
+				// iii. If kPresent is true, then
+				if (kPresent) {
+					// 1. Set accumulator to ? Get(O, Pk).
+					accumulator = O.get(interpreter, Pk);
+				}
+				// iv. Set k to k + 1.
+				k = k + 1;
+			}
+			// c. If kPresent is false, throw a TypeError exception.
+			if (!kPresent)
+				throw AbruptCompletion.error(new TypeError("Reduce of empty array with no initial value"));
+		}
+
+		// 9. Repeat, while k < len,
+		while (k < len) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final StringValue Pk = new StringValue(k);
+			// b. Let kPresent be ? HasProperty(O, Pk).
+			final boolean kPresent = O.hasProperty(Pk);
+			// c. If kPresent is true, then
+			if (kPresent) {
+				// i. Let kValue be ? Get(O, Pk).
+				final var kValue = O.get(interpreter, Pk);
+				// ii. Set accumulator to ? Call(callbackfn, undefined, « accumulator, kValue, 𝔽(k), O »).
+				accumulator = callback.call(interpreter, Undefined.instance, accumulator, kValue, new NumberValue(k), O);
+			}
+
+			// d. Set k to k + 1.
+			k = k + 1;
+		}
+
+		// 10. Return accumulator.
+		return accumulator;
 	}
 
 	private static class ArrayIterator extends ObjectValue {

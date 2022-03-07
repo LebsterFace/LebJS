@@ -32,7 +32,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 			this.arrayValues.add(new DataDescriptor(value));
 		}
 
-		this.value.put(Names.length, new NativeAccessorDescriptor(false) {
+		this.value.put(Names.length, new NativeAccessorDescriptor(false, false) {
 			@Override
 			public Value<?> get(Interpreter interpreter, ObjectValue thisValue) {
 				return new NumberValue(arrayValues.size());

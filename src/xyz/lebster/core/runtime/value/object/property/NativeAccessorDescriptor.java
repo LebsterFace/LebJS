@@ -7,9 +7,11 @@ import xyz.lebster.core.runtime.value.object.ObjectValue;
 import java.util.HashSet;
 
 public abstract class NativeAccessorDescriptor implements PropertyDescriptor {
+	private boolean enumerable;
 	private boolean configurable;
 
-	public NativeAccessorDescriptor(boolean configurable) {
+	public NativeAccessorDescriptor(boolean enumerable, boolean configurable) {
+		this.enumerable = enumerable;
 		this.configurable = configurable;
 	}
 
@@ -24,11 +26,12 @@ public abstract class NativeAccessorDescriptor implements PropertyDescriptor {
 
 	@Override
 	public boolean isEnumerable() {
-		return true;
+		return enumerable;
 	}
 
 	@Override
 	public void setEnumerable(boolean enumerable) {
+		this.enumerable = enumerable;
 	}
 
 	@Override

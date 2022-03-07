@@ -6,6 +6,10 @@ public final class StringRepresentation implements CharSequence {
 	private final StringBuilder builder = new StringBuilder();
 	private int currentIndent = 0;
 
+	public void append(String s) {
+		builder.append(s);
+	}
+
 	public void append(Object o) {
 		builder.append(o);
 	}

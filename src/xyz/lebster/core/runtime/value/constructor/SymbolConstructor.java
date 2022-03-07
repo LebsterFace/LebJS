@@ -50,7 +50,7 @@ public final class SymbolConstructor extends Executable {
 		// 1. If NewTarget is not undefined, throw a TypeError exception.
 		// 2. If description is undefined, let descString be undefined.
 		// 3. Else, let descString be ? ToString(description).
-		final String descString = description == Undefined.instance ? null : description.toStringValue(interpreter).value;
+		final StringValue descString = description == Undefined.instance ? null : description.toStringValue(interpreter);
 		// 4. Return a new unique Symbol value whose [[Description]] value is descString.
 		return new SymbolValue(descString);
 	}

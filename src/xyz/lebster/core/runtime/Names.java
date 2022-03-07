@@ -1,7 +1,5 @@
 package xyz.lebster.core.runtime;
 
-import xyz.lebster.core.ANSI;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 public final class Names {

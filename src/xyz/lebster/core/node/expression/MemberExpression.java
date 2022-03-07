@@ -10,8 +10,7 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
-public record MemberExpression(Expression base, Expression property,
-							   boolean computed) implements LeftHandSideExpression {
+public record MemberExpression(Expression base, Expression property, boolean computed) implements LeftHandSideExpression {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return toReference(interpreter).getValue(interpreter);

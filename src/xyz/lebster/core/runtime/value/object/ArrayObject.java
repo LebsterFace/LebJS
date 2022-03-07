@@ -18,7 +18,10 @@ import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 
 public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Iterable<PropertyDescriptor> {
 	private final ArrayList<PropertyDescriptor> arrayValues;
@@ -56,12 +59,6 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		this(arrayValues.toArray(new Value[0]));
 	}
 
-	private PropertyDescriptor getArrayPropertyOrNull(Key<?> key) {
-		final int index = getArrayIndex(key);
-		if (index == -1 || index >= arrayValues.size()) return null;
-		return arrayValues.get(index);
-	}
-
 	private static int getArrayIndex(Key<?> key) {
 		if (!(key instanceof StringValue stringValue)) return -1;
 		if (stringValue.value.length() == 0) return -1;
@@ -78,6 +75,11 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		return index;
 	}
 
+	private PropertyDescriptor getArrayPropertyOrNull(Key<?> key) {
+		final int index = getArrayIndex(key);
+		if (index == -1 || index >= arrayValues.size()) return null;
+		return arrayValues.get(index);
+	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array-exotic-objects-defineownproperty-p-desc")
 	@Override

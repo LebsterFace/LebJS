@@ -5,7 +5,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.statement.BlockStatement;
-import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.ArrowFunction;
 
 public final class ArrowFunctionExpression implements Expression {

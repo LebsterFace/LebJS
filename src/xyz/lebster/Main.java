@@ -10,7 +10,6 @@ import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
-import xyz.lebster.core.parser.ParserState;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.EvalError;
 

@@ -16,7 +16,11 @@ public record VariableDeclarator(String identifier, Expression init) implements 
 	@Override
 	public void dump(int indent) {
 		Dumper.dumpParameterized(indent, "VariableDeclarator", identifier);
-		init.dump(indent + 1);
+		if (init == null) {
+			Dumper.dumpSingle(indent + 1, "No Init");
+		} else {
+			init.dump(indent + 1);
+		}
 	}
 
 	@Override

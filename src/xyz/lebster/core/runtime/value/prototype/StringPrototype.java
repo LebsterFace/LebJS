@@ -305,23 +305,73 @@ public final class StringPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.startswith")
-	private static Value<?> startsWith(Interpreter interpreter, Value<?>[] arguments) {
-		throw new NotImplemented("String.prototype.startsWith");
+	@NonCompliant
+	private static Value<?> startsWith(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.23 String.prototype.startsWith ( searchString [ , position ] )
+		final Value<?> searchString = argument(0, arguments);
+		final Value<?> position = argument(1, arguments);
+
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.startsWith");
+		// 2. Let S be ? ToString(O).
+		final String S = O.toStringValue(interpreter).value;
+
+		// FIXME: 3. Let isRegExp be ? IsRegExp(searchString).
+		//         4. If isRegExp is true, throw a TypeError exception.
+
+		// 5. Let searchStr be ? ToString(searchString).
+		final String searchStr = searchString.toStringValue(interpreter).value;
+		// 6. Let len be the length of S.
+		final int len = S.length();
+		// 7. If position is undefined, let pos be 0; else let pos be ? ToIntegerOrInfinity(position).
+		final int pos = position == Undefined.instance ? 0 : toIntegerOrInfinity(interpreter, position);
+		// 8. Let start be the result of clamping pos between 0 and len.
+		final int start = Math.max(0, Math.min(pos, len));
+		// 9. Let searchLength be the length of searchStr.
+		// 10. If searchLength = 0, return true.
+		// 11. Let end be start + searchLength.
+		// 12. If end > len, return false.
+		// 13. Let substring be the substring of S from start to end.
+		// 14. Return SameValueNonNumeric(substring, searchStr).
+		return BooleanValue.of(S.startsWith(searchStr, start));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.substring")
-	private static Value<?> substring(Interpreter interpreter, Value<?>[] arguments) {
-		throw new NotImplemented("String.prototype.substring");
+	private static StringValue substring(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.24 String.prototype.substring ( start, end )
+		final Value<?> start = argument(0, arguments);
+		final Value<?> end = argument(1, arguments);
+
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.substring");
+		// 2. Let S be ? ToString(O).
+		final String S = O.toStringValue(interpreter).value;
+		// 3. Let len be the length of S.
+		final int len = S.length();
+		// 4. Let intStart be ? ToIntegerOrInfinity(start).
+		final int intStart = toIntegerOrInfinity(interpreter, start);
+		// 5. If end is undefined, let intEnd be len; else let intEnd be ? ToIntegerOrInfinity(end).
+		final int intEnd = end == Undefined.instance ? len : toIntegerOrInfinity(interpreter, end);
+		// 6. Let finalStart be the result of clamping intStart between 0 and len.
+		final int finalStart = Math.max(0, Math.min(intStart, len));
+		// 7. Let finalEnd be the result of clamping intEnd between 0 and len.
+		final int finalEnd = Math.max(0, Math.min(intEnd, len));
+		// 8. Let from be min(finalStart, finalEnd).
+		final int from = Math.min(finalStart, finalEnd);
+		// 9. Let `to` be max(finalStart, finalEnd).
+		final int to = Math.max(finalStart, finalEnd);
+		// 10. Return the substring of S from `from` to `to`.
+		return new StringValue(S.substring(from, to));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tolocalelowercase")
-	private static Value<?> toLocaleLowerCase(Interpreter interpreter, Value<?>[] arguments) {
-		throw new NotImplemented("String.prototype.toLocaleLowerCase");
+	private static Value<?> toLocaleLowerCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		return StringPrototype.toLowerCase(interpreter, arguments);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tolocaleuppercase")
-	private static Value<?> toLocaleUpperCase(Interpreter interpreter, Value<?>[] arguments) {
-		throw new NotImplemented("String.prototype.toLocaleUpperCase");
+	private static Value<?> toLocaleUpperCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		return StringPrototype.toUpperCase(interpreter, arguments);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tolowercase")

@@ -18,7 +18,7 @@ public final class Interpreter {
 		this.globalObject = new GlobalObject();
 		this.stackSize = 32;
 		this.executionContextStack = new ExecutionContext[stackSize];
-		this.executionContextStack[0] = new ExecutionContext(new LexicalEnvironment(globalObject, null), globalObject);
+		this.executionContextStack[0] = new ExecutionContext(new GlobalEnvironment(globalObject), globalObject);
 		this.mode = Mode.Strict;
 	}
 
@@ -32,14 +32,14 @@ public final class Interpreter {
 
 	@NonStandard
 	// FIXME: Environment records
-	public void declareVariable(String name, Value<?> value) throws AbruptCompletion {
-		lexicalEnvironment().setVariable(this, new StringValue(name), value);
+	public void declareVariable(String name, Value<?> value) {
+		lexicalEnvironment().createBinding(this, new StringValue(name), value);
 	}
 
 	@NonStandard
 	// FIXME: Environment records
-	public void declareVariable(StringValue name, Value<?> value) throws AbruptCompletion {
-		lexicalEnvironment().setVariable(this, name, value);
+	public void declareVariable(StringValue name, Value<?> value) {
+		lexicalEnvironment().createBinding(this, name, value);
 	}
 
 	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {
@@ -62,7 +62,7 @@ public final class Interpreter {
 		return executionContextStack[currentExecutionContext].thisValue();
 	}
 
-	public LexicalEnvironment lexicalEnvironment() {
+	public Environment lexicalEnvironment() {
 		return executionContextStack[currentExecutionContext].environment();
 	}
 
@@ -71,7 +71,7 @@ public final class Interpreter {
 	}
 
 
-	public ExecutionContext pushEnvironmentAndThisValue(LexicalEnvironment env, Value<?> thisValue) throws AbruptCompletion {
+	public ExecutionContext pushEnvironmentAndThisValue(Environment env, Value<?> thisValue) throws AbruptCompletion {
 		final ExecutionContext context = new ExecutionContext(env, thisValue);
 		this.enterExecutionContext(context);
 		return context;
@@ -84,7 +84,7 @@ public final class Interpreter {
 		return context;
 	}
 
-	public ExecutionContext pushLexicalEnvironment(LexicalEnvironment env) throws AbruptCompletion {
+	public ExecutionContext pushLexicalEnvironment(Environment env) throws AbruptCompletion {
 		final ExecutionContext context = new ExecutionContext(env, thisValue());
 		this.enterExecutionContext(context);
 		return context;

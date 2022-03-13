@@ -34,6 +34,6 @@ public record BindingPattern(VariableDeclaration.Kind kind, String identifier) i
 
 	@Override
 	public Reference toReference(Interpreter interpreter) {
-		return new Reference(interpreter.lexicalEnvironment().variables(), new StringValue(identifier));
+		return interpreter.lexicalEnvironment().getBinding(interpreter, new StringValue(identifier));
 	}
 }

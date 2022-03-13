@@ -4,14 +4,23 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 
-public record LexicalEnvironment(ObjectValue variables, Environment parent) implements Environment {
+public record GlobalEnvironment(ObjectValue variables, GlobalObject globalObject) implements Environment {
+	public GlobalEnvironment(GlobalObject globalObject) {
+		this(new ObjectValue(), globalObject);
+	}
+
+	@Override
+	public Environment parent() {
+		return null;
+	}
+
 	public boolean hasBinding(StringValue name) {
-		return variables.hasOwnProperty(name);
+		return variables.hasProperty(name) || globalObject.hasProperty(name);
 	}
 
 	@Override
 	public Reference getBinding(Interpreter interpreter, StringValue name) {
-		return new Reference(variables, name);
+		return new Reference(variables.hasOwnProperty(name) ? variables : globalObject, name);
 	}
 
 	@Override

@@ -12,10 +12,10 @@ import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 import java.util.HashSet;
 
 public final class Function extends Constructor {
-	private final LexicalEnvironment environment;
+	private final Environment environment;
 	private final FunctionNode code;
 
-	public Function(FunctionNode code, LexicalEnvironment environment) {
+	public Function(FunctionNode code, Environment environment) {
 		super(code.name() == null ? Names.EMPTY : new StringValue(code.name()));
 		this.code = code;
 		this.environment = environment;

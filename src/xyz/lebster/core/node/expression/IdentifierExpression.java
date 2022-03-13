@@ -22,13 +22,13 @@ public record IdentifierExpression(String value) implements LeftHandSideExpressi
 	public Reference toReference(Interpreter interpreter) {
 		final StringValue name = new StringValue(this.value);
 
-		LexicalEnvironment env = interpreter.lexicalEnvironment();
+		Environment env = interpreter.lexicalEnvironment();
 		while (env != null) {
 			// 2. Let exists be ? env.HasBinding(name).
 			// 3. If exists is true, then
 			if (env.hasBinding(name)) {
 				// a. Return the Reference Record { base: env, referencedName: name }.
-				return new Reference(env.variables(), name);
+				return env.getBinding(interpreter, name);
 			}
 
 			// 4. Else,

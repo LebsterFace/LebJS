@@ -17,8 +17,12 @@ public record ReturnStatement(Expression value) implements Statement {
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "ReturnStatement");
-		value.dump(indent + 1);
+		if (value == null) {
+			Dumper.dumpSingle(indent, "ReturnStatement");
+		} else {
+			Dumper.dumpName(indent, "ReturnStatement");
+			value.dump(indent + 1);
+		}
 	}
 
 	@Override

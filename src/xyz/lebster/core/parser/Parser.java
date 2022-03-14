@@ -516,6 +516,7 @@ public final class Parser {
 		return new FunctionExpression(parseFunctionBody(), name, arguments);
 	}
 
+	private static final Set<TokenType> COMMA_SET = Set.of(TokenType.Comma);
 	private ExpressionList parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {
 		final ExpressionList result = new ExpressionList();
 		if (expectParens) state.require(TokenType.LParen);
@@ -525,9 +526,9 @@ public final class Parser {
 			consumeAllLineTerminators();
 			if (state.currentToken.type == TokenType.DotDotDot) {
 				state.consume();
-				result.addSpreadExpression(parseExpression());
+				result.addSpreadExpression(parseExpression(COMMA_SET));
 			} else {
-				result.addSingleExpression(parseExpression());
+				result.addSingleExpression(parseExpression(COMMA_SET));
 			}
 
 			consumeAllLineTerminators();
@@ -580,6 +581,10 @@ public final class Parser {
 		};
 
 		return new UpdateExpression(ensureLHS(parseExpression(minPrecedence, assoc), UpdateExpression.invalidPreLHS), op);
+	}
+
+	private Expression parseExpression(Set<TokenType> forbidden) throws SyntaxError, CannotParse {
+		return parseExpression(0, Left, forbidden);
 	}
 
 	private Expression parseExpression() throws SyntaxError, CannotParse {
@@ -673,6 +678,11 @@ public final class Parser {
 				final Expression prop = parseExpression();
 				state.require(TokenType.RBracket);
 				yield new MemberExpression(left, prop, true);
+			}
+
+			case Comma -> {
+				final Expression next = parseExpression();
+				yield new SequenceExpression(left, next);
 			}
 
 			default -> throw new CannotParse(token, "SecondaryExpression");
@@ -791,7 +801,8 @@ public final class Parser {
 		if (state.currentToken.type == TokenType.LBrace) {
 			return new ArrowFunctionExpression(parseBlockStatement(), arguments);
 		} else if (matchPrimaryExpression()) {
-			return new ArrowFunctionExpression(parseExpression(), arguments);
+			// NOTE: Minimum precedence of 1 (excludes TokenType.Comma): `() => 1,2` is not valid
+			return new ArrowFunctionExpression(parseExpression(1, Left), arguments);
 		} else {
 			return null;
 		}
@@ -825,7 +836,7 @@ public final class Parser {
 			} else {
 				state.require(TokenType.Colon);
 				consumeAllLineTerminators();
-				result.entries().put(key, parseExpression());
+				result.entries().put(key, parseExpression(COMMA_SET));
 			}
 
 			consumeAllLineTerminators();
@@ -955,6 +966,7 @@ public final class Parser {
 			   t == TokenType.UnsignedRightShift ||
 			   t == TokenType.Caret ||
 			   t == TokenType.QuestionMark ||
+			   t == TokenType.Comma ||
 			   t == TokenType.Exponent ||
 			   t == TokenType.StrictEqual ||
 			   t == TokenType.StrictNotEqual ||

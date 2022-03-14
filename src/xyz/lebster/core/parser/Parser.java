@@ -456,7 +456,7 @@ public final class Parser {
 				throw new NotImplemented("Parsing destructuring assignment");
 
 			final String identifier = state.require(TokenType.Identifier);
-			final Expression value = state.accept(TokenType.Equals) == null ? null : parseExpression();
+			final Expression value = state.accept(TokenType.Equals) == null ? null : parseExpression(1, Left);
 			declarators.add(new VariableDeclarator(identifier, value));
 			consumeAllLineTerminators();
 			if (state.currentToken.type != TokenType.Comma) break;
@@ -516,7 +516,6 @@ public final class Parser {
 		return new FunctionExpression(parseFunctionBody(), name, arguments);
 	}
 
-	private static final Set<TokenType> COMMA_SET = Set.of(TokenType.Comma);
 	private ExpressionList parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {
 		final ExpressionList result = new ExpressionList();
 		if (expectParens) state.require(TokenType.LParen);
@@ -526,9 +525,9 @@ public final class Parser {
 			consumeAllLineTerminators();
 			if (state.currentToken.type == TokenType.DotDotDot) {
 				state.consume();
-				result.addSpreadExpression(parseExpression(COMMA_SET));
+				result.addSpreadExpression(parseExpression(1, Left));
 			} else {
-				result.addSingleExpression(parseExpression(COMMA_SET));
+				result.addSingleExpression(parseExpression(1, Left));
 			}
 
 			consumeAllLineTerminators();
@@ -836,7 +835,7 @@ public final class Parser {
 			} else {
 				state.require(TokenType.Colon);
 				consumeAllLineTerminators();
-				result.entries().put(key, parseExpression(COMMA_SET));
+				result.entries().put(key, parseExpression(1, Left));
 			}
 
 			consumeAllLineTerminators();

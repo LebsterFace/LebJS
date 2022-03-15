@@ -28,7 +28,7 @@ public record ObjectExpression(Map<Expression, Expression> entries) implements E
 			if (Executable.isAnonymousFunctionExpression(entry.getValue())) {
 				if (value instanceof final Executable function) {
 					function.set(interpreter, Names.name, key);
-					function.updateName(key.toStringValue(interpreter));
+					function.updateName(key.toFunctionName());
 				}
 			}
 

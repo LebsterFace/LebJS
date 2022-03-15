@@ -31,7 +31,7 @@ public record VariableDeclarator(String identifier, Expression init) implements 
 		if (Executable.isAnonymousFunctionExpression(init)) {
 			if (value instanceof final Executable function) {
 				function.set(interpreter, Names.name, name);
-				function.updateName(name.toStringValue(interpreter));
+				function.updateName(name.toFunctionName());
 			}
 		}
 

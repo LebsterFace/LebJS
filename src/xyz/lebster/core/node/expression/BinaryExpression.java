@@ -29,21 +29,34 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 
 		final NumberValue left_number = left_value.toNumberValue(interpreter);
 		final NumberValue right_number = right_value.toNumberValue(interpreter);
+		final double LNV = left_number.value;
+		final double RNV = right_number.value;
 
 		return new NumberValue(switch (op) {
-			case Add -> left_number.value + right_number.value;
-			case Subtract -> left_number.value - right_number.value;
-			case Multiply -> left_number.value * right_number.value;
-			case Divide -> left_number.value / right_number.value;
-			case Exponentiate -> Math.pow(left_number.value, right_number.value);
-			case Remainder -> left_number.value % right_number.value;
+			case Add -> LNV + RNV;
+			case Subtract -> LNV - RNV;
+			case Multiply -> LNV * RNV;
+			case Divide -> LNV / RNV;
+			case Exponentiate -> Math.pow(LNV, RNV);
+			case Remainder -> LNV % RNV;
 
 			// https://tc39.es/ecma262/multipage#sec-numeric-types-number-leftShift
 			case LeftShift -> (double) (left_number.toInt32() << (right_number.toUint32() % 32));
 			case SignedRightShift -> (double) (left_number.toInt32() >> (right_number.toUint32() % 32));
 			case UnsignedRightShift -> {
-				final long result = (int) left_number.toUint32() >>> ((int) right_number.toUint32()) % 32;
-				yield (double) (result & UINT32_LIMIT);
+				// (NaN|0|+-Infinity) >>> x = 0
+				if (Double.isNaN(LNV) || LNV == 0.0 || Double.isInfinite(LNV))
+					yield 0D;
+
+				final int left_int32 = (int) ((long) LNV % NumberValue.TWO_TO_THE_32);
+
+				/// x >>> (NaN|0|+-Infinity) = uint32(x)
+				if (Double.isNaN(RNV) || RNV == 0.0 || Double.isInfinite(RNV))
+					yield (double) (left_int32 & UINT32_LIMIT);
+
+				final long right_uint32 = (long) RNV % NumberValue.TWO_TO_THE_32;
+				final long shiftCount = right_uint32 % 32;
+				yield (double) ((left_int32 >>> shiftCount) & UINT32_LIMIT);
 			}
 
 			// https://tc39.es/ecma262/multipage#sec-numberbitwiseop

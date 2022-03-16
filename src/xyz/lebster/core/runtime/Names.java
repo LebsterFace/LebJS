@@ -75,6 +75,7 @@ public final class Names {
 	public static final StringValue valueOf = new StringValue("valueOf");
 	public static final StringValue values = new StringValue("values");
 	public static final StringValue warn = new StringValue("warn");
+	public static final StringValue write = new StringValue("write");
 
 	// Values
 	public static final StringValue default_ = new StringValue("default");

@@ -22,26 +22,24 @@ public final class ConsoleObject extends ObjectValue {
 	private static final Scanner scanner = new Scanner(System.in);
 
 	private ConsoleObject() {
-		this.putMethod(Names.log, (interpreter, data) -> {
-			logger(LogLevel.Log, data);
+
+		this.putMethod(Names.write, (interpreter, data) -> {
+			// If args is empty, return.
+			if (data.length == 0) return Undefined.instance;
+
+			final var representation = new StringRepresentation();
+			representation.append(ANSI.RESET);
+			for (final Value<?> arg : data)
+				arg.displayForConsoleLog(representation);
+			representation.append(ANSI.RESET);
+			System.out.print(representation);
 			return Undefined.instance;
 		});
 
-		this.putMethod(Names.warn, (interpreter, data) -> {
-			logger(LogLevel.Warn, data);
-			return Undefined.instance;
-		});
-
-		this.putMethod(Names.error, (interpreter, data) -> {
-			logger(LogLevel.Error, data);
-			return Undefined.instance;
-		});
-
-		this.putMethod(Names.info, (interpreter, data) -> {
-			logger(LogLevel.Info, data);
-			return Undefined.instance;
-		});
-
+		this.putMethod(Names.log, (interpreter, data) -> logger(LogLevel.Log, data));
+		this.putMethod(Names.warn, (interpreter, data) -> logger(LogLevel.Warn, data));
+		this.putMethod(Names.error, (interpreter, data) -> logger(LogLevel.Error, data));
+		this.putMethod(Names.info, (interpreter, data) -> logger(LogLevel.Info, data));
 		this.putMethod(Names.input, ConsoleObject::input);
 	}
 
@@ -63,21 +61,8 @@ public final class ConsoleObject extends ObjectValue {
 	}
 
 	@NonStandard
-	private void logger(LogLevel logLevel, Value<?>[] args) {
-		// If args is empty, return.
-		if (args.length == 0) return;
-		// Let first be args[0].
-		// Let rest be all elements following first in args.
-		// If rest is empty
-		if (args.length == 1) {
-			// perform Printer(logLevel, « first ») and return.
-			printer(logLevel, args[0]);
-		} else {
-			printer(logLevel, args);
-		}
-	}
-
-	private void printer(LogLevel logLevel, Value<?>... args) {
+	private Undefined logger(LogLevel logLevel, Value<?>[] args) {
+		if (args.length == 0) return Undefined.instance;
 		final var representation = new StringRepresentation();
 
 		representation.append(switch (logLevel) {
@@ -94,6 +79,7 @@ public final class ConsoleObject extends ObjectValue {
 
 		representation.append(ANSI.RESET);
 		System.out.println(representation);
+		return Undefined.instance;
 	}
 
 	private enum LogLevel { Log, Info, Warn, Error }

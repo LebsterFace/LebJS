@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -18,10 +18,11 @@ public record ConditionalExpression(Expression test, Expression left, Expression
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "ConditionalExpression");
-		Dumper.dumpIndicated(indent + 1, "Test", test);
-		Dumper.dumpIndicated(indent + 1, "Left", left);
-		Dumper.dumpIndicated(indent + 1, "Right", right);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Test", test)
+			.child("Left", left)
+			.child("Right", right);
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -11,12 +11,11 @@ import xyz.lebster.core.runtime.value.primitive.Undefined;
 public record IfStatement(Expression condition, Statement consequence, Statement elseStatement) implements Statement {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "IfStatement");
-		Dumper.dumpIndicated(indent + 1, "Condition", condition);
-		Dumper.dumpIndicated(indent + 1, "Consequence", consequence);
-		if (elseStatement != null) {
-			Dumper.dumpIndicated(indent + 1, "ElseStatement", elseStatement);
-		}
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Condition", condition)
+			.child("Consequence", consequence)
+			.optionalHidden("Else", elseStatement);
 	}
 
 	@Override

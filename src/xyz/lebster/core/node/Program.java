@@ -22,18 +22,22 @@ public record Program(List<Statement> children) implements AppendableNode {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		Value<?> lastValue = Undefined.instance;
-		for (final ASTNode child : children)
+		for (final ASTNode child : children) {
 			lastValue = child.execute(interpreter);
+		}
+
 		return lastValue;
 	}
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		for (final ASTNode child : children) child.represent(representation);
+		for (final ASTNode child : children)
+			child.represent(representation);
 	}
 
 	@Override
 	public void dump(int indent) {
-		for (final ASTNode child : children) child.dump(indent);
+		for (final ASTNode child : children)
+			child.dump(indent);
 	}
 }

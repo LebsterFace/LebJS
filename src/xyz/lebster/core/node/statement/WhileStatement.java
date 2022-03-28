@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -31,9 +31,10 @@ public record WhileStatement(Expression condition, Statement body) implements St
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "WhileStatement");
-		Dumper.dumpIndicated(indent, "Condition", condition);
-		Dumper.dumpIndicated(indent, "Body", body);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Condition", condition)
+			.child("Body", body);
 	}
 
 	@Override

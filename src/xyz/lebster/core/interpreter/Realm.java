@@ -23,10 +23,10 @@ public record Realm(Interpreter interpreter) {
 	public Value<?> execute(String sourceText, boolean dumpAST) throws CannotParse, SyntaxError, AbruptCompletion {
 		final Program program = parse(sourceText);
 		if (dumpAST) {
-			System.out.println("------- AST -------");
 			program.dump(0);
-			System.out.println("------- END -------");
+			System.out.println();
 		}
+
 		return program.execute(interpreter);
 	}
 }

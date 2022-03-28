@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.*;
 import xyz.lebster.core.node.expression.Expression;
@@ -39,10 +39,11 @@ public record ForOfStatement(LeftHandSideExpression left, Expression right, Stat
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "ForOfStatement");
-		Dumper.dumpIndicated(indent, "Left", left);
-		Dumper.dumpIndicated(indent, "Right", right);
-		Dumper.dumpIndicated(indent, "Body", body);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Left", left)
+			.child("Right", right)
+			.child("Body", body);
 	}
 
 	@Override

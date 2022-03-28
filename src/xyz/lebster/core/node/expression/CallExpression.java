@@ -1,7 +1,7 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -38,10 +38,10 @@ public record CallExpression(Expression callee, ExpressionList arguments) implem
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "CallExpression");
-		Dumper.dumpIndicated(indent + 1, "Callee", callee);
-		Dumper.dumpIndicator(indent + 1, arguments.isEmpty() ? "No Arguments" : "Arguments");
-		arguments.dumpWithoutIndices(indent + 1);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Callee", callee)
+			.expressionList("Arguments", arguments);
 	}
 
 	@Override

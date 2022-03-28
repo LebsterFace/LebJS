@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -34,9 +34,10 @@ public record UpdateExpression(LeftHandSideExpression expression, UpdateOp op) i
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "UpdateExpression");
-		Dumper.dumpIndicated(indent + 1, "Expression", expression);
-		Dumper.dumpEnum(indent + 1, "Operator", op);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Expression", expression)
+			.operator(op);
 	}
 
 	@Override

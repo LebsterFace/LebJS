@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
@@ -18,9 +18,10 @@ public record MemberExpression(Expression base, Expression property, boolean com
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpParameterized(indent, "MemberExpression", computed ? "Computed" : "NonComputed");
-		Dumper.dumpIndicated(indent + 1, "Base", base);
-		Dumper.dumpIndicated(indent + 1, "ReferencedName", property);
+		DumpBuilder.begin(indent)
+			.selfNamed(this, computed ? "Computed" : "Non-Computed")
+			.child("Base", base)
+			.child("ReferencedName", property);
 	}
 
 	@Override

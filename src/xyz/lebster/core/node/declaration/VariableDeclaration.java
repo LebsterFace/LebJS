@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.declaration;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -11,10 +11,9 @@ import xyz.lebster.core.runtime.value.primitive.Undefined;
 public record VariableDeclaration(Kind kind, VariableDeclarator... declarations) implements Declaration {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "VariableDeclaration");
-		for (VariableDeclarator declarator : declarations) {
-			declarator.dump(indent + 1);
-		}
+		DumpBuilder.begin(indent)
+			.self(this)
+			.children("Declarations", declarations);
 	}
 
 	@Override

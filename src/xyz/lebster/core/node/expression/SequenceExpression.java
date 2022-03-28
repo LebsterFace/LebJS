@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -21,9 +21,10 @@ public record SequenceExpression(Expression left, Expression right) implements E
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "SequenceExpression");
-		Dumper.dumpIndicated(indent + 1, "Left", left);
-		Dumper.dumpIndicated(indent + 1, "Right", right);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Left", left)
+			.child("Right", right);
 	}
 
 	@Override

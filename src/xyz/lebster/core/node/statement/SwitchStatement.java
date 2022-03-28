@@ -1,7 +1,7 @@
 package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -52,13 +52,10 @@ public record SwitchStatement(Expression discriminant, SwitchCase... cases) impl
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "SwitchStatement");
-		// TODO: Standardise indents
-		Dumper.dumpIndicated(indent, "Discriminant", discriminant);
-		Dumper.dumpIndicator(indent, "Cases");
-		for (final SwitchCase aCase : cases) {
-			aCase.dump(indent + 1);
-		}
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Discriminant", discriminant)
+			.children("Cases", cases);
 	}
 
 	@Override

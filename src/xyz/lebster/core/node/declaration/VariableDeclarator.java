@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.declaration;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -15,12 +15,9 @@ import xyz.lebster.core.runtime.value.primitive.Undefined;
 public record VariableDeclarator(String identifier, Expression init) implements ASTNode {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpParameterized(indent, "VariableDeclarator", identifier);
-		if (init == null) {
-			Dumper.dumpSingle(indent + 1, "No Init");
-		} else {
-			init.dump(indent + 1);
-		}
+		DumpBuilder.begin(indent)
+			.selfNamed(this, identifier)
+			.optional("Initializer", init);
 	}
 
 	@Override

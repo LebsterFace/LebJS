@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -15,8 +15,9 @@ public record ExpressionStatement(Expression expression) implements Statement {
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "ExpressionStatement");
-		expression.dump(indent + 1);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.container(expression);
 	}
 
 	@Override

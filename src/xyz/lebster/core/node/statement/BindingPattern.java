@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
@@ -13,11 +13,10 @@ import xyz.lebster.core.runtime.value.primitive.StringValue;
 public record BindingPattern(VariableDeclaration.Kind kind, String identifier) implements LeftHandSideExpression {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "BindingPattern");
-		Dumper.dumpIndicator(indent, "Kind");
-		Dumper.dumpEnum(indent + 1, kind);
-		Dumper.dumpIndicator(indent, "Identifier");
-		Dumper.dumpSingle(indent + 1, identifier);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.enum_("Kind", kind)
+			.singleChild("Identifier", identifier);
 	}
 
 	@Override

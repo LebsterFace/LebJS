@@ -1,12 +1,13 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.AppendableNode;
+import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 
@@ -53,9 +54,8 @@ public record BlockStatement(List<Statement> children) implements Statement, App
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "BlockStatement");
-		for (final ASTNode child : children) {
-			child.dump(indent + 1);
-		}
+		DumpBuilder.begin(indent)
+			.self(this)
+			.children("Children", children.toArray(new Dumpable[0]));
 	}
 }

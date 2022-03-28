@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -9,8 +9,9 @@ import xyz.lebster.core.runtime.value.Value;
 public record CatchClause(String parameter, BlockStatement body) implements Statement {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpParameterized(indent, "CatchClause", parameter);
-		body.dump(indent + 1);
+		DumpBuilder.begin(indent)
+			.selfNamed(this, parameter)
+			.container(body);
 	}
 
 	@Override

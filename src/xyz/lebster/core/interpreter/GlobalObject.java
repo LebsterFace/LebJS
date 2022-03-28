@@ -1,6 +1,6 @@
 package xyz.lebster.core.interpreter;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
@@ -176,10 +176,10 @@ public final class GlobalObject extends ObjectValue {
 		final Value<?> received = arguments[1];
 
 		if (!expected.equals(received)) {
-			Dumper.dumpIndicator(0, "Expected");
-			Dumper.dumpValue(0, expected.getClass().getSimpleName(), expected.toDisplayString());
-			Dumper.dumpIndicator(0, "Received");
-			Dumper.dumpValue(0, received.getClass().getSimpleName(), received.toDisplayString());
+			DumpBuilder.begin(0)
+				.value("Expected", expected)
+				.value("Received", received);
+
 			throw new ShouldNotHappen("Assertion failed.");
 		}
 

@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -17,12 +17,9 @@ public record ReturnStatement(Expression value) implements Statement {
 
 	@Override
 	public void dump(int indent) {
-		if (value == null) {
-			Dumper.dumpSingle(indent, "ReturnStatement");
-		} else {
-			Dumper.dumpName(indent, "ReturnStatement");
-			value.dump(indent + 1);
-		}
+		DumpBuilder.begin(indent)
+			.self(this)
+			.optionalContainer(value);
 	}
 
 	@Override

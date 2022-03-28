@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -31,10 +31,9 @@ public record NewExpression(Expression constructExpr, ExpressionList arguments) 
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "NewExpression");
-		Dumper.dumpIndicated(indent + 1, "Construct Expression", constructExpr);
-		Dumper.dumpIndicator(indent + 1, arguments.isEmpty() ? "No Arguments" : "Arguments");
-		arguments.dumpWithoutIndices(indent + 1);
+		DumpBuilder.begin(indent)
+			.child("Construct Expression", constructExpr)
+			.expressionList("Arguments", arguments);
 	}
 
 	@Override

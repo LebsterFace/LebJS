@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -14,10 +14,11 @@ public record AssignmentExpression(LeftHandSideExpression left, Expression right
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpName(indent, "AssignmentExpression");
-		Dumper.dumpIndicated(indent + 1, "Left", left);
-		Dumper.dumpEnum(indent + 1, "Operator", op);
-		Dumper.dumpIndicated(indent + 1, "Right", right);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Left", left)
+			.operator(op)
+			.child("Right", right);
 	}
 
 	@Override

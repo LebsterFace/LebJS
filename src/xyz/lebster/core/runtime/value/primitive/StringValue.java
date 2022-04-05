@@ -39,7 +39,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
-	protected void displayForObjectKey(StringRepresentation representation) {
+	public void displayForObjectKey(StringRepresentation representation) {
 		if (this.value.contains(" ")) {
 			this.display(representation);
 		} else {

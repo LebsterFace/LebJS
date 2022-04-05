@@ -813,30 +813,37 @@ public final class Parser {
 		final ObjectExpression result = new ObjectExpression();
 
 		// FIXME:
-		//      - Spread { ...object }
 		// 		- Methods { a() { alert(1) } }
 		// 		- Getters / Setters { get a() { return Math.random() } }
 		while (state.currentToken.type != TokenType.RBrace) {
-			Expression key;
-			String propertyName = null;
-			boolean isIdentifier = matchIdentifierName();
-
-			if (isIdentifier || state.is(TokenType.NumericLiteral, TokenType.StringLiteral)) {
-				propertyName = state.consume().value;
-				key = new StringLiteral(new StringValue(propertyName));
-			} else {
-				state.require(TokenType.LBracket);
-				key = parseExpression();
-				state.require(TokenType.RBracket);
+			if (state.accept(TokenType.DotDotDot) != null) {
+				result.spreadEntry(parseExpression());
+				consumeAllLineTerminators();
+				if (state.accept(TokenType.Comma) == null) break;
+				consumeAllLineTerminators();
+				continue;
 			}
 
-			consumeAllLineTerminators();
-			if (isIdentifier && state.currentToken.type != TokenType.Colon) {
-				result.entries().put(key, new IdentifierExpression(propertyName));
+			boolean isIdentifier = matchIdentifierName();
+			if (isIdentifier || state.is(TokenType.NumericLiteral, TokenType.StringLiteral)) {
+				final String propertyName = state.consume().value;
+				consumeAllLineTerminators();
+
+				if (isIdentifier && state.currentToken.type != TokenType.Colon) {
+					result.shorthandEntry(new StringValue(propertyName));
+				} else {
+					state.require(TokenType.Colon);
+					consumeAllLineTerminators();
+					result.staticEntry(new StringValue(propertyName), parseExpression(1, Left));
+				}
 			} else {
+				state.require(TokenType.LBracket);
+				final Expression keyExpression = parseExpression();
+				state.require(TokenType.RBracket);
+				consumeAllLineTerminators();
 				state.require(TokenType.Colon);
 				consumeAllLineTerminators();
-				result.entries().put(key, parseExpression(1, Left));
+				result.computedKeyEntry(keyExpression, parseExpression(1, Left));
 			}
 
 			consumeAllLineTerminators();

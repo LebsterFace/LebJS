@@ -104,5 +104,26 @@ public final class Interpreter {
 		return context;
 	}
 
+	public Reference getBinding(StringValue name) {
+		Environment env = this.lexicalEnvironment();
+		while (env != null) {
+			// 2. Let exists be ? env.HasBinding(name).
+			// 3. If exists is true, then
+			if (env.hasBinding(name)) {
+				// a. Return the Reference Record { base: env, referencedName: name }.
+				return env.getBinding(this, name);
+			}
+
+			// 4. Else,
+			// a. Let outer be env.[[OuterEnv]].
+			env = env.parent();
+			// (Recursive call)
+		}
+
+		// 1. If env is the value null, then
+		// a. Return the Reference Record { base: unresolvable, referencedName: name }.
+		return new Reference(null, name);
+	}
+
 	private enum Mode { Normal, Strict, Checked }
 }

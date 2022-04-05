@@ -4,6 +4,7 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.error.RangeError;
+import xyz.lebster.core.runtime.value.error.ReferenceError;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 
@@ -38,8 +39,14 @@ public final class Interpreter {
 
 	@NonStandard
 	// FIXME: Environment records
-	public void declareVariable(StringValue name, Value<?> value) {
-		lexicalEnvironment().createBinding(this, name, value);
+	public void declareVariable(StringValue name, Value<?> value) throws AbruptCompletion {
+		final Environment environment = executionContextStack[currentExecutionContext].environment();
+		if (environment.hasBinding(name)) {
+			// FIXME: This should be a Syntax Error at parse-time
+			throw AbruptCompletion.error(new ReferenceError("Identifier '" + name.value + "' has already been declared"));
+		} else {
+			environment.createBinding(this, name, value);
+		}
 	}
 
 	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {

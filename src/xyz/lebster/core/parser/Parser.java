@@ -813,6 +813,7 @@ public final class Parser {
 		final ObjectExpression result = new ObjectExpression();
 
 		// FIXME:
+		//      - Spread { ...object }
 		// 		- Methods { a() { alert(1) } }
 		// 		- Getters / Setters { get a() { return Math.random() } }
 		while (state.currentToken.type != TokenType.RBrace) {

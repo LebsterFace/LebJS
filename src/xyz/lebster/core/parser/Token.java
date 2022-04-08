@@ -1,20 +1,23 @@
 package xyz.lebster.core.parser;
 
+import xyz.lebster.core.node.SourcePosition;
+
 public final class Token {
 	public final TokenType type;
 	public final String value;
-	public final int start;
-	public final int end;
 
-	public Token(TokenType type, String value, int start, int end) {
+	public SourcePosition position;
+
+	public Token(TokenType type, String value, SourcePosition position) {
 		this.type = type;
 		this.value = value;
-		this.start = start;
-		this.end = end;
+		this.position = position;
 	}
 
-	public Token(TokenType type, int start, int end) {
-		this(type, null, start, end);
+	public Token(TokenType type, SourcePosition position) {
+		this.type = type;
+		this.value = null;
+		this.position = position;
 	}
 
 	@Override

@@ -17,7 +17,7 @@ public record Realm(Interpreter interpreter) {
 	}
 
 	public static Program parse(String sourceText) throws SyntaxError, CannotParse {
-		return new Parser(new Lexer(sourceText).tokenize()).parse();
+		return new Parser(sourceText, new Lexer(sourceText).tokenize()).parse();
 	}
 
 	public Value<?> execute(String sourceText, boolean dumpAST) throws CannotParse, SyntaxError, AbruptCompletion {

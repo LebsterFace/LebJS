@@ -1,6 +1,7 @@
 package xyz.lebster.core.parser;
 
 import xyz.lebster.core.exception.SyntaxError;
+import xyz.lebster.core.node.SourcePosition;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -237,17 +238,16 @@ public final class Lexer {
 		consumeWhitespace();
 		consumeComment();
 		consumeWhitespace();
-		int start = index;
 		builder.setLength(0);
 
 		if (isTerminator()) {
 			while (isTerminator()) consume();
-			return new Token(TokenType.LineTerminator, start, index);
+			return new Token(TokenType.LineTerminator, position());
 		} else if (isIdentifierStart()) {
 			while (isIdentifierMiddle()) collect();
 			final String value = builder.toString();
 			final TokenType type = keywords.getOrDefault(value, TokenType.Identifier);
-			return new Token(type, value, start, index);
+			return new Token(type, value, position());
 		} else if (currentChar == '"' || currentChar == '\'') {
 			// FIXME: Template strings
 			final char stringType = currentChar;
@@ -312,7 +312,7 @@ public final class Lexer {
 			}
 
 			consume();
-			return new Token(TokenType.StringLiteral, builder.toString(), start, index);
+			return new Token(TokenType.StringLiteral, builder.toString(), position());
 		} else if (isDigit(currentChar)) {
 			int decimalPos = -1;
 
@@ -321,19 +321,23 @@ public final class Lexer {
 				collect();
 			}
 
-			return new Token(TokenType.NumericLiteral, builder.toString(), start, index);
+			return new Token(TokenType.NumericLiteral, builder.toString(), position());
 		} else {
 			for (Map<String, TokenType> symbolSize : symbols) {
 				for (Map.Entry<String, TokenType> entry : symbolSize.entrySet()) {
 					final String key = entry.getKey();
 					if (accept(key)) {
-						return new Token(entry.getValue(), key, start, index);
+						return new Token(entry.getValue(), key, position());
 					}
 				}
 			}
 
-			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "' (index " + index + ")"));
+			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "' (" + position() + ")"));
 		}
+	}
+
+	private SourcePosition position() {
+		return new SourcePosition(source, index);
 	}
 
 	private char consumeHexDigit() throws SyntaxError {
@@ -357,7 +361,7 @@ public final class Lexer {
 
 		while (!isFinished()) {
 			final Token token = next();
-			if (token.type == TokenType.LineTerminator) {
+			if (token != null && token.type == TokenType.LineTerminator) {
 				if (lastWasTerminator) {
 					continue;
 				} else {
@@ -370,7 +374,7 @@ public final class Lexer {
 			result.add(token);
 		}
 
-		result.add(new Token(TokenType.EOF, "", length, length));
+		result.add(new Token(TokenType.EOF, position()));
 		return result.toArray(new Token[0]);
 	}
 }

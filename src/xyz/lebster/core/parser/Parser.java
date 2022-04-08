@@ -7,6 +7,8 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.AppendableNode;
 import xyz.lebster.core.node.Program;
+import xyz.lebster.core.node.SourcePosition;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.declaration.Declaration;
 import xyz.lebster.core.node.declaration.FunctionDeclaration;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
@@ -27,11 +29,13 @@ import static xyz.lebster.core.parser.Associativity.Left;
 import static xyz.lebster.core.parser.Associativity.Right;
 
 public final class Parser {
+	private final String sourceText;
 	private ParserState state;
 	private ParserState saved = null;
 	private boolean hasConsumedSeparator = false;
 
-	public Parser(Token[] tokens) {
+	public Parser(String sourceText, Token[] tokens) {
+		this.sourceText = sourceText;
 		this.state = new ParserState(tokens);
 	}
 
@@ -439,7 +443,17 @@ public final class Parser {
 		};
 	}
 
+	private SourcePosition position() {
+		return state.currentToken.position;
+	}
+
+	private SourceRange range(SourcePosition start) {
+		return new SourceRange(sourceText, start, position());
+	}
+
 	private VariableDeclaration parseVariableDeclaration() throws SyntaxError, CannotParse {
+		// final SourcePosition declarationStart = position();
+
 		// TODO: Missing init in 'const' declaration
 		final var kind = switch (state.currentToken.type) {
 			case Var -> VariableDeclaration.Kind.Var;
@@ -452,12 +466,13 @@ public final class Parser {
 
 		final List<VariableDeclarator> declarators = new ArrayList<>();
 		while (true) {
+			final SourcePosition declaratorStart = position();
 			if (state.currentToken.type == TokenType.LBrace || state.currentToken.type == TokenType.LBracket)
 				throw new NotImplemented("Parsing destructuring assignment");
 
 			final String identifier = state.require(TokenType.Identifier);
 			final Expression value = state.accept(TokenType.Equals) == null ? null : parseExpression(1, Left);
-			declarators.add(new VariableDeclarator(identifier, value));
+			declarators.add(new VariableDeclarator(identifier, value, range(declaratorStart)));
 			consumeAllLineTerminators();
 			if (state.currentToken.type != TokenType.Comma) break;
 			state.consume();

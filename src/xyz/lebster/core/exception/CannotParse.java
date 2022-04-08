@@ -8,6 +8,6 @@ public final class CannotParse extends ParseException {
 	}
 
 	public CannotParse(Token token, String what) {
-		super(token.type + " cannot be parsed as " + what + " (index " + token.start + ")");
+		super(token.type + " cannot be parsed as " + what + " (" + token.position + ")");
 	}
 }

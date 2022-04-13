@@ -234,7 +234,6 @@ public final class Lexer {
 	}
 
 	public Token next() throws SyntaxError {
-		if (index == length) return null;
 		consumeWhitespace();
 		consumeComment();
 		consumeWhitespace();
@@ -249,19 +248,17 @@ public final class Lexer {
 			final TokenType type = keywords.getOrDefault(value, TokenType.Identifier);
 			return new Token(type, value, position());
 		} else if (currentChar == '"' || currentChar == '\'') {
-			// FIXME: Template strings
 			final char stringType = currentChar;
 			consume();
 
 			boolean escaped = false;
 			while (true) {
 				if (isFinished())
-					throw new SyntaxError("Unterminated string literal (index " + index + ")");
+					throw new SyntaxError("Unterminated string literal (" + position() + ")");
 
 				if (escaped) {
 					escaped = false;
 					switch (currentChar) {
-						case '"' -> consumeThenAppend('"');
 						case '0' -> consumeThenAppend('\0');
 						case '\'' -> consumeThenAppend('\'');
 						case '\\' -> consumeThenAppend('\\');
@@ -361,7 +358,7 @@ public final class Lexer {
 
 		while (!isFinished()) {
 			final Token token = next();
-			if (token != null && token.type == TokenType.LineTerminator) {
+			if (token.type == TokenType.LineTerminator) {
 				if (lastWasTerminator) {
 					continue;
 				} else {

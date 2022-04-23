@@ -357,6 +357,31 @@ public final class Parser {
 		return new ForOfStatement(lhs, expression, body);
 	}
 
+	private ForInStatement parseForInStatement(VariableDeclaration declaration) throws SyntaxError, CannotParse {
+		// for ( LetOrConst ForBinding in Expression ) Statement
+		if (declaration.declarations().length != 1)
+			throw new SyntaxError("Invalid left-hand side in for-in loop: Must have a single binding.");
+		final VariableDeclarator declarator = declaration.declarations()[0];
+		if (declarator.init() != null) throw new SyntaxError("for-in loop variable declaration may not have an init.");
+		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), declarator.identifier());
+
+		state.require(TokenType.In);
+		final Expression expression = parseExpression();
+		state.require(TokenType.RParen);
+		final Statement body = parseContextualStatement(true, true);
+		return new ForInStatement(bindingPattern, expression, body);
+	}
+
+	private ForInStatement parseForInStatement(Expression left_expression) throws SyntaxError, CannotParse {
+		// for ( LeftHandSideExpression in Expression ) Statement
+		final LeftHandSideExpression lhs = ensureLHS(left_expression, "Invalid left-hand side in for-loop");
+		state.require(TokenType.In);
+		final Expression expression = parseExpression();
+		state.require(TokenType.RParen);
+		final Statement body = parseContextualStatement(true, true);
+		return new ForInStatement(lhs, expression, body);
+	}
+
 	private Statement parseForStatement() throws SyntaxError, CannotParse {
 		// TODO: `for .. in`
 		state.require(TokenType.For);
@@ -366,12 +391,14 @@ public final class Parser {
 		if (state.currentToken.type != TokenType.Semicolon) {
 			if (matchVariableDeclaration()) {
 				// TODO: for_loop_variable_declaration
-				final var declaration = parseVariableDeclaration(/* true */);
+				final VariableDeclaration declaration = parseVariableDeclaration(/* true */);
 				if (state.match(TokenType.Identifier, "of")) return parseForOfStatement(declaration);
+				if (state.currentToken.type == TokenType.In) return parseForInStatement(declaration);
 				else init = declaration;
 			} else if (matchPrimaryExpression()) {
-				final var expression = parseExpression();
+				final Expression expression = parseExpression(0, Associativity.Right, Collections.singleton(TokenType.In));
 				if (state.match(TokenType.Identifier, "of")) return parseForOfStatement(expression);
+				if (state.currentToken.type == TokenType.In) return parseForInStatement(expression);
 				else init = new ExpressionStatement(expression);
 			} else {
 				state.unexpected();

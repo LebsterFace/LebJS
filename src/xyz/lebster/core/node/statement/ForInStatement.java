@@ -6,20 +6,30 @@ import xyz.lebster.core.interpreter.*;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.expression.LeftHandSideExpression;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.IteratorHelper;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 
-public record ForOfStatement(LeftHandSideExpression left, Expression right, Statement body) implements Statement {
+import java.util.ArrayList;
+
+// FIXME: Properties which are removed while iterating should not appear in the iteration
+public record ForInStatement(LeftHandSideExpression left, Expression right, Statement body) implements Statement {
 	@Override
 	@NonCompliant
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Reference left_reference = left.toReference(interpreter);
-		final IteratorHelper.ObjectIterator iterator = IteratorHelper.getIterator(interpreter, right);
+		final Value<?> exprValue = right.execute(interpreter);
+		if (exprValue.isNullish()) return Undefined.instance;
+		final ObjectValue objectValue = exprValue.toObjectValue(interpreter);
+		final ArrayList<StringValue> enumerateProperties = objectValue.enumerateObjectProperties();
+
 		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
+
 		try {
 			Value<?> lastValue = Undefined.instance;
-			for (IteratorHelper.IteratorResult next = iterator.next(); !next.done; next = iterator.next()) {
-				left_reference.putValue(interpreter, next.value); // FIXME: Close the iterator if this errors
+			for (final StringValue nextResult : enumerateProperties) {
+				// TODO: Specifically "initialise" BindingPatterns
+				left_reference.putValue(interpreter, nextResult);
 
 				try {
 					lastValue = body.execute(interpreter);
@@ -49,7 +59,7 @@ public record ForOfStatement(LeftHandSideExpression left, Expression right, Stat
 	public void represent(StringRepresentation representation) {
 		representation.append("for (");
 		left.represent(representation);
-		representation.append(" of ");
+		representation.append(" in ");
 		right.represent(representation);
 		representation.append(") ");
 		body.represent(representation);

@@ -9,7 +9,7 @@ public final class SourcePosition {
 		this.index = index;
 
 		int indexOfLastNewline = -1;
-		int lineNumber = 0;
+		int lineNumber = 1;
 		for (int i = 0; i < index && i < sourceText.length(); i++) {
 			if (sourceText.charAt(i) == '\n') {
 				indexOfLastNewline = i;

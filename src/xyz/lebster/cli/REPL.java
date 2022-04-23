@@ -37,7 +37,7 @@ public final class REPL {
 				final Value<?> lastValue = realm.execute(input, options.showAST());
 				System.out.println(lastValue.toDisplayString());
 			} catch (Throwable e) {
-				Main.handleError(e, System.out, options.showStackTrace());
+				Main.handleError(e, System.out, options.hideStackTrace());
 			}
 		}
 	}

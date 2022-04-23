@@ -40,7 +40,7 @@ public final class Main {
 				case Tests -> Testing.test(arguments);
 			}
 		} catch (Throwable e) {
-			handleError(e, System.out, arguments.options().showStackTrace());
+			handleError(e, System.out, arguments.options().hideStackTrace());
 		}
 	}
 
@@ -59,9 +59,9 @@ public final class Main {
 		}
 	}
 
-	public static void handleError(Throwable throwable, PrintStream stream, boolean showStackTrace) {
+	public static void handleError(Throwable throwable, PrintStream stream, boolean hideStackTrace) {
 		stream.print(ANSI.BRIGHT_RED);
-		if (showStackTrace) {
+		if (!hideStackTrace) {
 			throwable.printStackTrace(stream);
 			stream.print(ANSI.RESET);
 			stream.flush();

@@ -56,7 +56,7 @@ public final class Testing {
 		} catch (Throwable throwable) {
 			printTestResult(failedStream, ANSI.BRIGHT_RED, "FAILED", fileName);
 			printTestOutput(failedStream, tempOutput);
-			Main.handleError(throwable, failedStream, arguments.options().showStackTrace());
+			Main.handleError(throwable, failedStream, arguments.options().hideStackTrace());
 		}
 
 		System.setOut(stdout);

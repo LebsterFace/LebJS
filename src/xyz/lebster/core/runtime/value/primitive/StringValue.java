@@ -29,6 +29,22 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
+	public int toIndex() {
+		if (value.length() == 0) return -1;
+
+		int index = 0;
+		for (int i = 0; i < value.length(); i++) {
+			final char c = value.charAt(i);
+			if (c < '0' || c > '9') return -1;
+
+			index *= 10;
+			index += c - '0';
+		}
+
+		return index;
+	}
+
+	@Override
 	public void display(StringRepresentation representation) {
 		representation.append(ANSI.GREEN);
 		final char quoteType = this.value.contains("'") ? '"' : '\'';

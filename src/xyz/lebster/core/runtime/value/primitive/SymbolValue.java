@@ -92,6 +92,11 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 	}
 
 	@Override
+	public int toIndex() {
+		return -1;
+	}
+
+	@Override
 	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError("Cannot convert a Symbol value to a string"));
 	}

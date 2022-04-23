@@ -59,57 +59,38 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		this(arrayValues.toArray(new Value[0]));
 	}
 
-	private static int getArrayIndex(Key<?> key) {
-		if (!(key instanceof StringValue stringValue)) return -1;
-		if (stringValue.value.length() == 0) return -1;
-
-		int index = 0;
-		for (int i = 0; i < stringValue.value.length(); i++) {
-			final char c = stringValue.value.charAt(i);
-			if (c < '0' || c > '9') return -1;
-
-			index *= 10;
-			index += c - '0';
-		}
-
-		return index;
+	@Override
+	public PropertyDescriptor getOwnProperty(Key<?> key) {
+		final PropertyDescriptor fromMap = this.value.get(key);
+		if (fromMap != null) return fromMap;
+		final int index = key.toIndex();
+		return index != -1 && index < arrayValues.size() ? arrayValues.get(index) : null;
 	}
 
-	private PropertyDescriptor getArrayPropertyOrNull(Key<?> key) {
-		final int index = getArrayIndex(key);
-		if (index == -1 || index >= arrayValues.size()) return null;
-		return arrayValues.get(index);
+	@Override
+	public boolean hasOwnProperty(Key<?> key) {
+		if (this.value.containsKey(key)) return true;
+		final int index = key.toIndex();
+		return index != -1 && index < arrayValues.size();
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array-exotic-objects-defineownproperty-p-desc")
 	@Override
 	@NonCompliant
 	public boolean defineOwnProperty(Interpreter interpreter, Key<?> P, PropertyDescriptor Desc) throws AbruptCompletion {
-		final int arrayIndex = getArrayIndex(P);
+		final int arrayIndex = P.toIndex();
 		if (arrayIndex != -1) {
 			final long indexLong = P.toNumberValue(interpreter).toUint32();
 			if (indexLong > Integer.MAX_VALUE) throw new NotImplemented("Arrays longer than 2^31-1");
 			final int index = (int) indexLong;
 			final int delta = (index + 1) - arrayValues.size();
 			for (int i = 0; i < delta; i++)
-				arrayValues.add(new DataDescriptor(Undefined.instance));
+				arrayValues.add(new DataDescriptor(Undefined.instance, true, true, true));
 			arrayValues.set(index, Desc);
 			return true;
 		}
 
 		return super.defineOwnProperty(interpreter, P, Desc);
-	}
-
-	@Override
-	public PropertyDescriptor getOwnProperty(Key<?> key) {
-		final PropertyDescriptor fromMap = this.value.get(key);
-		if (fromMap != null) return fromMap;
-		return getArrayPropertyOrNull(key);
-	}
-
-	@Override
-	public boolean hasOwnProperty(Key<?> key) {
-		return this.value.containsKey(key) || getArrayPropertyOrNull(key) != null;
 	}
 
 	@Override

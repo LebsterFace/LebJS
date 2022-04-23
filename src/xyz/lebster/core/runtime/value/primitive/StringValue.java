@@ -14,8 +14,16 @@ public final class StringValue extends ObjectValue.Key<String> {
 		super(value);
 	}
 
-	public StringValue(Object value) {
-		super(String.valueOf(value));
+	public StringValue(char value) {
+		super(Character.toString(value));
+	}
+
+	public StringValue(int value) {
+		super(Integer.toString(value));
+	}
+
+	public StringValue(long value) {
+		super(Long.toString(value));
 	}
 
 	@Override

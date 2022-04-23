@@ -56,7 +56,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-tostring")
 	@NonCompliant
-	private static String stringValueOf(Double d) {
+	public static String stringValueOf(Double d) {
 		if (d == 0.0) return "0";
 		if (d.isNaN()) return "NaN";
 		else if (d < 0.0) return "-" + stringValueOf(-d);

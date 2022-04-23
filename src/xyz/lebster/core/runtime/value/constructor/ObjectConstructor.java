@@ -16,6 +16,9 @@ import xyz.lebster.core.runtime.value.primitive.Null;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
@@ -61,21 +64,45 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.keys")
-	private static Value<?> keys(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+	private static ArrayObject keys(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		final ObjectValue obj = argument(0, args).toObjectValue(interpreter);
-		return new ArrayObject(obj.enumerableOwnKeys());
+		final ArrayList<StringValue> properties = new ArrayList<>();
+		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : obj.entries()) {
+			if (entry.getValue().isEnumerable() && entry.getKey() instanceof final StringValue key) {
+				properties.add(key);
+			}
+		}
+
+		return new ArrayObject(properties.toArray(new StringValue[0]));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.values")
-	private static Value<?> values(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+	private static ArrayObject values(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		final ObjectValue obj = argument(0, args).toObjectValue(interpreter);
-		return new ArrayObject(obj.enumerableOwnValues(interpreter));
+		final ArrayList<Value<?>> properties = new ArrayList<>();
+		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : obj.entries()) {
+			if (entry.getValue().isEnumerable() && entry.getKey() instanceof StringValue) {
+				properties.add(entry.getValue().get(interpreter, obj));
+			}
+		}
+
+		return new ArrayObject(properties.toArray(new Value[0]));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.entries")
-	private static Value<?> entries(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+	private static ArrayObject entries(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		final ObjectValue obj = argument(0, args).toObjectValue(interpreter);
-		return new ArrayObject(obj.enumerableOwnEntries(interpreter));
+		final ArrayList<ArrayObject> properties = new ArrayList<>();
+		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : obj.entries()) {
+			if (entry.getValue().isEnumerable() && entry.getKey() instanceof StringValue) {
+				properties.add(new ArrayObject(
+					entry.getKey(),
+					entry.getValue().get(interpreter, obj)
+				));
+			}
+		}
+
+		return new ArrayObject(properties.toArray(new ArrayObject[0]));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.create")

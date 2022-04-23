@@ -345,75 +345,30 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		this.put(key, new NativeFunction(key.toFunctionName(), code));
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
-	// The spec defines these three methods in EnumerableOwnPropertyNames
-	// They have been split for clarity
-	public StringValue[] enumerableOwnKeys() {
-		// 2. Let properties be a new empty List.
-		final List<StringValue> properties = new ArrayList<>();
-		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
-		// 3. For each element key of ownKeys, do
-		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : this.value.entrySet()) {
-			// a. If Type(key) is String, then
-			if (entry.getKey() instanceof final StringValue key_string) {
-				// i. Let desc be ? O.[[GetOwnProperty]](key).
-				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
-				if (entry.getValue().isEnumerable()) {
-					// 1. If kind is key, append key to properties.
-					properties.add(key_string);
-				}
-			}
-		}
-
-		// 4. Return properties.
-		return properties.toArray(new StringValue[0]);
+	public Iterable<Map.Entry<Key<?>, PropertyDescriptor>> entries() {
+		return this.value.entrySet();
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
-	public Value<?>[] enumerableOwnValues(Interpreter interpreter) throws AbruptCompletion {
-		// 2. Let properties be a new empty List.
-		final List<Value<?>> properties = new ArrayList<>();
-		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
-		// 3. For each element key of ownKeys, do
-		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : this.value.entrySet()) {
-			// a. If Type(key) is String, then
-			if (entry.getKey() instanceof StringValue) {
-				// i. Let desc be ? O.[[GetOwnProperty]](key).
-				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
-				if (entry.getValue().isEnumerable()) {
-					// a. Let value be ? Get(O, key).
-					final Value<?> value = entry.getValue().get(interpreter, this);
-					// b. If kind is value, append value to properties.
-					properties.add(value);
-				}
-			}
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerate-object-properties")
+	public ArrayList<StringValue> enumerateObjectProperties() {
+		final ArrayList<StringValue> result = new ArrayList<>();
+		final HashSet<StringValue> visited = new HashSet<>();
+		for (final var entry : entries()) {
+			if (!(entry.getKey() instanceof StringValue key)) continue;
+			final PropertyDescriptor desc = this.getOwnProperty(key);
+			visited.add(key);
+			if (desc.isEnumerable()) result.add(key);
 		}
 
-		// 4. Return properties.
-		return properties.toArray(new Value[0]);
-	}
+		final ObjectValue proto = this.getPrototype();
+		if (proto == null) return result;
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
-	public ArrayObject[] enumerableOwnEntries(Interpreter interpreter) throws AbruptCompletion {
-		// 2. Let properties be a new empty List.
-		final List<ArrayObject> properties = new ArrayList<>();
-		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
-		// 3. For each element key of ownKeys, do
-		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : this.value.entrySet()) {
-			// a. If Type(key) is String, then
-			if (entry.getKey() instanceof StringValue) {
-				// i. Let desc be ? O.[[GetOwnProperty]](key).
-				// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
-				if (entry.getValue().isEnumerable()) {
-					// ii. Let entry be ! CreateArrayFromList(« key, value »).
-					// iii. Append entry to properties.
-					properties.add(new ArrayObject(entry.getKey(), entry.getValue().get(interpreter, this)));
-				}
-			}
+		for (final StringValue protoKey : proto.enumerateObjectProperties()) {
+			if (!visited.contains(protoKey))
+				result.add(protoKey);
 		}
 
-		// 4. Return properties.
-		return properties.toArray(new ArrayObject[0]);
+		return result;
 	}
 
 	public final void representClassName(StringRepresentation representation) {

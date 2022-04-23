@@ -13,9 +13,9 @@ public record ForOfStatement(LeftHandSideExpression left, Expression right, Stat
 	@Override
 	@NonCompliant
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Reference left_reference = left.toReference(interpreter);
 		final IteratorHelper.ObjectIterator iterator = IteratorHelper.getIterator(interpreter, right);
 		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
+		final Reference left_reference = left.toReference(interpreter);
 		try {
 			Value<?> lastValue = Undefined.instance;
 			for (IteratorHelper.IteratorResult next = iterator.next(); !next.done; next = iterator.next()) {

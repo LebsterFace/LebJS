@@ -1,34 +1,40 @@
 function foo() {
-    throw 123
+	throw 123
+	expect(false, true)
 }
-
 try {
-    foo()
-} catch(e) {
-    expect(123, e);
+	foo()
+	expect(false, true)
+} catch (e) {
+	expect(123, e);
 }
 let err = "oops!";
 try {
-    {
-        throw err;
-    }
+	{
+		throw err;
+		expect(false, true)
+	}
+	expect(false, true)
 } catch (e) {
-    expect(err, e);
+	expect(err, e);
 }
-
 try {
-    fake
-} catch(e) {
-    expect("fake is not defined", e.message)
-}
-
-try {
-    try {
-        error
-    } catch(e) {
-        alsoError
-    }
+	fake
+	expect(false, true)
 } catch (e) {
-    expect("alsoError is not defined", e.message);
-    expect("ReferenceError", e.name);
+	expect("fake is not defined", e.message)
+	expect("ReferenceError", e.name);
+}
+try {
+	try {
+		error
+		expect(false, true)
+	} catch (e) {
+		alsoError
+		expect(false, true)
+	}
+	expect(false, true)
+} catch (e) {
+	expect("alsoError is not defined", e.message);
+	expect("ReferenceError", e.name);
 }

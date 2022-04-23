@@ -2,6 +2,7 @@ package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
+import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
@@ -11,21 +12,26 @@ import xyz.lebster.core.runtime.value.primitive.Undefined;
 public record ForStatement(Statement init, Expression test, Expression update, Statement body) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		if (init != null) init.execute(interpreter);
-		final Value<?> result = Undefined.instance;
+		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
+		try {
+			if (init != null) init.execute(interpreter);
+			final Value<?> result = Undefined.instance;
 
-		while (test.execute(interpreter).isTruthy(interpreter)) {
-			try {
-				body.execute(interpreter);
-				update.execute(interpreter);
-			} catch (AbruptCompletion completion) {
-				if (completion.type == AbruptCompletion.Type.Continue) continue;
-				else if (completion.type == AbruptCompletion.Type.Break) break;
-				else throw completion;
+			while (test.execute(interpreter).isTruthy(interpreter)) {
+				try {
+					body.execute(interpreter);
+					update.execute(interpreter);
+				} catch (AbruptCompletion completion) {
+					if (completion.type == AbruptCompletion.Type.Continue) continue;
+					else if (completion.type == AbruptCompletion.Type.Break) break;
+					else throw completion;
+				}
 			}
-		}
 
-		return result;
+			return result;
+		} finally {
+			interpreter.exitExecutionContext(context);
+		}
 	}
 
 	@Override

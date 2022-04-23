@@ -17,6 +17,14 @@
 	expect(a.length, 0);
 }
 
+for (const property in {a:1,b:1,c:1,d:1,e:1}) {}
+try {
+	property
+	expect(false, true)
+} catch (e) {
+	expect("property is not defined", e.message)
+	expect("ReferenceError", e.name);
+}
 
 // iterate through empty object
 {

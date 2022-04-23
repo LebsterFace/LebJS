@@ -17,13 +17,13 @@ public record ForInStatement(LeftHandSideExpression left, Expression right, Stat
 	@Override
 	@NonCompliant
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Reference left_reference = left.toReference(interpreter);
 		final Value<?> exprValue = right.execute(interpreter);
 		if (exprValue.isNullish()) return Undefined.instance;
 		final ObjectValue objectValue = exprValue.toObjectValue(interpreter);
 		final ArrayList<StringValue> enumerateProperties = objectValue.enumerateObjectProperties();
 
 		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
+		final Reference left_reference = left.toReference(interpreter);
 
 		try {
 			Value<?> lastValue = Undefined.instance;

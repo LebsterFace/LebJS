@@ -2,7 +2,7 @@ package xyz.lebster.core.parser;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
-import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.exception.ParserNotImplemented;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.AppendableNode;
@@ -211,7 +211,7 @@ public final class Parser {
 			case Break -> parseBreakStatement();
 			case Continue -> parseContinueStatement();
 
-			case Import, Export -> throw new NotImplemented("Parsing import / export statements");
+			case Import, Export -> throw new ParserNotImplemented(position(), "Parsing import / export statements");
 
 			case Throw -> {
 				state.consume();
@@ -438,7 +438,7 @@ public final class Parser {
 		return switch (state.currentToken.type) {
 			case Let, Var, Const -> parseVariableDeclaration();
 			case Function -> parseFunctionDeclaration();
-			case Class -> throw new NotImplemented("Parsing class declarations");
+			case Class -> throw new ParserNotImplemented(position(), "Parsing class declarations");
 			default -> throw new CannotParse(state.currentToken, "Declaration");
 		};
 	}
@@ -468,7 +468,7 @@ public final class Parser {
 		while (true) {
 			final SourcePosition declaratorStart = position();
 			if (state.currentToken.type == TokenType.LBrace || state.currentToken.type == TokenType.LBracket)
-				throw new NotImplemented("Parsing destructuring assignment");
+				throw new ParserNotImplemented(position(), "Parsing destructuring assignment");
 
 			final String identifier = state.require(TokenType.Identifier);
 			final Expression value = state.accept(TokenType.Equals) == null ? null : parseExpression(1, Left);
@@ -505,11 +505,11 @@ public final class Parser {
 
 	private void FAIL_FOR_UNSUPPORTED_ARG() {
 		if (state.currentToken.type == TokenType.DotDotDot)
-			throw new NotImplemented("Parsing rest (`...`) arguments");
+			throw new ParserNotImplemented(position(), "Parsing rest (`...`) arguments");
 		else if (state.currentToken.type == TokenType.LBrace || state.currentToken.type == TokenType.LBracket)
-			throw new NotImplemented("Parsing destructuring arguments");
+			throw new ParserNotImplemented(position(), "Parsing destructuring arguments");
 		else if (state.currentToken.type == TokenType.Equals)
-			throw new NotImplemented("Parsing default parameters");
+			throw new ParserNotImplemented(position(), "Parsing default parameters");
 	}
 
 	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
@@ -757,7 +757,7 @@ public final class Parser {
 				yield new BooleanLiteral(BooleanValue.FALSE);
 			}
 
-			case Await -> throw new NotImplemented("Parsing `await` expressions");
+			case Await -> throw new ParserNotImplemented(position(), "Parsing `await` expressions");
 
 			case Function -> parseFunctionExpression();
 			case LBracket -> parseArrayExpression();

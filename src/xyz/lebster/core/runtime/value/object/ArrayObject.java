@@ -14,7 +14,6 @@ import xyz.lebster.core.runtime.value.object.property.DataDescriptor;
 import xyz.lebster.core.runtime.value.object.property.NativeAccessorDescriptor;
 import xyz.lebster.core.runtime.value.object.property.PropertyDescriptor;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 
@@ -29,7 +28,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 	public ArrayObject(Value<?>... initialValues) {
 		this.arrayValues = new ArrayList<>(initialValues.length);
 		for (final Value<?> value : initialValues) {
-			this.arrayValues.add(new DataDescriptor(value));
+			this.arrayValues.add(new DataDescriptor(value, true, true, true));
 		}
 
 		this.value.put(Names.length, new NativeAccessorDescriptor(false, false) {
@@ -47,7 +46,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 				if (newLen > arrayValues.size()) {
 					final int delta = newLen - arrayValues.size();
 					for (int i = 0; i < delta; i++)
-						arrayValues.add(new DataDescriptor(Undefined.instance));
+						arrayValues.add(new DataDescriptor(Undefined.instance, true, true, true));
 				} else {
 					arrayValues.subList(newLen, arrayValues.size()).clear();
 				}

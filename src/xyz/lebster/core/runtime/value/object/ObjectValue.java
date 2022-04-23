@@ -247,7 +247,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return false;
 	}
 
-	public PropertyDescriptor getProperty(Key<?> key) {
+	public final PropertyDescriptor getProperty(Key<?> key) {
 		ObjectValue object = this;
 
 		while (object != null) {
@@ -275,7 +275,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	public void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
 		final PropertyDescriptor property = this.getProperty(key);
 		if (property == null) {
-			this.defineOwnProperty(interpreter, key, new DataDescriptor(value));
+			this.defineOwnProperty(interpreter, key, new DataDescriptor(value, true, false, true));
 			return;
 		}
 
@@ -326,23 +326,23 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	}
 
 	public void put(Key<?> key, Value<?> value) {
-		this.value.put(key, new DataDescriptor(value));
+		this.value.put(key, new DataDescriptor(value, true, false, true));
 	}
 
-	public void put(String key, Value<?> value) {
-		this.value.put(new StringValue(key), new DataDescriptor(value));
+	public void putEnumerable(Key<?> key, Value<?> value) {
+		this.value.put(key, new DataDescriptor(value, true, true, true));
 	}
 
 	public void putNonWritable(Key<?> key, Value<?> value) {
-		this.value.put(key, new DataDescriptor(value, false, true, true));
+		this.value.put(key, new DataDescriptor(value, false, false, true));
 	}
 
 	protected void putFrozen(Key<?> key, Value<?> value) {
 		this.value.put(key, new DataDescriptor(value, false, false, false));
 	}
 
-	public void putMethod(ObjectValue.Key<?> name, NativeCode code) {
-		this.value.put(name, new DataDescriptor(new NativeFunction(name.toFunctionName(), code)));
+	public void putMethod(ObjectValue.Key<?> key, NativeCode code) {
+		this.put(key, new NativeFunction(key.toFunctionName(), code));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")

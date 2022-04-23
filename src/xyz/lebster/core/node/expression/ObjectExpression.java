@@ -75,7 +75,7 @@ public record ObjectExpression(ArrayList<ObjectEntryNode> entries) implements Ex
 				function.updateName(key.toFunctionName());
 			}
 
-			result.put(key, executedValue);
+			result.putEnumerable(key, executedValue);
 		}
 
 		@Override

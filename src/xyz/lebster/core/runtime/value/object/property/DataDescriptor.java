@@ -21,13 +21,6 @@ public final class DataDescriptor implements PropertyDescriptor {
 		this.configurable = configurable;
 	}
 
-	public DataDescriptor(Value<?> value) {
-		this.value = value;
-		this.writable = true;
-		this.enumerable = true;
-		this.configurable = true;
-	}
-
 	public static void display(Value<?> value, StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
 		if (!(value instanceof final ObjectValue object)) {
 			value.display(representation);

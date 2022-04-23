@@ -54,7 +54,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 
 			final ObjectValue.Key<?> entryKey = entry.get($, new StringValue("0")).toPropertyKey($);
 			final Value<?> entryValue = entry.get($, new StringValue("1"));
-			result.put(entryKey, entryValue);
+			result.putEnumerable(entryKey, entryValue);
 		}
 
 		return result;

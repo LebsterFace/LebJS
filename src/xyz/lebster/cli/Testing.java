@@ -46,9 +46,7 @@ public final class Testing {
 			try {
 				Realm.executeStatic(Files.readString(file.toPath()), arguments.options().showAST());
 			} catch (AbruptCompletion completion) {
-				if (arguments.options().parseOnly() && completion.type != AbruptCompletion.Type.Throw) {
-					throw completion;
-				}
+				if (!arguments.options().parseOnly()) throw completion;
 			}
 			successfulTests++;
 			printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", fileName);

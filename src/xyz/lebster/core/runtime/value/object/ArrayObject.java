@@ -160,4 +160,14 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 			else representation.appendLine();
 		}
 	}
+
+	public Value<?>[] values(Interpreter interpreter) throws AbruptCompletion {
+		final Value<?>[] result = new Value[arrayValues.size()];
+		for (int i = 0; i < arrayValues.size(); i++) {
+			final PropertyDescriptor desc = arrayValues.get(i);
+			if (desc != null) result[i] = desc.get(interpreter, this);
+		}
+
+		return result;
+	}
 }

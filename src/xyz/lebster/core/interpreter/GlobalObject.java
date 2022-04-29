@@ -1,10 +1,8 @@
 package xyz.lebster.core.interpreter;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
-import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
@@ -13,6 +11,7 @@ import xyz.lebster.core.runtime.value.error.EvalError;
 import xyz.lebster.core.runtime.value.object.ConsoleObject;
 import xyz.lebster.core.runtime.value.object.MathObject;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.object.TestObject;
 import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
@@ -49,9 +48,9 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.String, StringConstructor.instance);
 		put(Names.Symbol, SymbolConstructor.instance);
 		put(Names.Function, FunctionConstructor.instance);
+		put(Names.Test, TestObject.instance);
 
 		// Non-Standard properties
-		putMethod(Names.expect, GlobalObject::expect);
 		put(Names.console, ConsoleObject.instance);
 	}
 
@@ -169,20 +168,5 @@ public final class GlobalObject extends ObjectValue {
 	private static BooleanValue isNaN(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		if (arguments.length == 0) return BooleanValue.FALSE;
 		return BooleanValue.of(arguments[0].toNumberValue(interpreter).value.isNaN());
-	}
-
-	private static Undefined expect(Interpreter interpreter, Value<?>[] arguments) {
-		final Value<?> expected = arguments[0];
-		final Value<?> received = arguments[1];
-
-		if (!expected.equals(received)) {
-			DumpBuilder.begin(0)
-				.value("Expected", expected)
-				.value("Received", received);
-
-			throw new ShouldNotHappen("Assertion failed.");
-		}
-
-		return Undefined.instance;
 	}
 }

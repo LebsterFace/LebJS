@@ -23,7 +23,7 @@ public final class Dumper {
 
 	public static void dumpValue(int indent, String name, String value) {
 		dumpIndent(indent);
-		System.out.printf("%s%s %s%s%s%n", ANSI.CYAN, name, ANSI.BRIGHT_YELLOW, value, ANSI.RESET);
+		System.out.printf("%s%s %s%s%s%n", ANSI.CYAN, name, ANSI.RESET, value, ANSI.RESET);
 	}
 
 	public static void dumpValue(int indent, String value) {

@@ -125,7 +125,7 @@ public final class DumpBuilder {
 
 	public DumpBuilder value(String indicator, Value<?> value) {
 		Dumper.dumpIndicator(rootIndentation, indicator);
-		Dumper.dumpValue(rootIndentation, value.getClass().getSimpleName(), value.toDisplayString());
+		Dumper.dumpValue(rootIndentation + 1, value.getClass().getSimpleName(), value.toDisplayString());
 		return this;
 	}
 }

@@ -17,10 +17,12 @@ public final class Names {
 	public static final StringValue done = new StringValue("done");
 	public static final StringValue endsWith = new StringValue("endsWith");
 	public static final StringValue entries = new StringValue("entries");
+	public static final StringValue equals = new StringValue("equals");
 	public static final StringValue error = new StringValue("error");
 	public static final StringValue eval = new StringValue("eval");
 	public static final StringValue evaluate = new StringValue("evaluate");
 	public static final StringValue expect = new StringValue("expect");
+	public static final StringValue fail = new StringValue("fail");
 	public static final StringValue filter = new StringValue("filter");
 	public static final StringValue forEach = new StringValue("forEach");
 	public static final StringValue fromEntries = new StringValue("fromEntries");
@@ -107,22 +109,10 @@ public final class Names {
 	public static final StringValue ShadowRealm = new StringValue("ShadowRealm");
 	public static final StringValue String = new StringValue("String");
 	public static final StringValue Symbol = new StringValue("Symbol");
+	public static final StringValue Test = new StringValue("Test");
 	public static final StringValue console = new StringValue("console");
 
 	// Symbols
-	public static final StringValue asyncIterator = new StringValue("asyncIterator");
-	public static final StringValue hasInstance = new StringValue("hasInstance");
-	public static final StringValue isConcatSpreadable = new StringValue("isConcatSpreadable");
-	public static final StringValue iterator = new StringValue("iterator");
-	public static final StringValue match = new StringValue("match");
-	public static final StringValue matchAll = new StringValue("matchAll");
-	public static final StringValue replace = new StringValue("replace");
-	public static final StringValue search = new StringValue("search");
-	public static final StringValue species = new StringValue("species");
-	public static final StringValue split = new StringValue("split");
-	public static final StringValue toPrimitive = new StringValue("toPrimitive");
-	public static final StringValue toStringTag = new StringValue("toStringTag");
-	public static final StringValue unscopables = new StringValue("unscopables");
 	public static final StringValue SymbolDotAsyncIterator = new StringValue("Symbol.asyncIterator");
 	public static final StringValue SymbolDotHasInstance = new StringValue("Symbol.hasInstance");
 	public static final StringValue SymbolDotIsConcatSpreadable = new StringValue("Symbol.isConcatSpreadable");
@@ -136,6 +126,19 @@ public final class Names {
 	public static final StringValue SymbolDotToPrimitive = new StringValue("Symbol.toPrimitive");
 	public static final StringValue SymbolDotToStringTag = new StringValue("Symbol.toStringTag");
 	public static final StringValue SymbolDotUnscopables = new StringValue("Symbol.unscopables");
+	public static final StringValue asyncIterator = new StringValue("asyncIterator");
+	public static final StringValue hasInstance = new StringValue("hasInstance");
+	public static final StringValue isConcatSpreadable = new StringValue("isConcatSpreadable");
+	public static final StringValue iterator = new StringValue("iterator");
+	public static final StringValue match = new StringValue("match");
+	public static final StringValue matchAll = new StringValue("matchAll");
+	public static final StringValue replace = new StringValue("replace");
+	public static final StringValue search = new StringValue("search");
+	public static final StringValue species = new StringValue("species");
+	public static final StringValue split = new StringValue("split");
+	public static final StringValue toPrimitive = new StringValue("toPrimitive");
+	public static final StringValue toStringTag = new StringValue("toStringTag");
+	public static final StringValue unscopables = new StringValue("unscopables");
 
 	public static final StringValue EMPTY = new StringValue("");
 }

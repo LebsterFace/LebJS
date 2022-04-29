@@ -14,9 +14,9 @@ const myFunc = function myFunc(a, b) {
     return add(a, square(b), doNothing);
 }
 
-expect(5, myFunc(1, 2));
-expect(16, add(2, 2, square));
-expect(null, add(2, 2, function(n) {
+Test.expect(5, myFunc(1, 2));
+Test.expect(16, add(2, 2, square));
+Test.expect(null, add(2, 2, function(n) {
     if (n === 4) {
         return null;
     } else {

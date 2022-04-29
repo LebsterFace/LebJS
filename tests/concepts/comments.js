@@ -7,7 +7,7 @@ can go anywhere
     return/*1234*/5678
 }
 
-expect/*
+Test.expect/*
 */(/**/5678/*
 */, name/**/(/*
         */)/*

@@ -3,9 +3,9 @@ while (i < 5) {
     i = i + 1
 }
 
-expect(5, i)
+Test.expect(5, i)
 i = 0; while (i < 5) i = i + 1
-expect(5, i)
+Test.expect(5, i)
 
 i = 0;
 while (i < 5) {
@@ -15,4 +15,4 @@ while (i < 5) {
     }
 }
 
-expect(3, i)
+Test.expect(3, i)

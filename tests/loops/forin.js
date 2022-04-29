@@ -4,7 +4,7 @@
 	for (const property in "") {
 		a.push(property);
 	}
-	expect(a.length, 0);
+	Test.equals(a, []);
 }
 
 
@@ -14,16 +14,16 @@
 	for (const property in 123) {
 		a.push(property);
 	}
-	expect(a.length, 0);
+	Test.equals(a, []);
 }
 
 for (const property in {a:1,b:1,c:1,d:1,e:1}) {}
 try {
 	property
-	expect(false, true)
+	Test.fail()
 } catch (e) {
-	expect("property is not defined", e.message)
-	expect("ReferenceError", e.name);
+	Test.expect("property is not defined", e.message)
+	Test.expect("ReferenceError", e.name);
 }
 
 // iterate through empty object
@@ -32,7 +32,7 @@ try {
 	for (const property in {}) {
 		a.push(property);
 	}
-	expect(a.length, 0);
+	Test.expect(a.length, 0);
 }
 
 
@@ -42,7 +42,7 @@ try {
 	for (const property in "hello") {
 		a.push(property);
 	}
-	expect(a.join(""), '01234');
+	Test.equals(a, ["0", "1", "2", "3", "4"]);
 }
 
 
@@ -52,7 +52,7 @@ try {
 	for (const property in { a: 1, b: 2, c: 2 }) {
 		a.push(property);
 	}
-	expect(a.join(""), 'abc');
+	Test.equals(a, ["a", "b", "c"]);
 }
 
 
@@ -64,14 +64,14 @@ for (const property in undefined) {
 // use already-declared variable
 let property;
 for (property in "abc");
-expect(property, "2");
+Test.expect(property, "2");
 
 
 // special left hand sides
 // allow member expression as variable
 const f = {};
 for (f.a in "abc");
-expect(f.a, "2");
+Test.expect(f.a, "2");
 
 
 // allow member expression of function call
@@ -82,8 +82,8 @@ function f() {
 
 for (f().a in "abc");
 
-expect(f().a, "2");
-expect(b.a, "2");
+Test.expect(f().a, "2");
+Test.expect(b.a, "2");
 
 
 // FIXME: remove properties while iterating
@@ -93,7 +93,7 @@ expect(b.a, "2");
 //	to.push(prop);
 //	from.pop();
 //}
-//expect(to.join(""), "01");
+//Test.equals(to, [0, 1]);
 
 
 // duplicated properties in prototype
@@ -105,5 +105,5 @@ expect(b.a, "2");
 	for (const prop in object) {
 		a.push(prop);
 	}
-	expect(a.join(""), "a");
+	Test.equals(a, ["a"]);
 }

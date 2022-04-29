@@ -25,10 +25,10 @@ external = 1000; case "sixty":
     return external;
 }
 
-expect("two", get(1 + 1))
-expect("four", get(1 + 2 + 3 + 4 - 3 - 2 - 1))
-expect(7, get("seven"))
-expect("AH!", get("six"))
-expect(60, get("sixty"))
-expect(2000, get("fake"))
-expect(2000, get({ some: null }))
+Test.expect("two", get(1 + 1))
+Test.expect("four", get(1 + 2 + 3 + 4 - 3 - 2 - 1))
+Test.expect(7, get("seven"))
+Test.expect("AH!", get("six"))
+Test.expect(60, get("sixty"))
+Test.expect(2000, get("fake"))
+Test.expect(2000, get({ some: null }))

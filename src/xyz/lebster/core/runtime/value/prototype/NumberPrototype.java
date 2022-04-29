@@ -12,6 +12,7 @@ import xyz.lebster.core.runtime.value.object.NumberWrapper;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
@@ -86,7 +87,7 @@ public final class NumberPrototype extends ObjectValue {
 		final NumberValue x = thisNumberValue(interpreter.thisValue());
 		// 2. If radix is undefined, let radixMV be 10.
 		// 3. Else, let radixMV be ? ToIntegerOrInfinity(radix).
-		final int radixMV = toIntegerOrInfinity(interpreter, radix);
+		final int radixMV = radix == Undefined.instance ? 10 : toIntegerOrInfinity(interpreter, radix);
 		// 4. If radixMV < 2 or radixMV > 36, throw a RangeError exception.
 		if (radixMV < 2 || radixMV > 36)
 			throw AbruptCompletion.error(new TypeError("toString() radix argument must be between 2 and 36"));

@@ -4,7 +4,7 @@ let odds = [ 1, 3, 5, 7 ]
 function test(array, string) {
     let joined = "";
     for (const element of array) joined += element.toString();
-    expect(joined, string);
+    Test.expect(joined, string);
 }
 
 let oddsThenEvens = [ ...odds, ...evens ]

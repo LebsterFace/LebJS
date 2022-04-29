@@ -5,33 +5,33 @@ if (10 * 2 === 20) {
     result = false;
 }
 
-expect(true, result);
-if (true) expect(0,0);
-else expect(false, true);
+Test.expect(true, result);
+if (true) Test.expect(0,0);
+else Test.fail();
 
 let a = 0;
 if (a === 0) {
-    expect(0, a);
+    Test.expect(0, a);
 } else if (a === 1) {
-   expect(1, a);
+   Test.expect(1, a);
 } else {
-    expect(2, a);
+    Test.expect(2, a);
 }
 
 a = a + 1
 if (a === 0) {
-    expect(0, a);
+    Test.expect(0, a);
 } else if (a === 1) {
-    expect(1, a);
+    Test.expect(1, a);
 } else {
-    expect(2, a);
+    Test.expect(2, a);
 }
 
 a = a + 1
  if (a === 0) {
-     expect(0, a);
+     Test.expect(0, a);
  } else if (a === 1) {
-     expect(1, a);
+     Test.expect(1, a);
  } else {
-     expect(2, a);
+     Test.expect(2, a);
  }

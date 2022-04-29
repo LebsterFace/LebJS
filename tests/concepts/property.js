@@ -1,9 +1,9 @@
-expect(3, "123".length);
-expect(3, "123"  .           length);
-expect(3,
+Test.expect(3, "123".length);
+Test.expect(3, "123"  .           length);
+Test.expect(3,
     "123"
         .length
 );
-expect(3, "123"["length"])
-expect(3, "123"   [ "length" ] )
-expect(3, "123"["len"+ "gth"])
+Test.expect(3, "123"["length"])
+Test.expect(3, "123"   [ "length" ] )
+Test.expect(3, "123"["len"+ "gth"])

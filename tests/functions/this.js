@@ -1,5 +1,5 @@
-expect(globalThis, this);
+Test.expect(globalThis, this);
 (function(){
-    expect(5, this.length);
+    Test.expect(5, this.length);
 }).call("Hello");
-expect(globalThis, this);
+Test.expect(globalThis, this);

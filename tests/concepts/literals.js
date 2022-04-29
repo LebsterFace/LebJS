@@ -1,7 +1,7 @@
-expect("abc", "abc");
-expect(10, 10);
-expect(1.2345, 1.2345);
-expect(true, true);
-expect(false, false);
-expect(null, null);
-expect(undefined, undefined);
+Test.expect("abc", "abc");
+Test.expect(10, 10);
+Test.expect(1.2345, 1.2345);
+Test.expect(true, true);
+Test.expect(false, false);
+Test.expect(null, null);
+Test.expect(undefined, undefined);

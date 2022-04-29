@@ -9,7 +9,7 @@ const joinNine = (one, two, three, four, five, six, seven, eight, nine) => {
     return "" + one + two + three + four + five + six + seven + eight + nine;
 }
 
-expect("13572468", joinEight(...odds, ...evens))
-expect("24681357", joinEight(...evens, ...odds))
-expect("135752468", joinNine(...odds, 5, ...evens))
-expect("513572468", joinNine(5, ...odds, ...evens))
+Test.expect("13572468", joinEight(...odds, ...evens))
+Test.expect("24681357", joinEight(...evens, ...odds))
+Test.expect("135752468", joinNine(...odds, 5, ...evens))
+Test.expect("513572468", joinNine(5, ...odds, ...evens))

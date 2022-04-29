@@ -12,9 +12,9 @@ let set = undefined;
     }
 }
 
-expect(40, get())
+Test.expect(40, get())
 let value = "hello!"
-expect(40, get())
+Test.expect(40, get())
 set(129)
-expect(129, get())
-expect("hello!", value)
+Test.expect(129, get())
+Test.expect("hello!", value)

@@ -5,16 +5,16 @@ for (let i = 1; i < 7; i++) {
 
 try {
 	i
-	expect(false, true)
+	Test.fail()
 } catch (e) {
-	expect("i is not defined", e.message)
-	expect("ReferenceError", e.name);
+	Test.expect("i is not defined", e.message)
+	Test.expect("ReferenceError", e.name);
 }
 
-expect(21, num)
+Test.expect(21, num)
 num = null;
 for (; false;) {
     num = 6000
 }
 
-expect(null, num)
+Test.expect(null, num)

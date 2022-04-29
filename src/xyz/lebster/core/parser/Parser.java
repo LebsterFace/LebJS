@@ -14,10 +14,7 @@ import xyz.lebster.core.node.declaration.FunctionDeclaration;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.node.declaration.VariableDeclarator;
 import xyz.lebster.core.node.expression.*;
-import xyz.lebster.core.node.expression.literal.BooleanLiteral;
-import xyz.lebster.core.node.expression.literal.NullLiteral;
-import xyz.lebster.core.node.expression.literal.NumericLiteral;
-import xyz.lebster.core.node.expression.literal.StringLiteral;
+import xyz.lebster.core.node.expression.literal.*;
 import xyz.lebster.core.node.statement.*;
 import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
@@ -64,7 +61,8 @@ public final class Parser {
 				LeftShiftEquals, PercentEquals, DivideEquals, MultiplyEquals -> 3;
 			case Yield -> 2;
 			case Comma -> 1;
-			default -> throw new ShouldNotHappen("Attempting to get precedence for token type '" + state.currentToken.type + "'");
+			default ->
+				throw new ShouldNotHappen("Attempting to get precedence for token type '" + state.currentToken.type + "'");
 		};
 	}
 
@@ -81,7 +79,8 @@ public final class Parser {
 				AmpersandEquals, UnsignedRightShiftEquals, RightShiftEquals, LeftShiftEquals, PercentEquals,
 				DivideEquals, MultiplyEquals, Yield -> Associativity.Right;
 
-			default -> throw new ShouldNotHappen("Attempting to get associativity for token type '" + state.currentToken.type + "'");
+			default ->
+				throw new ShouldNotHappen("Attempting to get associativity for token type '" + state.currentToken.type + "'");
 		};
 	}
 
@@ -667,48 +666,81 @@ public final class Parser {
 		consumeAllLineTerminators();
 
 		return switch (token.type) {
-			case Plus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Add);
-			case Minus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Subtract);
-			case Star -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Multiply);
-			case Slash -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Divide);
-			case Percent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Remainder);
-			case Exponent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Exponentiate);
+			case Plus ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Add);
+			case Minus ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Subtract);
+			case Star ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Multiply);
+			case Slash ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Divide);
+			case Percent ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Remainder);
+			case Exponent ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Exponentiate);
 
-			case Pipe -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseOR);
-			case Ampersand -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseAND);
-			case Caret -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseXOR);
-			case LeftShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.LeftShift);
-			case RightShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.SignedRightShift);
-			case UnsignedRightShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.UnsignedRightShift);
+			case Pipe ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseOR);
+			case Ampersand ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseAND);
+			case Caret ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseXOR);
+			case LeftShift ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.LeftShift);
+			case RightShift ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.SignedRightShift);
+			case UnsignedRightShift ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.UnsignedRightShift);
 
 			case QuestionMark -> parseConditionalExpression(left);
 			case LParen -> parseCallExpression(left);
 
-			case StrictEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictEquals);
-			case LooseEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.LooseEquals);
-			case StrictNotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictNotEquals);
-			case NotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.LooseNotEquals);
+			case StrictEqual ->
+				new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictEquals);
+			case LooseEqual ->
+				new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.LooseEquals);
+			case StrictNotEqual ->
+				new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictNotEquals);
+			case NotEqual ->
+				new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.LooseNotEquals);
 
-			case LogicalOr -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Or);
-			case LogicalAnd -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
-			case NullishCoalescing -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Coalesce);
+			case LogicalOr ->
+				new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Or);
+			case LogicalAnd ->
+				new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
+			case NullishCoalescing ->
+				new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Coalesce);
 
-			case PlusEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.PlusAssign);
-			case MinusEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
-			case MultiplyEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MultiplyAssign);
-			case DivideEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.DivideAssign);
-			case ExponentEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.ExponentAssign);
-			case Equals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
+			case PlusEquals ->
+				new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.PlusAssign);
+			case MinusEquals ->
+				new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
+			case MultiplyEquals ->
+				new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MultiplyAssign);
+			case DivideEquals ->
+				new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.DivideAssign);
+			case ExponentEquals ->
+				new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.ExponentAssign);
+			case Equals ->
+				new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
 
-			case MinusMinus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), UpdateExpression.UpdateOp.PostDecrement);
-			case PlusPlus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), UpdateExpression.UpdateOp.PostIncrement);
+			case MinusMinus ->
+				new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), UpdateExpression.UpdateOp.PostDecrement);
+			case PlusPlus ->
+				new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), UpdateExpression.UpdateOp.PostIncrement);
 
-			case LessThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
-			case LessThanEqual -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThanEquals);
-			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
-			case GreaterThanEqual -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThanEquals);
-			case In -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.In);
-			case Instanceof -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.InstanceOf);
+			case LessThan ->
+				new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
+			case LessThanEqual ->
+				new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThanEquals);
+			case GreaterThan ->
+				new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
+			case GreaterThanEqual ->
+				new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThanEquals);
+			case In ->
+				new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.In);
+			case Instanceof ->
+				new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.InstanceOf);
 
 			case Period -> {
 				if (!matchIdentifierName()) state.expected("IdentifierName");
@@ -789,6 +821,7 @@ public final class Parser {
 			case Function -> parseFunctionExpression();
 			case LBracket -> parseArrayExpression();
 			case LBrace -> parseObjectExpression();
+			case TemplateStart -> parseTemplateLiteral();
 
 			case This -> {
 				state.consume();
@@ -811,6 +844,29 @@ public final class Parser {
 
 			default -> throw new CannotParse(state.currentToken, "PrimaryExpression");
 		};
+	}
+
+	private TemplateLiteral parseTemplateLiteral() throws SyntaxError, CannotParse {
+		state.require(TokenType.TemplateStart);
+		final TemplateLiteral result = new TemplateLiteral();
+
+		while (true) {
+			if (state.currentToken.type == TokenType.TemplateSpan) {
+				result.spanNode(state.consume().value);
+			} else if (state.currentToken.type == TokenType.TemplateExpressionStart) {
+				state.consume();
+				final Expression expression = parseExpression();
+				state.require(TokenType.TemplateExpressionEnd);
+				result.expressionNode(expression);
+			} else if (state.currentToken.type == TokenType.TemplateEnd) {
+				break;
+			} else {
+				state.unexpected();
+			}
+		}
+
+		state.require(TokenType.TemplateEnd);
+		return result;
 	}
 
 	private ArrowFunctionExpression tryParseArrowFunctionExpression() throws SyntaxError, CannotParse {
@@ -984,6 +1040,7 @@ public final class Parser {
 	private boolean matchPrimaryExpression() {
 		final TokenType t = state.currentToken.type;
 		return t == TokenType.LParen ||
+			   t == TokenType.TemplateStart ||
 			   t == TokenType.Identifier ||
 			   t == TokenType.StringLiteral ||
 			   t == TokenType.NumericLiteral ||

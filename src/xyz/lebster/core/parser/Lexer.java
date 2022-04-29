@@ -3,10 +3,7 @@ package xyz.lebster.core.parser;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.SourcePosition;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class Lexer {
 	private static final HashMap<String, TokenType> keywords = new HashMap<>();
@@ -131,6 +128,7 @@ public final class Lexer {
 	private final String source;
 	private final StringBuilder builder = new StringBuilder();
 	private final int length;
+	private final ArrayDeque<TemplateLiteralState> templateLiteralStates = new ArrayDeque<>();
 	private int index = -1;
 	private char currentChar = '\0';
 
@@ -141,7 +139,7 @@ public final class Lexer {
 	}
 
 	public boolean isFinished() {
-		return index >= length;
+		return index > length;
 	}
 
 	private boolean isDigit(char c) {
@@ -203,6 +201,12 @@ public final class Lexer {
 		return result;
 	}
 
+	private boolean accept(char c) {
+		final boolean result = currentChar == c;
+		if (result) consume();
+		return result;
+	}
+
 	private boolean isIdentifierStart() {
 		if (currentChar == '\\') {
 			return false;
@@ -233,11 +237,58 @@ public final class Lexer {
 		}
 	}
 
-	public Token next() throws SyntaxError {
-		consumeWhitespace();
-		consumeComment();
-		consumeWhitespace();
+	private Token next() throws SyntaxError {
 		builder.setLength(0);
+		final boolean inTemplateLiteral = !templateLiteralStates.isEmpty();
+
+		if (!inTemplateLiteral || templateLiteralStates.getFirst().inExpression) {
+			consumeWhitespace();
+			consumeComment();
+			consumeWhitespace();
+		}
+
+		if (accept('`')) {
+			if (!inTemplateLiteral || templateLiteralStates.getFirst().inExpression) {
+				templateLiteralStates.push(new TemplateLiteralState());
+				return new Token(TokenType.TemplateStart, position());
+			} else {
+				templateLiteralStates.pop();
+				return new Token(TokenType.TemplateEnd, position());
+			}
+		} else if (
+			inTemplateLiteral &&
+			templateLiteralStates.getFirst().inExpression &&
+			templateLiteralStates.getFirst().bracketCount == 0 &&
+			accept('}')
+		) {
+			templateLiteralStates.getFirst().inExpression = false;
+			return new Token(TokenType.TemplateExpressionEnd, position());
+		} else if (inTemplateLiteral && !templateLiteralStates.getFirst().inExpression) {
+			if (isFinished()) {
+				throw new SyntaxError("Unterminated template literal (" + position() + ")");
+			} else if (accept("${")) {
+				templateLiteralStates.getFirst().inExpression = true;
+				return new Token(TokenType.TemplateExpressionStart, position());
+			} else {
+				while (!peek("${") && currentChar != '`' && !isFinished()) {
+					if (peek("\\$") || peek("\\`")) {
+						consume();
+						collect();
+					} else if (peek("\\\n")) {
+						consume(2);
+					} else {
+						collect();
+					}
+
+				}
+				if (isFinished() && !templateLiteralStates.isEmpty()) {
+					throw new SyntaxError("Unterminated template literal (" + position() + ")");
+				} else {
+					return new Token(TokenType.TemplateSpan, builder.toString(), position());
+				}
+			}
+		}
+
 
 		if (isTerminator()) {
 			while (isTerminator()) consume();
@@ -368,10 +419,23 @@ public final class Lexer {
 				lastWasTerminator = false;
 			}
 
+			if (!templateLiteralStates.isEmpty() && templateLiteralStates.getFirst().inExpression) {
+				if (token.type == TokenType.LBrace) {
+					templateLiteralStates.getFirst().bracketCount++;
+				} else if (token.type == TokenType.RBrace) {
+					templateLiteralStates.getFirst().bracketCount--;
+				}
+			}
+
 			result.add(token);
 		}
 
 		result.add(new Token(TokenType.EOF, position()));
 		return result.toArray(new Token[0]);
+	}
+
+	private static final class TemplateLiteralState {
+		public boolean inExpression = false;
+		public int bracketCount = 0;
 	}
 }

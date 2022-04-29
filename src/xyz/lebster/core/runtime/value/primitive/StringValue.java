@@ -4,6 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.parser.StringEscapeUtils;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.StringWrapper;
 
@@ -57,7 +58,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 		representation.append(ANSI.GREEN);
 		final char quoteType = this.value.contains("'") ? '"' : '\'';
 		representation.append(quoteType);
-		representation.append(value);
+		representation.append(StringEscapeUtils.escape(value));
 		representation.append(quoteType);
 		representation.append(ANSI.RESET);
 	}

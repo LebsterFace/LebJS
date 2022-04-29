@@ -12,5 +12,7 @@ public enum TokenType {
 	PercentEquals, Period, Pipe, PipeEquals, Plus, PlusEquals, PlusPlus, QuestionMark, RBrace,
 	RBracket, RParen, Return, RightShift, RightShiftEquals, Semicolon, Slash, Star, StrictEqual,
 	StrictNotEqual, StringLiteral, Super, Switch, This, Throw, Tilde, True, Try, Typeof, Undefined,
-	UnsignedRightShift, UnsignedRightShiftEquals, Var, Void, While, With, Yield
+	UnsignedRightShift, UnsignedRightShiftEquals, Var, Void, While, With, Yield,
+
+	TemplateStart, TemplateEnd, TemplateSpan, TemplateExpressionStart, TemplateExpressionEnd
 }

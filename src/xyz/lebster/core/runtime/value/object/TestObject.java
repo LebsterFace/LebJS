@@ -19,6 +19,9 @@ public final class TestObject extends ObjectValue {
 		instance.putMethod(Names.fail, TestObject::fail);
 	}
 
+	private TestObject() {
+	}
+
 	private static Undefined equalsMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final Value<?> a = argument(0, arguments);
 		final Value<?> b = argument(1, arguments);
@@ -66,8 +69,5 @@ public final class TestObject extends ObjectValue {
 
 	private static Undefined fail(Interpreter interpreter, Value<?>[] values) {
 		throw new ShouldNotHappen("Test.fail()");
-	}
-
-	private TestObject() {
 	}
 }

@@ -270,16 +270,24 @@ public final class Lexer {
 				templateLiteralStates.getFirst().inExpression = true;
 				return new Token(TokenType.TemplateExpressionStart, position());
 			} else {
-				while (!peek("${") && currentChar != '`' && !isFinished()) {
-					if (peek("\\$") || peek("\\`")) {
+				boolean escaped = false;
+
+				while (!(isFinished() || peek("${") && !escaped)) {
+					if (escaped) {
+						escaped = false;
+						if (isTerminator()) {
+							consumeTerminator();
+						} else {
+							collectEscapedCharacter();
+						}
+					} else if (currentChar == '\\') {
+						escaped = true;
 						consume();
-						collect();
-					} else if (peek("\\\n")) {
-						consume(2);
+					} else if (currentChar == '`') {
+						break;
 					} else {
 						collect();
 					}
-
 				}
 				if (isFinished() && !templateLiteralStates.isEmpty()) {
 					throw new SyntaxError("Unterminated template literal (" + position() + ")");
@@ -309,46 +317,7 @@ public final class Lexer {
 
 				if (escaped) {
 					escaped = false;
-					switch (currentChar) {
-						case '0' -> consumeThenAppend('\0');
-						case '\'' -> consumeThenAppend('\'');
-						case '\\' -> consumeThenAppend('\\');
-						case 'b' -> consumeThenAppend('\b');
-						case 'f' -> consumeThenAppend('\f');
-						case 'n' -> consumeThenAppend('\n');
-						case 'r' -> consumeThenAppend('\r');
-						case 't' -> consumeThenAppend('\t');
-						case 'v' -> consumeThenAppend('\13');
-						case 'u' -> {
-							consume();
-							if (this.currentChar == '{') {
-								consume();
-								if (this.currentChar == '}') throw new SyntaxError("Invalid Unicode escape sequence");
-								int result = 0;
-								for (int i = 0; i < 6 && this.currentChar != '}'; i++) {
-									result *= 16;
-									result += Character.digit(consumeHexDigit(), 16);
-								}
-
-								if (consume() != '}') throw new SyntaxError("Invalid Unicode escape sequence");
-								this.builder.append((char) result);
-							} else {
-								int result = 0;
-								for (int i = 0; i < 4; i++) {
-									result *= 16;
-									result += Character.digit(consumeHexDigit(), 16);
-								}
-								this.builder.append((char) result);
-							}
-						}
-
-						case 'x' -> consumeThenAppend((char) (
-							Character.digit(consumeHexDigit(), 16) * 16 +
-							Character.digit(consumeHexDigit(), 16)
-						));
-
-						default -> collect();
-					}
+					collectEscapedCharacter();
 				} else if (currentChar == '\\') {
 					escaped = true;
 					consume();
@@ -381,6 +350,57 @@ public final class Lexer {
 			}
 
 			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "' (" + position() + ")"));
+		}
+	}
+
+	private void consumeTerminator() {
+		if (peek("\r\n")) {
+			consume(2);
+		} else if (currentChar == '\n') {
+			consume();
+		}
+	}
+
+	private void collectEscapedCharacter() throws SyntaxError {
+		switch (currentChar) {
+			case '0' -> consumeThenAppend('\0');
+			case '\'' -> consumeThenAppend('\'');
+			case '\\' -> consumeThenAppend('\\');
+			case 'b' -> consumeThenAppend('\b');
+			case 'f' -> consumeThenAppend('\f');
+			case 'n' -> consumeThenAppend('\n');
+			case 'r' -> consumeThenAppend('\r');
+			case 't' -> consumeThenAppend('\t');
+			case 'v' -> consumeThenAppend('\13');
+			case 'u' -> {
+				consume();
+				if (this.currentChar == '{') {
+					consume();
+					if (this.currentChar == '}') throw new SyntaxError("Invalid Unicode escape sequence");
+					int result = 0;
+					for (int i = 0; i < 6 && this.currentChar != '}'; i++) {
+						result *= 16;
+						result += Character.digit(consumeHexDigit(), 16);
+					}
+
+					if (consume() != '}') throw new SyntaxError("Invalid Unicode escape sequence");
+					this.builder.append((char) result);
+				} else {
+					int result = 0;
+					for (int i = 0; i < 4; i++) {
+						result *= 16;
+						result += Character.digit(consumeHexDigit(), 16);
+					}
+					this.builder.append((char) result);
+				}
+			}
+
+			case 'x' -> consumeThenAppend((char) (
+				Character.digit(consumeHexDigit(), 16) * 16 +
+				Character.digit(consumeHexDigit(), 16)
+			));
+
+			default -> collect();
 		}
 	}
 

@@ -40,7 +40,7 @@ Test.expect(`${`${`${`${"foo"}`} bar`}`}`, "foo bar");
 
 // newline literals (not characters)
 Test.expect(`foo
-    bar`, "foo\n    bar");
+    bar`, "foo\r\n    bar");
 
 // line continuation in literals (not characters)
 Test.expect(`foo\

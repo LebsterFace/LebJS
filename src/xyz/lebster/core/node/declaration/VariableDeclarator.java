@@ -41,8 +41,11 @@ public record VariableDeclarator(String identifier, Expression init, SourceRange
 	public void represent(StringRepresentation representation) {
 		representation.append("let ");
 		representation.append(identifier);
-		representation.append(" = ");
-		init.represent(representation);
+		if (init != null) {
+			representation.append(" = ");
+			init.represent(representation);
+		}
+
 		representation.append(';');
 	}
 }

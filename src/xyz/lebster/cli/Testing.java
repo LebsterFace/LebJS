@@ -46,7 +46,7 @@ public final class Testing {
 
 		try {
 			try {
-				Realm.executeStatic(Files.readString(file.toPath()), arguments.options().showAST());
+				Realm.executeStatic(Main.readFile(file.toPath()), arguments.options().showAST());
 			} catch (AbruptCompletion completion) {
 				if (!arguments.options().parseOnly()) throw completion;
 			}

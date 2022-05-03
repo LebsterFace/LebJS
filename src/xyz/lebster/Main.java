@@ -15,7 +15,11 @@ import xyz.lebster.core.runtime.value.error.EvalError;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public final class Main {
@@ -45,7 +49,7 @@ public final class Main {
 	}
 
 	private static void file(CLArguments arguments) throws IOException, CannotParse, AbruptCompletion, SyntaxError {
-		final String sourceText = Files.readString(arguments.filePathOrNull());
+		final String sourceText = Main.readFile(arguments.filePathOrNull());
 		Realm.executeStatic(sourceText, arguments.options().showAST());
 	}
 
@@ -57,6 +61,22 @@ public final class Main {
 			System.out.println(lastValue.toDisplayString());
 			System.out.print("#[END-OF-OUTPUT]#");
 		}
+	}
+
+	private static final Charset[] supportedCharsets = { StandardCharsets.UTF_8, StandardCharsets.UTF_16 };
+
+	public static String readFile(Path path) {
+		for (final Charset charset : supportedCharsets) {
+			try {
+				return Files.readString(path, charset);
+			} catch (MalformedInputException e) {
+				throw new RuntimeException("Cannot read " + path.getFileName() + ": Unsupported charset");
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		return "";
 	}
 
 	public static void handleError(Throwable throwable, PrintStream stream, boolean hideStackTrace) {

@@ -19,7 +19,8 @@ if (a === 0) {
 }
 
 a = a + 1
-if (a === 0) {
+if
+(a === 0) {
     Test.expect(0, a);
 } else if (a === 1) {
     Test.expect(1, a);
@@ -28,7 +29,9 @@ if (a === 0) {
 }
 
 a = a + 1
- if (a === 0) {
+ if (
+    a === 0
+) {
      Test.expect(0, a);
  } else if (a === 1) {
      Test.expect(1, a);

@@ -1,7 +1,9 @@
 function get(argument) {
     let external = 30;
 
-    switch (argument) {
+    switch (
+argument
+) {
         case 2: return "two"
 
         case 4:

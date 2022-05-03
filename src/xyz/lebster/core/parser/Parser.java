@@ -227,9 +227,12 @@ public final class Parser {
 
 	private Statement parseSwitchStatement() throws SyntaxError, CannotParse {
 		state.require(TokenType.Switch);
+		consumeAllLineTerminators();
 		state.require(TokenType.LParen);
+		consumeAllLineTerminators();
 		final Expression expression = parseExpression();
 		state.require(TokenType.RParen);
+		consumeAllLineTerminators();
 		state.require(TokenType.LBrace);
 		final boolean old_inBreakContext = state.inBreakContext;
 		state.inBreakContext = true;
@@ -378,9 +381,10 @@ public final class Parser {
 	}
 
 	private Statement parseForStatement() throws SyntaxError, CannotParse {
-		// TODO: `for .. in`
 		state.require(TokenType.For);
+		consumeAllLineTerminators();
 		state.require(TokenType.LParen);
+		consumeAllLineTerminators();
 
 		Statement init = null;
 		if (state.currentToken.type != TokenType.Semicolon) {
@@ -400,9 +404,11 @@ public final class Parser {
 			}
 		}
 		state.require(TokenType.Semicolon);
+		consumeAllLineTerminators();
 
 		final Expression test = matchPrimaryExpression() ? parseExpression() : null;
 		state.require(TokenType.Semicolon);
+		consumeAllLineTerminators();
 
 		final Expression update = matchPrimaryExpression() ? parseExpression() : null;
 		state.require(TokenType.RParen);
@@ -413,7 +419,9 @@ public final class Parser {
 
 	private WhileStatement parseWhileStatement() throws SyntaxError, CannotParse {
 		state.require(TokenType.While);
+		consumeAllLineTerminators();
 		state.require(TokenType.LParen);
+		consumeAllLineTerminators();
 		final Expression condition = parseExpression();
 		state.require(TokenType.RParen);
 		final Statement body = parseContextualStatement(true, true);
@@ -424,7 +432,9 @@ public final class Parser {
 		state.require(TokenType.Do);
 		final Statement body = parseContextualStatement(true, true);
 		state.require(TokenType.While);
+		consumeAllLineTerminators();
 		state.require(TokenType.LParen);
+		consumeAllLineTerminators();
 		final Expression condition = parseExpression();
 		state.require(TokenType.RParen);
 		return new DoWhileStatement(body, condition);
@@ -443,7 +453,9 @@ public final class Parser {
 
 	private IfStatement parseIfStatement() throws SyntaxError, CannotParse {
 		state.require(TokenType.If);
+		consumeAllLineTerminators();
 		state.require(TokenType.LParen);
+		consumeAllLineTerminators();
 		final Expression condition = parseExpression();
 		state.require(TokenType.RParen);
 		final Statement consequence = parseLine();
@@ -536,12 +548,15 @@ public final class Parser {
 
 	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
+		consumeAllLineTerminators();
 		if (state.currentToken.type != TokenType.Identifier) {
 			throw new SyntaxError("Function declarations require a function name");
 		}
 
 		final String name = state.consume().value;
+		consumeAllLineTerminators();
 		final String[] arguments = parseFunctionArguments();
+		consumeAllLineTerminators();
 		return new FunctionDeclaration(parseFunctionBody(), name, arguments);
 	}
 

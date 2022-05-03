@@ -10,7 +10,9 @@ const object = { property: null }
 for (object.property of [1, 2, 3]) {}
 Test.expect(3, object.property)
 
-for (const property of [1,1,1,1,1,1,1]) {}
+for (
+    const property of [1,1,1,1,1,1,1]
+) {}
 try {
 	property
 	Test.fail()

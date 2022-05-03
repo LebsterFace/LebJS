@@ -29,6 +29,8 @@ public final class Testing {
 	}
 
 	private static void runTestFile(CLArguments arguments, File file, String prefix) {
+		if (!file.getName().endsWith(".js") && !file.getName().endsWith(".js.skip")) return;
+
 		final String fileName = prefix + file.getName();
 		totalTests++;
 

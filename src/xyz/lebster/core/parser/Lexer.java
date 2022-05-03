@@ -376,14 +376,21 @@ public final class Lexer {
 				consume();
 				if (this.currentChar == '{') {
 					consume();
-					if (this.currentChar == '}') throw new SyntaxError("Invalid Unicode escape sequence");
+					if (this.currentChar == '}')
+						throw new SyntaxError("Invalid unicode escape sequence: No digits (" + position() + ")");
 					int result = 0;
+					final StringBuilder sequence = new StringBuilder();
 					for (int i = 0; i < 6 && this.currentChar != '}'; i++) {
 						result *= 16;
-						result += Character.digit(consumeHexDigit(), 16);
+						final char digit = consumeHexDigit();
+						sequence.append(digit);
+						result += Character.digit(digit, 16);
 					}
 
-					if (consume() != '}') throw new SyntaxError("Invalid Unicode escape sequence");
+					char last = consume();
+					sequence.append(last);
+					if (last != '}')
+						throw new SyntaxError("Invalid Unicode escape sequence '" + sequence + "' (" + position() + ")");
 					this.builder.append((char) result);
 				} else {
 					int result = 0;
@@ -395,10 +402,13 @@ public final class Lexer {
 				}
 			}
 
-			case 'x' -> consumeThenAppend((char) (
-				Character.digit(consumeHexDigit(), 16) * 16 +
-				Character.digit(consumeHexDigit(), 16)
-			));
+			case 'x' -> {
+				consume();
+				builder.append((char) (
+					Character.digit(consumeHexDigit(), 16) * 16 +
+					Character.digit(consumeHexDigit(), 16)
+				));
+			}
 
 			default -> collect();
 		}
@@ -411,7 +421,7 @@ public final class Lexer {
 	private char consumeHexDigit() throws SyntaxError {
 		final char c = consume();
 		if ((c < 'a' || c > 'f') && (c < 'A' || c > 'F') && (c < '0' || c > '9'))
-			throw new SyntaxError("Invalid Unicode escape sequence");
+			throw new SyntaxError("Invalid Unicode escape sequence (invalid character '" + c + "') (" + position() + ")");
 		return c;
 	}
 

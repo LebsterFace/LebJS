@@ -740,6 +740,9 @@ public final class Parser {
 		}
 
 		return switch (state.currentToken.type) {
+			case Await -> throw new ParserNotImplemented(position(), "Parsing `await` expressions");
+			case Slash -> throw new ParserNotImplemented(position(), "Parsing RegExp literals");
+
 			case LParen -> {
 				state.consume();
 				if (state.currentToken.type == TokenType.RParen || state.currentToken.type == TokenType.Identifier) {
@@ -778,8 +781,6 @@ public final class Parser {
 				state.consume();
 				yield new BooleanLiteral(BooleanValue.FALSE);
 			}
-
-			case Await -> throw new ParserNotImplemented(position(), "Parsing `await` expressions");
 
 			case Function -> parseFunctionExpression();
 			case LBracket -> parseArrayExpression();
@@ -1013,6 +1014,7 @@ public final class Parser {
 			   t == TokenType.LBracket ||
 			   t == TokenType.LBrace ||
 			   t == TokenType.This ||
+			   t == TokenType.Slash ||
 			   t == TokenType.Null ||
 			   t == TokenType.New ||
 			   t == TokenType.Infinity ||

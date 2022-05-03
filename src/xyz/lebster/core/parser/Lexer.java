@@ -146,6 +146,22 @@ public final class Lexer {
 		return c >= '0' && c <= '9';
 	}
 
+	private boolean isDigit(char digit, int radix) {
+		if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX) {
+			return false;
+		}
+
+		if (digit >= '0' && digit <= '9') {
+			return digit - '0' < radix;
+		} else if (digit >= 'A' && digit <= 'Z') {
+			return digit - 'A' + 10 < radix;
+		} else if (digit >= 'a' && digit <= 'z') {
+			return digit - 'a' + 10 < radix;
+		} else {
+			return false;
+		}
+	}
+
 	private boolean isAlphabetical(char c) {
 		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 	}
@@ -332,8 +348,11 @@ public final class Lexer {
 			consume();
 			return new Token(TokenType.StringLiteral, builder.toString(), position());
 		} else if (isDigit(currentChar)) {
-			int decimalPos = -1;
+			if (accept("0x")) return numericLiteralRadix(16, "Hexadecimal");
+			if (accept("0b")) return numericLiteralRadix(2, "Binary");
+			if (accept("0o")) return numericLiteralRadix(8, "Octal");
 
+			int decimalPos = -1;
 			while (isDigit(currentChar) || (currentChar == '.' && decimalPos == -1)) {
 				if (currentChar == '.') decimalPos = index;
 				collect();
@@ -352,6 +371,25 @@ public final class Lexer {
 
 			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "' (" + position() + ")"));
 		}
+	}
+
+	private Token numericLiteralRadix(int radix, String name) throws SyntaxError {
+		long result = 0;
+		boolean isEmpty = true;
+		while (isDigit(currentChar) || isAlphabetical(currentChar)) {
+			if (!isDigit(currentChar, radix)) {
+				throw new SyntaxError("Invalid digit '%s' in %s numeric literal (%s)".formatted(currentChar, name.toLowerCase(), position()));
+			}
+
+			isEmpty = false;
+			int digit = Character.digit(consume(), radix);
+			result *= radix;
+			result -= digit;
+
+		}
+
+		if (isEmpty) throw new SyntaxError(name + " numeric literal requires at least one digit");
+		return new Token(TokenType.NumericLiteral, Long.toString(-result), position());
 	}
 
 	private void consumeTerminator() {

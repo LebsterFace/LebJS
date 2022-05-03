@@ -643,6 +643,7 @@ public final class Parser {
 
 			final Associativity newAssoc = associativityForTokenType(state.currentToken.type);
 			latestExpr = parseSecondaryExpression(latestExpr, newPrecedence, newAssoc);
+			consumeAllLineTerminators();
 		}
 
 		return latestExpr;
@@ -657,7 +658,6 @@ public final class Parser {
 	}
 
 	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws SyntaxError, CannotParse {
-		consumeAllLineTerminators();
 		final Token token = state.consume();
 		consumeAllLineTerminators();
 

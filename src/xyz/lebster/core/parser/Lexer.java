@@ -297,6 +297,7 @@ public final class Lexer {
 			}
 		}
 
+		if (isFinished()) return null;
 
 		if (isTerminator()) {
 			while (isTerminator()) consume();
@@ -429,7 +430,10 @@ public final class Lexer {
 		if (accept("//")) {
 			while (!isTerminator()) consume();
 		} else if (accept("/*")) {
-			while (!accept("*/")) consume();
+			while (!isFinished()) {
+				if (accept("*/")) break;
+				consume();
+			}
 		}
 	}
 
@@ -439,6 +443,7 @@ public final class Lexer {
 
 		while (!isFinished()) {
 			final Token token = next();
+			if (token == null) break;
 			if (token.type == TokenType.LineTerminator) {
 				if (lastWasTerminator) {
 					continue;

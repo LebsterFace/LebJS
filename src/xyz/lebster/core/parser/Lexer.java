@@ -10,6 +10,7 @@ public final class Lexer {
 	private static final List<HashMap<String, TokenType>> symbols = new ArrayList<>();
 
 	static {
+		keywords.put("async", TokenType.Async);
 		keywords.put("await", TokenType.Await);
 		keywords.put("break", TokenType.Break);
 		keywords.put("case", TokenType.Case);

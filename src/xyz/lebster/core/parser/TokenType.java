@@ -1,7 +1,7 @@
 package xyz.lebster.core.parser;
 
 public enum TokenType {
-	Ampersand, AmpersandEquals, Arrow, At, Await, Backslash, Bang, Break, Caret, CaretEquals,
+	Ampersand, AmpersandEquals, Arrow, At, Async, Await, Backslash, Bang, Break, Caret, CaretEquals,
 	Case, Catch, Class, Colon, Comma, Const, Continue, Debugger, Default, Delete, DivideEquals,
 	Do, DotDotDot, EOF, Else, Enum, Equals, Exponent, ExponentEquals, Export, Extends, False,
 	Finally, For, Function, GreaterThan, GreaterThanEqual, Hashtag, Identifier, If, Import, In,

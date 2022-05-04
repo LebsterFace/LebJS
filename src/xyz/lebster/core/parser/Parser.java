@@ -773,6 +773,7 @@ public final class Parser {
 
 		return switch (state.currentToken.type) {
 			case Await -> throw new ParserNotImplemented(position(), "Parsing `await` expressions");
+			case Async -> throw new ParserNotImplemented(position(), "Parsing `async` functions");
 			case Slash -> throw new ParserNotImplemented(position(), "Parsing RegExp literals");
 			case Class -> throw new ParserNotImplemented(position(), "Parsing class expressions");
 
@@ -964,6 +965,7 @@ public final class Parser {
 		final TokenType t = state.currentToken.type;
 		return t == TokenType.Let ||
 			   t == TokenType.Identifier ||
+			   t == TokenType.Async ||
 			   t == TokenType.Await ||
 			   t == TokenType.Break ||
 			   t == TokenType.Case ||
@@ -1039,6 +1041,7 @@ public final class Parser {
 	private boolean matchPrimaryExpression() {
 		final TokenType t = state.currentToken.type;
 		return t == TokenType.LParen ||
+			   t == TokenType.Async ||
 			   t == TokenType.TemplateStart ||
 			   t == TokenType.Identifier ||
 			   t == TokenType.StringLiteral ||

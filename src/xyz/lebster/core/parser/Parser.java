@@ -915,7 +915,7 @@ public final class Parser {
 		// 		- Getters / Setters { get a() { return Math.random() } }
 		while (state.currentToken.type != TokenType.RBrace) {
 			if (state.accept(TokenType.DotDotDot) != null) {
-				result.spreadEntry(parseExpression());
+				result.spreadEntry(parseExpression(1, Left));
 				consumeAllLineTerminators();
 				if (state.accept(TokenType.Comma) == null) break;
 				consumeAllLineTerminators();

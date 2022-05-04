@@ -777,7 +777,7 @@ public final class Parser {
 
 			case LParen -> {
 				state.consume();
-				if (state.currentToken.type == TokenType.RParen || state.currentToken.type == TokenType.Identifier) {
+				if (state.is(TokenType.RParen, TokenType.Identifier, TokenType.DotDotDot, TokenType.RBrace, TokenType.LBracket)) {
 					final ArrowFunctionExpression result = tryParseArrowFunctionExpression();
 					if (result != null) yield result;
 				}
@@ -870,17 +870,19 @@ public final class Parser {
 
 		final String[] arguments = parseStringList();
 		this.FAIL_FOR_UNSUPPORTED_ARG();
-		if (state.currentToken.type != TokenType.RParen) {
+		if (state.currentToken.type == TokenType.RParen) {
+			state.consume();
+		} else {
 			load();
 			return null;
 		}
 
-		state.consume();
 		if (state.accept(TokenType.Arrow) == null) {
 			load();
 			return null;
 		}
 
+		consumeAllLineTerminators();
 		final ArrowFunctionExpression result = parseArrowFunctionBody(arguments);
 		if (result == null) {
 			load();

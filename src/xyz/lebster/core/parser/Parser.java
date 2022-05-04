@@ -24,6 +24,7 @@ import java.util.*;
 
 import static xyz.lebster.core.parser.Associativity.Left;
 import static xyz.lebster.core.parser.Associativity.Right;
+import static xyz.lebster.core.node.expression.AssignmentExpression.AssignmentOp;
 
 public final class Parser {
 	private final String sourceText;
@@ -703,12 +704,22 @@ public final class Parser {
 			case LogicalAnd -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
 			case NullishCoalescing -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Coalesce);
 
-			case PlusEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.PlusAssign);
-			case MinusEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MinusAssign);
-			case MultiplyEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.MultiplyAssign);
-			case DivideEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.DivideAssign);
-			case ExponentEquals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.ExponentAssign);
-			case Equals -> new AssignmentExpression(ensureLHS(left, AssignmentExpression.invalidLHS), parseExpression(minPrecedence, assoc), AssignmentExpression.AssignmentOp.Assign);
+			case Equals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.Assign);
+			case LogicalAndEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.LogicalAndAssign);
+			case LogicalOrEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.LogicalOrAssign);
+			case NullishCoalescingEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.NullishCoalesceAssign);
+			case MultiplyEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.MultiplyAssign);
+			case DivideEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.DivideAssign);
+			case PercentEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.RemainderAssign);
+			case PlusEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.PlusAssign);
+			case MinusEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.MinusAssign);
+			case LeftShiftEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.LeftShiftAssign);
+			case RightShiftEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.RightShiftAssign);
+			case UnsignedRightShiftEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.UnsignedRightShiftAssign);
+			case AmpersandEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.BitwiseAndAssign);
+			case CaretEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.BitwiseExclusiveOrAssign);
+			case PipeEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.BitwiseOrAssign);
+			case ExponentEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.ExponentAssign);
 
 			case MinusMinus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), UpdateExpression.UpdateOp.PostDecrement);
 			case PlusPlus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), UpdateExpression.UpdateOp.PostIncrement);
@@ -738,6 +749,12 @@ public final class Parser {
 
 			default -> throw new CannotParse(token, "SecondaryExpression");
 		};
+	}
+
+	private Expression parseAssignmentExpression(Expression left_expr, int minPrecedence, Associativity assoc, AssignmentOp op) throws SyntaxError, CannotParse {
+		final LeftHandSideExpression left = ensureLHS(left_expr, AssignmentExpression.invalidLHS);
+		final Expression right = parseExpression(minPrecedence, assoc);
+		return new AssignmentExpression(left, right, op);
 	}
 
 	private Expression parseConditionalExpression(Expression test) throws CannotParse, SyntaxError {
@@ -1047,40 +1064,49 @@ public final class Parser {
 			   t == TokenType.Star ||
 			   t == TokenType.Slash ||
 			   t == TokenType.Percent ||
+			   t == TokenType.Exponent ||
+			   t == TokenType.Pipe ||
+			   t == TokenType.Ampersand ||
+			   t == TokenType.Caret ||
 			   t == TokenType.LeftShift ||
 			   t == TokenType.RightShift ||
 			   t == TokenType.UnsignedRightShift ||
-			   t == TokenType.Caret ||
 			   t == TokenType.QuestionMark ||
-			   t == TokenType.Comma ||
-			   t == TokenType.Exponent ||
+			   t == TokenType.LParen ||
 			   t == TokenType.StrictEqual ||
-			   t == TokenType.StrictNotEqual ||
 			   t == TokenType.LooseEqual ||
+			   t == TokenType.StrictNotEqual ||
 			   t == TokenType.NotEqual ||
 			   t == TokenType.LogicalOr ||
 			   t == TokenType.LogicalAnd ||
-			   t == TokenType.Period ||
+			   t == TokenType.NullishCoalescing ||
+			   t == TokenType.Equals ||
+			   t == TokenType.LogicalAndEquals ||
+			   t == TokenType.LogicalOrEquals ||
+			   t == TokenType.NullishCoalescingEquals ||
+			   t == TokenType.MultiplyEquals ||
+			   t == TokenType.DivideEquals ||
+			   t == TokenType.PercentEquals ||
+			   t == TokenType.PlusEquals ||
+			   t == TokenType.MinusEquals ||
+			   t == TokenType.LeftShiftEquals ||
+			   t == TokenType.RightShiftEquals ||
+			   t == TokenType.UnsignedRightShiftEquals ||
+			   t == TokenType.AmpersandEquals ||
+			   t == TokenType.CaretEquals ||
+			   t == TokenType.PipeEquals ||
+			   t == TokenType.ExponentEquals ||
+			   t == TokenType.MinusMinus ||
+			   t == TokenType.PlusPlus ||
 			   t == TokenType.LessThan ||
 			   t == TokenType.LessThanEqual ||
 			   t == TokenType.GreaterThan ||
 			   t == TokenType.GreaterThanEqual ||
-			   t == TokenType.PlusEquals ||
-			   t == TokenType.MinusEquals ||
-			   t == TokenType.DivideEquals ||
-			   t == TokenType.MultiplyEquals ||
-			   t == TokenType.LeftShiftEquals ||
-			   t == TokenType.RightShiftEquals ||
-			   t == TokenType.NullishCoalescing ||
 			   t == TokenType.In ||
-			   t == TokenType.Pipe ||
-			   t == TokenType.Ampersand ||
 			   t == TokenType.Instanceof ||
+			   t == TokenType.Period ||
 			   t == TokenType.LBracket ||
-			   t == TokenType.LParen ||
-			   t == TokenType.Equals ||
-			   t == TokenType.PlusPlus ||
-			   t == TokenType.MinusMinus;
+			   t == TokenType.Comma;
 	}
 
 	private boolean matchPrefixedUpdateExpression() {

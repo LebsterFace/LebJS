@@ -26,21 +26,17 @@ public record AssignmentExpression(LeftHandSideExpression left, Expression right
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Reference left_reference = left.toReference(interpreter);
 
-		return switch (op) {
-			case Assign -> {
-				final Value<?> right_value = right.execute(interpreter);
-				left_reference.putValue(interpreter, right_value);
-				yield right_value;
-			}
+		if (op == AssignmentOp.Assign) {
+			final Value<?> right_value = right.execute(interpreter);
+			left_reference.putValue(interpreter, right_value);
+			return right_value;
+		}
 
-			default -> {
-				final Value<?> left_value = left.execute(interpreter);
-				final Value<?> right_value = right.execute(interpreter);
-				final Value<?> result = BinaryExpression.applyOperator(interpreter, left_value, lookupBinaryOp(op), right_value);
-				left_reference.putValue(interpreter, result);
-				yield result;
-			}
-		};
+		final Value<?> left_value = left.execute(interpreter);
+		final Value<?> right_value = right.execute(interpreter);
+		final Value<?> result = BinaryExpression.applyOperator(interpreter, left_value, lookupBinaryOp(op), right_value);
+		left_reference.putValue(interpreter, result);
+		return result;
 	}
 
 	@Override

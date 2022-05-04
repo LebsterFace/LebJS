@@ -294,13 +294,13 @@ public final class Parser {
 	}
 
 	private ContinueStatement parseContinueStatement() throws SyntaxError {
-		if (!state.inContinueContext) throw new SyntaxError("Illegal `continue` statement");
+		if (!state.inContinueContext) throw new SyntaxError("Illegal `continue` statement", position());
 		state.consume();
 		return new ContinueStatement();
 	}
 
 	private BreakStatement parseBreakStatement() throws SyntaxError {
-		if (!state.inBreakContext) throw new SyntaxError("Illegal `break` statement");
+		if (!state.inBreakContext) throw new SyntaxError("Illegal `break` statement", position());
 		state.consume();
 		return new BreakStatement();
 	}
@@ -334,9 +334,9 @@ public final class Parser {
 	private ForOfStatement parseForOfStatement(VariableDeclaration declaration) throws SyntaxError, CannotParse {
 		// for ( LetOrConst ForBinding of AssignmentExpression ) Statement
 		if (declaration.declarations().length != 1)
-			throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.");
+			throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.", position());
 		final VariableDeclarator declarator = declaration.declarations()[0];
-		if (declarator.init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.");
+		if (declarator.init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
 		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), declarator.identifier());
 
 		state.require(TokenType.Identifier, "of");
@@ -359,9 +359,9 @@ public final class Parser {
 	private ForInStatement parseForInStatement(VariableDeclaration declaration) throws SyntaxError, CannotParse {
 		// for ( LetOrConst ForBinding in Expression ) Statement
 		if (declaration.declarations().length != 1)
-			throw new SyntaxError("Invalid left-hand side in for-in loop: Must have a single binding.");
+			throw new SyntaxError("Invalid left-hand side in for-in loop: Must have a single binding.", position());
 		final VariableDeclarator declarator = declaration.declarations()[0];
-		if (declarator.init() != null) throw new SyntaxError("for-in loop variable declaration may not have an init.");
+		if (declarator.init() != null) throw new SyntaxError("for-in loop variable declaration may not have an init.", position());
 		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), declarator.identifier());
 
 		state.require(TokenType.In);
@@ -551,7 +551,7 @@ public final class Parser {
 		state.require(TokenType.Function);
 		consumeAllLineTerminators();
 		if (state.currentToken.type != TokenType.Identifier) {
-			throw new SyntaxError("Function declarations require a function name");
+			throw new SyntaxError("Function declarations require a function name", position());
 		}
 
 		final String name = state.consume().value;
@@ -635,10 +635,6 @@ public final class Parser {
 		return new UpdateExpression(ensureLHS(parseExpression(minPrecedence, assoc), UpdateExpression.invalidPreLHS), op);
 	}
 
-	private Expression parseExpression(Set<TokenType> forbidden) throws SyntaxError, CannotParse {
-		return parseExpression(0, Left, forbidden);
-	}
-
 	private Expression parseExpression() throws SyntaxError, CannotParse {
 		return parseExpression(0, Left, new HashSet<>());
 	}
@@ -669,7 +665,7 @@ public final class Parser {
 		if (expression instanceof final LeftHandSideExpression leftHandSideExpression) {
 			return leftHandSideExpression;
 		} else {
-			throw new SyntaxError(failureMessage);
+			throw new SyntaxError(failureMessage, position());
 		}
 	}
 

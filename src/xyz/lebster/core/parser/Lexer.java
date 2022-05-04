@@ -282,7 +282,7 @@ public final class Lexer {
 			return new Token(TokenType.TemplateExpressionEnd, position());
 		} else if (inTemplateLiteral && !templateLiteralStates.getFirst().inExpression) {
 			if (isFinished()) {
-				throw new SyntaxError("Unterminated template literal (" + position() + ")");
+				throw new SyntaxError("Unterminated template literal", position());
 			} else if (accept("${")) {
 				templateLiteralStates.getFirst().inExpression = true;
 				return new Token(TokenType.TemplateExpressionStart, position());
@@ -307,7 +307,7 @@ public final class Lexer {
 					}
 				}
 				if (isFinished() && !templateLiteralStates.isEmpty()) {
-					throw new SyntaxError("Unterminated template literal (" + position() + ")");
+					throw new SyntaxError("Unterminated template literal", position());
 				} else {
 					return new Token(TokenType.TemplateSpan, builder.toString(), position());
 				}
@@ -331,7 +331,7 @@ public final class Lexer {
 			boolean escaped = false;
 			while (true) {
 				if (isFinished())
-					throw new SyntaxError("Unterminated string literal (" + position() + ")");
+					throw new SyntaxError("Unterminated string literal", position());
 
 				if (escaped) {
 					escaped = false;
@@ -370,7 +370,7 @@ public final class Lexer {
 				}
 			}
 
-			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "' (" + position() + ")"));
+			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "'"), position());
 		}
 	}
 
@@ -379,7 +379,7 @@ public final class Lexer {
 		boolean isEmpty = true;
 		while (isDigit(currentChar) || isAlphabetical(currentChar)) {
 			if (!isDigit(currentChar, radix)) {
-				throw new SyntaxError("Invalid digit '%s' in %s numeric literal (%s)".formatted(currentChar, name.toLowerCase(), position()));
+				throw new SyntaxError("Invalid digit '" + currentChar + "' in " + name.toLowerCase() + " numeric literal", position());
 			}
 
 			isEmpty = false;
@@ -389,7 +389,7 @@ public final class Lexer {
 
 		}
 
-		if (isEmpty) throw new SyntaxError(name + " numeric literal requires at least one digit");
+		if (isEmpty) throw new SyntaxError(name + " numeric literal requires at least one digit", position());
 		return new Token(TokenType.NumericLiteral, Long.toString(-result), position());
 	}
 
@@ -417,7 +417,7 @@ public final class Lexer {
 				if (this.currentChar == '{') {
 					consume();
 					if (this.currentChar == '}')
-						throw new SyntaxError("Invalid unicode escape sequence: No digits (" + position() + ")");
+						throw new SyntaxError("Invalid unicode escape sequence: No digits", position());
 					int result = 0;
 					final StringBuilder sequence = new StringBuilder();
 					for (int i = 0; i < 6 && this.currentChar != '}'; i++) {
@@ -430,7 +430,7 @@ public final class Lexer {
 					char last = consume();
 					sequence.append(last);
 					if (last != '}')
-						throw new SyntaxError("Invalid Unicode escape sequence '" + sequence + "' (" + position() + ")");
+						throw new SyntaxError("Invalid Unicode escape sequence '" + sequence + "'", position());
 					this.builder.append((char) result);
 				} else {
 					int result = 0;
@@ -461,7 +461,7 @@ public final class Lexer {
 	private char consumeHexDigit() throws SyntaxError {
 		final char c = consume();
 		if ((c < 'a' || c > 'f') && (c < 'A' || c > 'F') && (c < '0' || c > '9'))
-			throw new SyntaxError("Invalid Unicode escape sequence (invalid character '" + c + "') (" + position() + ")");
+			throw new SyntaxError("Invalid Unicode escape sequence (invalid character '" + c + "')", position());
 		return c;
 	}
 

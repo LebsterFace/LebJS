@@ -20,15 +20,15 @@ public final class ParserState {
 	}
 
 	public void expected(TokenType type) throws SyntaxError {
-		throw new SyntaxError("Unexpected token " + currentToken + ". Expected " + type + " (" + currentToken.position + ")");
+		throw new SyntaxError("Unexpected token %s. Expected %s".formatted(currentToken, type), currentToken.position);
 	}
 
 	public void expected(String value) throws SyntaxError {
-		throw new SyntaxError("Unexpected token " + currentToken + ". Expected '" + value + "' (" + currentToken.position + ")");
+		throw new SyntaxError("Unexpected token %s. Expected '%s'".formatted(currentToken, value), currentToken.position);
 	}
 
 	public void unexpected() throws SyntaxError {
-		throw new SyntaxError("Unexpected token " + currentToken + " (" + currentToken.position + ")");
+		throw new SyntaxError("Unexpected token " + currentToken, currentToken.position);
 	}
 
 	Token consume() {

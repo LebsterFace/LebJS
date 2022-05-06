@@ -32,6 +32,7 @@ public final class ArrayPrototype extends ObjectValue {
 		instance.putMethod(Names.join, ArrayPrototype::join);
 		instance.putMethod(Names.toString, ArrayPrototype::toStringMethod);
 		instance.putMethod(Names.forEach, ArrayPrototype::forEach);
+		instance.putMethod(Names.reverse, ArrayPrototype::reverse);
 
 		final var values = new NativeFunction(Names.values, ArrayPrototype::values);
 		instance.put(Names.values, values);
@@ -286,6 +287,77 @@ public final class ArrayPrototype extends ObjectValue {
 
 		// 10. Return accumulator.
 		return accumulator;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reverse")
+	// TODO: Non-mutating Array.prototype.reverse*d*
+	private static ObjectValue reverse(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.24 Array.prototype.reverse ( )
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(O, interpreter);
+		// 3. Let middle be floor(len / 2).
+		final long middle = Math.floorDiv(len, 2);
+		// 4. Let lower be 0.
+		int lower = 0;
+		// 5. Repeat, while lower ≠ middle,
+		while (lower != middle) {
+			// a. Let upper be len - lower - 1.
+			final long upper = len - lower - 1;
+			// b. Let upperP be ! ToString(𝔽(upper)).
+			final StringValue upperP = new StringValue(upper);
+			// c. Let lowerP be ! ToString(𝔽(lower)).
+			final StringValue lowerP = new StringValue(lower);
+			// d. Let lowerExists be ? HasProperty(O, lowerP).
+			final boolean lowerExists = O.hasProperty(lowerP);
+			// e. If lowerExists is true, then
+			Value<?> lowerValue = Undefined.instance;
+			if (lowerExists) {
+				// i. Let lowerValue be ? Get(O, lowerP).
+				lowerValue = O.get(interpreter, lowerP);
+			}
+
+			// f. Let upperExists be ? HasProperty(O, upperP).
+			boolean upperExists = O.hasProperty(upperP);
+			// g. If upperExists is true, then
+			Value<?> upperValue = Undefined.instance;
+			if (upperExists) {
+				// i. Let upperValue be ? Get(O, upperP).
+				upperValue = O.get(interpreter, upperP);
+			}
+
+			// h. If lowerExists is true and upperExists is true, then
+			if (lowerExists && upperExists) {
+				// i. Perform ? Set(O, lowerP, upperValue, true).
+				O.set(interpreter, lowerP, upperValue /* FIXME: true */);
+				// ii. Perform ? Set(O, upperP, lowerValue, true).
+				O.set(interpreter, upperP, lowerValue /* FIXME: true */);
+			}
+			// i. Else if lowerExists is false and upperExists is true, then
+			else if (!lowerExists && upperExists) {
+				// i. Perform ? Set(O, lowerP, upperValue, true).
+				O.set(interpreter, lowerP, upperValue /* FIXME: true */);
+				// ii. Perform ? DeletePropertyOrThrow(O, upperP).
+				O.deletePropertyOrThrow(interpreter, upperP);
+
+			}
+			// j. Else if lowerExists is true and upperExists is false, then
+			else if (lowerExists && !upperExists) {
+				// i. Perform ? DeletePropertyOrThrow(O, lowerP).
+				O.deletePropertyOrThrow(interpreter, lowerP);
+				// ii. Perform ? Set(O, upperP, lowerValue, true).
+				O.set(interpreter, upperP, lowerValue /* FIXME: true */);
+			}
+			// k. Else,
+			// i. Assert: lowerExists and upperExists are both false.
+			// ii. No action is required.
+			// l. Set lower to lower + 1.
+			lower = lower + 1;
+		}
+
+		// 6. Return O.
+		return O;
 	}
 
 	private static class ArrayIterator extends ObjectValue {

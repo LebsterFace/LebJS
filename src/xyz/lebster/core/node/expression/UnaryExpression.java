@@ -1,6 +1,7 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.DumpBuilder;
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -8,6 +9,8 @@ import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 
@@ -42,10 +45,22 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 				yield Undefined.instance;
 			}
 
-			case Delete -> throw new NotImplemented("The `delete` operator");
+			case Delete -> deleteOperator(interpreter, expression);
+
 			case BitwiseNot -> throw new NotImplemented("The `~` operator");
 			case Await -> throw new NotImplemented("The `await` operator");
 		};
+	}
+
+	@NonCompliant
+	private BooleanValue deleteOperator(Interpreter interpreter, Expression expression) throws AbruptCompletion {
+		if (!(expression instanceof final MemberExpression memberExpression)) {
+			return BooleanValue.TRUE;
+		}
+
+		final ObjectValue obj = memberExpression.base().execute(interpreter).toObjectValue(interpreter);
+		final Value<?> propertyName = memberExpression.property().execute(interpreter);
+		return BooleanValue.of(obj.delete(propertyName.toPropertyKey(interpreter)));
 	}
 
 	@Override

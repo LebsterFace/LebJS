@@ -272,6 +272,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	}
 
 	@NonCompliant
+	// FIXME: `boolean throw` argument
 	public void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
 		final PropertyDescriptor property = this.getProperty(key);
 		if (property == null) {
@@ -323,6 +324,44 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		}
 
 		return property.get(interpreter, this);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-deletepropertyorthrow")
+	public final void deletePropertyOrThrow(Interpreter interpreter, ObjectValue.Key<?> P) throws AbruptCompletion {
+		// 7.3.10 DeletePropertyOrThrow ( O, P )
+		// 1. Let success be ? O.[[Delete]](P).
+		boolean success = this.delete(P);
+		// 2. If success is false, throw a TypeError exception.
+		if (!success) {
+			throw AbruptCompletion.error(new TypeError("Cannot assign to read only property '" + P.toDisplayString() + "' of object"));
+		}
+		// 3. Return unused.
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarydelete")
+	private boolean ordinaryDelete(ObjectValue.Key<?> P) {
+		// 10.1.10.1 OrdinaryDelete ( O, P )
+		// 1. Let desc be ? O.[[GetOwnProperty]](P).
+		final PropertyDescriptor desc = this.getOwnProperty(P);
+		// 2. If desc is undefined, return true.
+		if (desc == null) return true;
+		// 3. If desc.[[Configurable]] is true, then
+		if (desc.isConfigurable()) {
+			// a. Remove the own property with name P from O.
+			this.value.remove(P);
+			// b. Return true.
+			return true;
+		}
+
+		// 4. Return false.
+		return false;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinary-object-internal-methods-and-internal-slots-delete-p")
+	public boolean delete(ObjectValue.Key<?> P) {
+		// 10.1.10 [[Delete]] ( P )
+		// 1. Return ? OrdinaryDelete(O, P).
+		return this.ordinaryDelete(P);
 	}
 
 	public void put(Key<?> key, Value<?> value) {

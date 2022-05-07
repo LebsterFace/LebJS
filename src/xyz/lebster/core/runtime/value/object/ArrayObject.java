@@ -14,6 +14,7 @@ import xyz.lebster.core.runtime.value.object.property.DataDescriptor;
 import xyz.lebster.core.runtime.value.object.property.NativeAccessorDescriptor;
 import xyz.lebster.core.runtime.value.object.property.PropertyDescriptor;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
+import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 
@@ -64,6 +65,19 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		if (fromMap != null) return fromMap;
 		final int index = key.toIndex();
 		return index != -1 && index < arrayValues.size() ? arrayValues.get(index) : null;
+	}
+
+	@Override
+	public ArrayList<Map.Entry<Key<?>, PropertyDescriptor>> entries() {
+		final ArrayList<Map.Entry<Key<?>, PropertyDescriptor>> result = new ArrayList<>();
+
+		for (int i = 0; i < arrayValues.size(); i++) {
+			PropertyDescriptor arrayValue = arrayValues.get(i);
+			result.add(Map.entry(new StringValue(i), arrayValue));
+		}
+
+		result.addAll(value.entrySet());
+		return result;
 	}
 
 	@Override

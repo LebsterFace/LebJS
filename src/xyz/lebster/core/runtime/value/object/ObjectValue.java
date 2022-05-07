@@ -230,11 +230,10 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	}
 
 	public final boolean hasProperty(Key<?> name) {
-		if (this.hasOwnProperty(name)) return true;
 		ObjectValue object = this;
 
 		while (object != null) {
-			if (object.value.containsKey(name)) {
+			if (object.hasOwnProperty(name)) {
 				// Property was found
 				return true;
 			} else {

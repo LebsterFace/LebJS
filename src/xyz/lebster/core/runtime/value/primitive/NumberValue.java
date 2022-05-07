@@ -6,6 +6,7 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.NumberWrapper;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 
@@ -17,6 +18,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;
 	public static final long POSITIVE_ZERO_BITS = 0;
 	public static final NumberValue NaN = new NumberValue(Double.NaN);
+	public static final Value<?> ZERO = new NumberValue(0.0D);
 
 	public NumberValue(double num) {
 		super(num);

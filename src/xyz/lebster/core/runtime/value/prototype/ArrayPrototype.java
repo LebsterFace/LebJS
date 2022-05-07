@@ -33,6 +33,7 @@ public final class ArrayPrototype extends ObjectValue {
 		instance.putMethod(Names.toString, ArrayPrototype::toStringMethod);
 		instance.putMethod(Names.forEach, ArrayPrototype::forEach);
 		instance.putMethod(Names.reverse, ArrayPrototype::reverse);
+		instance.putMethod(Names.pop, ArrayPrototype::pop);
 
 		final var values = new NativeFunction(Names.values, ArrayPrototype::values);
 		instance.put(Names.values, values);
@@ -40,6 +41,39 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	private ArrayPrototype() {
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.pop")
+	private static Value<?> pop(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.20 Array.prototype.pop ( )
+
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(O, interpreter);
+		// 3. If len = 0, then
+		if (len == 0) {
+			// a. Perform ? Set(O, "length", +0𝔽, true).
+			O.set(interpreter, Names.length, NumberValue.ZERO);
+			// b. Return undefined.
+			return Undefined.instance;
+		}
+		// 4. Else,
+		else {
+			// a. Assert: len > 0.
+			// b. Let newLen be 𝔽(len - 1).
+			final long newLen = len - 1;
+			// c. Let index be ! ToString(newLen).
+			final StringValue index = new StringValue(newLen);
+			// d. Let element be ? Get(O, index).
+			final Value<?> element = O.get(interpreter, index);
+			// e. Perform ? DeletePropertyOrThrow(O, index).
+			O.deletePropertyOrThrow(interpreter, index);
+			// f. Perform ? Set(O, "length", newLen, true).
+			O.set(interpreter, Names.length, new NumberValue(newLen));
+			// g. Return element.
+			return element;
+		}
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.filter")

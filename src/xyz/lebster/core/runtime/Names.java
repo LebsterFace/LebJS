@@ -52,6 +52,7 @@ public final class Names {
 	public static final StringValue padStart = new StringValue("padStart");
 	public static final StringValue parseFloat = new StringValue("parseFloat");
 	public static final StringValue parseInt = new StringValue("parseInt");
+	public static final StringValue pop = new StringValue("pop");
 	public static final StringValue prototype = new StringValue("prototype");
 	public static final StringValue push = new StringValue("push");
 	public static final StringValue random = new StringValue("random");

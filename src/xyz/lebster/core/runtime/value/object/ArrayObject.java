@@ -47,7 +47,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 				if (newLen > arrayValues.size()) {
 					final int delta = newLen - arrayValues.size();
 					for (int i = 0; i < delta; i++)
-						arrayValues.add(new DataDescriptor(Undefined.instance, true, true, true));
+						arrayValues.add(null);
 				} else {
 					arrayValues.subList(newLen, arrayValues.size()).clear();
 				}
@@ -82,9 +82,9 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 	@Override
 	public boolean hasOwnProperty(Key<?> key) {
-		if (this.value.containsKey(key)) return true;
+		if (super.hasOwnProperty(key)) return true;
 		final int index = key.toIndex();
-		return index != -1 && index < arrayValues.size();
+		return index != -1 && index < arrayValues.size() && arrayValues.get(index) != null;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array-exotic-objects-defineownproperty-p-desc")
@@ -154,7 +154,11 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 		while (iterator.hasNext()) {
 			if (!singleLine) representation.appendIndent();
-			iterator.next().display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
+			PropertyDescriptor next = iterator.next();
+			if (next != null) {
+				next.display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
+			}
+
 			if (iterator.hasNext() || mapIterator.hasNext()) representation.append(',');
 			if (singleLine) representation.append(' ');
 			else representation.appendLine();

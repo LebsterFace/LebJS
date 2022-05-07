@@ -1,12 +1,14 @@
 package xyz.lebster.core.runtime.value.object;
 
-import xyz.lebster.core.DumpBuilder;
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
+
+import java.util.Arrays;
 
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
@@ -60,9 +62,15 @@ public final class TestObject extends ObjectValue {
 	}
 
 	private static void assertionFailed(Value<?> expected, Value<?> received) {
-		DumpBuilder.begin(0)
-			.value("Expected", expected)
-			.value("Received", received);
+		System.out.println(
+			ANSI.BRIGHT_MAGENTA + "Expected: " +
+			ANSI.CYAN + expected.getClass().getSimpleName() + " " +
+			ANSI.RESET + expected.toDisplayString() + ANSI.RESET +
+			"\n" +
+			ANSI.BRIGHT_MAGENTA + "Received: " +
+			ANSI.CYAN + received.getClass().getSimpleName() + " " +
+			ANSI.RESET + received.toDisplayString() + ANSI.RESET
+		);
 
 		throw new ShouldNotHappen("Assertion failed.");
 	}

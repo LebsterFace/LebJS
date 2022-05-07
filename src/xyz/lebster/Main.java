@@ -23,6 +23,8 @@ import java.nio.file.Path;
 import java.util.Scanner;
 
 public final class Main {
+	private static final Charset[] supportedCharsets = { StandardCharsets.UTF_8, StandardCharsets.UTF_16 };
+
 	public static void main(String[] args) {
 		CLArguments arguments;
 		try {
@@ -62,8 +64,6 @@ public final class Main {
 			System.out.print("#[END-OF-OUTPUT]#");
 		}
 	}
-
-	private static final Charset[] supportedCharsets = { StandardCharsets.UTF_8, StandardCharsets.UTF_16 };
 
 	public static String readFile(Path path) {
 		for (final Charset charset : supportedCharsets) {

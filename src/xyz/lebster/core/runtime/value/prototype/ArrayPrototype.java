@@ -319,7 +319,7 @@ public final class ArrayPrototype extends ObjectValue {
 			}
 
 			// f. Let upperExists be ? HasProperty(O, upperP).
-			boolean upperExists = O.hasProperty(upperP);
+			final boolean upperExists = O.hasProperty(upperP);
 			// g. If upperExists is true, then
 			Value<?> upperValue = Undefined.instance;
 			if (upperExists) {

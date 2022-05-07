@@ -22,9 +22,9 @@ import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 import java.util.*;
 
+import static xyz.lebster.core.node.expression.AssignmentExpression.AssignmentOp;
 import static xyz.lebster.core.parser.Associativity.Left;
 import static xyz.lebster.core.parser.Associativity.Right;
-import static xyz.lebster.core.node.expression.AssignmentExpression.AssignmentOp;
 
 public final class Parser {
 	private final String sourceText;

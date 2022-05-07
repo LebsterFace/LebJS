@@ -9,7 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
 
 public final class Testing {
 	private static final ByteArrayOutputStream passedOutput = new ByteArrayOutputStream();

@@ -225,6 +225,11 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return this.value.containsKey(key);
 	}
 
+	public final boolean hasOwnEnumerableProperty(Key<?> key) {
+		final PropertyDescriptor ownProperty = this.getOwnProperty(key);
+		return ownProperty != null && ownProperty.isEnumerable();
+	}
+
 	public PropertyDescriptor getOwnProperty(Key<?> key) {
 		return this.value.get(key);
 	}

@@ -88,14 +88,13 @@ Test.expect(f().a, "2");
 Test.expect(b.a, "2");
 
 
-// FIXME: remove properties while iterating
-//const from = [1, 2, 3];
-//const to = [];
-//for (const prop in from) {
-//	to.push(prop);
-//	from.pop();
-//}
-//Test.equals(to, [0, 1]);
+const from = [1, 2, 3];
+const to = [];
+for (const prop in from) {
+	to.push(prop);
+	from.pop();
+}
+Test.equals(['0', '1'], to);
 
 
 // duplicated properties in prototype

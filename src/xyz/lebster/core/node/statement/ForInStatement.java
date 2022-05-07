@@ -12,7 +12,6 @@ import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import java.util.ArrayList;
 
-// FIXME: Properties which are removed while iterating should not appear in the iteration
 public record ForInStatement(LeftHandSideExpression left, Expression right, Statement body) implements Statement {
 	@Override
 	@NonCompliant
@@ -28,6 +27,8 @@ public record ForInStatement(LeftHandSideExpression left, Expression right, Stat
 		try {
 			Value<?> lastValue = Undefined.instance;
 			for (final StringValue nextResult : enumerateProperties) {
+				if (!objectValue.hasOwnEnumerableProperty(nextResult)) continue;
+
 				// TODO: Specifically "initialise" BindingPatterns
 				left_reference.putValue(interpreter, nextResult);
 

@@ -14,7 +14,7 @@ public record NewExpression(Expression constructExpr, ExpressionList arguments) 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-evaluatenew")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> value = constructExpr.execute(interpreter);
-		final Value<?>[] executedArguments = arguments.executeAll(interpreter).toArray(new Value[0]);
+		final Value<?>[] executedArguments = arguments == null ? new Value[0] : arguments.executeAll(interpreter).toArray(new Value[0]);
 		return getConstructor(value).construct(interpreter, executedArguments);
 	}
 
@@ -31,9 +31,7 @@ public record NewExpression(Expression constructExpr, ExpressionList arguments) 
 
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.child("Construct Expression", constructExpr)
-			.expressionList("Arguments", arguments);
+		DumpBuilder.begin(indent).child("Construct Expression", constructExpr).expressionList("Arguments", arguments);
 	}
 
 	@Override

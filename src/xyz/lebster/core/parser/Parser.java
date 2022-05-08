@@ -832,7 +832,7 @@ public final class Parser {
 				// https://tc39.es/ecma262/multipage#sec-new-operator
 				final Expression constructExpr = parseExpression(precedenceForTokenType(n), associativityForTokenType(n), Collections.singleton(TokenType.LParen));
 				final boolean hasArguments = state.currentToken.type == TokenType.LParen;
-				final ExpressionList arguments = hasArguments ? parseExpressionList(true) : new ExpressionList(); // TODO: Perhaps `null`?
+				final ExpressionList arguments = hasArguments ? parseExpressionList(true) : null;
 				yield new NewExpression(constructExpr, arguments);
 			}
 

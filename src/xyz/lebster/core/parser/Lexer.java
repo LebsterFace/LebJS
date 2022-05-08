@@ -132,6 +132,7 @@ public final class Lexer {
 	private final ArrayDeque<TemplateLiteralState> templateLiteralStates = new ArrayDeque<>();
 	private int index = -1;
 	private char currentChar = '\0';
+	private Token currentToken;
 
 	public Lexer(String source) {
 		this.source = source;
@@ -254,6 +255,28 @@ public final class Lexer {
 		}
 	}
 
+	private boolean slashMeansDivision() {
+		return currentToken != null && (
+			currentToken.type == TokenType.BigIntLiteral
+			|| currentToken.type == TokenType.True
+			|| currentToken.type == TokenType.False
+			|| currentToken.type == TokenType.RBrace
+			|| currentToken.type == TokenType.RBracket
+			|| currentToken.type == TokenType.Identifier
+			|| currentToken.type == TokenType.In
+			|| currentToken.type == TokenType.Instanceof
+			|| currentToken.type == TokenType.MinusMinus
+			|| currentToken.type == TokenType.Null
+			|| currentToken.type == TokenType.NumericLiteral
+			|| currentToken.type == TokenType.RParen
+			|| currentToken.type == TokenType.PlusPlus
+			|| currentToken.type == TokenType.PrivateIdentifier
+			|| currentToken.type == TokenType.RegexpLiteral
+			|| currentToken.type == TokenType.StringLiteral
+			|| currentToken.type == TokenType.TemplateExpressionEnd
+			|| currentToken.type == TokenType.This);
+	}
+
 	private Token next() throws SyntaxError {
 		builder.setLength(0);
 		final boolean inTemplateLiteral = !templateLiteralStates.isEmpty();
@@ -360,6 +383,8 @@ public final class Lexer {
 			}
 
 			return new Token(TokenType.NumericLiteral, builder.toString(), position());
+		} else if (currentChar == '/' && !slashMeansDivision()) {
+			return consumeRegexpLiteral();
 		} else {
 			for (Map<String, TokenType> symbolSize : symbols) {
 				for (Map.Entry<String, TokenType> entry : symbolSize.entrySet()) {
@@ -372,6 +397,32 @@ public final class Lexer {
 
 			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "'"), position());
 		}
+	}
+
+	private Token consumeRegexpLiteral() {
+		collect();
+
+		boolean escaped = false;
+		while (!isFinished()) {
+			if (escaped) {
+				escaped = false;
+				collect();
+			} else if (currentChar == '\\') {
+				escaped = true;
+				consume();
+			} else if (currentChar == '/') {
+				collect();
+				break;
+			} else {
+				collect();
+			}
+		}
+
+		while (isAlphabetical(currentChar)) {
+			collect();
+		}
+
+		return new Token(TokenType.RegexpLiteral, builder.toString(), position());
 	}
 
 	private Token numericLiteralRadix(int radix, String name) throws SyntaxError {
@@ -482,6 +533,7 @@ public final class Lexer {
 
 		while (!isFinished()) {
 			final Token token = next();
+			currentToken = token;
 			if (token == null) break;
 			if (token.type == TokenType.LineTerminator) {
 				if (lastWasTerminator) {

@@ -770,7 +770,7 @@ public final class Parser {
 		return switch (state.currentToken.type) {
 			case Await -> throw new ParserNotImplemented(position(), "Parsing `await` expressions");
 			case Async -> throw new ParserNotImplemented(position(), "Parsing `async` functions");
-			case Slash -> throw new ParserNotImplemented(position(), "Parsing RegExp literals");
+			case RegexpLiteral -> throw new ParserNotImplemented(position(), "Parsing RegExp literals");
 			case Class -> throw new ParserNotImplemented(position(), "Parsing class expressions");
 
 			case LParen -> {
@@ -1049,7 +1049,7 @@ public final class Parser {
 			   t == TokenType.LBracket ||
 			   t == TokenType.LBrace ||
 			   t == TokenType.This ||
-			   t == TokenType.Slash ||
+			   t == TokenType.RegexpLiteral ||
 			   t == TokenType.Null ||
 			   t == TokenType.New ||
 			   t == TokenType.Infinity ||

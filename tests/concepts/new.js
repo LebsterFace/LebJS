@@ -13,3 +13,4 @@ function otherClass() {
 
 let obj2 = new otherClass();
 Test.expect("me!", obj2.property)
+Test.expect(false, obj2 instanceof otherClass)

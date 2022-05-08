@@ -1,5 +1,7 @@
 package xyz.lebster.core.runtime.value.executable;
 
+import xyz.lebster.core.NonCompliant;
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.*;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.runtime.Names;
@@ -11,6 +13,7 @@ import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 import java.util.HashSet;
 
+@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-function-objects")
 public final class Function extends Constructor {
 	private final Environment environment;
 	private final FunctionNode code;
@@ -65,6 +68,8 @@ public final class Function extends Constructor {
 	}
 
 	@Override
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-function-objects-construct-argumentslist-newtarget")
 	public ObjectValue construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		final Value<?> prototypeProperty = this.get(interpreter, Names.prototype);
 
@@ -73,12 +78,7 @@ public final class Function extends Constructor {
 		newInstance.setPrototype(prototype);
 
 		final Value<?> returnValue = this.call(interpreter, newInstance, args);
-
-		if (returnValue instanceof final ObjectValue asObject) {
-			// TODO: Improve this as it is a little hackish
-			newInstance.value.putAll(asObject.value);
-		}
-
+		if (returnValue instanceof final ObjectValue asObject) return asObject;
 		return newInstance;
 	}
 }

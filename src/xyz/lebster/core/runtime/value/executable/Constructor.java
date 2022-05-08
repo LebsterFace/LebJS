@@ -17,5 +17,6 @@ public abstract class Constructor extends Executable {
 		this.put(Names.prototype, prototype);
 	}
 
-	public abstract ObjectValue construct(Interpreter interpreter, Value<?>[] executedArguments) throws AbruptCompletion;
+	// FIXME: newTarget
+	public abstract ObjectValue construct(Interpreter interpreter, Value<?>[] argumentsList) throws AbruptCompletion;
 }

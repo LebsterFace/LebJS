@@ -30,6 +30,7 @@ public final class ArrayPrototype extends ObjectValue {
 		instance.putMethod(Names.reduce, ArrayPrototype::reduce);
 		instance.putMethod(Names.filter, ArrayPrototype::filter);
 		instance.putMethod(Names.join, ArrayPrototype::join);
+		instance.putMethod(Names.includes, ArrayPrototype::includes);
 		instance.putMethod(Names.toString, ArrayPrototype::toStringMethod);
 		instance.putMethod(Names.forEach, ArrayPrototype::forEach);
 		instance.putMethod(Names.reverse, ArrayPrototype::reverse);
@@ -41,6 +42,52 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	private ArrayPrototype() {
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.includes")
+	private static BooleanValue includes(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.14 Array.prototype.includes ( searchElement [ , fromIndex ] )
+		final Value<?> searchElement = argument(0, arguments);
+		final Value<?> fromIndex = argument(1, arguments);
+
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(O, interpreter);
+		// 3. If len is 0, return false.
+		if (len == 0) return BooleanValue.FALSE;
+		// 4. Let n be ? ToIntegerOrInfinity(fromIndex).
+		int n = NumberPrototype.toIntegerOrInfinity(interpreter, fromIndex);
+		// 5. Assert: If fromIndex is undefined, then n is 0.
+		assert fromIndex != Undefined.instance || n == 0;
+		// 6. If n is +∞, return false.
+		if (n == Integer.MAX_VALUE) return BooleanValue.FALSE;
+			// 7. Else if n is -∞, set n to 0.
+		else if (n == Integer.MIN_VALUE) n = 0;
+		// 8. If n ≥ 0, then
+		long k;
+		if (n >= 0) {
+			// a. Let k be n.
+			k = n;
+		}
+		// 9. Else,
+		else {
+			// a. Let k be len + n.
+			k = len + n;
+			// b. If k < 0, set k to 0.
+			if (k < 0) k = 0;
+		}
+		// 10. Repeat, while k < len,
+		while (k < len) {
+			// a. Let elementK be ? Get(O, ! ToString(𝔽(k))).
+			final Value<?> elementK = O.get(interpreter, new StringValue(k));
+			// b. If SameValueZero(searchElement, elementK) is true, return true.
+			if (searchElement.sameValueZero(elementK)) return BooleanValue.TRUE;
+			// c. Set k to k + 1.
+			k = k + 1;
+		}
+		// 11. Return false.
+		return BooleanValue.FALSE;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.pop")

@@ -146,6 +146,20 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		return output.substring(0, output.length() - 1) + afterDecimal;
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-sameValueZero")
+	public static boolean sameValueZero(NumberValue x, NumberValue y) {
+		// 6.1.6.1.15 Number::sameValueZero ( x, y )
+
+		// 1. If x is NaN and y is NaN, return true.
+		if (x.value.isNaN() && y.value.isNaN()) return true;
+		// 2. If x is +0𝔽 and y is -0𝔽, return true.
+		if (x.value == 0 && y.value == -0) return true;
+		// 3. If x is -0𝔽 and y is +0𝔽, return true.
+		// 4. If x is the same Number value as y, return true.
+		// 5. Return false.
+		return x.value.equals(y.value);
+	}
+
 	public String stringValueOf() {
 		return NumberValue.stringValueOf(this.value);
 	}

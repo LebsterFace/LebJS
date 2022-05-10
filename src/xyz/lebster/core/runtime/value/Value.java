@@ -48,6 +48,23 @@ public abstract class Value<JType> {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toobject")
 	public abstract ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion;
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevaluezero")
+	public boolean sameValueZero(Value<?> y) {
+		// 7.2.12 SameValueZero ( x, y )
+		// 1. If Type(x) is different from Type(y), return false.
+		if (!sameType(y)) return false;
+		// 2. If Type(x) is Number, then
+		if (this instanceof final NumberValue x) {
+			// a. Return Number::sameValueZero(x, y).
+			return NumberValue.sameValueZero(x, (NumberValue) y);
+		}
+		// TODO: 3. If Type(x) is BigInt, then
+		//           a. Return BigInt::sameValueZero(x, y).
+
+		// 4. Return SameValueNonNumeric(x, y).
+		return sameValueNonNumeric(y);
+	}
+
 	public final boolean sameType(Value<?> y) {
 		if (this instanceof ObjectValue) {
 			return y instanceof ObjectValue;

@@ -19,29 +19,24 @@ import java.util.Arrays;
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argumentString;
 
-public final class ArrayPrototype extends ObjectValue {
-	public static final ArrayPrototype instance = new ArrayPrototype();
+public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayConstructor> {
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
 
-	static {
-		instance.put(Names.constructor, ArrayConstructor.instance);
-		instance.putMethod(Names.push, ArrayPrototype::push);
-		instance.putMethod(Names.map, ArrayPrototype::map);
-		instance.putMethod(Names.reduce, ArrayPrototype::reduce);
-		instance.putMethod(Names.filter, ArrayPrototype::filter);
-		instance.putMethod(Names.join, ArrayPrototype::join);
-		instance.putMethod(Names.includes, ArrayPrototype::includes);
-		instance.putMethod(Names.toString, ArrayPrototype::toStringMethod);
-		instance.putMethod(Names.forEach, ArrayPrototype::forEach);
-		instance.putMethod(Names.reverse, ArrayPrototype::reverse);
-		instance.putMethod(Names.pop, ArrayPrototype::pop);
+	public ArrayPrototype(ObjectPrototype objectPrototype, FunctionPrototype fp) {
+		super(objectPrototype);
+		putMethod(fp, Names.push, ArrayPrototype::push);
+		putMethod(fp, Names.map, ArrayPrototype::map);
+		putMethod(fp, Names.reduce, ArrayPrototype::reduce);
+		putMethod(fp, Names.filter, ArrayPrototype::filter);
+		putMethod(fp, Names.join, ArrayPrototype::join);
+		putMethod(fp, Names.includes, ArrayPrototype::includes);
+		putMethod(fp, Names.toString, ArrayPrototype::toStringMethod);
+		putMethod(fp, Names.forEach, ArrayPrototype::forEach);
+		putMethod(fp, Names.reverse, ArrayPrototype::reverse);
+		putMethod(fp, Names.pop, ArrayPrototype::pop);
 
-		final var values = new NativeFunction(Names.values, ArrayPrototype::values);
-		instance.put(Names.values, values);
-		instance.put(SymbolValue.iterator, values);
-	}
-
-	private ArrayPrototype() {
+		final NativeFunction values = putMethod(fp, Names.values, ArrayPrototype::values);
+		put(SymbolValue.iterator, values);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.includes")
@@ -134,7 +129,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let len be ? LengthOfArrayLike(O).
 		final long len = lengthOfArrayLike(O, interpreter);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
-		final Executable executable = Executable.getExecutable(callbackfn);
+		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
 		// 4. Let A be ? ArraySpeciesCreate(O, 0).
 		final Value<?>[] A = new Value<?>[(int) len];
 		// 5. Let k be 0.
@@ -167,7 +162,7 @@ public final class ArrayPrototype extends ObjectValue {
 		}
 
 		// 8. Return A.
-		return new ArrayObject(Arrays.copyOfRange(A, 0, to));
+		return new ArrayObject(interpreter, Arrays.copyOfRange(A, 0, to));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.values")
@@ -186,7 +181,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let len be ? LengthOfArrayLike(O).
 		final long len = lengthOfArrayLike(O, interpreter);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
-		final Executable executable = Executable.getExecutable(callbackfn);
+		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
 		// 4. Let k be 0.
 		int k = 0;
 		// 5. Repeat, while k < len,
@@ -216,7 +211,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let func be ? Get(array, "join").
 		final Value<?> func = array.get(interpreter, Names.join);
 		// 3. If IsCallable(func) is false, set func to the intrinsic function %Object.prototype.toString%.
-		final Executable f_Func = func instanceof Executable e ? e : ObjectPrototype.toStringMethod;
+		final Executable f_Func = func instanceof Executable e ? e : interpreter.intrinsics.objectPrototype.toStringMethod;
 		// 4. Return ? Call(func, array).
 		return f_Func.call(interpreter, array);
 	}
@@ -261,8 +256,7 @@ public final class ArrayPrototype extends ObjectValue {
 		final int argCount = items.length;
 		// 4. If len + argCount > 2^53 - 1, throw a TypeError exception.
 		if (len + argCount > MAX_LENGTH) {
-			throw AbruptCompletion.error(new TypeError("Pushing " + argCount + " elements on an array-like of length " +
-													   len + " is disallowed, as the total surpasses 2^53-1"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "Pushing " + argCount + " elements on an array-like of length " + len + " is disallowed, as the total surpasses 2^53-1"));
 		}
 
 		// 5. For each element E of items, do
@@ -287,7 +281,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		final long len = lengthOfArrayLike(O, interpreter);
-		final Executable executable = Executable.getExecutable(callbackfn);
+		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
 
 		final Value<?>[] values = new Value<?>[(int) len];
 		for (int k = 0; k < len; k++) {
@@ -297,7 +291,7 @@ public final class ArrayPrototype extends ObjectValue {
 			}
 		}
 
-		return new ArrayObject(values);
+		return new ArrayObject(interpreter, values);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reduce")
@@ -311,10 +305,9 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let len be ? LengthOfArrayLike(O).
 		final long len = lengthOfArrayLike(O, interpreter);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
-		final Executable callback = Executable.getExecutable(callbackfn);
+		final Executable callback = Executable.getExecutable(interpreter, callbackfn);
 		// 4. If len = 0 and initialValue is not present, throw a TypeError exception.
-		if (len == 0 && arguments.length == 1)
-			throw AbruptCompletion.error(new TypeError("Reduce of empty array with no initial value"));
+		if (len == 0 && arguments.length == 1) throw AbruptCompletion.error(new TypeError(interpreter, "Reduce of empty array with no initial value"));
 
 		// 5. Let k be 0.
 		int k = 0;
@@ -344,8 +337,7 @@ public final class ArrayPrototype extends ObjectValue {
 				k = k + 1;
 			}
 			// c. If kPresent is false, throw a TypeError exception.
-			if (!kPresent)
-				throw AbruptCompletion.error(new TypeError("Reduce of empty array with no initial value"));
+			if (!kPresent) throw AbruptCompletion.error(new TypeError(interpreter, "Reduce of empty array with no initial value"));
 		}
 
 		// 9. Repeat, while k < len,
@@ -441,21 +433,24 @@ public final class ArrayPrototype extends ObjectValue {
 		return O;
 	}
 
-	private static class ArrayIterator extends ObjectValue {
+	private static final class ArrayIterator extends ObjectValue {
 		private final ObjectValue O;
 		private final long len;
 		private int index;
 
-		public ArrayIterator(Interpreter $) throws AbruptCompletion {
-			this.O = $.thisValue().toObjectValue($);
-			this.len = lengthOfArrayLike(O, $);
+		public ArrayIterator(Interpreter interpreter) throws AbruptCompletion {
+			super(null);
+			this.O = interpreter.thisValue().toObjectValue(interpreter);
+			this.len = lengthOfArrayLike(O, interpreter);
 			this.index = 0;
-			this.putMethod(Names.next, (__, ___) -> {
-				final ObjectValue result = new ObjectValue();
-				result.put(Names.value, index > len ? Undefined.instance : O.get($, new StringValue(index++)));
-				result.put(Names.done, BooleanValue.of(index > len));
-				return result;
-			});
+			this.putMethod(interpreter.intrinsics.functionPrototype, Names.next, this::next);
+		}
+
+		private Value<?> next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+			final ObjectValue result = new ObjectValue(interpreter.intrinsics.objectPrototype);
+			result.put(Names.value, index > len ? Undefined.instance : O.get(interpreter, new StringValue(index++)));
+			result.put(Names.done, BooleanValue.of(index > len));
+			return result;
 		}
 	}
 }

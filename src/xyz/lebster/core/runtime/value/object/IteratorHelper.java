@@ -30,20 +30,20 @@ public final class IteratorHelper {
 
 		final PropertyDescriptor iteratorProperty = objectValue.getProperty(SymbolValue.iterator);
 		if (iteratorProperty == null)
-			throw error(new TypeError(obj + " is not iterable (does not contain a `Symbol.iterator` property)"));
+			throw error(new TypeError(interpreter, obj + " is not iterable (does not contain a `Symbol.iterator` property)"));
 
 		if (!(iteratorProperty.get(interpreter, objectValue) instanceof final Executable iteratorMethod))
-			throw error(new TypeError(obj + "[Symbol.iterator] is not a function"));
+			throw error(new TypeError(interpreter, obj + "[Symbol.iterator] is not a function"));
 
 		if (!(iteratorMethod.call(interpreter, objectValue) instanceof final ObjectValue iterator))
-			throw error(new TypeError(obj + "[Symbol.iterator]() returned a non-object value"));
+			throw error(new TypeError(interpreter, obj + "[Symbol.iterator]() returned a non-object value"));
 
 		final PropertyDescriptor nextProperty = iterator.getProperty(Names.next);
 		if (nextProperty == null)
-			throw error(new TypeError(obj + "[Symbol.iterator]() returned an object which does not contain a `next` property"));
+			throw error(new TypeError(interpreter, obj + "[Symbol.iterator]() returned an object which does not contain a `next` property"));
 
 		if (!(nextProperty.get(interpreter, iterator) instanceof final Executable executable))
-			throw error(new TypeError(obj + "[Symbol.iterator]().next is not a function"));
+			throw error(new TypeError(interpreter, obj + "[Symbol.iterator]().next is not a function"));
 
 		return new ObjectIterator(interpreter, iterator, executable, obj);
 	}
@@ -65,7 +65,7 @@ public final class IteratorHelper {
 			final Value<?> iteratorResult = nextMethod.call(interpreter, iteratorObject);
 			if (!(iteratorResult instanceof ObjectValue next)) {
 				final String representation = ANSI.stripFormatting(iteratorResult.toDisplayString());
-				throw error(new TypeError(this.errorString + "[Symbol.iterator]().next() returned a non-object value (" + representation + ")"));
+				throw error(new TypeError(interpreter, this.errorString + "[Symbol.iterator]().next() returned a non-object value (" + representation + ")"));
 			}
 
 			final boolean done = next.get(interpreter, Names.done).isTruthy(interpreter);

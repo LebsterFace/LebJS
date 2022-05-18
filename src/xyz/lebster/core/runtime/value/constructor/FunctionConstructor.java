@@ -7,17 +7,12 @@ import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.executable.Function;
 import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
+import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-constructor")
-public class FunctionConstructor extends BuiltinConstructor<Function> {
-	public static final FunctionConstructor instance = new FunctionConstructor();
-
-	static {
-		instance.putNonWritable(Names.prototype, FunctionPrototype.instance);
-	}
-
-	private FunctionConstructor() {
-		super(Names.Function);
+public class FunctionConstructor extends BuiltinConstructor<Function, FunctionPrototype> {
+	public FunctionConstructor(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
+		super(objectPrototype, functionPrototype, Names.Function);
 	}
 
 	public Function construct(Interpreter interpreter, Value<?>[] arguments) {

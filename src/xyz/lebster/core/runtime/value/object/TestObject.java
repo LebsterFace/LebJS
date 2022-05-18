@@ -7,21 +7,17 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
-
-import java.util.Arrays;
+import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
 public final class TestObject extends ObjectValue {
-	public static final TestObject instance = new TestObject();
+	public TestObject(FunctionPrototype functionPrototype) {
+		super(null);
 
-	static {
-		instance.putMethod(Names.expect, TestObject::expect);
-		instance.putMethod(Names.equals, TestObject::equalsMethod);
-		instance.putMethod(Names.fail, TestObject::fail);
-	}
-
-	private TestObject() {
+		this.putMethod(functionPrototype, Names.expect, TestObject::expect);
+		this.putMethod(functionPrototype, Names.equals, TestObject::equalsMethod);
+		this.putMethod(functionPrototype, Names.fail, TestObject::fail);
 	}
 
 	private static Undefined equalsMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {

@@ -37,7 +37,7 @@ public final class Undefined extends PrimitiveValue<Void> {
 
 	@Override
 	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError("Cannot convert undefined to object"));
+		throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert undefined to object"));
 	}
 
 	@Override

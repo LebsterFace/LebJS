@@ -11,21 +11,17 @@ import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
+import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
+import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argumentInt;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-array-constructor")
-public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
-	public static final ArrayConstructor instance = new ArrayConstructor();
-
-	static {
-		instance.putNonWritable(Names.prototype, ArrayPrototype.instance);
-		instance.putMethod(Names.of, ArrayConstructor::of);
-	}
-
-	private ArrayConstructor() {
-		super(Names.Array);
+public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayPrototype> {
+	public ArrayConstructor(ObjectPrototype objectPrototype, FunctionPrototype fp) {
+		super(objectPrototype, fp, Names.Array);
+		this.putMethod(fp, Names.of, ArrayConstructor::of);
 	}
 
 	@NonStandard
@@ -34,11 +30,11 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject> {
 		final Value<?> callbackFn = argument(1, arguments);
 		final Value<?> thisArg = argument(2, arguments);
 
-		final Executable executable = Executable.getExecutable(callbackFn);
+		final Executable executable = Executable.getExecutable(interpreter, callbackFn);
 		final Value<?>[] result = new Value<?>[len];
 		for (int k = 0; k < len; k++)
 			result[k] = executable.call(interpreter, thisArg, new NumberValue(k));
-		return new ArrayObject(result);
+		return new ArrayObject(interpreter, result);
 	}
 
 	@Override

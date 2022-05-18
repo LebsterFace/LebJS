@@ -21,49 +21,45 @@ import static xyz.lebster.core.runtime.value.prototype.NumberPrototype.toInteger
 import static xyz.lebster.core.runtime.value.prototype.ObjectPrototype.requireObjectCoercible;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-string-prototype-object")
-public final class StringPrototype extends ObjectValue {
-	public static final StringPrototype instance = new StringPrototype();
+public final class StringPrototype extends BuiltinPrototype<StringWrapper, StringConstructor> {
 
-	static {
-		instance.put(Names.constructor, StringConstructor.instance);
+	public StringPrototype(ObjectPrototype objectPrototype, FunctionPrototype fp) {
+		super(objectPrototype);
 
-		instance.putMethod(Names.reverse, StringPrototype::reverse);
+		this.putMethod(fp, Names.reverse, StringPrototype::reverse);
 
-		instance.putMethod(Names.slice, StringPrototype::slice);
-		instance.putMethod(Names.charAt, StringPrototype::charAt);
-		instance.putMethod(Names.trim, StringPrototype::trim);
-		instance.putMethod(Names.trimStart, StringPrototype::trimStart);
-		instance.putMethod(Names.trimEnd, StringPrototype::trimEnd);
-		instance.putMethod(Names.toUpperCase, StringPrototype::toUpperCase);
-		instance.putMethod(Names.toLowerCase, StringPrototype::toLowerCase);
-		instance.putMethod(Names.valueOf, StringPrototype::valueOf);
-		instance.putMethod(Names.toString, StringPrototype::toStringMethod);
-		instance.putMethod(SymbolValue.iterator, StringIterator::new);
-		instance.putMethod(Names.charCodeAt, StringPrototype::charCodeAt);
-		instance.putMethod(Names.codePointAt, StringPrototype::codePointAt);
-		instance.putMethod(Names.concat, StringPrototype::concat);
-		instance.putMethod(Names.endsWith, StringPrototype::endsWith);
-		instance.putMethod(Names.includes, StringPrototype::includes);
-		instance.putMethod(Names.indexOf, StringPrototype::indexOf);
-		instance.putMethod(Names.lastIndexOf, StringPrototype::lastIndexOf);
-		instance.putMethod(Names.localeCompare, StringPrototype::localeCompare);
-		instance.putMethod(Names.match, StringPrototype::match);
-		instance.putMethod(Names.matchAll, StringPrototype::matchAll);
-		instance.putMethod(Names.normalize, StringPrototype::normalize);
-		instance.putMethod(Names.padEnd, StringPrototype::padEnd);
-		instance.putMethod(Names.padStart, StringPrototype::padStart);
-		instance.putMethod(Names.repeat, StringPrototype::repeat);
-		instance.putMethod(Names.replace, StringPrototype::replace);
-		instance.putMethod(Names.replaceAll, StringPrototype::replaceAll);
-		instance.putMethod(Names.search, StringPrototype::search);
-		instance.putMethod(Names.split, StringPrototype::split);
-		instance.putMethod(Names.startsWith, StringPrototype::startsWith);
-		instance.putMethod(Names.substring, StringPrototype::substring);
-		instance.putMethod(Names.toLocaleLowerCase, StringPrototype::toLocaleLowerCase);
-		instance.putMethod(Names.toLocaleUpperCase, StringPrototype::toLocaleUpperCase);
-	}
-
-	private StringPrototype() {
+		this.putMethod(fp, Names.slice, StringPrototype::slice);
+		this.putMethod(fp, Names.charAt, StringPrototype::charAt);
+		this.putMethod(fp, Names.trim, StringPrototype::trim);
+		this.putMethod(fp, Names.trimStart, StringPrototype::trimStart);
+		this.putMethod(fp, Names.trimEnd, StringPrototype::trimEnd);
+		this.putMethod(fp, Names.toUpperCase, StringPrototype::toUpperCase);
+		this.putMethod(fp, Names.toLowerCase, StringPrototype::toLowerCase);
+		this.putMethod(fp, Names.valueOf, StringPrototype::valueOf);
+		this.putMethod(fp, Names.toString, StringPrototype::toStringMethod);
+		this.putMethod(fp, SymbolValue.iterator, StringIterator::new);
+		this.putMethod(fp, Names.charCodeAt, StringPrototype::charCodeAt);
+		this.putMethod(fp, Names.codePointAt, StringPrototype::codePointAt);
+		this.putMethod(fp, Names.concat, StringPrototype::concat);
+		this.putMethod(fp, Names.endsWith, StringPrototype::endsWith);
+		this.putMethod(fp, Names.includes, StringPrototype::includes);
+		this.putMethod(fp, Names.indexOf, StringPrototype::indexOf);
+		this.putMethod(fp, Names.lastIndexOf, StringPrototype::lastIndexOf);
+		this.putMethod(fp, Names.localeCompare, StringPrototype::localeCompare);
+		this.putMethod(fp, Names.match, StringPrototype::match);
+		this.putMethod(fp, Names.matchAll, StringPrototype::matchAll);
+		this.putMethod(fp, Names.normalize, StringPrototype::normalize);
+		this.putMethod(fp, Names.padEnd, StringPrototype::padEnd);
+		this.putMethod(fp, Names.padStart, StringPrototype::padStart);
+		this.putMethod(fp, Names.repeat, StringPrototype::repeat);
+		this.putMethod(fp, Names.replace, StringPrototype::replace);
+		this.putMethod(fp, Names.replaceAll, StringPrototype::replaceAll);
+		this.putMethod(fp, Names.search, StringPrototype::search);
+		this.putMethod(fp, Names.split, StringPrototype::split);
+		this.putMethod(fp, Names.startsWith, StringPrototype::startsWith);
+		this.putMethod(fp, Names.substring, StringPrototype::substring);
+		this.putMethod(fp, Names.toLocaleLowerCase, StringPrototype::toLocaleLowerCase);
+		this.putMethod(fp, Names.toLocaleUpperCase, StringPrototype::toLocaleUpperCase);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charcodeat")
@@ -72,7 +68,7 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> pos = argument(0, arguments);
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.charCodeAt");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.charCodeAt");
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 		// 3. Let position be ? ToIntegerOrInfinity(pos).
@@ -91,7 +87,7 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> pos = argument(0, arguments);
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.codePointAt");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.codePointAt");
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 		// 3. Let position be ? ToIntegerOrInfinity(pos).
@@ -110,7 +106,7 @@ public final class StringPrototype extends ObjectValue {
 		// 22.1.3.5 String.prototype.concat ( ...args )
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.concat");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.concat");
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 		// 3. Let R be S.
@@ -135,7 +131,7 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> endPosition = argument(1, arguments);
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.endsWith");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.endsWith");
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 
@@ -172,7 +168,7 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> position = argument(1, arguments);
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.includes");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.includes");
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 
@@ -202,7 +198,7 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> position = argument(1, arguments);
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.indexOf");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.indexOf");
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 		// 3. Let searchStr be ? ToString(searchString).
@@ -225,7 +221,7 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> position = argument(1, arguments);
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.lastIndexOf");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.lastIndexOf");
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 		// 3. Let searchStr be ? ToString(searchString).
@@ -312,7 +308,7 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> position = argument(1, arguments);
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.startsWith");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.startsWith");
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 
@@ -343,7 +339,7 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> end = argument(1, arguments);
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.substring");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.substring");
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 		// 3. Let len be the length of S.
@@ -377,7 +373,7 @@ public final class StringPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tolowercase")
 	private static Value<?> toLowerCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.toLowerCase");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.toLowerCase");
 		// 2. Let S be ? ToString(O).
 		final StringValue S = O.toStringValue(interpreter);
 		// 3. Let sText be ! StringToCodePoints(S).
@@ -390,7 +386,7 @@ public final class StringPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.touppercase")
 	private static Value<?> toUpperCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.toUpperCase");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.toUpperCase");
 		// 2. Let S be ? ToString(O).
 		final StringValue S = O.toStringValue(interpreter);
 		// 3. Let sText be ! StringToCodePoints(S).
@@ -403,7 +399,7 @@ public final class StringPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.trimend")
 	private static StringValue trimEnd(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let str be ? RequireObjectCoercible(string).
-		final Value<?> str = requireObjectCoercible(interpreter.thisValue(), "String.prototype.trimEnd");
+		final Value<?> str = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.trimEnd");
 		// 2. Let S be ? ToString(str).
 		final StringValue S = str.toStringValue(interpreter);
 		// let T be the String value that is a copy of S with trailing white space removed.
@@ -414,7 +410,7 @@ public final class StringPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.trimstart")
 	private static StringValue trimStart(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let str be ? RequireObjectCoercible(string).
-		final Value<?> str = requireObjectCoercible(interpreter.thisValue(), "String.prototype.trimStart");
+		final Value<?> str = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.trimStart");
 		// 2. Let S be ? ToString(str).
 		final StringValue S = str.toStringValue(interpreter);
 		// let T be the String value that is a copy of S with leading white space removed.
@@ -425,7 +421,7 @@ public final class StringPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.trim")
 	private static StringValue trim(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let str be ? RequireObjectCoercible(string).
-		final Value<?> str = requireObjectCoercible(interpreter.thisValue(), "String.prototype.trim");
+		final Value<?> str = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.trim");
 		// 2. Let S be ? ToString(str).
 		final StringValue S = str.toStringValue(interpreter);
 		// b. Let T be the String value that is a copy of S with both leading and trailing white space removed.
@@ -438,7 +434,7 @@ public final class StringPrototype extends ObjectValue {
 		// String.prototype.charAt ( pos )
 		final Value<?> pos = argument(0, arguments);
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.charAt");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.charAt");
 		// 2. Let S be ? ToString(O).
 		final StringValue S = O.toStringValue(interpreter);
 		// 3. Let position be ? ToIntegerOrInfinity(pos).
@@ -457,7 +453,7 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> start = argument(0, arguments);
 		final Value<?> end = argument(1, arguments);
 		// 1. Let O be ? RequireObjectCoercible(this value).
-		final Value<?> O = requireObjectCoercible(interpreter.thisValue(), "String.prototype.slice");
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.slice");
 		// 2. Let S be ? ToString(O).
 		final StringValue S = O.toStringValue(interpreter);
 		// 3. Let len be the length of S.
@@ -501,17 +497,17 @@ public final class StringPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.valueof")
 	private static StringValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Return ? thisStringValue(this value).
-		return thisStringValue(interpreter.thisValue());
+		return thisStringValue(interpreter, interpreter.thisValue());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tostring")
 	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Return ? thisStringValue(this value).
-		return thisStringValue(interpreter.thisValue());
+		return thisStringValue(interpreter, interpreter.thisValue());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#thisstringvalue")
-	private static StringValue thisStringValue(Value<?> value) throws AbruptCompletion {
+	private static StringValue thisStringValue(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 		// 1. If Type(value) is String, return value.
 		if (value instanceof final StringValue stringValue) return stringValue;
 		// 2. If Type(value) is Object and value has a [[StringData]] internal slot, then
@@ -523,12 +519,12 @@ public final class StringPrototype extends ObjectValue {
 		}
 
 		// 3. Throw a TypeError exception.
-		throw AbruptCompletion.error(new TypeError("This method requires that 'this' be a String"));
+		throw AbruptCompletion.error(new TypeError(interpreter, "This method requires that 'this' be a String"));
 	}
 
 	@NonStandard
 	private static StringValue reverse(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final String S = thisStringValue(interpreter.thisValue()).value;
+		final String S = thisStringValue(interpreter, interpreter.thisValue()).value;
 		return new StringValue(new StringBuilder(S).reverse().toString());
 	}
 
@@ -538,13 +534,14 @@ public final class StringPrototype extends ObjectValue {
 
 		@NonCompliant
 		public StringIterator(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-			final String value = thisStringValue(interpreter.thisValue()).value;
+			super(null);
+			final String value = thisStringValue(interpreter, interpreter.thisValue()).value;
 			this.primitiveIterator = value.codePoints().iterator();
-			this.putMethod(Names.next, this::next);
+			this.putMethod(interpreter.intrinsics.functionPrototype, Names.next, this::next);
 		}
 
 		private ObjectValue next(Interpreter interpreter, Value<?>[] arguments) {
-			final ObjectValue result = new ObjectValue();
+			final ObjectValue result = new ObjectValue(interpreter.intrinsics.objectPrototype);
 			if (!primitiveIterator.hasNext()) {
 				result.put(Names.done, BooleanValue.TRUE);
 				result.put(Names.value, Undefined.instance);

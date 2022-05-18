@@ -6,6 +6,8 @@ import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.SymbolValue;
+import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
+import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
@@ -16,10 +18,8 @@ import static xyz.lebster.core.runtime.value.primitive.NumberValue.isPositiveZer
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-math-object")
 public final class MathObject extends ObjectValue {
-	public static final MathObject instance = new MathObject();
-
-	@SuppressWarnings("SpellCheckingInspection")
-	private MathObject() {
+	public MathObject(ObjectPrototype objectPrototype, FunctionPrototype fp) {
+		super(objectPrototype);
 		put(SymbolValue.toStringTag, Names.Math);
 
 		// 21.3.1 Value Properties of the Math Object
@@ -33,35 +33,35 @@ public final class MathObject extends ObjectValue {
 		this.putFrozen(Names.SQRT2, new NumberValue(1.4142135623730951D)); // the square root of 2
 
 		// (double) -> double
-		addWrapper("abs", (DoubleUnaryOperator) Math::abs);
-		addWrapper("acos", Math::acos);
-		addWrapper("asin", Math::asin);
-		addWrapper("atan", Math::atan);
-		addWrapper("ceil", Math::ceil);
-		addWrapper("cbrt", Math::cbrt);
-		addWrapper("expm1", Math::expm1);
-		addWrapper("cos", Math::cos);
-		addWrapper("cosh", Math::cosh);
-		addWrapper("exp", Math::exp);
-		addWrapper("floor", Math::floor);
-		addWrapper("log", Math::log);
-		addWrapper("log1p", Math::log1p);
-		addWrapper("log10", Math::log10);
-		addWrapper("round", (DoubleUnaryOperator) Math::round);
-		addWrapper("sin", Math::sin);
-		addWrapper("sinh", Math::sinh);
-		addWrapper("sqrt", Math::sqrt);
-		addWrapper("tan", Math::tan);
-		addWrapper("tanh", Math::tanh);
-		addWrapper("sign", (DoubleUnaryOperator) Math::signum);
+		addWrapper(fp, "abs", (DoubleUnaryOperator) Math::abs);
+		addWrapper(fp, "acos", Math::acos);
+		addWrapper(fp, "asin", Math::asin);
+		addWrapper(fp, "atan", Math::atan);
+		addWrapper(fp, "ceil", Math::ceil);
+		addWrapper(fp, "cbrt", Math::cbrt);
+		addWrapper(fp, "expm1", Math::expm1);
+		addWrapper(fp, "cos", Math::cos);
+		addWrapper(fp, "cosh", Math::cosh);
+		addWrapper(fp, "exp", Math::exp);
+		addWrapper(fp, "floor", Math::floor);
+		addWrapper(fp, "log", Math::log);
+		addWrapper(fp, "log1p", Math::log1p);
+		addWrapper(fp, "log10", Math::log10);
+		addWrapper(fp, "round", (DoubleUnaryOperator) Math::round);
+		addWrapper(fp, "sin", Math::sin);
+		addWrapper(fp, "sinh", Math::sinh);
+		addWrapper(fp, "sqrt", Math::sqrt);
+		addWrapper(fp, "tan", Math::tan);
+		addWrapper(fp, "tanh", Math::tanh);
+		addWrapper(fp, "sign", (DoubleUnaryOperator) Math::signum);
 
 		// (double, double) -> double
-		addWrapper("atan2", Math::atan2);
-		addWrapper("pow", Math::pow);
+		addWrapper(fp, "atan2", Math::atan2);
+		addWrapper(fp, "pow", Math::pow);
 
 		// This method conforms to the same interface as the specification, but doesn't
 		// follow it exactly. It should behave the same for any given input, however.
-		addWrapper("hypot", (double[] coerced) -> {
+		addWrapper(fp, "hypot", (double[] coerced) -> {
 			double sum = 0;
 			for (final double number : coerced) {
 				if (Double.isInfinite(number)) return Double.POSITIVE_INFINITY;
@@ -76,7 +76,7 @@ public final class MathObject extends ObjectValue {
 		});
 
 		// https://tc39.es/ecma262/multipage#sec-math.max
-		addWrapper("max", (double[] coerced) -> {
+		addWrapper(fp, "max", (double[] coerced) -> {
 			//  3. Let highest be -∞𝔽.
 			double highest = Double.NEGATIVE_INFINITY;
 			//  4. For each element number of coerced, do
@@ -96,7 +96,7 @@ public final class MathObject extends ObjectValue {
 		});
 
 		// https://tc39.es/ecma262/multipage#sec-math.min
-		addWrapper("min", (double[] coerced) -> {
+		addWrapper(fp, "min", (double[] coerced) -> {
 			//  3. Let lowest be +∞𝔽.
 			double lowest = Double.POSITIVE_INFINITY;
 			//  4. For each element number of coerced, do
@@ -115,10 +115,10 @@ public final class MathObject extends ObjectValue {
 		});
 
 		// () -> double
-		this.putMethod(Names.random, (interpreter, args) -> new NumberValue(Math.random()));
+		this.putMethod(fp, Names.random, (interpreter, args) -> new NumberValue(Math.random()));
 
 		// https://tc39.es/ecma262/multipage#sec-math.trunc
-		addWrapper("trunc", (double n) -> {
+		addWrapper(fp, "trunc", (double n) -> {
 			// 2. If n is NaN, n is +0𝔽, n is -0𝔽, n is +∞𝔽, or n is -∞𝔽, return n.
 			if (Double.isNaN(n) || n == 0 || Double.isInfinite(n)) {
 				return n;
@@ -140,7 +140,7 @@ public final class MathObject extends ObjectValue {
 		});
 
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/asinh#polyfill
-		addWrapper("asinh", (double x) -> {
+		addWrapper(fp, "asinh", (double x) -> {
 			double absX = Math.abs(x), w;
 
 			if (absX < 3.725290298461914e-9) // |x| < 2^-28
@@ -159,24 +159,24 @@ public final class MathObject extends ObjectValue {
 			return x > 0 ? w : -w;
 		});
 
-		addWrapper("log2", (double x) -> Math.log(x) / 0.6931471805599453D);
-		addWrapper("acosh", (double x) -> Math.log(x + Math.sqrt(x * x - 1)));
-		addWrapper("atanh", (double x) -> Math.log((1 + x) / (1 - x)) / 2);
+		addWrapper(fp, "log2", (double x) -> Math.log(x) / 0.6931471805599453D);
+		addWrapper(fp, "acosh", (double x) -> Math.log(x + Math.sqrt(x * x - 1)));
+		addWrapper(fp, "atanh", (double x) -> Math.log((1 + x) / (1 - x)) / 2);
 
-		notImplemented("imul");
-		notImplemented("clz32");
-		notImplemented("fround");
+		notImplemented(fp, "imul");
+		notImplemented(fp, "clz32");
+		notImplemented(fp, "fround");
 	}
 
-	private void notImplemented(String methodName) {
-		this.putMethod(new StringValue(methodName), (interpreter, args) -> {
+	private void notImplemented(FunctionPrototype fp, String methodName) {
+		this.putMethod(fp, new StringValue(methodName), (interpreter, args) -> {
 			throw new NotImplemented(methodName);
 		});
 	}
 
 	// https://tc39.es/ecma262/multipage#sec-math.hypot + sec-math.min + sec-math.max
-	private void addWrapper(String methodName, DoubleRestArgs restArgs) {
-		this.putMethod(new StringValue(methodName), (interpreter, args) -> {
+	private void addWrapper(FunctionPrototype fp, String methodName, DoubleRestArgs restArgs) {
+		this.putMethod(fp, new StringValue(methodName), (interpreter, args) -> {
 			final double[] coerced = new double[args.length];
 			for (int i = 0; i < args.length; i++) {
 				coerced[i] = args[i].toNumberValue(interpreter).value;
@@ -186,15 +186,15 @@ public final class MathObject extends ObjectValue {
 		});
 	}
 
-	private void addWrapper(String methodName, DoubleUnaryOperator unaryOperator) {
-		this.putMethod(new StringValue(methodName), (interpreter, args) -> {
+	private void addWrapper(FunctionPrototype fp, String methodName, DoubleUnaryOperator unaryOperator) {
+		this.putMethod(fp, new StringValue(methodName), (interpreter, args) -> {
 			final var number = argumentDouble(0, interpreter, args);
 			return new NumberValue(unaryOperator.applyAsDouble(number));
 		});
 	}
 
-	private void addWrapper(String methodName, DoubleBinaryOperator binaryOperator) {
-		this.putMethod(new StringValue(methodName), (interpreter, args) -> {
+	private void addWrapper(FunctionPrototype fp, String methodName, DoubleBinaryOperator binaryOperator) {
+		this.putMethod(fp, new StringValue(methodName), (interpreter, args) -> {
 			final var a = argumentDouble(0, interpreter, args);
 			final var b = argumentDouble(1, interpreter, args);
 			return new NumberValue(binaryOperator.applyAsDouble(a, b));

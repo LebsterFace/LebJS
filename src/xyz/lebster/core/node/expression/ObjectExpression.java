@@ -37,7 +37,7 @@ public record ObjectExpression(ArrayList<ObjectEntryNode> entries) implements Ex
 
 	@Override
 	public ObjectValue execute(Interpreter interpreter) throws AbruptCompletion {
-		final ObjectValue result = new ObjectValue();
+		final ObjectValue result = new ObjectValue(interpreter.intrinsics.objectPrototype);
 		for (final ObjectEntryNode entryNode : entries)
 			entryNode.insertInto(result, interpreter);
 		return result;

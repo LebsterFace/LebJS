@@ -12,37 +12,26 @@ import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.*;
 
-public final class ObjectPrototype extends ObjectValue {
-	public static final ObjectPrototype instance = new ObjectPrototype();
-	public static final NativeFunction toStringMethod = new NativeFunction(Names.toString, ObjectPrototype::toStringMethod);
+public final class ObjectPrototype extends BuiltinPrototype<ObjectValue, ObjectConstructor> {
+	public NativeFunction toStringMethod;
 
-	static {
-		instance.put(Names.constructor, ObjectConstructor.instance);
-		instance.put(Names.toString, toStringMethod);
-		instance.putMethod(Names.valueOf, ObjectPrototype::valueOf);
-		instance.putMethod(Names.hasOwnProperty, (interpreter, args) -> {
-			final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
-			final ObjectValue.Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
-			return BooleanValue.of(object.hasOwnProperty(property));
-		});
-
-		instance.putMethod(Names.hasProperty, (interpreter, args) -> {
-			final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
-			final ObjectValue.Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
-			return BooleanValue.of(object.hasProperty(property));
-		});
-	}
-
-	private ObjectPrototype() {
+	public ObjectPrototype() {
+		super(null);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-requireobjectcoercible")
-	public static Value<?> requireObjectCoercible(Value<?> argument, String methodName) throws AbruptCompletion {
+	public static Value<?> requireObjectCoercible(Interpreter interpreter, Value<?> argument, String methodName) throws AbruptCompletion {
 		if (argument.isNullish()) {
-			throw AbruptCompletion.error(new TypeError(methodName + " called on null or undefined"));
+			throw AbruptCompletion.error(new TypeError(interpreter, methodName + " called on null or undefined"));
 		} else {
 			return argument;
 		}
+	}
+
+	private static Value<?> hasOwnPropertyMethod(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
+		final Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
+		return BooleanValue.of(object.hasOwnProperty(property));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tostring")
@@ -85,8 +74,16 @@ public final class ObjectPrototype extends ObjectValue {
 		return interpreter.thisValue().toObjectValue(interpreter);
 	}
 
-	@Override
-	public ObjectValue getDefaultPrototype() {
-		return null;
+	private static Value<?> hasPropertyMethod(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
+		final Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
+		return BooleanValue.of(object.hasProperty(property));
+	}
+
+	public void populateMethods(FunctionPrototype fp) {
+		toStringMethod = this.putMethod(fp, Names.toString, ObjectPrototype::toStringMethod);
+		this.putMethod(fp, Names.valueOf, ObjectPrototype::valueOf);
+		this.putMethod(fp, Names.hasOwnProperty, ObjectPrototype::hasOwnPropertyMethod);
+		this.putMethod(fp, Names.hasProperty, ObjectPrototype::hasPropertyMethod);
 	}
 }

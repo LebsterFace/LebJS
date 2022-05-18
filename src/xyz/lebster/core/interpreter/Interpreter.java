@@ -9,6 +9,7 @@ import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 
 public final class Interpreter {
+	public final Intrinsics intrinsics;
 	public final GlobalObject globalObject;
 	public final int stackSize;
 	private final ExecutionContext[] executionContextStack;
@@ -16,7 +17,8 @@ public final class Interpreter {
 	private int currentExecutionContext = 0;
 
 	public Interpreter() {
-		this.globalObject = new GlobalObject();
+		this.intrinsics = new Intrinsics();
+		this.globalObject = new GlobalObject(intrinsics);
 		this.stackSize = 32;
 		this.executionContextStack = new ExecutionContext[stackSize];
 		this.executionContextStack[0] = new ExecutionContext(new GlobalEnvironment(globalObject), globalObject);
@@ -43,7 +45,7 @@ public final class Interpreter {
 		final Environment environment = executionContextStack[currentExecutionContext].environment();
 		if (environment.hasBinding(name)) {
 			// FIXME: This should be a Syntax Error at parse-time
-			throw AbruptCompletion.error(new ReferenceError("Identifier '" + name.value + "' has already been declared"));
+			throw AbruptCompletion.error(new ReferenceError(this, "Identifier '" + name.value + "' has already been declared"));
 		} else {
 			environment.createBinding(this, name, value);
 		}
@@ -51,7 +53,7 @@ public final class Interpreter {
 
 	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {
 		if (currentExecutionContext + 1 == stackSize) {
-			throw AbruptCompletion.error(new RangeError("Maximum call stack size exceeded"));
+			throw AbruptCompletion.error(new RangeError(this, "Maximum call stack size exceeded"));
 		}
 
 		executionContextStack[++currentExecutionContext] = context;
@@ -85,7 +87,7 @@ public final class Interpreter {
 	}
 
 	public ExecutionContext pushThisValue(Value<?> thisValue) throws AbruptCompletion {
-		final LexicalEnvironment env = new LexicalEnvironment(new ObjectValue(), lexicalEnvironment());
+		final LexicalEnvironment env = new LexicalEnvironment(new ObjectValue(null), lexicalEnvironment());
 		final ExecutionContext context = new ExecutionContext(env, thisValue);
 		this.enterExecutionContext(context);
 		return context;
@@ -98,7 +100,7 @@ public final class Interpreter {
 	}
 
 	public ExecutionContext pushNewLexicalEnvironment() throws AbruptCompletion {
-		final LexicalEnvironment env = new LexicalEnvironment(new ObjectValue(), lexicalEnvironment());
+		final LexicalEnvironment env = new LexicalEnvironment(new ObjectValue(null), lexicalEnvironment());
 		final ExecutionContext context = new ExecutionContext(env, thisValue());
 		this.enterExecutionContext(context);
 		return context;

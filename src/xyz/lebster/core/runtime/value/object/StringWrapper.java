@@ -15,12 +15,11 @@ import java.util.Map;
 import java.util.PrimitiveIterator;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-objects")
-public final class StringWrapper extends PrimitiveWrapper<StringValue> implements HasBuiltinTag {
-	public StringWrapper(StringValue s) {
-		super(s);
-		this.put(Names.length, new NumberValue(s.value.length()));
+public final class StringWrapper extends PrimitiveWrapper<StringValue, StringPrototype> implements HasBuiltinTag {
+	public StringWrapper(StringPrototype prototype, StringValue data) {
+		super(prototype, data);
+		this.put(Names.length, new NumberValue(data.value.length()));
 	}
-
 
 	@Override
 	public PropertyDescriptor getOwnProperty(Key<?> key) {
@@ -80,11 +79,6 @@ public final class StringWrapper extends PrimitiveWrapper<StringValue> implement
 				return x.next();
 			}
 		};
-	}
-
-	@Override
-	public ObjectValue getDefaultPrototype() {
-		return StringPrototype.instance;
 	}
 
 	@Override

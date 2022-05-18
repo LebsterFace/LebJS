@@ -17,10 +17,10 @@ public final class ArrowFunction extends Executable {
 	private final ExecutionContext context;
 	private final ArrowFunctionExpression expression;
 
-	public ArrowFunction(ArrowFunctionExpression expression, ExecutionContext context) {
+	public ArrowFunction(Interpreter interpreter, ArrowFunctionExpression expression, ExecutionContext context) {
 		// TODO: Automatic function names for arrow & non-arrow functions
 		//		e.g. ' let k = () => {} ' should be given the name 'k'
-		super(Names.EMPTY);
+		super(interpreter.intrinsics.functionPrototype, Names.EMPTY);
 		this.expression = expression;
 		this.context = context;
 	}

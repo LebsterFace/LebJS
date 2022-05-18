@@ -13,7 +13,7 @@ public record Reference(ObjectValue base, ObjectValue.Key<?> referencedName) {
 		if (isResolvable()) {
 			return base.get(interpreter, referencedName);
 		} else {
-			throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
+			throw AbruptCompletion.error(new ReferenceError(interpreter, referencedName.value + " is not defined"));
 		}
 	}
 
@@ -24,7 +24,7 @@ public record Reference(ObjectValue base, ObjectValue.Key<?> referencedName) {
 		if (!isResolvable()) {
 			// a. If V.[[Strict]] is true, throw a ReferenceError exception.
 			if (interpreter.isStrictMode())
-				throw AbruptCompletion.error(new ReferenceError(referencedName.value + " is not defined"));
+				throw AbruptCompletion.error(new ReferenceError(interpreter, referencedName.value + " is not defined"));
 			// b. Let globalObj be GetGlobalObject().
 			// c. Return ? Set(globalObj, V.[[ReferencedName]], W, false).
 			interpreter.globalObject.set(interpreter, referencedName, newValue);

@@ -98,7 +98,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 
 	@Override
 	public StringWrapper toObjectValue(Interpreter interpreter) {
-		return new StringWrapper(this);
+		return new StringWrapper(interpreter.intrinsics.stringPrototype, this);
 	}
 
 	@Override

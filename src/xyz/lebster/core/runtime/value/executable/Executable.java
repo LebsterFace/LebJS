@@ -21,17 +21,17 @@ import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	public StringValue name;
 
-	public Executable(StringValue name) {
-		super();
+	public Executable(FunctionPrototype functionPrototype, StringValue name) {
+		super(functionPrototype);
 		this.name = name;
 		this.put(Names.name, name);
 	}
 
-	public static Executable getExecutable(Value<?> value) throws AbruptCompletion {
+	public static Executable getExecutable(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 		if (value instanceof final Executable executable) return executable;
 
 		final String message = ANSI.stripFormatting(value.toDisplayString()) + " is not a function";
-		throw AbruptCompletion.error(new TypeError(message));
+		throw AbruptCompletion.error(new TypeError(interpreter, message));
 	}
 
 	public static boolean isAnonymousFunctionExpression(Expression expression) {
@@ -92,7 +92,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		// 4. Let P be ? Get(C, "prototype").
 		final Value<?> P = this.get(interpreter, Names.prototype);
 		// 5. If Type(P) is not Object, throw a TypeError exception.
-		if (!(P instanceof ObjectValue)) throw AbruptCompletion.error(new TypeError("Not an object!"));
+		if (!(P instanceof ObjectValue)) throw AbruptCompletion.error(new TypeError(interpreter, "Not an object!"));
 
 		// 6. Repeat,
 		while (true) {
@@ -103,10 +103,5 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 			// c. If SameValue(P, O) is true, return true.
 			if (P.sameValue(object)) return BooleanValue.TRUE;
 		}
-	}
-
-	@Override
-	public ObjectValue getDefaultPrototype() {
-		return FunctionPrototype.instance;
 	}
 }

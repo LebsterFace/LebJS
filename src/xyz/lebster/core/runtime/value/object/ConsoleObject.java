@@ -11,6 +11,7 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
+import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 
 import java.util.Scanner;
 
@@ -18,30 +19,31 @@ import static xyz.lebster.core.runtime.value.native_.NativeFunction.argumentStri
 
 @SpecificationURL("https://console.spec.whatwg.org/")
 public final class ConsoleObject extends ObjectValue {
-	public static final ConsoleObject instance = new ConsoleObject();
 	private static final Scanner scanner = new Scanner(System.in);
 
-	private ConsoleObject() {
-
-		this.putMethod(Names.write, (interpreter, data) -> {
-			// If args is empty, return.
-			if (data.length == 0) return Undefined.instance;
-
-			final var representation = new StringRepresentation();
-			representation.append(ANSI.RESET);
-			for (final Value<?> arg : data)
-				arg.displayForConsoleLog(representation);
-			representation.append(ANSI.RESET);
-			System.out.print(representation);
-			return Undefined.instance;
-		});
-
-		this.putMethod(Names.log, (interpreter, data) -> logger(LogLevel.Log, data));
-		this.putMethod(Names.warn, (interpreter, data) -> logger(LogLevel.Warn, data));
-		this.putMethod(Names.error, (interpreter, data) -> logger(LogLevel.Error, data));
-		this.putMethod(Names.info, (interpreter, data) -> logger(LogLevel.Info, data));
-		this.putMethod(Names.input, ConsoleObject::input);
+	public ConsoleObject(FunctionPrototype functionPrototype) {
+		super(null);
+		this.putMethod(functionPrototype, Names.write, ConsoleObject::write);
+		this.putMethod(functionPrototype, Names.log, (interpreter, data) -> logger(LogLevel.Log, data));
+		this.putMethod(functionPrototype, Names.warn, (interpreter, data) -> logger(LogLevel.Warn, data));
+		this.putMethod(functionPrototype, Names.error, (interpreter, data) -> logger(LogLevel.Error, data));
+		this.putMethod(functionPrototype, Names.info, (interpreter, data) -> logger(LogLevel.Info, data));
+		this.putMethod(functionPrototype, Names.input, ConsoleObject::input);
 	}
+
+	private static Undefined write(Interpreter interpreter, Value<?>[] data) {
+		// If args is empty, return.
+		if (data.length == 0) return Undefined.instance;
+
+		final var representation = new StringRepresentation();
+		representation.append(ANSI.RESET);
+		for (final Value<?> arg : data)
+			arg.displayForConsoleLog(representation);
+		representation.append(ANSI.RESET);
+		System.out.print(representation);
+		return Undefined.instance;
+	}
+
 
 	@NonStandard
 	private static Value<?> input(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
@@ -52,11 +54,7 @@ public final class ConsoleObject extends ObjectValue {
 		return switch (inputType.toUpperCase()) {
 			default -> new StringValue(input);
 			case "NUMBER" -> new StringValue(input).toNumberValue(interpreter);
-			case "BOOLEAN" -> BooleanValue.of(
-				input.equalsIgnoreCase("yes") ||
-				input.equalsIgnoreCase("true") ||
-				input.equalsIgnoreCase("y")
-			);
+			case "BOOLEAN" -> BooleanValue.of(input.equalsIgnoreCase("yes") || input.equalsIgnoreCase("true") || input.equalsIgnoreCase("y"));
 		};
 	}
 

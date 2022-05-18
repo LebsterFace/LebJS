@@ -40,7 +40,7 @@ public final class Null extends PrimitiveValue<Void> {
 
 	@Override
 	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError("Cannot convert null to object"));
+		throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert null to object"));
 	}
 
 	@Override

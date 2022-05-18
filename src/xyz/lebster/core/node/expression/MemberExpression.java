@@ -31,7 +31,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 
 		if (executedBase.isNullish()) {
 			final String msg = "Cannot read property '" + executedProp.value + "' of " + executedBase;
-			throw AbruptCompletion.error(new TypeError(msg));
+			throw AbruptCompletion.error(new TypeError(interpreter, msg));
 		}
 
 		return new Reference(executedBase.toObjectValue(interpreter), executedProp);

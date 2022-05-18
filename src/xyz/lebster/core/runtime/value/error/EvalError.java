@@ -1,13 +1,14 @@
 package xyz.lebster.core.runtime.value.error;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 
-public final class EvalError extends LanguageError {
+public final class EvalError extends ErrorObject {
 	public final Throwable wrappedThrowable;
 
-	public EvalError(Throwable e) {
-		super(e.getMessage());
+	public EvalError(Interpreter interpreter, Throwable e) {
+		super(interpreter, e.getMessage());
 		this.wrappedThrowable = e;
 	}
 

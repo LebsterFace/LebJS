@@ -13,16 +13,14 @@ import xyz.lebster.core.runtime.value.object.property.NativeAccessorDescriptor;
 import xyz.lebster.core.runtime.value.primitive.SymbolValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-symbol-prototype-object")
-public final class SymbolPrototype extends ObjectValue {
-	public static final SymbolPrototype instance = new SymbolPrototype();
-
+public final class SymbolPrototype extends BuiltinPrototype<SymbolWrapper, SymbolConstructor> {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype.description")
 	private static final NativeAccessorDescriptor DESCRIPTION = new NativeAccessorDescriptor(false, true) {
 		@Override
 		public Value<?> get(Interpreter interpreter, ObjectValue thisValue) throws AbruptCompletion {
 			// 1. Let s be the this value.
 			// 2. Let sym be ? thisSymbolValue(s).
-			final SymbolValue sym = thisSymbolValue(thisValue, "Symbol.prototype.description");
+			final SymbolValue sym = thisSymbolValue(interpreter, thisValue, "Symbol.prototype.description");
 			// 3. Return sym.[[Description]].
 			return sym.description;
 		}
@@ -32,15 +30,12 @@ public final class SymbolPrototype extends ObjectValue {
 		}
 	};
 
-	static {
-		instance.put(Names.constructor, SymbolConstructor.instance);
-		instance.value.put(Names.description, SymbolPrototype.DESCRIPTION);
+	public SymbolPrototype(ObjectPrototype objectPrototype) {
+		super(objectPrototype);
+		this.value.put(Names.description, SymbolPrototype.DESCRIPTION);
 	}
 
-	private SymbolPrototype() {
-	}
-
-	private static SymbolValue thisSymbolValue(Value<?> value, String methodName) throws AbruptCompletion {
+	private static SymbolValue thisSymbolValue(Interpreter interpreter, Value<?> value, String methodName) throws AbruptCompletion {
 		// 1. If Type(value) is Symbol, return value.
 		if (value instanceof final SymbolValue symbolValue) return symbolValue;
 		// 2. If Type(value) is Object and value has a [[SymbolData]] internal slot, then
@@ -49,6 +44,6 @@ public final class SymbolPrototype extends ObjectValue {
 		// c. Return s.
 		if (value instanceof final SymbolWrapper symbolWrapper) return symbolWrapper.data;
 		// 3. Throw a TypeError exception.
-		throw AbruptCompletion.error(new TypeError(methodName + " requires that 'this' be a Symbol"));
+		throw AbruptCompletion.error(new TypeError(interpreter, methodName + " requires that 'this' be a Symbol"));
 	}
 }

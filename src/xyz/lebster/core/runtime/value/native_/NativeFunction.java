@@ -9,14 +9,15 @@ import xyz.lebster.core.runtime.value.executable.Executable;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
+import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 
 import java.util.HashSet;
 
 public final class NativeFunction extends Executable {
 	private final NativeCode code;
 
-	public NativeFunction(StringValue name, NativeCode code) {
-		super(name);
+	public NativeFunction(FunctionPrototype functionPrototype, StringValue name, NativeCode code) {
+		super(functionPrototype, name);
 		this.code = code;
 	}
 

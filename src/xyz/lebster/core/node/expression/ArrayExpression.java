@@ -9,7 +9,7 @@ import xyz.lebster.core.runtime.value.object.ArrayObject;
 public record ArrayExpression(ExpressionList expressionList) implements Expression {
 	@Override
 	public ArrayObject execute(Interpreter interpreter) throws AbruptCompletion {
-		return new ArrayObject(expressionList.executeAll(interpreter));
+		return new ArrayObject(interpreter, expressionList.executeAll(interpreter));
 	}
 
 	@Override

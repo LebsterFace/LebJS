@@ -13,7 +13,7 @@ import xyz.lebster.core.runtime.value.primitive.Undefined;
 public record FunctionDeclaration(BlockStatement body, String name, String[] arguments) implements FunctionNode, Declaration {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Function function = new Function(this, interpreter.lexicalEnvironment());
+		final Function function = new Function(interpreter, interpreter.lexicalEnvironment(), this);
 		interpreter.declareVariable(name, function);
 		return Undefined.instance;
 	}

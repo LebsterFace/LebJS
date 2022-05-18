@@ -98,12 +98,12 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError("Cannot convert a Symbol value to a string"));
+		throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert a Symbol value to a string"));
 	}
 
 	@Override
 	public NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError("Cannot convert a Symbol value to a number"));
+		throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert a Symbol value to a number"));
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 
 	@Override
 	public ObjectValue toObjectValue(Interpreter interpreter) {
-		return new SymbolWrapper(this);
+		return new SymbolWrapper(interpreter.intrinsics.symbolPrototype, this);
 	}
 
 	@Override

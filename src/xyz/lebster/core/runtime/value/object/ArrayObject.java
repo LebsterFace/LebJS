@@ -16,7 +16,6 @@ import xyz.lebster.core.runtime.value.object.property.PropertyDescriptor;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
-import xyz.lebster.core.runtime.value.prototype.ArrayPrototype;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,7 +25,8 @@ import java.util.Map;
 public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Iterable<PropertyDescriptor> {
 	private final ArrayList<PropertyDescriptor> arrayValues;
 
-	public ArrayObject(Value<?>... initialValues) {
+	public ArrayObject(Interpreter interpreter, Value<?>... initialValues) {
+		super(interpreter.intrinsics.arrayPrototype);
 		this.arrayValues = new ArrayList<>(initialValues.length);
 		for (final Value<?> value : initialValues) {
 			this.arrayValues.add(new DataDescriptor(value, true, true, true));
@@ -55,8 +55,8 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		});
 	}
 
-	public ArrayObject(ArrayList<Value<?>> arrayValues) {
-		this(arrayValues.toArray(new Value[0]));
+	public ArrayObject(Interpreter interpreter, ArrayList<Value<?>> arrayValues) {
+		this(interpreter, arrayValues.toArray(new Value[0]));
 	}
 
 	@Override
@@ -104,11 +104,6 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		}
 
 		return super.defineOwnProperty(interpreter, P, Desc);
-	}
-
-	@Override
-	public ObjectValue getDefaultPrototype() {
-		return ArrayPrototype.instance;
 	}
 
 	@Override

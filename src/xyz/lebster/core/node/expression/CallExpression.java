@@ -20,20 +20,20 @@ public record CallExpression(Expression callee, ExpressionList arguments) implem
 		if (callee instanceof final MemberExpression memberExpression) {
 			// toReference is being used to handle executing the base, property, and lookup in one
 			final Reference reference = memberExpression.toReference(interpreter);
-			final Executable executable = getExecutable(reference.getValue(interpreter));
+			final Executable executable = getExecutable(interpreter, reference.getValue(interpreter));
 			return executable.call(interpreter, reference.base(), executedArguments);
 		} else {
-			final Executable executable = getExecutable(callee.execute(interpreter));
+			final Executable executable = getExecutable(interpreter, callee.execute(interpreter));
 			return executable.call(interpreter, executedArguments);
 		}
 	}
 
-	private Executable getExecutable(Value<?> value) throws AbruptCompletion {
+	private Executable getExecutable(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 		if (value instanceof final Executable executable)
 			return executable;
 
 		final String message = ANSI.stripFormatting(callee.toRepresentationString()) + " is not a function";
-		throw AbruptCompletion.error(new TypeError(message));
+		throw AbruptCompletion.error(new TypeError(interpreter, message));
 	}
 
 	@Override

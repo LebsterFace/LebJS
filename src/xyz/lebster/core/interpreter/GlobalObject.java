@@ -6,12 +6,8 @@ import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.constructor.*;
 import xyz.lebster.core.runtime.value.error.EvalError;
-import xyz.lebster.core.runtime.value.object.ConsoleObject;
-import xyz.lebster.core.runtime.value.object.MathObject;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.object.TestObject;
 import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
@@ -21,8 +17,8 @@ import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
 public final class GlobalObject extends ObjectValue {
-	public GlobalObject() {
-		super();
+	public GlobalObject(Intrinsics intrinsics) {
+		super(intrinsics.objectPrototype);
 
 		// 19.1 Value Properties of the Global Object
 		put(Names.globalThis, this);
@@ -32,26 +28,26 @@ public final class GlobalObject extends ObjectValue {
 		putNonWritable(Names.undefined, Undefined.instance);
 
 		// 19.2 Function Properties of the Global Object
-		putMethod(Names.eval, GlobalObject::eval);
-		putMethod(Names.isFinite, GlobalObject::isFinite);
-		putMethod(Names.isNaN, GlobalObject::isNaN);
-		putMethod(Names.parseFloat, GlobalObject::parseFloat);
-		putMethod(Names.parseInt, GlobalObject::parseInt);
+		putMethod(intrinsics.functionPrototype, Names.eval, GlobalObject::eval);
+		putMethod(intrinsics.functionPrototype, Names.isFinite, GlobalObject::isFinite);
+		putMethod(intrinsics.functionPrototype, Names.isNaN, GlobalObject::isNaN);
+		putMethod(intrinsics.functionPrototype, Names.parseFloat, GlobalObject::parseFloat);
+		putMethod(intrinsics.functionPrototype, Names.parseInt, GlobalObject::parseInt);
 
 		// 19.3 Constructor Properties of the Global Object
-		put(Names.Array, ArrayConstructor.instance);
-		put(Names.Boolean, BooleanConstructor.instance);
-		put(Names.Math, MathObject.instance);
-		put(Names.Number, NumberConstructor.instance);
-		put(Names.Object, ObjectConstructor.instance);
-		put(Names.ShadowRealm, ShadowRealmConstructor.instance);
-		put(Names.String, StringConstructor.instance);
-		put(Names.Symbol, SymbolConstructor.instance);
-		put(Names.Function, FunctionConstructor.instance);
-		put(Names.Test, TestObject.instance);
+		put(Names.Array, intrinsics.arrayConstructor);
+		put(Names.Boolean, intrinsics.booleanConstructor);
+		put(Names.Math, intrinsics.mathObject);
+		put(Names.Number, intrinsics.numberConstructor);
+		put(Names.Object, intrinsics.objectConstructor);
+		put(Names.ShadowRealm, intrinsics.shadowRealmConstructor);
+		put(Names.String, intrinsics.stringConstructor);
+		put(Names.Symbol, intrinsics.symbolConstructor);
+		put(Names.Function, intrinsics.functionConstructor);
+		put(Names.Test, intrinsics.testObject);
 
 		// Non-Standard properties
-		put(Names.console, ConsoleObject.instance);
+		put(Names.console, intrinsics.consoleObject);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parseint-string-radix")
@@ -159,7 +155,7 @@ public final class GlobalObject extends ObjectValue {
 		try {
 			return Realm.executeWith(sourceText, interpreter);
 		} catch (CannotParse | SyntaxError e) {
-			throw AbruptCompletion.error(new EvalError(e));
+			throw AbruptCompletion.error(new EvalError(interpreter, e));
 		}
 	}
 

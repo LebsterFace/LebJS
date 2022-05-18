@@ -4,6 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -17,33 +18,24 @@ import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.object.property.DataDescriptor;
 import xyz.lebster.core.runtime.value.object.property.PropertyDescriptor;
 import xyz.lebster.core.runtime.value.primitive.*;
-import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
+import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 
 import java.util.*;
 
 public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescriptor>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
 	private final int UNIQUE_ID = ObjectValue.LAST_UNUSED_IDENTIFIER++;
-	private ObjectValue prototypeSlot = this.getDefaultPrototype();
 
-	public ObjectValue() {
-		super(new HashMap<>());
+	private ObjectValue prototypeSlot;
+
+	private ObjectValue() {
+		super(null);
+		throw new ShouldNotHappen("Usage of private ObjectValue()");
 	}
 
-	protected static ObjectValue createFromPrototype(Value<?> O) throws AbruptCompletion {
-		ObjectValue prototype;
-		if (O == Null.instance) {
-			prototype = null;
-		} else if (O instanceof final ObjectValue O_obj) {
-			prototype = O_obj;
-		} else {
-			// 1. If Type(O) is neither Object nor Null, throw a TypeError exception.
-			throw AbruptCompletion.error(new TypeError("Object prototype may only be an Object or null"));
-		}
-
-		final var result = new ObjectValue();
-		result.prototypeSlot = prototype;
-		return result;
+	public ObjectValue(ObjectValue prototype) {
+		super(new HashMap<>());
+		this.prototypeSlot = prototype;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -87,10 +79,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		}
 
 		representation.append('}');
-	}
-
-	public ObjectValue getDefaultPrototype() {
-		return ObjectPrototype.instance;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarygetprototypeof")
@@ -156,7 +144,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 		// b. If exoticToPrim is not undefined, then
 		if (exoticToPrim_property != null) {
-			final Executable exoticToPrim = Executable.getExecutable(exoticToPrim_property.get(interpreter, this));
+			final Executable exoticToPrim = Executable.getExecutable(interpreter, exoticToPrim_property.get(interpreter, this));
 			final StringValue hint = preferredType == null ? Names.default_ :
 				preferredType == PreferredType.String ? Names.string : Names.number;
 			// iv. Let result be ? Call(exoticToPrim, input, hint).
@@ -164,7 +152,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			// v. If Type(result) is not Object, return result.
 			if (!(result instanceof ObjectValue)) return result.toPrimitive(interpreter);
 			// vi. Throw a TypeError exception.
-			throw AbruptCompletion.error(new TypeError("Cannot convert object to primitive value"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert object to primitive value"));
 		}
 
 		// c. If preferredType is not present, let preferredType be number.
@@ -198,7 +186,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		}
 
 		// 6. Throw a TypeError exception.
-		throw AbruptCompletion.error(new TypeError("Cannot convert object to primitive value"));
+		throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert object to primitive value"));
 	}
 
 	@Override
@@ -290,7 +278,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			final var representation = new StringRepresentation();
 			representation.append("Cannot assign to read-only property ");
 			key.display(representation);
-			throw AbruptCompletion.error(new TypeError(representation.toString()));
+			throw AbruptCompletion.error(new TypeError(interpreter, representation.toString()));
 		}
 	}
 
@@ -308,7 +296,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			return Undefined.instance;
 		// 3. If IsCallable(func) is false, throw a TypeError exception.
 		if (!(func instanceof Executable))
-			throw AbruptCompletion.error(new TypeError("Not a function!"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "Not a function!"));
 		// 4. Return func.
 		return func;
 	}
@@ -321,7 +309,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 				representation.append("Property ");
 				key.displayForObjectKey(representation);
 				representation.append(" does not exist on object.");
-				throw AbruptCompletion.error(new CheckedError(representation.toString()));
+				throw AbruptCompletion.error(new CheckedError(interpreter, representation.toString()));
 			} else {
 				return Undefined.instance;
 			}
@@ -337,7 +325,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		boolean success = this.delete(P);
 		// 2. If success is false, throw a TypeError exception.
 		if (!success) {
-			throw AbruptCompletion.error(new TypeError("Cannot assign to read only property '" + P.toDisplayString() + "' of object"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "Cannot assign to read only property '" + P.toDisplayString() + "' of object"));
 		}
 		// 3. Return unused.
 	}
@@ -384,8 +372,10 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		this.value.put(key, new DataDescriptor(value, false, false, false));
 	}
 
-	public void putMethod(ObjectValue.Key<?> key, NativeCode code) {
-		this.put(key, new NativeFunction(key.toFunctionName(), code));
+	public NativeFunction putMethod(FunctionPrototype functionPrototype, ObjectValue.Key<?> key, NativeCode code) {
+		final var function = new NativeFunction(functionPrototype, key.toFunctionName(), code);
+		this.put(key, function);
+		return function;
 	}
 
 	public Iterable<Map.Entry<Key<?>, PropertyDescriptor>> entries() {

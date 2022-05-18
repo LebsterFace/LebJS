@@ -9,33 +9,27 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.NumberConstructor;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.NumberWrapper;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
-public final class NumberPrototype extends ObjectValue {
-	public static final NumberPrototype instance = new NumberPrototype();
-
-	static {
-		instance.put(Names.constructor, NumberConstructor.instance);
-		instance.putMethod(Names.toString, NumberPrototype::toStringMethod);
-		instance.putMethod(Names.valueOf, NumberPrototype::valueOf);
-		instance.putMethod(Names.toLocaleString, NumberPrototype::toLocaleString);
-	}
-
-	private NumberPrototype() {
+public final class NumberPrototype extends BuiltinPrototype<NumberWrapper, NumberConstructor> {
+	public NumberPrototype(ObjectPrototype objectPrototype, FunctionPrototype fp) {
+		super(objectPrototype);
+		this.putMethod(fp, Names.toString, NumberPrototype::toStringMethod);
+		this.putMethod(fp, Names.valueOf, NumberPrototype::valueOf);
+		this.putMethod(fp, Names.toLocaleString, NumberPrototype::toLocaleString);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.valueof")
 	private static NumberValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Return ? thisNumberValue(this value).
-		return thisNumberValue(interpreter.thisValue());
+		return thisNumberValue(interpreter, interpreter.thisValue());
 	}
 
-	private static NumberValue thisNumberValue(Value<?> value) throws AbruptCompletion {
+	private static NumberValue thisNumberValue(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 		// 1. If Type(value) is Number, return value.
 		if (value instanceof final NumberValue numberValue) return numberValue;
 		// 2. If Type(value) is Object and value has a [[NumberData]] internal slot, then
@@ -46,7 +40,7 @@ public final class NumberPrototype extends ObjectValue {
 			return numberWrapper.data;
 		}
 		// 3. Throw a TypeError exception.
-		throw AbruptCompletion.error(new TypeError("This method requires that 'this' be a Number"));
+		throw AbruptCompletion.error(new TypeError(interpreter, "This method requires that 'this' be a Number"));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tointegerorinfinity")
@@ -75,7 +69,7 @@ public final class NumberPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tolocalestring")
 	@NonCompliant
 	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
-		final NumberValue x = thisNumberValue(interpreter.thisValue());
+		final NumberValue x = thisNumberValue(interpreter, interpreter.thisValue());
 		return new StringValue(x.toLocaleString());
 	}
 
@@ -84,13 +78,13 @@ public final class NumberPrototype extends ObjectValue {
 	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final Value<?> radix = argument(0, arguments);
 		// 1. Let x be ? thisNumberValue(this value).
-		final NumberValue x = thisNumberValue(interpreter.thisValue());
+		final NumberValue x = thisNumberValue(interpreter, interpreter.thisValue());
 		// 2. If radix is undefined, let radixMV be 10.
 		// 3. Else, let radixMV be ? ToIntegerOrInfinity(radix).
 		final int radixMV = radix == Undefined.instance ? 10 : toIntegerOrInfinity(interpreter, radix);
 		// 4. If radixMV < 2 or radixMV > 36, throw a RangeError exception.
 		if (radixMV < 2 || radixMV > 36)
-			throw AbruptCompletion.error(new TypeError("toString() radix argument must be between 2 and 36"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "toString() radix argument must be between 2 and 36"));
 		// 5. If radixMV = 10, return ! ToString(x).
 		if (radixMV == 10) return x.toStringValue(interpreter);
 		// 6. Return the String representation of this Number value using the radix specified by radixMV. Letters a-z

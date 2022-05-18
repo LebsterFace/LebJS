@@ -1,7 +1,9 @@
 package xyz.lebster.core.runtime.value.error;
 
-public class CheckedError extends LanguageError {
-	public CheckedError(String message) {
-		super(message);
+import xyz.lebster.core.interpreter.Interpreter;
+
+public class CheckedError extends ErrorObject {
+	public CheckedError(Interpreter interpreter, String message) {
+		super(interpreter, message);
 	}
 }

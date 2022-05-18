@@ -188,7 +188,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 
 	@Override
 	public ObjectValue toObjectValue(Interpreter interpreter) {
-		return new NumberWrapper(this);
+		return new NumberWrapper(interpreter.intrinsics.numberPrototype, this);
 	}
 
 	@Override

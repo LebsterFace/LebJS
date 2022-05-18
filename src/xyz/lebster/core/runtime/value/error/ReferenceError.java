@@ -1,7 +1,10 @@
 package xyz.lebster.core.runtime.value.error;
 
-public final class ReferenceError extends LanguageError {
-	public ReferenceError(String message) {
-		super(message);
+import xyz.lebster.core.interpreter.Interpreter;
+
+public final class ReferenceError extends ErrorObject {
+
+	public ReferenceError(Interpreter interpreter, String message) {
+		super(interpreter, message);
 	}
 }

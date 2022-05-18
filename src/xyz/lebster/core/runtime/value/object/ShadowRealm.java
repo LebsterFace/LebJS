@@ -12,19 +12,15 @@ import xyz.lebster.core.runtime.value.prototype.ShadowRealmPrototype;
 public final class ShadowRealm extends ObjectValue {
 	private final Realm realm = new Realm(new Interpreter());
 
-	public ShadowRealm() {
-	}
-
-	@Override
-	public ShadowRealmPrototype getDefaultPrototype() {
-		return ShadowRealmPrototype.instance;
+	public ShadowRealm(ShadowRealmPrototype prototype) {
+		super(prototype);
 	}
 
 	public Value<?> evaluate(String sourceText) throws AbruptCompletion {
 		try {
 			return this.realm.execute(sourceText, false);
 		} catch (AbruptCompletion | SyntaxError | CannotParse e) {
-			throw AbruptCompletion.error(new EvalError(e));
+			throw AbruptCompletion.error(new EvalError(realm.interpreter(), e));
 		}
 	}
 

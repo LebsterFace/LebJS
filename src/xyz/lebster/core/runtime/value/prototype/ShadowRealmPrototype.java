@@ -7,27 +7,22 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.constructor.ShadowRealmConstructor;
 import xyz.lebster.core.runtime.value.error.TypeError;
 import xyz.lebster.core.runtime.value.object.ArrayObject;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.ShadowRealm;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
 
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
-public final class ShadowRealmPrototype extends ObjectValue {
-	public static final ShadowRealmPrototype instance = new ShadowRealmPrototype();
+public final class ShadowRealmPrototype extends BuiltinPrototype<ShadowRealm, ShadowRealmConstructor> {
+	public ShadowRealmPrototype(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
+		super(objectPrototype);
 
-	static {
-		instance.put(Names.constructor, ShadowRealmConstructor.instance);
-		instance.putMethod(Names.evaluate, ShadowRealmPrototype::evaluate);
-		instance.putMethod(Names.declare, ShadowRealmPrototype::declare);
-	}
-
-	private ShadowRealmPrototype() {
+		this.putMethod(functionPrototype, Names.evaluate, ShadowRealmPrototype::evaluate);
+		this.putMethod(functionPrototype, Names.declare, ShadowRealmPrototype::declare);
 	}
 
 	private static Value<?> evaluate(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		if (!(interpreter.thisValue() instanceof final ShadowRealm shadowRealm)) {
-			throw AbruptCompletion.error(new TypeError("ShadowRealm.prototype.evaluate requires that 'this' be a ShadowRealm"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "ShadowRealm.prototype.evaluate requires that 'this' be a ShadowRealm"));
 		}
 
 		if (arguments.length == 0) return Undefined.instance;
@@ -37,14 +32,14 @@ public final class ShadowRealmPrototype extends ObjectValue {
 			results[i] = shadowRealm.evaluate(arguments[i].toStringValue(interpreter).value);
 		}
 
-		return results.length == 1 ? results[0] : new ArrayObject(results);
+		return results.length == 1 ? results[0] : new ArrayObject(interpreter, results);
 	}
 
 	private static Value<?> declare(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		if (!(interpreter.thisValue() instanceof final ShadowRealm shadowRealm))
-			throw AbruptCompletion.error(new TypeError("ShadowRealm.prototype.declare requires that `this` be a ShadowRealm"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "ShadowRealm.prototype.declare requires that `this` be a ShadowRealm"));
 		if (arguments.length < 1)
-			throw AbruptCompletion.error(new TypeError("Missing variable name"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "Missing variable name"));
 
 		final String name = arguments[0].toStringValue(interpreter).value;
 		final Value<?> value = argument(1, arguments);

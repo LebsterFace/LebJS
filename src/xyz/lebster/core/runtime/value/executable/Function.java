@@ -9,7 +9,6 @@ import xyz.lebster.core.runtime.value.Value;
 import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
-import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 import java.util.HashSet;
 
@@ -18,10 +17,10 @@ public final class Function extends Constructor {
 	private final Environment environment;
 	private final FunctionNode code;
 
-	public Function(FunctionNode code, Environment environment) {
-		super(code.name() == null ? Names.EMPTY : new StringValue(code.name()));
-		this.code = code;
+	public Function(Interpreter interpreter, Environment environment, FunctionNode code) {
+		super(interpreter.intrinsics.objectPrototype, interpreter.intrinsics.functionPrototype, code.name() == null ? Names.EMPTY : new StringValue(code.name()));
 		this.environment = environment;
+		this.code = code;
 	}
 
 	@Override
@@ -71,11 +70,9 @@ public final class Function extends Constructor {
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-function-objects-construct-argumentslist-newtarget")
 	public ObjectValue construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final Value<?> prototypeProperty = this.get(interpreter, Names.prototype);
-
-		final ObjectValue prototype = prototypeProperty instanceof ObjectValue object ? object : ObjectPrototype.instance;
-		final ObjectValue newInstance = new ObjectValue();
-		newInstance.setPrototype(prototype);
+		final Value<?> prop = this.get(interpreter, Names.prototype);
+		final ObjectValue prototype = prop instanceof ObjectValue proto ? proto : interpreter.intrinsics.objectPrototype;
+		final ObjectValue newInstance = new ObjectValue(prototype);
 
 		final Value<?> returnValue = this.call(interpreter, newInstance, args);
 		if (returnValue instanceof final ObjectValue asObject) return asObject;

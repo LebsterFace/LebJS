@@ -19,7 +19,7 @@ public record VariableDeclaration(Kind kind, VariableDeclarator... declarations)
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		if (this.kind == Kind.Var && interpreter.isCheckedMode()) {
-			throw AbruptCompletion.error(new CheckedError("Usage of `var` in checked mode. Use `let` or `const` instead."));
+			throw AbruptCompletion.error(new CheckedError(interpreter, "Usage of `var` in checked mode. Use `let` or `const` instead."));
 		}
 
 		for (VariableDeclarator declarator : declarations)

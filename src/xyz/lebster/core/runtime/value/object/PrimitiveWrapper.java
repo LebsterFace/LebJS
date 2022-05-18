@@ -6,11 +6,13 @@ import xyz.lebster.core.runtime.value.primitive.BooleanValue;
 import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.primitive.PrimitiveValue;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.runtime.value.prototype.BuiltinPrototype;
 
-public abstract class PrimitiveWrapper<P extends PrimitiveValue<?>> extends ObjectValue {
-	public final P data;
+public abstract class PrimitiveWrapper<T extends PrimitiveValue<?>, P extends BuiltinPrototype<?, ?>> extends ObjectValue {
+	public final T data;
 
-	public PrimitiveWrapper(P data) {
+	public PrimitiveWrapper(P prototype, T data) {
+		super(prototype);
 		this.data = data;
 	}
 

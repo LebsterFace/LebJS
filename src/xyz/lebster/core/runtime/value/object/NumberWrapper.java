@@ -6,14 +6,9 @@ import xyz.lebster.core.runtime.value.primitive.NumberValue;
 import xyz.lebster.core.runtime.value.prototype.NumberPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-number-objects")
-public final class NumberWrapper extends PrimitiveWrapper<NumberValue> implements HasBuiltinTag {
-	public NumberWrapper(NumberValue s) {
-		super(s);
-	}
-
-	@Override
-	public ObjectValue getDefaultPrototype() {
-		return NumberPrototype.instance;
+public final class NumberWrapper extends PrimitiveWrapper<NumberValue, NumberPrototype> implements HasBuiltinTag {
+	public NumberWrapper(NumberPrototype prototype, NumberValue data) {
+		super(prototype, data);
 	}
 
 	@Override

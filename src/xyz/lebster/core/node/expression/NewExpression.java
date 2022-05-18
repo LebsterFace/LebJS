@@ -15,17 +15,17 @@ public record NewExpression(Expression constructExpr, ExpressionList arguments) 
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> value = constructExpr.execute(interpreter);
 		final Value<?>[] executedArguments = arguments == null ? new Value[0] : arguments.executeAll(interpreter).toArray(new Value[0]);
-		return getConstructor(value).construct(interpreter, executedArguments);
+		return getConstructor(interpreter, value).construct(interpreter, executedArguments);
 	}
 
-	private Constructor getConstructor(Value<?> exprValue) throws AbruptCompletion {
+	private Constructor getConstructor(Interpreter interpreter, Value<?> exprValue) throws AbruptCompletion {
 		if (exprValue instanceof final Constructor constructor) {
 			return constructor;
 		} else {
 			final var representation = new StringRepresentation();
 			exprValue.display(representation);
 			representation.append(" is not a constructor");
-			throw AbruptCompletion.error(new TypeError(representation.toString()));
+			throw AbruptCompletion.error(new TypeError(interpreter, representation.toString()));
 		}
 	}
 

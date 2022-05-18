@@ -14,6 +14,7 @@ import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.property.PropertyDescriptor;
 import xyz.lebster.core.runtime.value.primitive.Null;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.runtime.value.prototype.FunctionPrototype;
 import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 
 import java.util.ArrayList;
@@ -22,41 +23,36 @@ import java.util.Map;
 import static xyz.lebster.core.runtime.value.native_.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
-public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
-	public static final ObjectConstructor instance = new ObjectConstructor();
+public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, ObjectPrototype> {
+	public ObjectConstructor(ObjectPrototype objectPrototype, FunctionPrototype fp) {
+		super(objectPrototype, fp, Names.Object);
 
-	static {
-		instance.putNonWritable(Names.prototype, ObjectPrototype.instance);
-
-		instance.putMethod(Names.setPrototypeOf, ObjectConstructor::setPrototypeOf);
-		instance.putMethod(Names.getPrototypeOf, ObjectConstructor::getPrototypeOf);
-		instance.putMethod(Names.create, ObjectConstructor::create);
-		instance.putMethod(Names.keys, ObjectConstructor::keys);
-		instance.putMethod(Names.values, ObjectConstructor::values);
-		instance.putMethod(Names.entries, ObjectConstructor::entries);
-		instance.putMethod(Names.fromEntries, ObjectConstructor::fromEntries);
+		this.putMethod(fp, Names.setPrototypeOf, ObjectConstructor::setPrototypeOf);
+		this.putMethod(fp, Names.getPrototypeOf, ObjectConstructor::getPrototypeOf);
+		this.putMethod(fp, Names.create, ObjectConstructor::create);
+		this.putMethod(fp, Names.keys, ObjectConstructor::keys);
+		this.putMethod(fp, Names.values, ObjectConstructor::values);
+		this.putMethod(fp, Names.entries, ObjectConstructor::entries);
+		this.putMethod(fp, Names.fromEntries, ObjectConstructor::fromEntries);
 	}
 
-	private ObjectConstructor() {
-		super(Names.Object);
-	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.fromentries")
 	@NonCompliant
-	private static ObjectValue fromEntries(Interpreter $, Value<?>[] arguments) throws AbruptCompletion {
+	private static ObjectValue fromEntries(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final Value<?> arg = NativeFunction.argument(0, arguments);
 		if (!(arg instanceof ArrayObject arrayObject))
-			throw AbruptCompletion.error(new TypeError("Object.fromEntries call with non-array"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "Object.fromEntries call with non-array"));
 
-		final ObjectValue result = new ObjectValue();
+		final ObjectValue result = new ObjectValue(interpreter.intrinsics.objectPrototype);
 		for (final PropertyDescriptor descriptor : arrayObject) {
-			final Value<?> value = descriptor.get($, arrayObject);
+			final Value<?> value = descriptor.get(interpreter, arrayObject);
 
 			if (!(value instanceof final ObjectValue entry))
-				throw AbruptCompletion.error(new TypeError("Value is not an entry object"));
+				throw AbruptCompletion.error(new TypeError(interpreter, "Value is not an entry object"));
 
-			final ObjectValue.Key<?> entryKey = entry.get($, new StringValue("0")).toPropertyKey($);
-			final Value<?> entryValue = entry.get($, new StringValue("1"));
+			final ObjectValue.Key<?> entryKey = entry.get(interpreter, new StringValue("0")).toPropertyKey(interpreter);
+			final Value<?> entryValue = entry.get(interpreter, new StringValue("1"));
 			result.putEnumerable(entryKey, entryValue);
 		}
 
@@ -73,7 +69,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 			}
 		}
 
-		return new ArrayObject(properties.toArray(new StringValue[0]));
+		return new ArrayObject(interpreter, properties.toArray(new StringValue[0]));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.values")
@@ -86,7 +82,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 			}
 		}
 
-		return new ArrayObject(properties.toArray(new Value[0]));
+		return new ArrayObject(interpreter, properties.toArray(new Value[0]));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.entries")
@@ -95,14 +91,14 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 		final ArrayList<ArrayObject> properties = new ArrayList<>();
 		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : obj.entries()) {
 			if (entry.getValue().isEnumerable() && entry.getKey() instanceof StringValue) {
-				properties.add(new ArrayObject(
+				properties.add(new ArrayObject(interpreter,
 					entry.getKey(),
 					entry.getValue().get(interpreter, obj)
 				));
 			}
 		}
 
-		return new ArrayObject(properties.toArray(new ArrayObject[0]));
+		return new ArrayObject(interpreter, properties.toArray(new ArrayObject[0]));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.create")
@@ -110,7 +106,15 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 	private static Value<?> create(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// Object.create ( O, Properties )
 		final Value<?> O = argument(0, arguments);
-		return ObjectValue.createFromPrototype(O);
+
+		if (O == Null.instance) {
+			return new ObjectValue(null);
+		} else if (O instanceof final ObjectValue prototype) {
+			return new ObjectValue(prototype);
+		} else {
+			// 1. If Type(O) is neither Object nor Null, throw a TypeError exception.
+			throw AbruptCompletion.error(new TypeError(interpreter, "Object prototype may only be an Object or null"));
+		}
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.setprototypeof")
@@ -121,14 +125,14 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 
 		// 1. Set O to ? RequireObjectCoercible(O).
 		if (O.isNullish())
-			throw AbruptCompletion.error(new TypeError("Object.setPrototypeOf called on null or undefined"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "Object.setPrototypeOf called on null or undefined"));
 
 		// 2. If Type(proto) is neither Object nor Null, throw a TypeError exception.
 		ObjectValue proto_objectValue = null;
 		if (proto instanceof final ObjectValue p) {
 			proto_objectValue = p;
 		} else if (proto != Null.instance) {
-			throw AbruptCompletion.error(new TypeError("Object prototype may only be an Object or null"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "Object prototype may only be an Object or null"));
 		}
 
 		// 3. If Type(O) is not Object, return O.
@@ -137,7 +141,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue> {
 		final boolean status = O_objectValue.setPrototype(proto_objectValue);
 		// 5. If status is false, throw a TypeError exception.
 		if (!status)
-			throw AbruptCompletion.error(new TypeError("Cyclic object prototype value"));
+			throw AbruptCompletion.error(new TypeError(interpreter, "Cyclic object prototype value"));
 		// 6. Return O.
 		return O;
 	}

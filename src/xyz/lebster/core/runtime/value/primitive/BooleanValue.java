@@ -1,10 +1,9 @@
 package xyz.lebster.core.runtime.value.primitive;
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.runtime.value.object.BooleanWrapper;
 
 public final class BooleanValue extends PrimitiveValue<Boolean> {
 	public static final BooleanValue TRUE = new BooleanValue(Boolean.TRUE);
@@ -41,8 +40,8 @@ public final class BooleanValue extends PrimitiveValue<Boolean> {
 	}
 
 	@Override
-	public ObjectValue toObjectValue(Interpreter interpreter) {
-		throw new NotImplemented("BooleanWrapper");
+	public BooleanWrapper toObjectValue(Interpreter interpreter) {
+		return new BooleanWrapper(interpreter.intrinsics.booleanPrototype, this);
 	}
 
 	public BooleanValue not() {

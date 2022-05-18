@@ -1,12 +1,12 @@
 package xyz.lebster.core.runtime.value.constructor;
 
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.runtime.Names;
 import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.SymbolWrapper;
+import xyz.lebster.core.runtime.value.executable.Executable;
+import xyz.lebster.core.runtime.value.native_.NativeFunction;
 import xyz.lebster.core.runtime.value.primitive.StringValue;
 import xyz.lebster.core.runtime.value.primitive.SymbolValue;
 import xyz.lebster.core.runtime.value.primitive.Undefined;
@@ -15,10 +15,9 @@ import xyz.lebster.core.runtime.value.prototype.ObjectPrototype;
 import xyz.lebster.core.runtime.value.prototype.SymbolPrototype;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol-constructor")
-public final class SymbolConstructor extends BuiltinConstructor<SymbolWrapper, SymbolPrototype> {
-	public SymbolConstructor(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
-		super(objectPrototype, functionPrototype, Names.Symbol);
-
+public final class SymbolConstructor extends Executable {
+	public SymbolConstructor(FunctionPrototype functionPrototype) {
+		super(functionPrototype, Names.Symbol);
 		this.putNonWritable(Names.asyncIterator, SymbolValue.asyncIterator);
 		this.putNonWritable(Names.hasInstance, SymbolValue.hasInstance);
 		this.putNonWritable(Names.isConcatSpreadable, SymbolValue.isConcatSpreadable);
@@ -33,14 +32,10 @@ public final class SymbolConstructor extends BuiltinConstructor<SymbolWrapper, S
 		this.putNonWritable(Names.toStringTag, SymbolValue.toStringTag);
 		this.putNonWritable(Names.unscopables, SymbolValue.unscopables);
 	}
-	// @Override
-	// public StringValue toStringMethod() {
-	// 	return NativeFunction.toStringForName(Names.Symbol.value);
-	// }
 
 	@Override
-	public SymbolWrapper construct(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		throw new NotImplemented("!!!!!");
+	public StringValue toStringMethod() {
+		return NativeFunction.toStringForName(Names.Symbol.value);
 	}
 
 	@Override
@@ -54,5 +49,10 @@ public final class SymbolConstructor extends BuiltinConstructor<SymbolWrapper, S
 		final StringValue descString = description == Undefined.instance ? null : description.toStringValue(interpreter);
 		// 4. Return a new unique Symbol value whose [[Description]] value is descString.
 		return new SymbolValue(descString);
+	}
+
+	public void linkToPrototype(SymbolPrototype prototype) {
+		this.putFrozen(Names.prototype, prototype);
+		prototype.put(Names.constructor, this);
 	}
 }

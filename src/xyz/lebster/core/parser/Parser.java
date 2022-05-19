@@ -473,7 +473,7 @@ public final class Parser {
 		return switch (state.currentToken.type) {
 			case Let, Var, Const -> parseVariableDeclaration();
 			case Function -> parseFunctionDeclaration();
-			case Class -> throw new ParserNotImplemented(position(), "Parsing class declarations");
+			case Class -> parseClassDeclaration();
 			default -> throw new CannotParse(state.currentToken, "Declaration");
 		};
 	}
@@ -771,7 +771,7 @@ public final class Parser {
 			case Await -> throw new ParserNotImplemented(position(), "Parsing `await` expressions");
 			case Async -> throw new ParserNotImplemented(position(), "Parsing `async` functions");
 			case RegexpLiteral -> throw new ParserNotImplemented(position(), "Parsing RegExp literals");
-			case Class -> throw new ParserNotImplemented(position(), "Parsing class expressions");
+			case Class -> parseClassExpression();
 
 			case LParen -> {
 				state.consume();
@@ -838,6 +838,61 @@ public final class Parser {
 
 			default -> throw new CannotParse(state.currentToken, "PrimaryExpression");
 		};
+	}
+
+	private ClassExpression parseClassExpression() throws SyntaxError, CannotParse {
+		final SourcePosition start = position();
+		state.require(TokenType.Class);
+		consumeAllLineTerminators();
+		final Token potentialName = state.accept(TokenType.Identifier);
+		final String className = potentialName == null ? null : potentialName.value;
+		consumeAllLineTerminators();
+		return parseClassBody(start, className);
+	}
+
+	// TODO: ClassDeclaration
+	private VariableDeclaration parseClassDeclaration() throws SyntaxError, CannotParse {
+		final SourcePosition start = position();
+		state.require(TokenType.Class);
+		consumeAllLineTerminators();
+		if (state.currentToken.type != TokenType.Identifier) {
+			throw new SyntaxError("Class declarations require a class name", position());
+		}
+
+		final String className = state.consume().value;
+		consumeAllLineTerminators();
+		return new VariableDeclaration(VariableDeclaration.Kind.Let, new VariableDeclarator(className, parseClassBody(start, className), null));
+	}
+
+	private ClassExpression parseClassBody(SourcePosition start, String className) throws SyntaxError, CannotParse {
+		state.require(TokenType.LBrace);
+		ClassExpression.ClassConstructorNode constructor = null;
+		List<ClassExpression.ClassMethodNode> methods = new ArrayList<>();
+		while (state.currentToken.type != TokenType.RBrace) {
+			consumeAllLineTerminators();
+
+			final SourcePosition methodStart = position();
+			final String methodName = state.require(TokenType.Identifier);
+			final boolean isConstructor = methodName.equals("constructor");
+			if (isConstructor && constructor != null)
+				throw new SyntaxError("A class may only have one constructor", methodStart);
+
+			consumeAllLineTerminators();
+			final String[] arguments = parseFunctionArguments();
+			consumeAllLineTerminators();
+			final BlockStatement body = parseFunctionBody();
+
+			if (isConstructor) {
+				constructor = new ClassExpression.ClassConstructorNode(className, methodName, arguments, body, range(methodStart));
+			} else {
+				methods.add(new ClassExpression.ClassMethodNode(className, methodName, arguments, body, range(methodStart)));
+			}
+
+			consumeAllLineTerminators();
+		}
+
+		state.require(TokenType.RBrace);
+		return new ClassExpression(className, constructor, methods.toArray(new ClassExpression.ClassMethodNode[0]), range(start));
 	}
 
 	private TemplateLiteral parseTemplateLiteral() throws SyntaxError, CannotParse {

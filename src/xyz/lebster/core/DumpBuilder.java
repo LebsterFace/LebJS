@@ -68,9 +68,13 @@ public final class DumpBuilder {
 	}
 
 	public DumpBuilder children(String indicator, Dumpable[] values) {
-		Dumper.dumpIndicator(rootIndentation + 1, indicator);
-		for (final Dumpable child : values) {
-			child.dump(rootIndentation + 2);
+		if (values.length == 0) {
+			Dumper.dumpSingle(rootIndentation + 1, "No " + indicator);
+		} else {
+			Dumper.dumpIndicator(rootIndentation + 1, indicator);
+			for (final Dumpable child : values) {
+				child.dump(rootIndentation + 2);
+			}
 		}
 
 		return this;

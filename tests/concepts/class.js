@@ -3,6 +3,10 @@ class Example {
         this.name = name;
         this.property = 123;
     }
+
+    multiply(x) {
+        return this.property * x;
+    }
 }
 
 const example = new Example("lorem");
@@ -14,3 +18,5 @@ Test.expect(Example, example.constructor);
 
 Test.expect("lorem", example.name);
 Test.expect(123, example.property);
+
+Test.expect(1, example.multiply(1 / 123));

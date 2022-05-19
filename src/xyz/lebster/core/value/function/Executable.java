@@ -8,9 +8,10 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.expression.ArrowFunctionExpression;
+import xyz.lebster.core.node.expression.ClassExpression;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.HasBuiltinTag;
+import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
@@ -34,8 +35,10 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	}
 
 	public static boolean isAnonymousFunctionExpression(Expression expression) {
-		return expression instanceof ArrowFunctionExpression ||
-			   (expression instanceof final FunctionNode functionNode && functionNode.name() == null);
+		if (expression instanceof ArrowFunctionExpression) return true;
+		if (expression instanceof final ClassExpression classExpression) return classExpression.className() == null;
+		if (expression instanceof final FunctionNode functionNode) return functionNode.name() == null || functionNode.name().isEmpty();
+		return false;
 	}
 
 	public final void updateName(StringValue newName) {

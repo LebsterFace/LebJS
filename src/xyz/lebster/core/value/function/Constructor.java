@@ -13,7 +13,7 @@ public abstract class Constructor extends Executable {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-makeconstructor")
 	public Constructor(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype, StringValue name) {
 		super(functionPrototype, name);
-		final ObjectValue prototypeProperty = new ObjectValue(objectPrototype);
+		ObjectValue prototypeProperty = new ObjectValue(objectPrototype);
 		prototypeProperty.put(Names.constructor, this);
 		this.put(Names.prototype, prototypeProperty);
 	}

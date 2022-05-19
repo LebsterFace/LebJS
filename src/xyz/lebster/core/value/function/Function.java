@@ -6,7 +6,6 @@ import xyz.lebster.core.interpreter.*;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
@@ -33,37 +32,18 @@ public final class Function extends Constructor {
 		return new StringValue(code.toRepresentationString());
 	}
 
-	private Value<?> executeCode(ExecutionContext context, Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
-		// Declare passed arguments as variables
-		int i = 0;
-		for (; i < code.arguments().length && i < passedArguments.length; i++)
-			interpreter.declareVariable(code.arguments()[i], passedArguments[i]);
-		for (; i < code.arguments().length; i++)
-			interpreter.declareVariable(code.arguments()[i], Undefined.instance);
-
-		try {
-			code.body().execute(interpreter);
-			return Undefined.instance;
-		} catch (AbruptCompletion e) {
-			if (e.type != AbruptCompletion.Type.Return) throw e;
-			return e.value;
-		} finally {
-			interpreter.exitExecutionContext(context);
-		}
-	}
-
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		// Closures: The LexicalEnvironment of this.code; The surrounding `this` value
 		final ExecutionContext context = interpreter.pushLexicalEnvironment(environment);
-		return this.executeCode(context, interpreter, arguments);
+		return code.execute(interpreter, context, arguments);
 	}
 
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) throws AbruptCompletion {
 		// Calling when `this` is bound: The LexicalEnvironment of this.code; The bound `this` value
 		final ExecutionContext context = interpreter.pushEnvironmentAndThisValue(environment, newThisValue);
-		return this.executeCode(context, interpreter, arguments);
+		return code.execute(interpreter, context, arguments);
 	}
 
 	@Override

@@ -44,6 +44,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 	@SuppressWarnings("unchecked")
 	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		// TODO: Display class name if prototype is not Object.prototype
 		if (objectValue.getClass() != ObjectValue.class) {
 			objectValue.representClassName(representation);
 			representation.append(' ');

@@ -10,8 +10,8 @@ import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
-import xyz.lebster.core.value.string.StringValue;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.string.StringValue;
 
 public record VariableDeclarator(String identifier, Expression init, SourceRange range) implements ASTNode {
 	@Override

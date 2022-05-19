@@ -8,12 +8,12 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.PrimitiveValue;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.boolean_.BooleanValue;
-import xyz.lebster.core.value.number.NumberValue;
-import xyz.lebster.core.value.string.StringValue;
-import xyz.lebster.core.value.symbol.SymbolValue;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.symbol.SymbolValue;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override

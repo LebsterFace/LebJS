@@ -6,9 +6,9 @@ import xyz.lebster.core.interpreter.*;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.expression.LeftHandSideExpression;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
-import xyz.lebster.core.value.globals.Undefined;
 
 import java.util.ArrayList;
 

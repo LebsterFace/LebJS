@@ -4,8 +4,13 @@ import xyz.lebster.core.value.array.ArrayConstructor;
 import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.boolean_.BooleanConstructor;
 import xyz.lebster.core.value.boolean_.BooleanPrototype;
+import xyz.lebster.core.value.error.ErrorConstructor;
+import xyz.lebster.core.value.error.ErrorPrototype;
 import xyz.lebster.core.value.function.FunctionConstructor;
 import xyz.lebster.core.value.function.FunctionPrototype;
+import xyz.lebster.core.value.globals.ConsoleObject;
+import xyz.lebster.core.value.globals.MathObject;
+import xyz.lebster.core.value.globals.TestObject;
 import xyz.lebster.core.value.number.NumberConstructor;
 import xyz.lebster.core.value.number.NumberPrototype;
 import xyz.lebster.core.value.object.ObjectConstructor;
@@ -16,11 +21,6 @@ import xyz.lebster.core.value.string.StringConstructor;
 import xyz.lebster.core.value.string.StringPrototype;
 import xyz.lebster.core.value.symbol.SymbolConstructor;
 import xyz.lebster.core.value.symbol.SymbolPrototype;
-import xyz.lebster.core.value.error.ErrorConstructor;
-import xyz.lebster.core.value.error.ErrorPrototype;
-import xyz.lebster.core.value.globals.ConsoleObject;
-import xyz.lebster.core.value.globals.MathObject;
-import xyz.lebster.core.value.globals.TestObject;
 
 public final class Intrinsics {
 	public final ObjectPrototype objectPrototype;

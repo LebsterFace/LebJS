@@ -3,8 +3,8 @@ package xyz.lebster.core.value.function;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.BuiltinConstructor;
+import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectPrototype;
 

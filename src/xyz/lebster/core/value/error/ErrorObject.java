@@ -3,8 +3,8 @@ package xyz.lebster.core.value.error;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.HasBuiltinTag;
+import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 

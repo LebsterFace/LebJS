@@ -2,8 +2,8 @@ package xyz.lebster.core.value.error;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.BuiltinConstructor;
+import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.ObjectPrototype;

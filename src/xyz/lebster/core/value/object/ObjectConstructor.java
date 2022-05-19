@@ -13,6 +13,7 @@ import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
+import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.string.StringValue;
 
 import java.util.ArrayList;
@@ -155,12 +156,26 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	}
 
 	@Override
-	public Value<?> call(Interpreter interpreter, Value<?>... arguments) {
-		throw new NotImplemented("Object()");
+	public Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+		// 20.1.1.1 Object ( [ value ] )
+		final Value<?> value = argument(0, arguments);
+		// 2. If value is undefined or null, return OrdinaryObjectCreate(%Object.prototype%).
+		if (value.isNullish()) return new ObjectValue(interpreter.intrinsics.objectPrototype);
+		// 3. Return ! ToObject(value).
+		return value.toObjectValue(interpreter);
 	}
 
 	@Override
-	public ObjectValue construct(Interpreter interpreter, Value<?>[] arguments) {
-		throw new NotImplemented("new Object()");
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
+	public ObjectValue construct(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.1.1.1 Object ( [ value ] )
+		final Value<?> value = argument(0, arguments);
+
+		// FIXME: 1. If NewTarget is neither undefined nor the active function, then
+		//            a. Return ? OrdinaryCreateFromConstructor(NewTarget, "%Object.prototype%").
+		// 2. If value is undefined or null, return OrdinaryObjectCreate(%Object.prototype%).
+		if (value.isNullish()) return new ObjectValue(interpreter.intrinsics.objectPrototype);
+		// 3. Return ! ToObject(value).
+		return value.toObjectValue(interpreter);
 	}
 }

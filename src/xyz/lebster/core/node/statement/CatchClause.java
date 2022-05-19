@@ -4,7 +4,7 @@ import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.value.Value;
 
 public record CatchClause(String parameter, BlockStatement body) implements Statement {
 	@Override

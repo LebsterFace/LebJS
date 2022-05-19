@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Token;
-import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.value.Value;
 
 import java.util.Scanner;
 

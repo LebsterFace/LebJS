@@ -5,7 +5,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.value.Value;
 
 public record ThrowStatement(Expression value) implements Statement {
 	@Override

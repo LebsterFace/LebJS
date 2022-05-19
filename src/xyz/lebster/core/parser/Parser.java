@@ -16,9 +16,9 @@ import xyz.lebster.core.node.declaration.VariableDeclarator;
 import xyz.lebster.core.node.expression.*;
 import xyz.lebster.core.node.expression.literal.*;
 import xyz.lebster.core.node.statement.*;
-import xyz.lebster.core.runtime.value.primitive.BooleanValue;
-import xyz.lebster.core.runtime.value.primitive.NumberValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.number.NumberValue;
+import xyz.lebster.core.value.string.StringValue;
 
 import java.util.*;
 

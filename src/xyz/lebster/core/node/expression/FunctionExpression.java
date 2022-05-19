@@ -5,8 +5,8 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.statement.BlockStatement;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.executable.Function;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.function.Function;
 
 public record FunctionExpression(BlockStatement body, String name, String[] arguments) implements FunctionNode, Expression {
 	@Override

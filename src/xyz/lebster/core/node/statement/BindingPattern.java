@@ -7,8 +7,8 @@ import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.node.expression.LeftHandSideExpression;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.string.StringValue;
 
 public record BindingPattern(VariableDeclaration.Kind kind, String identifier) implements LeftHandSideExpression {
 	@Override

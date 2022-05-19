@@ -10,8 +10,8 @@ import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.EvalError;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.EvalError;
 
 import java.io.IOException;
 import java.io.PrintStream;

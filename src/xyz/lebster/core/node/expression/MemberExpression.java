@@ -6,9 +6,9 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.TypeError;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.object.ObjectValue;
 
 public record MemberExpression(Expression base, Expression property, boolean computed) implements LeftHandSideExpression {
 	@Override

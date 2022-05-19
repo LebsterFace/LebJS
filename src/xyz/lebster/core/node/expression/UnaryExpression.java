@@ -7,12 +7,12 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.Names;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.primitive.BooleanValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.Undefined;
+import xyz.lebster.core.value.Names;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.globals.Undefined;
 
 public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op) implements Expression {
 	@Override

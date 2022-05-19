@@ -2,7 +2,7 @@ package xyz.lebster.core;
 
 import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.expression.ExpressionList;
-import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.value.Value;
 
 public final class DumpBuilder {
 	private final int rootIndentation;

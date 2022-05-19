@@ -2,7 +2,7 @@ package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.value.Value;
 
 public final class ThisKeyword implements Expression {
 	private static final IdentifierExpression _IDENTIFIER_EXPRESSION =

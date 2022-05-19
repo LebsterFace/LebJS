@@ -8,8 +8,8 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.AppendableNode;
 import xyz.lebster.core.node.Dumpable;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.Undefined;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.globals.Undefined;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -5,9 +5,9 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.*;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.expression.LeftHandSideExpression;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.IteratorHelper;
-import xyz.lebster.core.runtime.value.primitive.Undefined;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.IteratorHelper;
+import xyz.lebster.core.value.globals.Undefined;
 
 public record ForOfStatement(LeftHandSideExpression left, Expression right, Statement body) implements Statement {
 	@Override

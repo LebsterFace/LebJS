@@ -5,9 +5,9 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.TypeError;
-import xyz.lebster.core.runtime.value.executable.Constructor;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.function.Constructor;
 
 public record NewExpression(Expression constructExpr, ExpressionList arguments) implements Expression {
 	@Override

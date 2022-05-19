@@ -6,8 +6,8 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.NumberValue;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.number.NumberValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-update-expressions")
 public record UpdateExpression(LeftHandSideExpression expression, UpdateOp op) implements Expression {

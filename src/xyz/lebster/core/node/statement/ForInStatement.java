@@ -5,10 +5,10 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.*;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.expression.LeftHandSideExpression;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.Undefined;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.globals.Undefined;
 
 import java.util.ArrayList;
 

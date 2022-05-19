@@ -5,7 +5,7 @@ import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
-import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.value.Value;
 
 public record Realm(Interpreter interpreter) {
 	public static void executeStatic(String sourceText, boolean dumpAST) throws CannotParse, AbruptCompletion, SyntaxError {

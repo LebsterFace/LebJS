@@ -4,8 +4,8 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.IteratorHelper;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.IteratorHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;

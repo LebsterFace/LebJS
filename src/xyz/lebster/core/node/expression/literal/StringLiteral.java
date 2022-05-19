@@ -2,7 +2,7 @@ package xyz.lebster.core.node.expression.literal;
 
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.value.string.StringValue;
 
 public record StringLiteral(StringValue value) implements Literal<StringValue> {
 	@Override

@@ -2,9 +2,9 @@ package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.ReferenceError;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.ReferenceError;
+import xyz.lebster.core.value.object.ObjectValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-reference-record-specification-type")
 public record Reference(ObjectValue base, ObjectValue.Key<?> referencedName) {

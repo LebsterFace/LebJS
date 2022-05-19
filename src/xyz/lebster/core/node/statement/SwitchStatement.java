@@ -7,8 +7,8 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.Undefined;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.globals.Undefined;
 
 @NonCompliant
 public record SwitchStatement(Expression discriminant, SwitchCase... cases) implements Statement {

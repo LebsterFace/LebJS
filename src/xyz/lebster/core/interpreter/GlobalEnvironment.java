@@ -1,8 +1,8 @@
 package xyz.lebster.core.interpreter;
 
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.string.StringValue;
 
 public record GlobalEnvironment(ObjectValue variables, GlobalObject globalObject) implements Environment {
 	public GlobalEnvironment(GlobalObject globalObject) {

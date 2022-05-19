@@ -2,11 +2,11 @@ package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.exception.ShouldNotHappen;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.RangeError;
-import xyz.lebster.core.runtime.value.error.ReferenceError;
-import xyz.lebster.core.runtime.value.object.ObjectValue;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.RangeError;
+import xyz.lebster.core.value.error.ReferenceError;
+import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.string.StringValue;
 
 public final class Interpreter {
 	public final Intrinsics intrinsics;

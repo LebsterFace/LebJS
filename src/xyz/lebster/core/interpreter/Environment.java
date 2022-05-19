@@ -1,7 +1,7 @@
 package xyz.lebster.core.interpreter;
 
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.string.StringValue;
 
 // TODO: Properly follow spec
 public interface Environment {

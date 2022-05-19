@@ -7,9 +7,9 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.error.TypeError;
-import xyz.lebster.core.runtime.value.executable.Executable;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.function.Executable;
 
 public record CallExpression(Expression callee, ExpressionList arguments) implements Expression {
 	@Override

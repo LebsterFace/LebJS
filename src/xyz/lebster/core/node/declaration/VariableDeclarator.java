@@ -7,11 +7,11 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.runtime.Names;
-import xyz.lebster.core.runtime.value.Value;
-import xyz.lebster.core.runtime.value.executable.Executable;
-import xyz.lebster.core.runtime.value.primitive.StringValue;
-import xyz.lebster.core.runtime.value.primitive.Undefined;
+import xyz.lebster.core.value.Names;
+import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.globals.Undefined;
 
 public record VariableDeclarator(String identifier, Expression init, SourceRange range) implements ASTNode {
 	@Override

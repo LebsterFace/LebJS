@@ -5,7 +5,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.runtime.value.Value;
+import xyz.lebster.core.value.Value;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-conditional-operator")
 public record ConditionalExpression(Expression test, Expression left, Expression right) implements Expression {

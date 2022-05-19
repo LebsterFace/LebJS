@@ -1,8 +1,11 @@
 package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.runtime.value.constructor.*;
+import xyz.lebster.core.runtime.value.error.ErrorConstructor;
+import xyz.lebster.core.runtime.value.error.ErrorPrototype;
 import xyz.lebster.core.runtime.value.object.ConsoleObject;
 import xyz.lebster.core.runtime.value.object.MathObject;
+import xyz.lebster.core.runtime.value.object.ObjectValue;
 import xyz.lebster.core.runtime.value.object.TestObject;
 import xyz.lebster.core.runtime.value.prototype.*;
 
@@ -28,6 +31,8 @@ public final class Intrinsics {
 	public final ConsoleObject consoleObject;
 	public final MathObject mathObject;
 
+	public final ErrorConstructor errorConstructor;
+	public final ErrorPrototype errorPrototype;
 
 	Intrinsics() {
 		objectPrototype = new ObjectPrototype();
@@ -63,6 +68,10 @@ public final class Intrinsics {
 		symbolPrototype = new SymbolPrototype(objectPrototype);
 		symbolConstructor = new SymbolConstructor(functionPrototype);
 		symbolConstructor.linkToPrototype(symbolPrototype);
+
+		errorPrototype = new ErrorPrototype(objectPrototype);
+		errorConstructor = new ErrorConstructor(objectPrototype, functionPrototype);
+		errorConstructor.linkToPrototype(errorPrototype);
 
 		mathObject = new MathObject(objectPrototype, functionPrototype);
 		testObject = new TestObject(functionPrototype);

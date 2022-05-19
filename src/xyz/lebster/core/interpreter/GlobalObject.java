@@ -37,13 +37,14 @@ public final class GlobalObject extends ObjectValue {
 		// 19.3 Constructor Properties of the Global Object
 		put(Names.Array, intrinsics.arrayConstructor);
 		put(Names.Boolean, intrinsics.booleanConstructor);
+		put(Names.Error, intrinsics.errorConstructor);
+		put(Names.Function, intrinsics.functionConstructor);
 		put(Names.Math, intrinsics.mathObject);
 		put(Names.Number, intrinsics.numberConstructor);
 		put(Names.Object, intrinsics.objectConstructor);
 		put(Names.ShadowRealm, intrinsics.shadowRealmConstructor);
 		put(Names.String, intrinsics.stringConstructor);
 		put(Names.Symbol, intrinsics.symbolConstructor);
-		put(Names.Function, intrinsics.functionConstructor);
 		put(Names.Test, intrinsics.testObject);
 
 		// Non-Standard properties

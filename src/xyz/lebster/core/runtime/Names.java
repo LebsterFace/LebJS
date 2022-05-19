@@ -103,6 +103,7 @@ public final class Names {
 	// Constructors & Global objects
 	public static final StringValue Array = new StringValue("Array");
 	public static final StringValue Boolean = new StringValue("Boolean");
+	public static final StringValue Error = new StringValue("Error");
 	public static final StringValue Function = new StringValue("Function");
 	public static final StringValue Math = new StringValue("Math");
 	public static final StringValue Number = new StringValue("Number");

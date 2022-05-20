@@ -2,6 +2,8 @@ package xyz.lebster.cli;
 
 import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.exception.ParserNotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Realm;
 
@@ -46,8 +48,14 @@ public final class Testing {
 		try {
 			try {
 				Realm.executeStatic(Main.readFile(file.toPath()), arguments.options().showAST());
-			} catch (AbruptCompletion completion) {
-				if (!arguments.options().parseOnly()) throw completion;
+			} catch (AbruptCompletion exception) {
+				if (!arguments.options().parseOnly()) {
+					throw exception;
+				}
+			} catch (NotImplemented | ParserNotImplemented exception) {
+				if (!arguments.options().ignoreNotImplemented()) {
+					throw exception;
+				}
 			}
 			successfulTests++;
 			printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", fileName);

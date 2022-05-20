@@ -25,7 +25,8 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		boolean showAST,
 		boolean hideStackTrace,
 		boolean hidePrompt,
-		boolean parseOnly
+		boolean parseOnly,
+		boolean ignoreNotImplemented
 	) {
 	}
 
@@ -37,13 +38,15 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private boolean hideStackTrace = true;
 		private boolean hidePrompt = false;
 		private boolean parseOnly = false;
+		private boolean ignoreNotImplemented = false;
 
 		private ExecutionOptions toExecutionOptions() {
 			return new ExecutionOptions(
 				this.showAST,
 				this.hideStackTrace,
 				this.hidePrompt,
-				this.parseOnly
+				this.parseOnly,
+				this.ignoreNotImplemented
 			);
 		}
 
@@ -53,6 +56,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				case "s", "show", "stack", "v", "verbose" -> hideStackTrace = false;
 				case "p", "prompt" -> hidePrompt = true;
 				case "parse-only" -> parseOnly = true;
+				case "ignore-not-impl" -> ignoreNotImplemented = true;
 
 				case "t", "test" -> setMode(ExecutionMode.Tests);
 				case "g", "gif" -> {

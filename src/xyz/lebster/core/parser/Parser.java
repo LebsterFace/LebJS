@@ -865,6 +865,10 @@ public final class Parser {
 	}
 
 	private ClassExpression parseClassBody(SourcePosition start, String className) throws SyntaxError, CannotParse {
+		if (state.currentToken.type == TokenType.Extends) {
+			throw new ParserNotImplemented(position(), "`class extends` syntax");
+		}
+
 		state.require(TokenType.LBrace);
 		ClassExpression.ClassConstructorNode constructor = null;
 		List<ClassExpression.ClassMethodNode> methods = new ArrayList<>();

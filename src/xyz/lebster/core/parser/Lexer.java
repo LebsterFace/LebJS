@@ -376,10 +376,17 @@ public final class Lexer {
 			if (accept("0b")) return numericLiteralRadix(2, "Binary");
 			if (accept("0o")) return numericLiteralRadix(8, "Octal");
 
-			int decimalPos = -1;
-			while (isDigit(currentChar) || (currentChar == '.' && decimalPos == -1)) {
-				if (currentChar == '.') decimalPos = index;
+			boolean isInteger = true;
+			while (isDigit(currentChar) || (currentChar == '.' && isInteger)) {
+				if (currentChar == '.') isInteger = false;
 				collect();
+			}
+
+			if (acceptCollect('e', 'E')) {
+				acceptCollect('-');
+				while (isDigit(currentChar)) {
+					collect();
+				}
 			}
 
 			return new Token(TokenType.NumericLiteral, builder.toString(), position());
@@ -397,6 +404,17 @@ public final class Lexer {
 
 			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "'"), position());
 		}
+	}
+
+	private boolean acceptCollect(char... characters) {
+		for (final char c : characters) {
+			if (currentChar == c) {
+				collect();
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private Token consumeRegexpLiteral() {

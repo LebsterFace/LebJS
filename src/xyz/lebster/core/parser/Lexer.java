@@ -138,6 +138,11 @@ public final class Lexer {
 		this.source = source;
 		this.length = source.length();
 		consume();
+		if (accept("#!")) {
+			while (!isTerminator()) {
+				consume();
+			}
+		}
 	}
 
 	public boolean isFinished() {

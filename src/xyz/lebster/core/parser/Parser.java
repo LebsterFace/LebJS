@@ -20,6 +20,7 @@ import xyz.lebster.core.value.boolean_.BooleanValue;
 import xyz.lebster.core.value.number.NumberValue;
 import xyz.lebster.core.value.string.StringValue;
 
+import javax.swing.plaf.IconUIResource;
 import java.util.*;
 
 import static xyz.lebster.core.node.expression.AssignmentExpression.AssignmentOp;
@@ -882,6 +883,10 @@ public final class Parser {
 				throw new SyntaxError("A class may only have one constructor", methodStart);
 
 			consumeAllLineTerminators();
+			if ((methodName.equals("get") || methodName.equals("set")) && state.currentToken.type != TokenType.LParen) {
+				throw new ParserNotImplemented(position(), "Class getter / setters");
+			}
+
 			final String[] arguments = parseFunctionArguments();
 			consumeAllLineTerminators();
 			final BlockStatement body = parseFunctionBody();
@@ -968,6 +973,7 @@ public final class Parser {
 		// FIXME:
 		// 		- Methods { a() { alert(1) } }
 		// 		- Getters / Setters { get a() { return Math.random() } }
+		boolean couldBeGetterSetter = false;
 		while (state.currentToken.type != TokenType.RBrace) {
 			if (state.accept(TokenType.DotDotDot) != null) {
 				result.spreadEntry(parseExpression(1, Left));
@@ -984,6 +990,7 @@ public final class Parser {
 
 				if (isIdentifier && state.currentToken.type != TokenType.Colon) {
 					result.shorthandEntry(new StringValue(propertyName));
+					couldBeGetterSetter = propertyName.equals("get") || propertyName.equals("set");
 				} else {
 					state.require(TokenType.Colon);
 					consumeAllLineTerminators();
@@ -1002,6 +1009,10 @@ public final class Parser {
 			consumeAllLineTerminators();
 			if (state.accept(TokenType.Comma) == null) break;
 			consumeAllLineTerminators();
+		}
+
+		if (couldBeGetterSetter) {
+			throw new ParserNotImplemented(position(), "Object literal getter & setter syntax");
 		}
 
 		consumeAllLineTerminators();

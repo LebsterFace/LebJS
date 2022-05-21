@@ -562,23 +562,31 @@ public final class Parser {
 			state.require(TokenType.RBrace);
 			return new ObjectAssignmentTarget(pairs, spreadName);
 		} else if (state.optional(TokenType.LBracket)) {
-			final ArrayList<AssignmentTarget> nodes = new ArrayList<>();
+			final ArrayList<AssignmentTarget> children = new ArrayList<>();
+			AssignmentTarget spreadTarget = null;
 
 			consumeAllLineTerminators();
 			while (true) {
 				consumeAllLineTerminators();
 				if (state.optional(TokenType.Comma)) {
-					nodes.add(null);
+					children.add(null);
+				} else if (state.optional(TokenType.DotDotDot)) {
+					consumeAllLineTerminators();
+					spreadTarget = parseAssignmentTarget();
+					consumeAllLineTerminators();
+					if (state.optional(TokenType.Comma))
+						throw new SyntaxError("Rest element must be last element", position());
+					break;
 				} else {
-					nodes.add(parseAssignmentTarget());
+					children.add(parseAssignmentTarget());
 					consumeAllLineTerminators();
 					if (!state.optional(TokenType.Comma)) break;
 				}
 			}
 
 			state.require(TokenType.RBracket);
-			return new ArrayAssignmentTarget(nodes.toArray(new AssignmentTarget[0]));
-		} else if (state.currentToken.type == TokenType.Identifier) {
+			return new ArrayAssignmentTarget(spreadTarget, children.toArray(new AssignmentTarget[0]));
+		} else if (matchIdentifierName()) {
 			return new IdentifierAssignmentTarget(state.consume().value);
 		} else {
 			state.unexpected();

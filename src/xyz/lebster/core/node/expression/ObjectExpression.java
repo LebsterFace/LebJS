@@ -145,8 +145,11 @@ public record ObjectExpression(ArrayList<ObjectEntryNode> entries) implements Ex
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
 			final ObjectValue value = name.execute(interpreter).toObjectValue(interpreter);
-			for (final ObjectValue.Key<?> key : value.value.keySet())
-				result.put(key, value.get(interpreter, key));
+			for (final var entry : value.entries()) {
+				if (entry.getValue().isEnumerable()) {
+					result.put(entry.getKey(), value.get(interpreter, entry.getKey()));
+				}
+			}
 		}
 
 		@Override

@@ -13,34 +13,37 @@ import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.string.StringValue;
 
-public record VariableDeclarator(String identifier, Expression init, SourceRange range) implements ASTNode {
+public record VariableDeclarator(AssignmentTarget lhs, Expression init, SourceRange range) implements ASTNode {
 	@Override
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
-			.selfNamed(this, identifier)
+			.selfNamed(this, "no dice")
 			.optional("Initializer", init);
 	}
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> value = init == null ? Undefined.instance : init.execute(interpreter);
-		final StringValue name = new StringValue(identifier);
-
-		if (Executable.isAnonymousFunctionExpression(init)) {
-			if (value instanceof final Executable function) {
-				function.set(interpreter, Names.name, name);
-				function.updateName(name.toFunctionName());
+		if (lhs instanceof final IdentifierAssignmentTarget identifierAssignmentTarget) {
+			final StringValue name = identifierAssignmentTarget.name();
+			if (Executable.isAnonymousFunctionExpression(init)) {
+				if (value instanceof final Executable function) {
+					function.set(interpreter, Names.name, name);
+					function.updateName(name.toFunctionName());
+				}
 			}
 		}
 
-		interpreter.declareVariable(name, value);
+		for (var binding : lhs.getBindings(interpreter, value))
+			binding.declare(interpreter);
+
 		return Undefined.instance;
 	}
 
 	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append("let ");
-		representation.append(identifier);
+		representation.append("no dice");
 		if (init != null) {
 			representation.append(" = ");
 			init.represent(representation);

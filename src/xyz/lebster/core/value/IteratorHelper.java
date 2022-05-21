@@ -26,7 +26,18 @@ public final class IteratorHelper {
 	public static ObjectIterator getIterator(Interpreter interpreter, Expression expression) throws AbruptCompletion {
 		final ObjectValue objectValue = expression.execute(interpreter).toObjectValue(interpreter);
 		final String obj = ANSI.stripFormatting(expression.toRepresentationString());
+		return getObjectIterator(interpreter, objectValue, obj);
+	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
+	@NonCompliant
+	public static ObjectIterator getIterator(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
+		final ObjectValue objectValue = value.toObjectValue(interpreter);
+		final String obj = ANSI.stripFormatting(value.toDisplayString());
+		return getObjectIterator(interpreter, objectValue, obj);
+	}
+
+	private static ObjectIterator getObjectIterator(Interpreter interpreter, ObjectValue objectValue, String obj) throws AbruptCompletion {
 		final PropertyDescriptor iteratorProperty = objectValue.getProperty(SymbolValue.iterator);
 		if (iteratorProperty == null)
 			throw error(new TypeError(interpreter, obj + " is not iterable (does not contain a `Symbol.iterator` property)"));

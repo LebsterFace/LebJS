@@ -1,18 +1,12 @@
 package xyz.lebster.core.parser;
 
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.CannotParse;
-import xyz.lebster.core.exception.ParserNotImplemented;
-import xyz.lebster.core.exception.ShouldNotHappen;
-import xyz.lebster.core.exception.SyntaxError;
+import xyz.lebster.core.exception.*;
 import xyz.lebster.core.node.AppendableNode;
 import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.SourcePosition;
 import xyz.lebster.core.node.SourceRange;
-import xyz.lebster.core.node.declaration.Declaration;
-import xyz.lebster.core.node.declaration.FunctionDeclaration;
-import xyz.lebster.core.node.declaration.VariableDeclaration;
-import xyz.lebster.core.node.declaration.VariableDeclarator;
+import xyz.lebster.core.node.declaration.*;
 import xyz.lebster.core.node.expression.*;
 import xyz.lebster.core.node.expression.literal.*;
 import xyz.lebster.core.node.statement.*;
@@ -20,7 +14,6 @@ import xyz.lebster.core.value.boolean_.BooleanValue;
 import xyz.lebster.core.value.number.NumberValue;
 import xyz.lebster.core.value.string.StringValue;
 
-import javax.swing.plaf.IconUIResource;
 import java.util.*;
 
 import static xyz.lebster.core.node.expression.AssignmentExpression.AssignmentOp;
@@ -338,7 +331,8 @@ public final class Parser {
 			throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.", position());
 		final VariableDeclarator declarator = declaration.declarations()[0];
 		if (declarator.init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
-		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), declarator.identifier());
+		if (!(declarator.lhs() instanceof final IdentifierAssignmentTarget identifierAssignmentTarget)) throw new NotImplemented("For-of loops with destructuring declarations");
+		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), identifierAssignmentTarget.name().value);
 
 		state.require(TokenType.Identifier, "of");
 		final Expression expression = parseExpression();
@@ -363,7 +357,8 @@ public final class Parser {
 			throw new SyntaxError("Invalid left-hand side in for-in loop: Must have a single binding.", position());
 		final VariableDeclarator declarator = declaration.declarations()[0];
 		if (declarator.init() != null) throw new SyntaxError("for-in loop variable declaration may not have an init.", position());
-		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), declarator.identifier());
+		if (!(declarator.lhs() instanceof final IdentifierAssignmentTarget identifierAssignmentTarget)) throw new NotImplemented("For-in loops with destructuring declarations");
+		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), identifierAssignmentTarget.name().value);
 
 		state.require(TokenType.In);
 		final Expression expression = parseExpression();
@@ -488,27 +483,19 @@ public final class Parser {
 	}
 
 	private VariableDeclaration parseVariableDeclaration() throws SyntaxError, CannotParse {
-		// final SourcePosition declarationStart = position();
-
 		// TODO: Missing init in 'const' declaration
 		final var kind = switch (state.currentToken.type) {
 			case Var -> VariableDeclaration.Kind.Var;
 			case Let -> VariableDeclaration.Kind.Let;
 			case Const -> VariableDeclaration.Kind.Const;
-			default -> throw new IllegalStateException("Unexpected value: " + state.currentToken.type);
+			default -> throw new SyntaxError("Unexpected token " + state.currentToken, state.currentToken.position);
 		};
 
 		state.consume();
 
 		final List<VariableDeclarator> declarators = new ArrayList<>();
 		while (true) {
-			final SourcePosition declaratorStart = position();
-			if (state.currentToken.type == TokenType.LBrace || state.currentToken.type == TokenType.LBracket)
-				throw new ParserNotImplemented(position(), "Parsing destructuring assignment");
-
-			final String identifier = state.require(TokenType.Identifier);
-			final Expression value = state.accept(TokenType.Equals) == null ? null : parseExpression(1, Left);
-			declarators.add(new VariableDeclarator(identifier, value, range(declaratorStart)));
+			declarators.add(parseVariableDeclarator());
 			consumeAllLineTerminators();
 			if (state.currentToken.type != TokenType.Comma) break;
 			state.consume();
@@ -518,6 +505,87 @@ public final class Parser {
 		return new VariableDeclaration(kind, declarators.toArray(new VariableDeclarator[0]));
 	}
 
+	private VariableDeclarator parseVariableDeclarator() throws SyntaxError, CannotParse {
+		final SourcePosition declaratorStart = position();
+		final AssignmentTarget lhs = parseAssignmentTarget();
+		final Expression value = state.optional(TokenType.Equals) ? parseExpression(1, Left) : null;
+		return new VariableDeclarator(lhs, value, range(declaratorStart));
+	}
+
+	private AssignmentTarget parseAssignmentTarget() throws SyntaxError, CannotParse {
+		if (state.optional(TokenType.LBrace)) {
+			consumeAllLineTerminators();
+
+			final Map<Expression, AssignmentTarget> pairs = new HashMap<>();
+			StringValue spreadName = null;
+			while (state.currentToken.type != TokenType.RBrace) {
+				if (state.optional(TokenType.DotDotDot)) {
+					consumeAllLineTerminators();
+					if (matchIdentifierName()) {
+						spreadName = new StringValue(state.consume().value);
+						consumeAllLineTerminators();
+						if (!state.optional(TokenType.Comma)) break;
+						consumeAllLineTerminators();
+						continue;
+					} else {
+						throw new SyntaxError("`...` must be followed by an identifier in declaration contexts", position());
+					}
+				}
+
+				if (matchIdentifierName()) {
+					final StringValue key = new StringValue(state.consume().value);
+					consumeAllLineTerminators();
+
+					if (state.currentToken.type == TokenType.Colon) {
+						state.require(TokenType.Colon);
+						consumeAllLineTerminators();
+						pairs.put(new StringLiteral(key), parseAssignmentTarget());
+					} else {
+						pairs.put(new StringLiteral(key), new IdentifierAssignmentTarget(key));
+					}
+				} else {
+					state.require(TokenType.LBracket);
+					final Expression keyExpression = parseExpression();
+					state.require(TokenType.RBracket);
+					consumeAllLineTerminators();
+					state.require(TokenType.Colon);
+					consumeAllLineTerminators();
+					pairs.put(keyExpression, parseAssignmentTarget());
+				}
+
+				consumeAllLineTerminators();
+				if (!state.optional(TokenType.Comma)) break;
+				consumeAllLineTerminators();
+			}
+
+			consumeAllLineTerminators();
+			state.require(TokenType.RBrace);
+			return new ObjectAssignmentTarget(pairs, spreadName);
+		} else if (state.optional(TokenType.LBracket)) {
+			final ArrayList<AssignmentTarget> nodes = new ArrayList<>();
+
+			consumeAllLineTerminators();
+			while (true) {
+				consumeAllLineTerminators();
+				if (state.optional(TokenType.Comma)) {
+					nodes.add(null);
+				} else {
+					nodes.add(parseAssignmentTarget());
+					consumeAllLineTerminators();
+					if (!state.optional(TokenType.Comma)) break;
+				}
+			}
+
+			state.require(TokenType.RBracket);
+			return new ArrayAssignmentTarget(nodes.toArray(new AssignmentTarget[0]));
+		} else if (state.currentToken.type == TokenType.Identifier) {
+			return new IdentifierAssignmentTarget(state.consume().value);
+		} else {
+			state.unexpected();
+			return null;
+		}
+	}
+
 	private String[] parseStringList() {
 		final List<String> result = new ArrayList<>();
 		consumeAllLineTerminators();
@@ -525,7 +593,7 @@ public final class Parser {
 			consumeAllLineTerminators();
 			result.add(state.consume().value);
 			consumeAllLineTerminators();
-			if (state.accept(TokenType.Comma) == null) break;
+			if (!state.optional(TokenType.Comma)) break;
 		}
 
 		return result.toArray(new String[0]);
@@ -585,7 +653,7 @@ public final class Parser {
 			}
 
 			consumeAllLineTerminators();
-			if (state.accept(TokenType.Comma) == null) break;
+			if (!state.optional(TokenType.Comma)) break;
 			consumeAllLineTerminators();
 		}
 
@@ -862,7 +930,7 @@ public final class Parser {
 
 		final String className = state.consume().value;
 		consumeAllLineTerminators();
-		return new VariableDeclaration(VariableDeclaration.Kind.Let, new VariableDeclarator(className, parseClassBody(start, className), null));
+		return new VariableDeclaration(VariableDeclaration.Kind.Let, new VariableDeclarator(new IdentifierAssignmentTarget(className), parseClassBody(start, className), null));
 	}
 
 	private ClassExpression parseClassBody(SourcePosition start, String className) throws SyntaxError, CannotParse {
@@ -939,7 +1007,7 @@ public final class Parser {
 			return null;
 		}
 
-		if (state.accept(TokenType.Arrow) == null) {
+		if (!state.optional(TokenType.Arrow)) {
 			load();
 			return null;
 		}
@@ -975,10 +1043,11 @@ public final class Parser {
 		// 		- Getters / Setters { get a() { return Math.random() } }
 		boolean couldBeGetterSetter = false;
 		while (state.currentToken.type != TokenType.RBrace) {
-			if (state.accept(TokenType.DotDotDot) != null) {
+			if (state.optional(TokenType.DotDotDot)) {
+				consumeAllLineTerminators();
 				result.spreadEntry(parseExpression(1, Left));
 				consumeAllLineTerminators();
-				if (state.accept(TokenType.Comma) == null) break;
+				if (!state.optional(TokenType.Comma)) break;
 				consumeAllLineTerminators();
 				continue;
 			}
@@ -1007,7 +1076,7 @@ public final class Parser {
 			}
 
 			consumeAllLineTerminators();
-			if (state.accept(TokenType.Comma) == null) break;
+			if (!state.optional(TokenType.Comma)) break;
 			consumeAllLineTerminators();
 		}
 
@@ -1029,8 +1098,8 @@ public final class Parser {
 
 	private boolean matchIdentifierName() {
 		final TokenType t = state.currentToken.type;
-		return t == TokenType.Let ||
-			   t == TokenType.Identifier ||
+		return t == TokenType.Identifier ||
+			   t == TokenType.Let ||
 			   t == TokenType.Async ||
 			   t == TokenType.Await ||
 			   t == TokenType.Break ||

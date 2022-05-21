@@ -57,6 +57,15 @@ public final class ParserState {
 		return currentToken.type == type && currentToken.value.equals(value);
 	}
 
+	boolean optional(TokenType type) {
+		if (currentToken.type == type) {
+			consume();
+			return true;
+		}
+
+		return false;
+	}
+
 	boolean is(TokenType... types) {
 		for (final TokenType type : types) {
 			if (currentToken.type == type)

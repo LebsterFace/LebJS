@@ -19,6 +19,7 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.symbol.SymbolValue;
 
 import java.util.PrimitiveIterator;
+import java.util.regex.Pattern;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.number.NumberPrototype.toIntegerOrInfinity;
@@ -128,7 +129,6 @@ public final class StringPrototype extends BuiltinPrototype<StringWrapper, Strin
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.endswith")
 	@NonCompliant
-	// TODO: Use java.lang.String#endsWith
 	private static BooleanValue endsWith(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 22.1.3.7 String.prototype.endsWith ( searchString [ , endPosition ] )
 		final Value<?> searchString = argument(0, arguments);
@@ -290,8 +290,20 @@ public final class StringPrototype extends BuiltinPrototype<StringWrapper, Strin
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.replaceall")
-	private static Value<?> replaceAll(Interpreter interpreter, Value<?>[] arguments) {
-		throw new NotImplemented("String.prototype.replaceAll");
+	@NonCompliant
+	// TODO: Check if this is spec-compliant (for strings)
+	// TODO: RegExp & Functional replace
+	private static Value<?> replaceAll(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.19 String.prototype.replaceAll ( searchValue, replaceValue )
+		final Value<?> searchValue = argument(0, arguments);
+		final Value<?> replaceValue = argument(1, arguments);
+
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.replaceAll");
+		final String string = O.toStringValue(interpreter).value;
+		final String searchString = searchValue.toStringValue(interpreter).value;
+		final String replaceString = replaceValue.toStringValue(interpreter).value;
+
+		return new StringValue(string.replaceAll(Pattern.quote(searchString), replaceString));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.search")

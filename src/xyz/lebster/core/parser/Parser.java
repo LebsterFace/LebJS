@@ -331,7 +331,7 @@ public final class Parser {
 			throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.", position());
 		final VariableDeclarator declarator = declaration.declarations()[0];
 		if (declarator.init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
-		if (!(declarator.lhs() instanceof final IdentifierAssignmentTarget identifierAssignmentTarget)) throw new NotImplemented("For-of loops with destructuring declarations");
+		if (!(declarator.target() instanceof final IdentifierAssignmentTarget identifierAssignmentTarget)) throw new NotImplemented("For-of loops with destructuring declarations");
 		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), identifierAssignmentTarget.name().value);
 
 		state.require(TokenType.Identifier, "of");
@@ -357,7 +357,7 @@ public final class Parser {
 			throw new SyntaxError("Invalid left-hand side in for-in loop: Must have a single binding.", position());
 		final VariableDeclarator declarator = declaration.declarations()[0];
 		if (declarator.init() != null) throw new SyntaxError("for-in loop variable declaration may not have an init.", position());
-		if (!(declarator.lhs() instanceof final IdentifierAssignmentTarget identifierAssignmentTarget)) throw new NotImplemented("For-in loops with destructuring declarations");
+		if (!(declarator.target() instanceof final IdentifierAssignmentTarget identifierAssignmentTarget)) throw new NotImplemented("For-in loops with destructuring declarations");
 		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), identifierAssignmentTarget.name().value);
 
 		state.require(TokenType.In);
@@ -517,12 +517,12 @@ public final class Parser {
 			consumeAllLineTerminators();
 
 			final Map<Expression, AssignmentTarget> pairs = new HashMap<>();
-			StringValue spreadName = null;
+			StringValue restName = null;
 			while (state.currentToken.type != TokenType.RBrace) {
 				if (state.optional(TokenType.DotDotDot)) {
 					consumeAllLineTerminators();
 					if (matchIdentifierName()) {
-						spreadName = new StringValue(state.consume().value);
+						restName = new StringValue(state.consume().value);
 						consumeAllLineTerminators();
 						if (!state.optional(TokenType.Comma)) break;
 						consumeAllLineTerminators();
@@ -560,7 +560,7 @@ public final class Parser {
 
 			consumeAllLineTerminators();
 			state.require(TokenType.RBrace);
-			return new ObjectAssignmentTarget(pairs, spreadName);
+			return new ObjectAssignmentTarget(pairs, restName);
 		} else if (state.optional(TokenType.LBracket)) {
 			final ArrayList<AssignmentTarget> children = new ArrayList<>();
 			AssignmentTarget spreadTarget = null;

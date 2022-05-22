@@ -1,7 +1,9 @@
 package xyz.lebster.core.node.declaration;
 
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
@@ -38,5 +40,26 @@ public record ArrayAssignmentTarget(AssignmentTarget restTarget, AssignmentTarge
 		}
 
 		return result;
+	}
+
+	@Override
+	public void dump(int indent) {
+		DumpBuilder.notImplemented(indent, this);
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append('[');
+		for (int i = 0; i < children.length; i++) {
+			children[i].represent(representation);
+			if (restTarget != null || i + 1 < children.length) representation.append(", ");
+		}
+
+		if (restTarget != null) {
+			representation.append("...");
+			restTarget.represent(representation);
+		}
+
+		representation.append(']');
 	}
 }

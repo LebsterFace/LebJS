@@ -1,5 +1,7 @@
 package xyz.lebster.core;
 
+import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.expression.ExpressionList;
 import xyz.lebster.core.value.Value;
@@ -20,7 +22,7 @@ public final class DumpBuilder {
 	}
 
 	public static void notImplemented(int indent, Dumpable dumpable) {
-		Dumper.dumpSingle(indent, ANSI.BACKGROUND_BRIGHT_YELLOW + ANSI.BLACK + '[' + dumpable.getClass().getSimpleName() + ']' + ANSI.RESET);
+		throw new NotImplemented(dumpable.getClass().getSimpleName() + "#" + "dump");
 	}
 
 	public DumpBuilder self(Dumpable obj) {
@@ -59,9 +61,14 @@ public final class DumpBuilder {
 	}
 
 	public DumpBuilder children(String indicator, Iterable<Dumpable> values) {
-		Dumper.dumpIndicator(rootIndentation + 1, indicator);
-		for (final Dumpable child : values) {
-			child.dump(rootIndentation + 2);
+		final var iterator = values.iterator();
+		if (iterator.hasNext()) {
+			Dumper.dumpIndicator(rootIndentation + 1, indicator);
+			while (iterator.hasNext()) {
+				iterator.next().dump(rootIndentation + 2);
+			}
+		} else {
+			Dumper.dumpSingle(rootIndentation + 1, "No " + indicator);
 		}
 
 		return this;
@@ -130,6 +137,18 @@ public final class DumpBuilder {
 	public DumpBuilder value(String indicator, Value<?> value) {
 		Dumper.dumpIndicator(rootIndentation, indicator);
 		Dumper.dumpValue(rootIndentation + 1, value.getClass().getSimpleName(), value.toDisplayString());
+		return this;
+	}
+
+	public DumpBuilder optionalValue(String name, Value<?> value) {
+		if (value == null) {
+			Dumper.dumpSingle(rootIndentation + 1, "No " + name);
+		} else {
+			final var representation = new StringRepresentation();
+			value.displayForConsoleLog(representation);
+			Dumper.dumpValue(rootIndentation + 1, name, representation.toString());
+		}
+
 		return this;
 	}
 }

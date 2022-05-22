@@ -1,15 +1,18 @@
 package xyz.lebster.core.node.declaration;
 
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
+import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
 import java.util.*;
 
-public record ObjectAssignmentTarget(Map<Expression, AssignmentTarget> pairs, StringValue spreadName) implements AssignmentTarget {
+public record ObjectAssignmentTarget(Map<Expression, AssignmentTarget> pairs, StringValue restName) implements AssignmentTarget {
 	@Override
 	public List<BindingPair> getBindings(Interpreter interpreter, Value<?> input) throws AbruptCompletion {
 		final ObjectValue objectValue = input.toObjectValue(interpreter);
@@ -23,18 +26,54 @@ public record ObjectAssignmentTarget(Map<Expression, AssignmentTarget> pairs, St
 			visitedKeys.add(key);
 		}
 
-		if (spreadName != null) {
-			final ObjectValue spreadObject = new ObjectValue(interpreter.intrinsics.objectPrototype);
+		if (restName != null) {
+			final ObjectValue restObject = new ObjectValue(interpreter.intrinsics.objectPrototype);
 			for (final var entry : objectValue.entries()) {
 				final ObjectValue.Key<?> key = entry.getKey();
 				if (!visitedKeys.contains(key) && entry.getValue().isEnumerable()) {
-					spreadObject.put(key, objectValue.get(interpreter, key));
+					restObject.put(key, objectValue.get(interpreter, key));
 				}
 			}
 
-			result.add(new BindingPair(spreadName, spreadObject));
+			result.add(new BindingPair(restName, restObject));
 		}
 
 		return result;
+	}
+
+	@Override
+	public void dump(int indent) {
+		DumpBuilder.notImplemented(indent, this);
+	}
+
+	@Override
+	public void represent(StringRepresentation representation) {
+		representation.append("{ ");
+		final var iterator = pairs.entrySet().iterator();
+		while (iterator.hasNext()) {
+			final var entry = iterator.next();
+			// TODO: Different types of keys to store this info (similar/(identical?) to ObjectExpression)
+			if (entry.getKey() instanceof final StringLiteral literal) {
+				literal.value().displayForObjectKey(representation);
+			} else {
+				representation.append('[');
+				entry.getKey().represent(representation);
+				representation.append(']');
+			}
+
+			representation.append(": ");
+			// TODO: Represent shorthands as shorthands
+			entry.getValue().represent(representation);
+			if (iterator.hasNext() || restName != null) representation.append(',');
+			representation.append(' ');
+		}
+
+		if (restName != null) {
+			representation.append("...");
+			representation.append(restName.value);
+			representation.append(' ');
+		}
+
+		representation.append('}');
 	}
 }

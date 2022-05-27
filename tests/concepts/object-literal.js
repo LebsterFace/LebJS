@@ -29,9 +29,10 @@ Test.expect("example", object.stringconcatenation)
 
 const env = {
 	...object,
+	object,
 	charset: 'UTF-8'
 };
 
-
 Test.expect("example", env.stringconcatenation);
+Test.expect(object, env.object);
 Test.expect("UTF-8", env.charset);

@@ -104,7 +104,7 @@ public record ObjectExpression(ArrayList<ObjectEntryNode> entries) implements Ex
 				function.updateName(executedKey.toFunctionName());
 			}
 
-			result.put(executedKey, executedValue);
+			result.putEnumerable(executedKey, executedValue);
 		}
 
 		@Override
@@ -126,7 +126,7 @@ public record ObjectExpression(ArrayList<ObjectEntryNode> entries) implements Ex
 	private record ShorthandEntryNode(StringValue key) implements ObjectEntryNode {
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
-			result.put(key, interpreter.getBinding(key).getValue(interpreter));
+			result.putEnumerable(key, interpreter.getBinding(key).getValue(interpreter));
 		}
 
 		@Override

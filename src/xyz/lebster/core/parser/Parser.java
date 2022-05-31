@@ -1045,9 +1045,10 @@ public final class Parser {
 	}
 
 	private ObjectExpression parseObjectExpression() throws SyntaxError, CannotParse {
+		final SourcePosition start = position();
 		state.require(TokenType.LBrace);
 		consumeAllLineTerminators();
-		final ObjectExpression result = new ObjectExpression();
+		final ArrayList<ObjectExpression.ObjectEntryNode> entries = new ArrayList<>();
 
 		// FIXME:
 		// 		- Methods { a() { alert(1) } }
@@ -1056,7 +1057,7 @@ public final class Parser {
 		while (state.currentToken.type != TokenType.RBrace) {
 			if (state.optional(TokenType.DotDotDot)) {
 				consumeAllLineTerminators();
-				result.spreadEntry(parseExpression(1, Left));
+				entries.add(ObjectExpression.spreadEntry(parseExpression(1, Left)));
 				consumeAllLineTerminators();
 				if (!state.optional(TokenType.Comma)) break;
 				consumeAllLineTerminators();
@@ -1069,12 +1070,12 @@ public final class Parser {
 				consumeAllLineTerminators();
 
 				if (isIdentifier && state.currentToken.type != TokenType.Colon) {
-					result.shorthandEntry(new StringValue(propertyName));
+					entries.add(ObjectExpression.shorthandEntry(new StringValue(propertyName)));
 					couldBeGetterSetter = propertyName.equals("get") || propertyName.equals("set");
 				} else {
 					state.require(TokenType.Colon);
 					consumeAllLineTerminators();
-					result.staticEntry(new StringValue(propertyName), parseExpression(1, Left));
+					entries.add(ObjectExpression.staticEntry(new StringValue(propertyName), parseExpression(1, Left)));
 				}
 			} else {
 				state.require(TokenType.LBracket);
@@ -1083,7 +1084,7 @@ public final class Parser {
 				consumeAllLineTerminators();
 				state.require(TokenType.Colon);
 				consumeAllLineTerminators();
-				result.computedKeyEntry(keyExpression, parseExpression(1, Left));
+				entries.add(ObjectExpression.computedKeyEntry(keyExpression, parseExpression(1, Left)));
 			}
 
 			consumeAllLineTerminators();
@@ -1097,14 +1098,16 @@ public final class Parser {
 
 		consumeAllLineTerminators();
 		state.require(TokenType.RBrace);
-		return result;
+
+		return new ObjectExpression(range(start), entries);
 	}
 
 	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {
+		final SourcePosition start = position();
 		state.require(TokenType.LBracket);
 		final ExpressionList elements = parseExpressionList(false);
 		state.require(TokenType.RBracket);
-		return new ArrayExpression(elements);
+		return new ArrayExpression(range(start), elements);
 	}
 
 	private boolean matchIdentifierName() {

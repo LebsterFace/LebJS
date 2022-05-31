@@ -5,6 +5,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Dumpable;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
@@ -14,25 +15,22 @@ import xyz.lebster.core.value.string.StringValue;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public record ObjectExpression(ArrayList<ObjectEntryNode> entries) implements Expression {
-	public ObjectExpression() {
-		this(new ArrayList<>());
+public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> entries) implements Expression {
+
+	public static StaticEntryNode staticEntry(StringValue key, Expression value) {
+		return new StaticEntryNode(key, value);
 	}
 
-	public void staticEntry(StringValue key, Expression value) {
-		this.entries.add(new StaticEntryNode(key, value));
+	public static ComputedKeyEntryNode computedKeyEntry(Expression key, Expression value) {
+		return new ComputedKeyEntryNode(key, value);
 	}
 
-	public void computedKeyEntry(Expression key, Expression value) {
-		this.entries.add(new ComputedKeyEntryNode(key, value));
+	public static ShorthandEntryNode shorthandEntry(StringValue key) {
+		return new ShorthandEntryNode(key);
 	}
 
-	public void shorthandEntry(StringValue key) {
-		this.entries.add(new ShorthandEntryNode(key));
-	}
-
-	public void spreadEntry(Expression name) {
-		this.entries.add(new SpreadEntryNode(name));
+	public static SpreadEntryNode spreadEntry(Expression name) {
+		return new SpreadEntryNode(name);
 	}
 
 	@Override
@@ -62,7 +60,7 @@ public record ObjectExpression(ArrayList<ObjectEntryNode> entries) implements Ex
 		representation.append('}');
 	}
 
-	private interface ObjectEntryNode extends Dumpable {
+	public interface ObjectEntryNode extends Dumpable {
 		void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion;
 	}
 

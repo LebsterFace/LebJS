@@ -12,14 +12,14 @@ import xyz.lebster.core.value.globals.Undefined;
 import java.util.ArrayList;
 import java.util.List;
 
-public record ArrayAssignmentTarget(AssignmentTarget restTarget, AssignmentTarget... children) implements AssignmentTarget {
+public record ArrayDestructuring(DestructuringAssignmentTarget restTarget, DestructuringAssignmentTarget... children) implements DestructuringAssignmentTarget {
 	@Override
 	public List<BindingPair> getBindings(Interpreter interpreter, Value<?> input) throws AbruptCompletion {
 		final var iterator = IteratorHelper.getIterator(interpreter, input);
 
 		final ArrayList<BindingPair> result = new ArrayList<>();
 		IteratorHelper.IteratorResult next = iterator.next();
-		for (final AssignmentTarget child : children) {
+		for (final DestructuringAssignmentTarget child : children) {
 			if (child != null) {
 				final Value<?> v = next.done ? Undefined.instance : next.value;
 				result.addAll(child.getBindings(interpreter, v));

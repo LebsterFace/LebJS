@@ -8,6 +8,15 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 
 public interface FunctionNode extends ASTNode {
+	static void declareArguments(Interpreter interpreter, String[] arguments, Value<?>[] passedArguments) throws AbruptCompletion {
+		// Declare passed arguments as variables
+		int i = 0;
+		for (; i < arguments.length && i < passedArguments.length; i++)
+			interpreter.declareVariable(arguments[i], passedArguments[i]);
+		for (; i < arguments.length; i++)
+			interpreter.declareVariable(arguments[i], Undefined.instance);
+	}
+
 	String name();
 
 	String[] arguments();
@@ -43,14 +52,5 @@ public interface FunctionNode extends ASTNode {
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}
-	}
-
-	static void declareArguments(Interpreter interpreter, String[] arguments, Value<?>[] passedArguments) throws AbruptCompletion {
-		// Declare passed arguments as variables
-		int i = 0;
-		for (; i < arguments.length && i < passedArguments.length; i++)
-			interpreter.declareVariable(arguments[i], passedArguments[i]);
-		for (; i < arguments.length; i++)
-			interpreter.declareVariable(arguments[i], Undefined.instance);
 	}
 }

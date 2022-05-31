@@ -2,6 +2,7 @@ package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.exception.ShouldNotHappen;
+import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.RangeError;
 import xyz.lebster.core.value.error.ReferenceError;
@@ -35,13 +36,13 @@ public final class Interpreter {
 
 	@NonStandard
 	// FIXME: Environment records
-	public void declareVariable(String name, Value<?> value) {
-		lexicalEnvironment().createBinding(this, new StringValue(name), value);
+	public void declareVariable(String name, Value<?> value) throws AbruptCompletion {
+		this.declareVariable(VariableDeclaration.Kind.Let, new StringValue(name), value);
 	}
 
 	@NonStandard
 	// FIXME: Environment records
-	public void declareVariable(StringValue name, Value<?> value) throws AbruptCompletion {
+	public void declareVariable(VariableDeclaration.Kind kind, StringValue name, Value<?> value) throws AbruptCompletion {
 		final Environment environment = executionContextStack[currentExecutionContext].environment();
 		if (environment.hasBinding(name)) {
 			// FIXME: This should be a Syntax Error at parse-time

@@ -2,10 +2,7 @@ package xyz.lebster.core.parser;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.*;
-import xyz.lebster.core.node.AppendableNode;
-import xyz.lebster.core.node.Program;
-import xyz.lebster.core.node.SourcePosition;
-import xyz.lebster.core.node.SourceRange;
+import xyz.lebster.core.node.*;
 import xyz.lebster.core.node.declaration.*;
 import xyz.lebster.core.node.expression.*;
 import xyz.lebster.core.node.expression.literal.*;
@@ -334,7 +331,7 @@ public final class Parser {
 			throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.", position());
 		final VariableDeclarator declarator = declaration.declarations()[0];
 		if (declarator.init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
-		if (!(declarator.target() instanceof final IdentifierAssignmentTarget identifierAssignmentTarget)) throw new NotImplemented("For-of loops with destructuring declarations");
+		if (!(declarator.target() instanceof final IdentifierExpression identifierAssignmentTarget)) throw new NotImplemented("For-of loops with destructuring declarations");
 		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), identifierAssignmentTarget.name().value);
 
 		state.require(TokenType.Identifier, "of");
@@ -360,7 +357,7 @@ public final class Parser {
 			throw new SyntaxError("Invalid left-hand side in for-in loop: Must have a single binding.", position());
 		final VariableDeclarator declarator = declaration.declarations()[0];
 		if (declarator.init() != null) throw new SyntaxError("for-in loop variable declaration may not have an init.", position());
-		if (!(declarator.target() instanceof final IdentifierAssignmentTarget identifierAssignmentTarget)) throw new NotImplemented("For-in loops with destructuring declarations");
+		if (!(declarator.target() instanceof final IdentifierExpression identifierAssignmentTarget)) throw new NotImplemented("For-in loops with destructuring declarations");
 		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), identifierAssignmentTarget.name().value);
 
 		state.require(TokenType.In);
@@ -510,16 +507,16 @@ public final class Parser {
 
 	private VariableDeclarator parseVariableDeclarator() throws SyntaxError, CannotParse {
 		final SourcePosition declaratorStart = position();
-		final AssignmentTarget lhs = parseAssignmentTarget();
+		final DestructuringAssignmentTarget lhs = parseAssignmentTarget();
 		final Expression value = state.optional(TokenType.Equals) ? parseExpression(1, Left) : null;
 		return new VariableDeclarator(lhs, value, range(declaratorStart));
 	}
 
-	private AssignmentTarget parseAssignmentTarget() throws SyntaxError, CannotParse {
+	private DestructuringAssignmentTarget parseAssignmentTarget() throws SyntaxError, CannotParse {
 		if (state.optional(TokenType.LBrace)) {
 			consumeAllLineTerminators();
 
-			final Map<Expression, AssignmentTarget> pairs = new HashMap<>();
+			final Map<Expression, DestructuringAssignmentTarget> pairs = new HashMap<>();
 			StringValue restName = null;
 			while (state.currentToken.type != TokenType.RBrace) {
 				if (state.optional(TokenType.DotDotDot)) {
@@ -544,7 +541,7 @@ public final class Parser {
 						consumeAllLineTerminators();
 						pairs.put(new StringLiteral(key), parseAssignmentTarget());
 					} else {
-						pairs.put(new StringLiteral(key), new IdentifierAssignmentTarget(key));
+						pairs.put(new StringLiteral(key), new IdentifierExpression(key));
 					}
 				} else {
 					state.require(TokenType.LBracket);
@@ -563,10 +560,10 @@ public final class Parser {
 
 			consumeAllLineTerminators();
 			state.require(TokenType.RBrace);
-			return new ObjectAssignmentTarget(pairs, restName);
+			return new ObjectDestructuring(pairs, restName);
 		} else if (state.optional(TokenType.LBracket)) {
-			final ArrayList<AssignmentTarget> children = new ArrayList<>();
-			AssignmentTarget spreadTarget = null;
+			final ArrayList<DestructuringAssignmentTarget> children = new ArrayList<>();
+			DestructuringAssignmentTarget spreadTarget = null;
 
 			consumeAllLineTerminators();
 			while (true) {
@@ -588,9 +585,9 @@ public final class Parser {
 			}
 
 			state.require(TokenType.RBracket);
-			return new ArrayAssignmentTarget(spreadTarget, children.toArray(new AssignmentTarget[0]));
+			return new ArrayDestructuring(spreadTarget, children.toArray(new DestructuringAssignmentTarget[0]));
 		} else if (matchIdentifierName()) {
-			return new IdentifierAssignmentTarget(state.consume().value);
+			return new IdentifierExpression(state.consume().value);
 		} else {
 			state.unexpected();
 			return null;
@@ -828,9 +825,23 @@ public final class Parser {
 	}
 
 	private Expression parseAssignmentExpression(Expression left_expr, int minPrecedence, Associativity assoc, AssignmentOp op) throws SyntaxError, CannotParse {
-		final LeftHandSideExpression left = ensureLHS(left_expr, AssignmentExpression.invalidLHS);
+		final Assignable left = ensureAssignable(left_expr, op);
 		final Expression right = parseExpression(minPrecedence, assoc);
 		return new AssignmentExpression(left, right, op);
+	}
+
+	private Assignable ensureAssignable(Expression left_expr, AssignmentOp op) throws SyntaxError, CannotParse {
+		if (left_expr instanceof final Assignable assignable) {
+			if (left_expr instanceof LeftHandSideExpression || op == AssignmentOp.Assign) {
+				return assignable;
+			}
+		} else if (op == AssignmentOp.Assign && (left_expr instanceof ArrayExpression || left_expr instanceof ObjectExpression)) {
+			// left_expr is a destructuring pattern we mis-parsed as an array / object literal
+			// TODO: Convert to DestructuringAssignmentTarget manually, rather than re-parsing the source
+			return new Parser(left_expr.range().getText()).parseAssignmentTarget();
+		}
+
+		throw new SyntaxError(AssignmentExpression.invalidLHS, position());
 	}
 
 	private Expression parseConditionalExpression(Expression test) throws CannotParse, SyntaxError {
@@ -941,7 +952,7 @@ public final class Parser {
 
 		final String className = state.consume().value;
 		consumeAllLineTerminators();
-		return new VariableDeclaration(VariableDeclaration.Kind.Let, new VariableDeclarator(new IdentifierAssignmentTarget(className), parseClassBody(start, className), null));
+		return new VariableDeclaration(VariableDeclaration.Kind.Let, new VariableDeclarator(new IdentifierExpression(className), parseClassBody(start, className), null));
 	}
 
 	private ClassExpression parseClassBody(SourcePosition start, String className) throws SyntaxError, CannotParse {

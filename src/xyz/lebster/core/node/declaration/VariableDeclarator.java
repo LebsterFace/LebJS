@@ -5,15 +5,13 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
+import xyz.lebster.core.node.Declarable;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.string.StringValue;
 
-public record VariableDeclarator(AssignmentTarget target, Expression init, SourceRange range) implements ASTNode {
+public record VariableDeclarator(Declarable target, Expression init, SourceRange range) implements ASTNode {
 	@Override
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
@@ -24,20 +22,7 @@ public record VariableDeclarator(AssignmentTarget target, Expression init, Sourc
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> value = init == null ? Undefined.instance : init.execute(interpreter);
-		if (target instanceof final IdentifierAssignmentTarget identifierAssignmentTarget) {
-			final StringValue name = identifierAssignmentTarget.name();
-			if (Executable.isAnonymousFunctionExpression(init)) {
-				if (value instanceof final Executable function) {
-					function.set(interpreter, Names.name, name);
-					function.updateName(name.toFunctionName());
-				}
-			}
-		}
-
-		for (var binding : target.getBindings(interpreter, value))
-			binding.declare(interpreter);
-
+		target.declare(interpreter, VariableDeclaration.Kind.Let, init);
 		return Undefined.instance;
 	}
 

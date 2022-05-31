@@ -35,15 +35,23 @@ public final class Function extends Constructor {
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		// Closures: The LexicalEnvironment of this.code; The surrounding `this` value
-		final ExecutionContext context = interpreter.pushLexicalEnvironment(environment);
-		return code.execute(interpreter, context, arguments);
+		final ExecutionContext parentContext = interpreter.pushLexicalEnvironment(environment);
+		try {
+			return code.execute(interpreter, arguments);
+		} finally {
+			interpreter.exitExecutionContext(parentContext);
+		}
 	}
 
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) throws AbruptCompletion {
 		// Calling when `this` is bound: The LexicalEnvironment of this.code; The bound `this` value
-		final ExecutionContext context = interpreter.pushEnvironmentAndThisValue(environment, newThisValue);
-		return code.execute(interpreter, context, arguments);
+		final ExecutionContext parentContext = interpreter.pushEnvironmentAndThisValue(environment, newThisValue);
+		try {
+			return code.execute(interpreter, arguments);
+		} finally {
+			interpreter.exitExecutionContext(parentContext);
+		}
 	}
 
 	@Override

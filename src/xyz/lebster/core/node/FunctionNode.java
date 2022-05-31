@@ -31,16 +31,11 @@ public interface FunctionNode extends ASTNode {
 		return builder.toString();
 	}
 
-	default Value<?> execute(Interpreter interpreter, ExecutionContext context, Value<?>[] passedArguments) throws AbruptCompletion {
-		// Declare passed arguments as variables
-		int i = 0;
-		for (; i < arguments().length && i < passedArguments.length; i++)
-			interpreter.declareVariable(arguments()[i], passedArguments[i]);
-		for (; i < arguments().length; i++)
-			interpreter.declareVariable(arguments()[i], Undefined.instance);
-
+	default Value<?> execute(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
+		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
 		try {
-			body().execute(interpreter);
+			FunctionNode.declareArguments(interpreter, arguments(), passedArguments);
+			body().executeWithoutNewContext(interpreter);
 			return Undefined.instance;
 		} catch (AbruptCompletion e) {
 			if (e.type != AbruptCompletion.Type.Return) throw e;
@@ -48,5 +43,14 @@ public interface FunctionNode extends ASTNode {
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}
+	}
+
+	static void declareArguments(Interpreter interpreter, String[] arguments, Value<?>[] passedArguments) throws AbruptCompletion {
+		// Declare passed arguments as variables
+		int i = 0;
+		for (; i < arguments.length && i < passedArguments.length; i++)
+			interpreter.declareVariable(arguments[i], passedArguments[i]);
+		for (; i < arguments.length; i++)
+			interpreter.declareVariable(arguments[i], Undefined.instance);
 	}
 }

@@ -71,9 +71,9 @@ Test.expect(property, "2");
 
 // special left hand sides
 // allow member expression as variable
-const f = {};
-for (f.a in "abc");
-Test.expect(f.a, "2");
+const O = {};
+for (O.a in "abc");
+Test.expect(O.a, "2");
 
 
 // allow member expression of function call

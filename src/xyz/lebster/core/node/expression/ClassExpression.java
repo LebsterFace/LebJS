@@ -11,6 +11,7 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.Constructor;
 import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.function.Function;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
@@ -124,13 +125,17 @@ public record ClassExpression(String className, ClassConstructorNode constructor
 		@Override
 		public ObjectValue construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 			final ObjectValue newInstance = new ObjectValue(this.prototypeProperty);
-			final ExecutionContext context = interpreter.pushEnvironmentAndThisValue(environment, newInstance);
-			final Value<?> returnValue = code.execute(interpreter, context, args);
+			final var returnValue = ajjj(interpreter, args, newInstance);
 			if (returnValue instanceof final ObjectValue asObject) return asObject;
 			return newInstance;
 		}
+
+		private Value<?> ajjj(Interpreter interpreter, Value<?>[] arguments, ObjectValue newInstance) throws AbruptCompletion {
+			return new Function(interpreter, environment, code).call(interpreter, newInstance, arguments);
+		}
 	}
 
+	// A copy of core.value.function.Function, without the construct method - class methods cannot be constructed
 	private static final class ClassMethod extends Executable {
 		private final Environment environment;
 		private final FunctionNode code;
@@ -153,16 +158,12 @@ public record ClassExpression(String className, ClassConstructorNode constructor
 
 		@Override
 		public Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
-			// Closures: The LexicalEnvironment of this.code; The surrounding `this` value
-			final ExecutionContext context = interpreter.pushLexicalEnvironment(environment);
-			return code.execute(interpreter, context, arguments);
+			return new Function(interpreter, environment, code).call(interpreter, arguments);
 		}
 
 		@Override
 		public Value<?> call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) throws AbruptCompletion {
-			// Calling when `this` is bound: The LexicalEnvironment of this.code; The bound `this` value
-			final ExecutionContext context = interpreter.pushEnvironmentAndThisValue(environment, newThisValue);
-			return code.execute(interpreter, context, arguments);
+			return new Function(interpreter, environment, code).call(interpreter, newThisValue, arguments);
 		}
 	}
 }

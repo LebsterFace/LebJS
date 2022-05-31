@@ -27,13 +27,17 @@ public record BlockStatement(List<Statement> children) implements Statement, App
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
 		try {
-			Value<?> lastValue = Undefined.instance;
-			for (ASTNode child : children)
-				lastValue = child.execute(interpreter);
-			return lastValue;
+			return this.executeWithoutNewContext(interpreter);
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}
+	}
+
+	public Value<?> executeWithoutNewContext(Interpreter interpreter) throws AbruptCompletion {
+		Value<?> lastValue = Undefined.instance;
+		for (ASTNode child : children)
+			lastValue = child.execute(interpreter);
+		return lastValue;
 	}
 
 	@Override

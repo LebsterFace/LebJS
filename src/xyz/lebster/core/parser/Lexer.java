@@ -529,7 +529,7 @@ public final class Lexer {
 	}
 
 	private SourcePosition position() {
-		return new SourcePosition(source, index);
+		return new SourcePosition(source, index - 1);
 	}
 
 	private char consumeHexDigit() throws SyntaxError {

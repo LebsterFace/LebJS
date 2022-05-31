@@ -31,6 +31,10 @@ public final class Parser {
 		this.state = new ParserState(tokens);
 	}
 
+	public Parser(String sourceText) throws SyntaxError {
+		this(sourceText, new Lexer(sourceText).tokenize());
+	}
+
 	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
 	private int precedenceForTokenType(TokenType type) {
 		return switch (type) {
@@ -89,7 +93,6 @@ public final class Parser {
 
 	public Program parse() throws SyntaxError, CannotParse {
 		final Program program = new Program();
-		state.consume();
 		populateAppendableNode(program, TokenType.EOF);
 		return program;
 	}

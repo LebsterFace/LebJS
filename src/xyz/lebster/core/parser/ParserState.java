@@ -11,6 +11,7 @@ public final class ParserState {
 
 	public ParserState(Token[] tokens) {
 		this.tokens = tokens;
+		this.consume();
 	}
 
 	private ParserState(Token[] tokens, int index, Token currentToken) {

@@ -3,7 +3,6 @@ package xyz.lebster.core.interpreter;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.Program;
-import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.value.Value;
 
@@ -17,7 +16,7 @@ public record Realm(Interpreter interpreter) {
 	}
 
 	public static Program parse(String sourceText) throws SyntaxError, CannotParse {
-		return new Parser(sourceText, new Lexer(sourceText).tokenize()).parse();
+		return new Parser(sourceText).parse();
 	}
 
 	public Value<?> execute(String sourceText, boolean dumpAST) throws CannotParse, SyntaxError, AbruptCompletion {

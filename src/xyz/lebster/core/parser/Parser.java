@@ -838,6 +838,7 @@ public final class Parser {
 		} else if (op == AssignmentOp.Assign && (left_expr instanceof ArrayExpression || left_expr instanceof ObjectExpression)) {
 			// left_expr is a destructuring pattern we mis-parsed as an array / object literal
 			// TODO: Convert to DestructuringAssignmentTarget manually, rather than re-parsing the source
+			// FIXME: ({ a, b }) = c should fail
 			return new Parser(left_expr.range().getText()).parseAssignmentTarget();
 		}
 

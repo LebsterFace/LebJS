@@ -35,14 +35,6 @@ public record MemberExpression(Expression base, Expression property, boolean com
 	}
 
 	@Override
-	public Value<?> assign(Interpreter interpreter, Expression rhs) throws AbruptCompletion {
-		final Reference ref = this.toReference(interpreter);
-		final Value<?> value = rhs.execute(interpreter);
-		ref.putValue(interpreter, value);
-		return value;
-	}
-
-	@Override
 	public void represent(StringRepresentation representation) {
 		base.represent(representation);
 		if (computed) {

@@ -42,4 +42,10 @@ public record IdentifierExpression(StringValue name) implements DestructuringAss
 	public void represent(StringRepresentation representation) {
 		representation.append(name.value);
 	}
+
+	public Value<?> assign(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
+		final Reference ref = this.toReference(interpreter);
+		ref.putValue(interpreter, value);
+		return value;
+	}
 }

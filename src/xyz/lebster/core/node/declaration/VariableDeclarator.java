@@ -5,13 +5,12 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
-import xyz.lebster.core.node.Declarable;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 
-public record VariableDeclarator(Declarable target, Expression init, SourceRange range) implements ASTNode {
+public record VariableDeclarator(DestructuringAssignmentTarget target, Expression init, SourceRange range) implements ASTNode {
 	@Override
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)

@@ -1,7 +1,10 @@
 package xyz.lebster.core.parser;
 
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.*;
+import xyz.lebster.core.exception.CannotParse;
+import xyz.lebster.core.exception.ParserNotImplemented;
+import xyz.lebster.core.exception.ShouldNotHappen;
+import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.*;
 import xyz.lebster.core.node.declaration.*;
 import xyz.lebster.core.node.expression.*;
@@ -329,11 +332,10 @@ public final class Parser {
 		// for ( LetOrConst ForBinding of AssignmentExpression ) Statement
 		if (declaration.declarations().length != 1)
 			throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.", position());
-		final VariableDeclarator declarator = declaration.declarations()[0];
-		if (declarator.init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
-		if (!(declarator.target() instanceof final IdentifierExpression identifierAssignmentTarget)) throw new NotImplemented("For-of loops with destructuring declarations");
-		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), identifierAssignmentTarget.name().value);
+		if (declaration.declarations()[0].init() != null)
+			throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
 
+		final BindingPattern bindingPattern = new BindingPattern(declaration);
 		state.require(TokenType.Identifier, "of");
 		final Expression expression = parseExpression();
 		state.require(TokenType.RParen);
@@ -355,11 +357,10 @@ public final class Parser {
 		// for ( LetOrConst ForBinding in Expression ) Statement
 		if (declaration.declarations().length != 1)
 			throw new SyntaxError("Invalid left-hand side in for-in loop: Must have a single binding.", position());
-		final VariableDeclarator declarator = declaration.declarations()[0];
-		if (declarator.init() != null) throw new SyntaxError("for-in loop variable declaration may not have an init.", position());
-		if (!(declarator.target() instanceof final IdentifierExpression identifierAssignmentTarget)) throw new NotImplemented("For-in loops with destructuring declarations");
-		final BindingPattern bindingPattern = new BindingPattern(declaration.kind(), identifierAssignmentTarget.name().value);
+		if (declaration.declarations()[0].init() != null)
+			throw new SyntaxError("for-in loop variable declaration may not have an init.", position());
 
+		final BindingPattern bindingPattern = new BindingPattern(declaration);
 		state.require(TokenType.In);
 		final Expression expression = parseExpression();
 		state.require(TokenType.RParen);

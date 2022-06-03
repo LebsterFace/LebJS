@@ -19,9 +19,16 @@ public sealed interface DestructuringAssignmentTarget extends Dumpable, Assignab
 	permits ArrayDestructuring, IdentifierExpression, ObjectDestructuring {
 	List<BindingPair> getBindings(Interpreter interpreter, Value<?> input) throws AbruptCompletion;
 
+	default Value<?> assign(Interpreter interpreter, Expression expression) throws AbruptCompletion {
+		return this.assign(interpreter, getValue(interpreter, expression));
+	}
+
+	default void declare(Interpreter interpreter, VariableDeclaration.Kind kind, Expression expression) throws AbruptCompletion {
+		this.declare(interpreter, kind, getValue(interpreter, expression));
+	}
+
 	@Override
-	default Value<?> assign(Interpreter interpreter, Expression rhs) throws AbruptCompletion {
-		final Value<?> value = getValue(interpreter, rhs);
+	default Value<?> assign(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 		for (var binding : this.getBindings(interpreter, value)) {
 			final Reference reference = interpreter.getBinding(binding.name());
 			reference.putValue(interpreter, binding.value());
@@ -30,9 +37,7 @@ public sealed interface DestructuringAssignmentTarget extends Dumpable, Assignab
 		return value;
 	}
 
-	@Override
-	default void declare(Interpreter interpreter, VariableDeclaration.Kind kind, Expression init) throws AbruptCompletion {
-		final Value<?> value = getValue(interpreter, init);
+	default void declare(Interpreter interpreter, VariableDeclaration.Kind kind, Value<?> value) throws AbruptCompletion {
 		for (var binding : this.getBindings(interpreter, value))
 			interpreter.declareVariable(kind, binding.name(), binding.value());
 	}

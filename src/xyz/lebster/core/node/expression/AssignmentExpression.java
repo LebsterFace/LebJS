@@ -9,6 +9,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Assignable;
+import xyz.lebster.core.node.declaration.DestructuringAssignmentTarget;
 import xyz.lebster.core.value.Value;
 
 public record AssignmentExpression(Assignable left, Expression right, AssignmentOp op) implements Expression {
@@ -26,7 +27,14 @@ public record AssignmentExpression(Assignable left, Expression right, Assignment
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-assignment-operators-runtime-semantics-evaluation")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		if (op == AssignmentOp.Assign) return left.assign(interpreter, right);
+		if (op == AssignmentOp.Assign) {
+			if (left instanceof final DestructuringAssignmentTarget dat) {
+				return dat.assign(interpreter, right);
+			} else {
+				return left.assign(interpreter, right.execute(interpreter));
+			}
+		}
+
 		if (!(left instanceof final LeftHandSideExpression lhs))
 			throw new ShouldNotHappen("Invalid left-hand side in assignment");
 

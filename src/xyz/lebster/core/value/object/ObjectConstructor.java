@@ -125,17 +125,13 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 			throw AbruptCompletion.error(new TypeError(interpreter, "Object.setPrototypeOf called on null or undefined"));
 
 		// 2. If Type(proto) is neither Object nor Null, throw a TypeError exception.
-		ObjectValue proto_objectValue = null;
-		if (proto instanceof final ObjectValue p) {
-			proto_objectValue = p;
-		} else if (proto != Null.instance) {
+		if (!(proto instanceof ObjectValue || proto == Null.instance))
 			throw AbruptCompletion.error(new TypeError(interpreter, "Object prototype may only be an Object or null"));
-		}
 
 		// 3. If Type(O) is not Object, return O.
 		if (!(O instanceof final ObjectValue O_objectValue)) return O;
 		// 4. Let status be ? O.[[SetPrototypeOf]](proto).
-		final boolean status = O_objectValue.setPrototype(proto_objectValue);
+		final boolean status = O_objectValue.setPrototype(proto);
 		// 5. If status is false, throw a TypeError exception.
 		if (!status)
 			throw AbruptCompletion.error(new TypeError(interpreter, "Cyclic object prototype value"));

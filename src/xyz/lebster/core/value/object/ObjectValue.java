@@ -92,7 +92,15 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarysetprototypeof")
-	public final boolean setPrototype(ObjectValue V) {
+	public final boolean setPrototype(Value<?> V_or_null) {
+		if (V_or_null == Null.instance) {
+			this.prototypeSlot = null;
+			return true;
+		}
+
+		if (!(V_or_null instanceof final ObjectValue V))
+			throw new ShouldNotHappen("ObjectValue#getPrototypeOf called with non-object parameter");
+
 		// 1. Let current be O.[[Prototype]].
 		final ObjectValue current = this.prototypeSlot;
 		// 2. If SameValue(V, current) is true, return true.

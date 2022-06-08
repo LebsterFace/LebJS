@@ -262,7 +262,8 @@ public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayCon
 		final int argCount = items.length;
 		// 4. If len + argCount > 2^53 - 1, throw a TypeError exception.
 		if (len + argCount > MAX_LENGTH) {
-			throw AbruptCompletion.error(new TypeError(interpreter, "Pushing " + argCount + " elements on an array-like of length " + len + " is disallowed, as the total surpasses 2^53-1"));
+			final String message = "Pushing %d elements on an array-like of length %d is disallowed, as the total surpasses 2^53-1";
+			throw AbruptCompletion.error(new TypeError(interpreter, message.formatted(argCount, len)));
 		}
 
 		// 5. For each element E of items, do

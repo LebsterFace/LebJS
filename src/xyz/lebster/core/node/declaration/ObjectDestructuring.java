@@ -1,6 +1,7 @@
 package xyz.lebster.core.node.declaration;
 
 import xyz.lebster.core.DumpBuilder;
+import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -43,7 +44,15 @@ public record ObjectDestructuring(Map<Expression, DestructuringAssignmentTarget>
 
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.notImplemented(indent, this);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.optionalValue("Rest Name", restName);
+		Dumper.dumpIndicator(indent, "Children");
+		for (final var entry : pairs.entrySet()) {
+			DumpBuilder.begin(indent + 1)
+				.child("Key", entry.getKey())
+				.child("Value", entry.getValue());
+		}
 	}
 
 	@Override

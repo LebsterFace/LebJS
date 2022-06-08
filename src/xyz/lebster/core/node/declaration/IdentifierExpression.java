@@ -29,7 +29,7 @@ public record IdentifierExpression(StringValue name) implements DestructuringAss
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpValue(indent, "IdentifierExpression", name.value);
+		Dumper.dumpValue(indent, "Identifier", name.value);
 	}
 
 	@Override

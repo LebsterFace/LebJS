@@ -44,7 +44,10 @@ public record ArrayDestructuring(DestructuringAssignmentTarget restTarget, Destr
 
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.notImplemented(indent, this);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.optional("Rest Target", restTarget)
+			.children("Elements", children);
 	}
 
 	@Override

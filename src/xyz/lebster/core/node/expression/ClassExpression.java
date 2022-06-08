@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.SourceRange;
-import xyz.lebster.core.node.declaration.DestructuringAssignmentTarget;
+import xyz.lebster.core.node.declaration.AssignmentTarget;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
@@ -75,14 +75,14 @@ public record ClassExpression(String className, ClassConstructorNode constructor
 	}
 
 
-	public record ClassMethodNode(String className, String name, DestructuringAssignmentTarget[] arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
+	public record ClassMethodNode(String className, String name, AssignmentTarget[] arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
 		@Override
 		public ClassMethod execute(Interpreter interpreter) {
 			return new ClassMethod(interpreter, interpreter.lexicalEnvironment(), this);
 		}
 	}
 
-	public record ClassConstructorNode(String className, String name, DestructuringAssignmentTarget[] arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
+	public record ClassConstructorNode(String className, String name, AssignmentTarget[] arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
 		@Override
 		public ClassConstructor execute(Interpreter interpreter) throws AbruptCompletion {
 			return new ClassConstructor(interpreter, interpreter.lexicalEnvironment(), this, className);

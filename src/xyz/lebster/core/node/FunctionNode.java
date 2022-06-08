@@ -5,14 +5,14 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.declaration.DestructuringAssignmentTarget;
+import xyz.lebster.core.node.declaration.AssignmentTarget;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 
 public interface FunctionNode extends ASTNode {
-	static void declareArguments(Interpreter interpreter, DestructuringAssignmentTarget[] arguments, Value<?>[] passedArguments) throws AbruptCompletion {
+	static void declareArguments(Interpreter interpreter, AssignmentTarget[] arguments, Value<?>[] passedArguments) throws AbruptCompletion {
 		// Declare passed arguments as variables
 		int i = 0;
 		for (; i < arguments.length && i < passedArguments.length; i++)
@@ -23,13 +23,13 @@ public interface FunctionNode extends ASTNode {
 
 	String name();
 
-	DestructuringAssignmentTarget[] arguments();
+	AssignmentTarget[] arguments();
 
 	BlockStatement body();
 
 	default String toCallString() {
 		final String name = name();
-		final DestructuringAssignmentTarget[] arguments = arguments();
+		final AssignmentTarget[] arguments = arguments();
 
 		final var representation = new StringRepresentation();
 		if (name != null) representation.append(name);

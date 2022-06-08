@@ -5,24 +5,24 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
-import xyz.lebster.core.node.declaration.DestructuringAssignmentTarget;
+import xyz.lebster.core.node.declaration.AssignmentTarget;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.function.ArrowFunction;
 
 public final class ArrowFunctionExpression implements Expression {
-	public final DestructuringAssignmentTarget[] arguments;
+	public final AssignmentTarget[] arguments;
 	public final BlockStatement body;
 	public final Expression implicitReturnExpression;
 	public final boolean hasFullBody;
 
-	public ArrowFunctionExpression(BlockStatement body, DestructuringAssignmentTarget... arguments) {
+	public ArrowFunctionExpression(BlockStatement body, AssignmentTarget... arguments) {
 		this.arguments = arguments;
 		this.body = body;
 		this.hasFullBody = true;
 		this.implicitReturnExpression = null;
 	}
 
-	public ArrowFunctionExpression(Expression implicitReturnExpression, DestructuringAssignmentTarget... arguments) {
+	public ArrowFunctionExpression(Expression implicitReturnExpression, AssignmentTarget... arguments) {
 		this.body = null;
 		this.arguments = arguments;
 		this.hasFullBody = false;

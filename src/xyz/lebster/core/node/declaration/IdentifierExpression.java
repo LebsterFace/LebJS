@@ -12,7 +12,7 @@ import xyz.lebster.core.value.string.StringValue;
 
 import java.util.List;
 
-public record IdentifierExpression(StringValue name) implements DestructuringAssignmentTarget, LeftHandSideExpression {
+public record IdentifierExpression(StringValue name) implements AssignmentTarget, LeftHandSideExpression {
 	public IdentifierExpression(String name) {
 		this(new StringValue(name));
 	}

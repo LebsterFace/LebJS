@@ -13,7 +13,7 @@ import xyz.lebster.core.value.string.StringValue;
 
 import java.util.*;
 
-public record ObjectDestructuring(Map<Expression, DestructuringAssignmentTarget> pairs, StringValue restName) implements DestructuringAssignmentTarget {
+public record ObjectDestructuring(Map<Expression, AssignmentTarget> pairs, StringValue restName) implements AssignmentTarget {
 	@Override
 	public List<BindingPair> getBindings(Interpreter interpreter, Value<?> input) throws AbruptCompletion {
 		final ObjectValue objectValue = input.toObjectValue(interpreter);

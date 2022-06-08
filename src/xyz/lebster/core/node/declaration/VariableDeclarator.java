@@ -10,7 +10,7 @@ import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 
-public record VariableDeclarator(DestructuringAssignmentTarget target, Expression init, SourceRange range) implements ASTNode {
+public record VariableDeclarator(AssignmentTarget target, Expression init, SourceRange range) implements ASTNode {
 	@Override
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)

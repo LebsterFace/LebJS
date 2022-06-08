@@ -508,16 +508,16 @@ public final class Parser {
 
 	private VariableDeclarator parseVariableDeclarator() throws SyntaxError, CannotParse {
 		final SourcePosition declaratorStart = position();
-		final DestructuringAssignmentTarget lhs = parseAssignmentTarget();
+		final AssignmentTarget lhs = parseAssignmentTarget();
 		final Expression value = state.optional(TokenType.Equals) ? parseExpression(1, Left) : null;
 		return new VariableDeclarator(lhs, value, range(declaratorStart));
 	}
 
-	private DestructuringAssignmentTarget parseAssignmentTarget() throws SyntaxError, CannotParse {
+	private AssignmentTarget parseAssignmentTarget() throws SyntaxError, CannotParse {
 		if (state.optional(TokenType.LBrace)) {
 			consumeAllLineTerminators();
 
-			final Map<Expression, DestructuringAssignmentTarget> pairs = new HashMap<>();
+			final Map<Expression, AssignmentTarget> pairs = new HashMap<>();
 			StringValue restName = null;
 			while (state.currentToken.type != TokenType.RBrace) {
 				if (state.optional(TokenType.DotDotDot)) {
@@ -563,8 +563,8 @@ public final class Parser {
 			state.require(TokenType.RBrace);
 			return new ObjectDestructuring(pairs, restName);
 		} else if (state.optional(TokenType.LBracket)) {
-			final ArrayList<DestructuringAssignmentTarget> children = new ArrayList<>();
-			DestructuringAssignmentTarget spreadTarget = null;
+			final ArrayList<AssignmentTarget> children = new ArrayList<>();
+			AssignmentTarget spreadTarget = null;
 
 			consumeAllLineTerminators();
 			while (true) {
@@ -586,7 +586,7 @@ public final class Parser {
 			}
 
 			state.require(TokenType.RBracket);
-			return new ArrayDestructuring(spreadTarget, children.toArray(new DestructuringAssignmentTarget[0]));
+			return new ArrayDestructuring(spreadTarget, children.toArray(new AssignmentTarget[0]));
 		} else if (matchIdentifierName()) {
 			return new IdentifierExpression(state.consume().value);
 		} else {
@@ -595,10 +595,10 @@ public final class Parser {
 		}
 	}
 
-	private DestructuringAssignmentTarget[] parseFunctionArguments(boolean expectLParen) throws SyntaxError, CannotParse {
+	private AssignmentTarget[] parseFunctionArguments(boolean expectLParen) throws SyntaxError, CannotParse {
 		if (expectLParen) state.require(TokenType.LParen);
 
-		final List<DestructuringAssignmentTarget> result = new ArrayList<>();
+		final List<AssignmentTarget> result = new ArrayList<>();
 		consumeAllLineTerminators();
 		while (state.currentToken.type != TokenType.RParen) {
 			consumeAllLineTerminators();
@@ -609,7 +609,7 @@ public final class Parser {
 
 		this.FAIL_FOR_UNSUPPORTED_ARG();
 		state.require(TokenType.RParen);
-		return result.toArray(new DestructuringAssignmentTarget[0]);
+		return result.toArray(new AssignmentTarget[0]);
 	}
 
 	private void FAIL_FOR_UNSUPPORTED_ARG() {
@@ -628,7 +628,7 @@ public final class Parser {
 
 		final String name = state.consume().value;
 		consumeAllLineTerminators();
-		final DestructuringAssignmentTarget[] arguments = parseFunctionArguments(true);
+		final AssignmentTarget[] arguments = parseFunctionArguments(true);
 		consumeAllLineTerminators();
 		return new FunctionDeclaration(parseFunctionBody(), name, arguments);
 	}
@@ -637,7 +637,7 @@ public final class Parser {
 		state.require(TokenType.Function);
 		final Token potentialName = state.accept(TokenType.Identifier);
 		final String name = potentialName == null ? null : potentialName.value;
-		final DestructuringAssignmentTarget[] arguments = parseFunctionArguments(true);
+		final AssignmentTarget[] arguments = parseFunctionArguments(true);
 		return new FunctionExpression(parseFunctionBody(), name, arguments);
 	}
 
@@ -971,7 +971,7 @@ public final class Parser {
 				throw new ParserNotImplemented(position(), "Class getter / setters");
 			}
 
-			final DestructuringAssignmentTarget[] arguments = parseFunctionArguments(true);
+			final AssignmentTarget[] arguments = parseFunctionArguments(true);
 			consumeAllLineTerminators();
 			final BlockStatement body = parseFunctionBody();
 
@@ -1014,7 +1014,7 @@ public final class Parser {
 	private ArrowFunctionExpression tryParseArrowFunctionExpression() throws CannotParse, SyntaxError {
 		save();
 
-		final DestructuringAssignmentTarget[] arguments;
+		final AssignmentTarget[] arguments;
 		try {
 			arguments = parseFunctionArguments(false);
 		} catch (SyntaxError | CannotParse e) {
@@ -1034,7 +1034,7 @@ public final class Parser {
 		return parseArrowFunctionBody(arguments);
 	}
 
-	private ArrowFunctionExpression parseArrowFunctionBody(DestructuringAssignmentTarget... arguments) throws CannotParse, SyntaxError {
+	private ArrowFunctionExpression parseArrowFunctionBody(AssignmentTarget... arguments) throws CannotParse, SyntaxError {
 		if (state.currentToken.type == TokenType.LBrace) {
 			return new ArrowFunctionExpression(parseBlockStatement(), arguments);
 		} else if (matchPrimaryExpression()) {

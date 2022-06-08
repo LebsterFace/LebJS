@@ -15,7 +15,7 @@ import xyz.lebster.core.value.string.StringValue;
 
 import java.util.List;
 
-public sealed interface DestructuringAssignmentTarget extends Dumpable, Assignable, Declarable
+public sealed interface AssignmentTarget extends Dumpable, Assignable, Declarable
 	permits ArrayDestructuring, IdentifierExpression, ObjectDestructuring {
 	List<BindingPair> getBindings(Interpreter interpreter, Value<?> input) throws AbruptCompletion;
 

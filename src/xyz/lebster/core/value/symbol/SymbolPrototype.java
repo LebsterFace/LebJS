@@ -17,7 +17,7 @@ public final class SymbolPrototype extends BuiltinPrototype<SymbolWrapper, Symbo
 	private static final NativeAccessorDescriptor DESCRIPTION = new NativeAccessorDescriptor(false, true) {
 		@Override
 		public Value<?> get(Interpreter interpreter, ObjectValue thisValue) throws AbruptCompletion {
-			// 1. Let s be the this value.
+			// 1. Let s be the `this` value.
 			// 2. Let sym be ? thisSymbolValue(s).
 			final SymbolValue sym = thisSymbolValue(interpreter, thisValue, "Symbol.prototype.description");
 			// 3. Return sym.[[Description]].

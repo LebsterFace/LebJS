@@ -50,7 +50,7 @@ public final class Main {
 		}
 	}
 
-	private static void file(CLArguments arguments) throws IOException, CannotParse, AbruptCompletion, SyntaxError {
+	private static void file(CLArguments arguments) throws CannotParse, AbruptCompletion, SyntaxError {
 		final String sourceText = Main.readFile(arguments.filePathOrNull());
 		Realm.executeStatic(sourceText, arguments.options().showAST());
 	}

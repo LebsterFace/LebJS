@@ -6,6 +6,7 @@ import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.expression.ExpressionList;
 import xyz.lebster.core.value.Value;
 
+@SuppressWarnings("UnusedReturnValue")
 public final class DumpBuilder {
 	private final int rootIndentation;
 

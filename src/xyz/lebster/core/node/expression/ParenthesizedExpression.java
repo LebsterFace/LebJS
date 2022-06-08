@@ -1,14 +1,11 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.DumpBuilder;
-import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
-import xyz.lebster.core.value.function.Constructor;
 
 public record ParenthesizedExpression(Expression expression, SourceRange range) implements Expression {
 	@Override

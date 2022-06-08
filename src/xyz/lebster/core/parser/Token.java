@@ -6,7 +6,7 @@ public final class Token {
 	public final TokenType type;
 	public final String value;
 
-	public SourcePosition position;
+	public final SourcePosition position;
 
 	public Token(TokenType type, String value, SourcePosition position) {
 		this.type = type;

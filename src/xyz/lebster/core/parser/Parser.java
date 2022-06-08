@@ -1,10 +1,7 @@
 package xyz.lebster.core.parser;
 
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.CannotParse;
-import xyz.lebster.core.exception.ParserNotImplemented;
-import xyz.lebster.core.exception.ShouldNotHappen;
-import xyz.lebster.core.exception.SyntaxError;
+import xyz.lebster.core.exception.*;
 import xyz.lebster.core.node.*;
 import xyz.lebster.core.node.declaration.*;
 import xyz.lebster.core.node.expression.*;
@@ -621,6 +618,7 @@ public final class Parser {
 
 	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
+		if (state.currentToken.type == TokenType.Star) throw new ParserNotImplemented(position(), "Generator function declarations");
 		consumeAllLineTerminators();
 		if (state.currentToken.type != TokenType.Identifier) {
 			throw new SyntaxError("Function declarations require a function name", position());
@@ -635,6 +633,7 @@ public final class Parser {
 
 	private FunctionExpression parseFunctionExpression() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
+		if (state.currentToken.type == TokenType.Star) throw new ParserNotImplemented(position(), "Generator function expressions");
 		final Token potentialName = state.accept(TokenType.Identifier);
 		final String name = potentialName == null ? null : potentialName.value;
 		final AssignmentTarget[] arguments = parseFunctionArguments(true);

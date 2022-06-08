@@ -839,7 +839,6 @@ public final class Parser {
 		} else if (op == AssignmentOp.Assign && (left_expr instanceof ArrayExpression || left_expr instanceof ObjectExpression)) {
 			// left_expr is a destructuring pattern we mis-parsed as an array / object literal
 			// TODO: Convert to DestructuringAssignmentTarget manually, rather than re-parsing the source
-			// FIXME: ({ a, b }) = c should fail
 			return new Parser(left_expr.range().getText()).parseAssignmentTarget();
 		}
 
@@ -867,7 +866,8 @@ public final class Parser {
 			case Class -> parseClassExpression();
 
 			case LParen -> {
-				state.consume();
+				final SourcePosition start = state.consume().position;
+
 				if (state.is(TokenType.RParen, TokenType.Identifier, TokenType.DotDotDot, TokenType.RBrace, TokenType.LBracket)) {
 					final ArrowFunctionExpression result = tryParseArrowFunctionExpression();
 					if (result != null) yield result;
@@ -877,7 +877,7 @@ public final class Parser {
 				final Expression expression = parseExpression();
 				consumeAllLineTerminators();
 				state.require(TokenType.RParen);
-				yield expression;
+				yield new ParenthesizedExpression(expression, range(start));
 			}
 
 			case Identifier -> {

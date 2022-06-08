@@ -595,32 +595,26 @@ public final class Parser {
 		}
 	}
 
-	private String[] parseStringList() {
-		final List<String> result = new ArrayList<>();
+	private DestructuringAssignmentTarget[] parseFunctionArguments(boolean expectLParen) throws SyntaxError, CannotParse {
+		if (expectLParen) state.require(TokenType.LParen);
+
+		final List<DestructuringAssignmentTarget> result = new ArrayList<>();
 		consumeAllLineTerminators();
-		while (state.currentToken.type == TokenType.Identifier) {
+		while (state.currentToken.type != TokenType.RParen) {
 			consumeAllLineTerminators();
-			result.add(state.consume().value);
+			result.add(parseAssignmentTarget());
 			consumeAllLineTerminators();
 			if (!state.optional(TokenType.Comma)) break;
 		}
 
-		return result.toArray(new String[0]);
-	}
-
-	private String[] parseFunctionArguments() throws SyntaxError {
-		state.require(TokenType.LParen);
-		final String[] arguments = parseStringList();
 		this.FAIL_FOR_UNSUPPORTED_ARG();
 		state.require(TokenType.RParen);
-		return arguments;
+		return result.toArray(new DestructuringAssignmentTarget[0]);
 	}
 
 	private void FAIL_FOR_UNSUPPORTED_ARG() {
 		if (state.currentToken.type == TokenType.DotDotDot)
 			throw new ParserNotImplemented(position(), "Parsing rest (`...`) arguments");
-		else if (state.currentToken.type == TokenType.LBrace || state.currentToken.type == TokenType.LBracket)
-			throw new ParserNotImplemented(position(), "Parsing destructuring arguments");
 		else if (state.currentToken.type == TokenType.Equals)
 			throw new ParserNotImplemented(position(), "Parsing default parameters");
 	}
@@ -634,7 +628,7 @@ public final class Parser {
 
 		final String name = state.consume().value;
 		consumeAllLineTerminators();
-		final String[] arguments = parseFunctionArguments();
+		final DestructuringAssignmentTarget[] arguments = parseFunctionArguments(true);
 		consumeAllLineTerminators();
 		return new FunctionDeclaration(parseFunctionBody(), name, arguments);
 	}
@@ -643,7 +637,7 @@ public final class Parser {
 		state.require(TokenType.Function);
 		final Token potentialName = state.accept(TokenType.Identifier);
 		final String name = potentialName == null ? null : potentialName.value;
-		final String[] arguments = parseFunctionArguments();
+		final DestructuringAssignmentTarget[] arguments = parseFunctionArguments(true);
 		return new FunctionExpression(parseFunctionBody(), name, arguments);
 	}
 
@@ -868,7 +862,7 @@ public final class Parser {
 			case LParen -> {
 				final SourcePosition start = state.consume().position;
 
-				if (state.is(TokenType.RParen, TokenType.Identifier, TokenType.DotDotDot, TokenType.RBrace, TokenType.LBracket)) {
+				if (state.is(TokenType.RParen, TokenType.Identifier, TokenType.DotDotDot, TokenType.LBrace, TokenType.LBracket)) {
 					final ArrowFunctionExpression result = tryParseArrowFunctionExpression();
 					if (result != null) yield result;
 				}
@@ -881,14 +875,12 @@ public final class Parser {
 			}
 
 			case Identifier -> {
-				final String identifier = state.consume().value;
+				final var identifier = new IdentifierExpression(state.consume().value);
 				if (state.currentToken.type == TokenType.Arrow) {
 					state.consume();
-					final ArrowFunctionExpression arrowFunction = parseArrowFunctionBody(identifier);
-					if (arrowFunction == null) state.unexpected();
-					yield arrowFunction;
+					yield parseArrowFunctionBody(identifier);
 				} else {
-					yield new IdentifierExpression(identifier);
+					yield identifier;
 				}
 			}
 
@@ -979,7 +971,7 @@ public final class Parser {
 				throw new ParserNotImplemented(position(), "Class getter / setters");
 			}
 
-			final String[] arguments = parseFunctionArguments();
+			final DestructuringAssignmentTarget[] arguments = parseFunctionArguments(true);
 			consumeAllLineTerminators();
 			final BlockStatement body = parseFunctionBody();
 
@@ -1019,40 +1011,37 @@ public final class Parser {
 		return result;
 	}
 
-	private ArrowFunctionExpression tryParseArrowFunctionExpression() throws SyntaxError, CannotParse {
+	private ArrowFunctionExpression tryParseArrowFunctionExpression() throws CannotParse, SyntaxError {
 		save();
 
-		final String[] arguments = parseStringList();
+		final DestructuringAssignmentTarget[] arguments;
+		try {
+			arguments = parseFunctionArguments(false);
+		} catch (SyntaxError | CannotParse e) {
+			load();
+			return null;
+		}
 		this.FAIL_FOR_UNSUPPORTED_ARG();
-		if (state.currentToken.type == TokenType.RParen) {
+		if (state.currentToken.type == TokenType.Arrow) {
 			state.consume();
 		} else {
 			load();
 			return null;
 		}
 
-		if (!state.optional(TokenType.Arrow)) {
-			load();
-			return null;
-		}
-
+		// At this point, we know it's an arrow function
 		consumeAllLineTerminators();
-		final ArrowFunctionExpression result = parseArrowFunctionBody(arguments);
-		if (result == null) {
-			load();
-			return null;
-		} else {
-			return result;
-		}
+		return parseArrowFunctionBody(arguments);
 	}
 
-	private ArrowFunctionExpression parseArrowFunctionBody(String... arguments) throws CannotParse, SyntaxError {
+	private ArrowFunctionExpression parseArrowFunctionBody(DestructuringAssignmentTarget... arguments) throws CannotParse, SyntaxError {
 		if (state.currentToken.type == TokenType.LBrace) {
 			return new ArrowFunctionExpression(parseBlockStatement(), arguments);
 		} else if (matchPrimaryExpression()) {
 			// NOTE: Minimum precedence of 1 (excludes TokenType.Comma): `() => 1,2` is not valid
 			return new ArrowFunctionExpression(parseExpression(1, Left), arguments);
 		} else {
+			state.unexpected();
 			return null;
 		}
 	}

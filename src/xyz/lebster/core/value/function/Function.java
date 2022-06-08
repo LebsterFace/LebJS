@@ -37,7 +37,7 @@ public final class Function extends Constructor {
 		// Closures: The LexicalEnvironment of this.code; The surrounding `this` value
 		final ExecutionContext parentContext = interpreter.pushLexicalEnvironment(environment);
 		try {
-			return code.execute(interpreter, arguments);
+			return code.executeBody(interpreter, arguments);
 		} finally {
 			interpreter.exitExecutionContext(parentContext);
 		}
@@ -48,7 +48,7 @@ public final class Function extends Constructor {
 		// Calling when `this` is bound: The LexicalEnvironment of this.code; The bound `this` value
 		final ExecutionContext parentContext = interpreter.pushEnvironmentAndThisValue(environment, newThisValue);
 		try {
-			return code.execute(interpreter, arguments);
+			return code.executeBody(interpreter, arguments);
 		} finally {
 			interpreter.exitExecutionContext(parentContext);
 		}

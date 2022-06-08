@@ -1,26 +1,28 @@
 package xyz.lebster.core.node.expression;
 
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
+import xyz.lebster.core.node.declaration.DestructuringAssignmentTarget;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.function.ArrowFunction;
 
 public final class ArrowFunctionExpression implements Expression {
-	public final String[] arguments;
+	public final DestructuringAssignmentTarget[] arguments;
 	public final BlockStatement body;
 	public final Expression implicitReturnExpression;
 	public final boolean hasFullBody;
 
-	public ArrowFunctionExpression(BlockStatement body, String... arguments) {
+	public ArrowFunctionExpression(BlockStatement body, DestructuringAssignmentTarget... arguments) {
 		this.arguments = arguments;
 		this.body = body;
 		this.hasFullBody = true;
 		this.implicitReturnExpression = null;
 	}
 
-	public ArrowFunctionExpression(Expression implicitReturnExpression, String... arguments) {
+	public ArrowFunctionExpression(Expression implicitReturnExpression, DestructuringAssignmentTarget... arguments) {
 		this.body = null;
 		this.arguments = arguments;
 		this.hasFullBody = false;
@@ -34,17 +36,10 @@ public final class ArrowFunctionExpression implements Expression {
 
 	@Override
 	public void dump(int indent) {
-		final StringBuilder builder = new StringBuilder("(");
-		if (arguments.length > 0) {
-			builder.append(arguments[0]);
-			for (int i = 1; i < arguments.length; i++) {
-				builder.append(", ");
-				builder.append(arguments[i]);
-			}
-		}
-		builder.append(')');
+		DumpBuilder.begin(indent)
+			.self(this)
+			.children("Arguments", arguments);
 
-		Dumper.dumpParameterized(indent, "ArrowFunctionExpression", builder.toString());
 		if (this.hasFullBody) {
 			assert body != null;
 			for (final ASTNode child : body.children()) {

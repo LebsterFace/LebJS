@@ -8,6 +8,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.SourceRange;
+import xyz.lebster.core.node.declaration.DestructuringAssignmentTarget;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
@@ -65,13 +66,6 @@ public record ClassExpression(String className, ClassConstructorNode constructor
 
 	private interface ClassFunctionNode extends FunctionNode {
 		@Override
-		default void dump(int indent) {
-			DumpBuilder.begin(indent)
-				.selfNamed(this, toCallString())
-				.child("Body", body());
-		}
-
-		@Override
 		default void represent(StringRepresentation representation) {
 			representation.append(name());
 			representation.append(toCallString());
@@ -81,14 +75,14 @@ public record ClassExpression(String className, ClassConstructorNode constructor
 	}
 
 
-	public record ClassMethodNode(String className, String name, String[] arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
+	public record ClassMethodNode(String className, String name, DestructuringAssignmentTarget[] arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
 		@Override
 		public ClassMethod execute(Interpreter interpreter) {
 			return new ClassMethod(interpreter, interpreter.lexicalEnvironment(), this);
 		}
 	}
 
-	public record ClassConstructorNode(String className, String name, String[] arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
+	public record ClassConstructorNode(String className, String name, DestructuringAssignmentTarget[] arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
 		@Override
 		public ClassConstructor execute(Interpreter interpreter) throws AbruptCompletion {
 			return new ClassConstructor(interpreter, interpreter.lexicalEnvironment(), this, className);
@@ -128,13 +122,9 @@ public record ClassExpression(String className, ClassConstructorNode constructor
 		@Override
 		public ObjectValue construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 			final ObjectValue newInstance = new ObjectValue(this.prototypeProperty);
-			final var returnValue = ajjj(interpreter, args, newInstance);
+			final var returnValue = new Function(interpreter, environment, code).call(interpreter, newInstance, args);
 			if (returnValue instanceof final ObjectValue asObject) return asObject;
 			return newInstance;
-		}
-
-		private Value<?> ajjj(Interpreter interpreter, Value<?>[] arguments, ObjectValue newInstance) throws AbruptCompletion {
-			return new Function(interpreter, environment, code).call(interpreter, newInstance, arguments);
 		}
 	}
 

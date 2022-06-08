@@ -40,7 +40,7 @@ public final class NumberRange extends ObjectValue {
 		this.putMethod(functionPrototype, SymbolValue.iterator, ($, $$) -> this);
 		this.putMethod(functionPrototype, Names.next, (interpreter, arguments) -> {
 			final ObjectValue result = new ObjectValue(interpreter.intrinsics.objectPrototype);
-			if (current >= end) {
+			if (current > end) {
 				result.put(Names.done, BooleanValue.TRUE);
 				result.put(Names.value, Undefined.instance);
 			} else {

@@ -1016,11 +1016,12 @@ public final class Parser {
 		final AssignmentTarget[] arguments;
 		try {
 			arguments = parseFunctionArguments(false);
-		} catch (SyntaxError | CannotParse e) {
+			this.FAIL_FOR_UNSUPPORTED_ARG();
+		} catch (SyntaxError | CannotParse | ParserNotImplemented e) {
 			load();
 			return null;
 		}
-		this.FAIL_FOR_UNSUPPORTED_ARG();
+
 		if (state.currentToken.type == TokenType.Arrow) {
 			state.consume();
 		} else {

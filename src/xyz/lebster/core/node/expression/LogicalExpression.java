@@ -10,7 +10,8 @@ import xyz.lebster.core.value.Value;
 public record LogicalExpression(Expression left, Expression right, LogicOp op) implements Expression {
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.begin(indent).binaryExpression(this, left, op, right);
+		DumpBuilder.begin(indent)
+			.binaryExpression(this, left, op, right);
 	}
 
 	@Override
@@ -22,6 +23,14 @@ public record LogicalExpression(Expression left, Expression right, LogicOp op) i
 			case And -> left_value.isTruthy(interpreter) ? right.execute(interpreter) : left_value;
 			case Or -> left_value.isTruthy(interpreter) ? left_value : right.execute(interpreter);
 			case Coalesce -> left_value.isNullish() ? right.execute(interpreter) : left_value;
+		};
+	}
+
+	public static Value<?> applyOperator(Interpreter interpreter, Value<?> left_value, LogicOp op, Value<?> right_value) throws AbruptCompletion {
+		return switch (op) {
+			case And -> left_value.isTruthy(interpreter) ? right_value : left_value;
+			case Or -> left_value.isTruthy(interpreter) ? left_value : right_value;
+			case Coalesce -> left_value.isNullish() ? right_value : left_value;
 		};
 	}
 

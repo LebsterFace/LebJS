@@ -20,13 +20,7 @@
 for (
     const property in {a:1,b:1,c:1,d:1,e:1}
 ) {}
-try {
-	property
-	Test.fail()
-} catch (e) {
-	Test.expect("property is not defined", e.message)
-	Test.expect("ReferenceError", e.name);
-}
+Test.expectError("ReferenceError", "property is not defined", () => property);
 
 // iterate through empty object
 {

@@ -22,6 +22,7 @@ public final class Names {
 	public static final StringValue eval = new StringValue("eval");
 	public static final StringValue evaluate = new StringValue("evaluate");
 	public static final StringValue expect = new StringValue("expect");
+	public static final StringValue expectError = new StringValue("expectError");
 	public static final StringValue fail = new StringValue("fail");
 	public static final StringValue filter = new StringValue("filter");
 	public static final StringValue forEach = new StringValue("forEach");

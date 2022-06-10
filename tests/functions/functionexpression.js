@@ -15,10 +15,7 @@ const myFunc = function myFunc(a, b) {
 }
 
 Test.expect(5, myFunc(1, 2));
-try { a; Test.fail(); } catch(e) {
-    Test.expect(e.name, 'ReferenceError');
-    Test.expect(e.message, 'a is not defined');
-}
+Test.expectError("ReferenceError", "a is not defined", () => a);
 
 Test.expect(16, add(2, 2, square));
 Test.expect(null, add(2, 2, function(n) {

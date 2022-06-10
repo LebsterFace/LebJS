@@ -7,8 +7,10 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
+import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.string.StringValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
@@ -19,6 +21,35 @@ public final class TestObject extends ObjectValue {
 		this.putMethod(functionPrototype, Names.expect, TestObject::expect);
 		this.putMethod(functionPrototype, Names.equals, TestObject::equalsMethod);
 		this.putMethod(functionPrototype, Names.fail, TestObject::fail);
+		this.putMethod(functionPrototype, Names.expectError, TestObject::expectError);
+	}
+
+	private static Undefined expectError(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		final StringValue name = argument(0, arguments).toStringValue(interpreter);
+		final StringValue messageStarter = argument(1, arguments).toStringValue(interpreter);
+		final Value<?> potentialCallback = argument(2, arguments);
+		if (!(potentialCallback instanceof final Executable callback)) {
+			throw new ShouldNotHappen("Test.expectError called without callback");
+		}
+
+		try {
+			callback.call(interpreter, new Value[0]);
+		} catch (AbruptCompletion completion) {
+			if (completion.type != AbruptCompletion.Type.Throw) throw completion;
+			if (completion.value.isNullish()) throw new ShouldNotHappen("Thrown value was nullish");
+
+			final ObjectValue error = completion.value.toObjectValue(interpreter);
+			final StringValue nameProperty = error.get(interpreter, Names.name).toStringValue(interpreter);
+			final StringValue messageProperty = error.get(interpreter, Names.message).toStringValue(interpreter);
+			TestObject.expect(interpreter, name, nameProperty);
+			if (!messageProperty.value.startsWith(messageStarter.value))
+				assertionFailed(messageProperty, messageStarter);
+
+
+			return Undefined.instance;
+		}
+
+		throw new ShouldNotHappen("Callback did not throw");
 	}
 
 	private static Undefined equalsMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
@@ -44,7 +75,7 @@ public final class TestObject extends ObjectValue {
 		}
 	}
 
-	private static Undefined expect(Interpreter interpreter, Value<?>[] arguments) {
+	private static Undefined expect(Interpreter interpreter, Value<?>... arguments) {
 		final Value<?> a = argument(0, arguments);
 		final Value<?> b = argument(1, arguments);
 		return expect(a, b);

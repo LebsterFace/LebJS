@@ -11,10 +11,7 @@ number < 3
 );
 Test.expect(3, number);
 
-try {
+Test.expectError("ReferenceError", "foo is not defined", () => {
     do
     {} while (foo);
-} catch (e) {
-    Test.expect("ReferenceError", e.name);
-    Test.expect("foo is not defined", e.message);
-}
+});

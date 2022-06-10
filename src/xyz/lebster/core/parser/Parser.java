@@ -851,7 +851,9 @@ public final class Parser {
 
 	private Expression parseConditionalExpression(Expression test) throws CannotParse, SyntaxError {
 		final Expression left = parseExpression(2, Right);
+		consumeAllLineTerminators();
 		state.require(TokenType.Colon);
+		consumeAllLineTerminators();
 		final Expression right = parseExpression(2, Right);
 		return new ConditionalExpression(test, left, right);
 	}

@@ -31,7 +31,10 @@ public record NewExpression(Expression constructExpr, ExpressionList arguments) 
 
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.begin(indent).child("Construct Expression", constructExpr).expressionList("Arguments", arguments);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Construct Expression", constructExpr)
+			.expressionList("Arguments", arguments);
 	}
 
 	@Override

@@ -47,9 +47,9 @@ public record ObjectDestructuring(Map<Expression, AssignmentTarget> pairs, Strin
 		DumpBuilder.begin(indent)
 			.self(this)
 			.optionalValue("Rest Name", restName);
-		Dumper.dumpIndicator(indent, "Children");
+		Dumper.dumpIndicator(indent + 1, "Children");
 		for (final var entry : pairs.entrySet()) {
-			DumpBuilder.begin(indent + 1)
+			DumpBuilder.begin(indent + 2)
 				.child("Key", entry.getKey())
 				.child("Value", entry.getValue());
 		}

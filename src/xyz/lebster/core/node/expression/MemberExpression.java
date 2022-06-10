@@ -18,7 +18,10 @@ public record MemberExpression(Expression base, Expression property, boolean com
 
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.begin(indent).selfNamed(this, computed ? "Computed" : "Non-Computed").child("Base", base).child("ReferencedName", property);
+		DumpBuilder.begin(indent)
+			.selfNamed(this, computed ? "Computed" : "Non-Computed")
+			.child("Base", base)
+			.child("ReferencedName", property);
 	}
 
 	@Override

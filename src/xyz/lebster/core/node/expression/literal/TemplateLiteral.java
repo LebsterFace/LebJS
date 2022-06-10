@@ -4,13 +4,15 @@ import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.string.StringValue;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TemplateLiteral implements Expression {
-	private final ArrayList<TemplateLiteralNode> backingList = new ArrayList<>();
+	private final List<TemplateLiteralNode> backingList = new ArrayList<>();
 
 	public void expressionNode(Expression expression) {
 		this.backingList.add(new TemplateLiteralExpressionNode(expression));
@@ -32,27 +34,21 @@ public class TemplateLiteral implements Expression {
 
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.notImplemented(indent, this);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.children("Nodes", backingList);
 	}
 
 	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append('`');
 		for (final TemplateLiteralNode node : this.backingList) {
-			if (node instanceof final TemplateLiteralSpanNode spanNode) {
-				representation.append(spanNode.string);
-			} else if (node instanceof final TemplateLiteralExpressionNode expressionNode) {
-				representation.append("${");
-				expressionNode.expression.represent(representation);
-				representation.append('}');
-			} else {
-				throw new IllegalStateException();
-			}
+			node.represent(representation);
 		}
 		representation.append('`');
 	}
 
-	private sealed interface TemplateLiteralNode {
+	private sealed interface TemplateLiteralNode extends Dumpable {
 		void append(Interpreter interpreter, StringBuilder builder) throws AbruptCompletion;
 	}
 
@@ -61,12 +57,38 @@ public class TemplateLiteral implements Expression {
 		public void append(Interpreter interpreter, StringBuilder builder) {
 			builder.append(string);
 		}
+
+		@Override
+		public void dump(int indent) {
+			DumpBuilder.begin(indent)
+				.self(this)
+				.singleChild("Value", string);
+		}
+
+		@Override
+		public void represent(StringRepresentation representation) {
+			representation.append(string);
+		}
 	}
 
 	private record TemplateLiteralExpressionNode(Expression expression) implements TemplateLiteralNode {
 		@Override
 		public void append(Interpreter interpreter, StringBuilder builder) throws AbruptCompletion {
 			builder.append(expression.execute(interpreter).toStringValue(interpreter).value);
+		}
+
+		@Override
+		public void dump(int indent) {
+			DumpBuilder.begin(indent)
+				.self(this)
+				.child("Expression", expression);
+		}
+
+		@Override
+		public void represent(StringRepresentation representation) {
+			representation.append("${");
+			expression.represent(representation);
+			representation.append('}');
 		}
 	}
 }

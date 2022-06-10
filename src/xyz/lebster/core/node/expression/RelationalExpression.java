@@ -18,7 +18,8 @@ import xyz.lebster.core.value.symbol.SymbolValue;
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.begin(indent).binaryExpression(this, left, op, right);
+		DumpBuilder.begin(indent)
+			.binaryExpression(this, left, op, right);
 	}
 
 	@Override

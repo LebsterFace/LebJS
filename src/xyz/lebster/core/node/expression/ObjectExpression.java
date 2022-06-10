@@ -43,7 +43,9 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.notImplemented(indent, this);
+		DumpBuilder.begin(indent)
+			.self(this)
+			.children("Entries", entries);
 	}
 
 	@Override
@@ -78,7 +80,8 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 
 		@Override
 		public void dump(int indent) {
-			DumpBuilder.begin(indent).self(this)
+			DumpBuilder.begin(indent)
+				.self(this)
 				.singleChild("Key", key.value)
 				.child("Value", value);
 		}
@@ -107,7 +110,8 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 
 		@Override
 		public void dump(int indent) {
-			DumpBuilder.begin(indent).self(this)
+			DumpBuilder.begin(indent)
+				.self(this)
 				.child("Key", key)
 				.child("Value", value);
 		}
@@ -129,8 +133,8 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 
 		@Override
 		public void dump(int indent) {
-			DumpBuilder.begin(indent).self(this)
-				.singleChild("Key", key.value);
+			DumpBuilder.begin(indent)
+				.selfNamed(this, key.value);
 		}
 
 		@Override
@@ -152,7 +156,8 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 
 		@Override
 		public void dump(int indent) {
-			DumpBuilder.begin(indent).self(this)
+			DumpBuilder.begin(indent)
+				.self(this)
 				.child("Key", name);
 		}
 

@@ -7,7 +7,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.AppendableNode;
-import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 
@@ -60,6 +59,6 @@ public record BlockStatement(List<Statement> children) implements Statement, App
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
 			.self(this)
-			.children("Children", children.toArray(new Dumpable[0]));
+			.children("Children", children);
 	}
 }

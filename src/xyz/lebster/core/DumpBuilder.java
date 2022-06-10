@@ -1,6 +1,5 @@
 package xyz.lebster.core;
 
-import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.expression.ExpressionList;
@@ -20,10 +19,6 @@ public final class DumpBuilder {
 
 	public static void single(int indent, String name) {
 		Dumper.dumpSingle(indent, name);
-	}
-
-	public static void notImplemented(int indent, Dumpable dumpable) {
-		throw new NotImplemented(dumpable.getClass().getSimpleName() + "#" + "dump");
 	}
 
 	public DumpBuilder self(Dumpable obj) {
@@ -61,7 +56,7 @@ public final class DumpBuilder {
 		return this;
 	}
 
-	public DumpBuilder children(String indicator, Iterable<Dumpable> values) {
+	public <E extends Dumpable> DumpBuilder children(String indicator, Iterable<E> values) {
 		final var iterator = values.iterator();
 		if (iterator.hasNext()) {
 			Dumper.dumpIndicator(rootIndentation + 1, indicator);

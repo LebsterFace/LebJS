@@ -1,7 +1,10 @@
 package xyz.lebster.core.parser;
 
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.*;
+import xyz.lebster.core.exception.CannotParse;
+import xyz.lebster.core.exception.ParserNotImplemented;
+import xyz.lebster.core.exception.ShouldNotHappen;
+import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.*;
 import xyz.lebster.core.node.declaration.*;
 import xyz.lebster.core.node.expression.*;
@@ -592,28 +595,36 @@ public final class Parser {
 		}
 	}
 
-	private AssignmentTarget[] parseFunctionArguments(boolean expectLParen) throws SyntaxError, CannotParse {
+	private FunctionArguments parseFunctionArguments(boolean expectLParen) throws SyntaxError, CannotParse {
 		if (expectLParen) state.require(TokenType.LParen);
 
-		final List<AssignmentTarget> result = new ArrayList<>();
+		final FunctionArguments result = new FunctionArguments();
 		consumeAllLineTerminators();
 		while (state.currentToken.type != TokenType.RParen) {
 			consumeAllLineTerminators();
-			result.add(parseAssignmentTarget());
+			if (state.optional(TokenType.DotDotDot)) {
+				consumeAllLineTerminators();
+				// Note: Rest parameter may not have a default initializer
+				result.rest = parseAssignmentTarget();
+				break; // Rest parameter must be last formal parameter
+				// TODO: Throw SyntaxError if not last formal parameter
+			} else {
+				final AssignmentTarget target = parseAssignmentTarget();
+				consumeAllLineTerminators();
+				if (state.optional(TokenType.Equals)) {
+					final Expression defaultExpression = parseExpression(1, Left);
+					result.addWithDefault(target, defaultExpression);
+				} else {
+					result.add(target);
+				}
+			}
+
 			consumeAllLineTerminators();
 			if (!state.optional(TokenType.Comma)) break;
 		}
 
-		this.FAIL_FOR_UNSUPPORTED_ARG();
 		state.require(TokenType.RParen);
-		return result.toArray(new AssignmentTarget[0]);
-	}
-
-	private void FAIL_FOR_UNSUPPORTED_ARG() {
-		if (state.currentToken.type == TokenType.DotDotDot)
-			throw new ParserNotImplemented(position(), "Parsing rest (`...`) arguments");
-		else if (state.currentToken.type == TokenType.Equals)
-			throw new ParserNotImplemented(position(), "Parsing default parameters");
+		return result;
 	}
 
 	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
@@ -626,7 +637,7 @@ public final class Parser {
 
 		final String name = state.consume().value;
 		consumeAllLineTerminators();
-		final AssignmentTarget[] arguments = parseFunctionArguments(true);
+		final FunctionArguments arguments = parseFunctionArguments(true);
 		consumeAllLineTerminators();
 		return new FunctionDeclaration(parseFunctionBody(), name, arguments);
 	}
@@ -636,7 +647,7 @@ public final class Parser {
 		if (state.currentToken.type == TokenType.Star) throw new ParserNotImplemented(position(), "Generator function expressions");
 		final Token potentialName = state.accept(TokenType.Identifier);
 		final String name = potentialName == null ? null : potentialName.value;
-		final AssignmentTarget[] arguments = parseFunctionArguments(true);
+		final FunctionArguments arguments = parseFunctionArguments(true);
 		return new FunctionExpression(parseFunctionBody(), name, arguments);
 	}
 
@@ -861,6 +872,7 @@ public final class Parser {
 			case LParen -> {
 				final SourcePosition start = state.consume().position;
 
+				consumeAllLineTerminators();
 				if (state.is(TokenType.RParen, TokenType.Identifier, TokenType.DotDotDot, TokenType.LBrace, TokenType.LBracket)) {
 					final ArrowFunctionExpression result = tryParseArrowFunctionExpression();
 					if (result != null) yield result;
@@ -877,7 +889,9 @@ public final class Parser {
 				final var identifier = new IdentifierExpression(state.consume().value);
 				if (state.currentToken.type == TokenType.Arrow) {
 					state.consume();
-					yield parseArrowFunctionBody(identifier);
+					final var arguments = new FunctionArguments();
+					arguments.add(identifier);
+					yield parseArrowFunctionBody(arguments);
 				} else {
 					yield identifier;
 				}
@@ -970,7 +984,7 @@ public final class Parser {
 				throw new ParserNotImplemented(position(), "Class getter / setters");
 			}
 
-			final AssignmentTarget[] arguments = parseFunctionArguments(true);
+			final FunctionArguments arguments = parseFunctionArguments(true);
 			consumeAllLineTerminators();
 			final BlockStatement body = parseFunctionBody();
 
@@ -1013,11 +1027,10 @@ public final class Parser {
 	private ArrowFunctionExpression tryParseArrowFunctionExpression() throws CannotParse, SyntaxError {
 		save();
 
-		final AssignmentTarget[] arguments;
+		final FunctionArguments arguments;
 		try {
 			arguments = parseFunctionArguments(false);
-			this.FAIL_FOR_UNSUPPORTED_ARG();
-		} catch (SyntaxError | CannotParse | ParserNotImplemented e) {
+		} catch (SyntaxError | CannotParse e) {
 			load();
 			return null;
 		}
@@ -1034,7 +1047,7 @@ public final class Parser {
 		return parseArrowFunctionBody(arguments);
 	}
 
-	private ArrowFunctionExpression parseArrowFunctionBody(AssignmentTarget... arguments) throws CannotParse, SyntaxError {
+	private ArrowFunctionExpression parseArrowFunctionBody(FunctionArguments arguments) throws CannotParse, SyntaxError {
 		if (state.currentToken.type == TokenType.LBrace) {
 			return new ArrowFunctionExpression(parseBlockStatement(), arguments);
 		} else if (matchPrimaryExpression()) {

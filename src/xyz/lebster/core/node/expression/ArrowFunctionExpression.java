@@ -5,28 +5,29 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
-import xyz.lebster.core.node.declaration.AssignmentTarget;
+import xyz.lebster.core.node.FunctionArguments;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.function.ArrowFunction;
 
 public final class ArrowFunctionExpression implements Expression {
-	public final AssignmentTarget[] arguments;
+	public final FunctionArguments arguments;
 	public final BlockStatement body;
 	public final Expression implicitReturnExpression;
 	public final boolean hasFullBody;
 
-	public ArrowFunctionExpression(BlockStatement body, AssignmentTarget... arguments) {
+	public ArrowFunctionExpression(FunctionArguments arguments, BlockStatement body, Expression implicitReturnExpression, boolean hasFullBody) {
 		this.arguments = arguments;
 		this.body = body;
-		this.hasFullBody = true;
-		this.implicitReturnExpression = null;
+		this.implicitReturnExpression = implicitReturnExpression;
+		this.hasFullBody = hasFullBody;
 	}
 
-	public ArrowFunctionExpression(Expression implicitReturnExpression, AssignmentTarget... arguments) {
-		this.body = null;
-		this.arguments = arguments;
-		this.hasFullBody = false;
-		this.implicitReturnExpression = implicitReturnExpression;
+	public ArrowFunctionExpression(BlockStatement body, FunctionArguments arguments) {
+		this(arguments, body, null, true);
+	}
+
+	public ArrowFunctionExpression(Expression implicitReturnExpression, FunctionArguments arguments) {
+		this(arguments, null, implicitReturnExpression, false);
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public final class ArrowFunctionExpression implements Expression {
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
 			.self(this)
-			.children("Arguments", arguments);
+			.child("Arguments", arguments);
 
 		if (this.hasFullBody) {
 			assert body != null;
@@ -54,20 +55,7 @@ public final class ArrowFunctionExpression implements Expression {
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		if (arguments.length == 1) {
-			representation.append(arguments[0]);
-		} else {
-			representation.append('(');
-			if (arguments.length > 0) {
-				representation.append(arguments[0]);
-				for (int i = 1; i < arguments.length; i++) {
-					representation.append(", ");
-					representation.append(arguments[i]);
-				}
-			}
-			representation.append(')');
-		}
-
+		arguments.represent(representation);
 		representation.append(" => ");
 
 		if (this.hasFullBody) {

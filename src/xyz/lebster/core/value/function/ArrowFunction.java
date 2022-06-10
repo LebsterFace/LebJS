@@ -4,7 +4,6 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.expression.ArrowFunctionExpression;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
@@ -40,7 +39,7 @@ public final class ArrowFunction extends Executable {
 		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
 
 		try {
-			FunctionNode.declareArguments(interpreter, expression.arguments, passedArguments);
+			expression.arguments.declareArguments(interpreter, passedArguments);
 
 			if (expression.hasFullBody) {
 				expression.body.executeWithoutNewContext(interpreter);

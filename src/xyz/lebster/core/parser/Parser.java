@@ -564,7 +564,7 @@ public final class Parser {
 			return new ObjectDestructuring(pairs, restName);
 		} else if (state.optional(TokenType.LBracket)) {
 			final ArrayList<AssignmentTarget> children = new ArrayList<>();
-			AssignmentTarget spreadTarget = null;
+			AssignmentTarget restTarget = null;
 
 			consumeAllLineTerminators();
 			while (true) {
@@ -573,7 +573,7 @@ public final class Parser {
 					children.add(null);
 				} else if (state.optional(TokenType.DotDotDot)) {
 					consumeAllLineTerminators();
-					spreadTarget = parseAssignmentTarget();
+					restTarget = parseAssignmentTarget();
 					consumeAllLineTerminators();
 					if (state.optional(TokenType.Comma))
 						throw new SyntaxError("Rest element must be last element", position());
@@ -586,7 +586,7 @@ public final class Parser {
 			}
 
 			state.require(TokenType.RBracket);
-			return new ArrayDestructuring(spreadTarget, children.toArray(new AssignmentTarget[0]));
+			return new ArrayDestructuring(restTarget, children.toArray(new AssignmentTarget[0]));
 		} else if (matchIdentifierName()) {
 			return new IdentifierExpression(state.consume().value);
 		} else {
@@ -603,11 +603,13 @@ public final class Parser {
 		while (state.currentToken.type != TokenType.RParen) {
 			consumeAllLineTerminators();
 			if (state.optional(TokenType.DotDotDot)) {
-				consumeAllLineTerminators();
 				// Note: Rest parameter may not have a default initializer
+				consumeAllLineTerminators();
 				result.rest = parseAssignmentTarget();
-				break; // Rest parameter must be last formal parameter
-				// TODO: Throw SyntaxError if not last formal parameter
+				consumeAllLineTerminators();
+				if (state.optional(TokenType.Comma))
+					throw new SyntaxError("Rest parameter must be last formal parameter", position());
+				break;
 			} else {
 				final AssignmentTarget target = parseAssignmentTarget();
 				consumeAllLineTerminators();

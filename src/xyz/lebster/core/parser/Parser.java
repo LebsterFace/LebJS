@@ -993,7 +993,7 @@ public final class Parser {
 			final BlockStatement body = parseFunctionBody();
 
 			if (isConstructor) {
-				constructor = new ClassExpression.ClassConstructorNode(className, methodName, arguments, body, range(methodStart));
+				constructor = new ClassExpression.ClassConstructorNode(className, arguments, body, range(methodStart));
 			} else {
 				methods.add(new ClassExpression.ClassMethodNode(className, methodName, arguments, body, range(methodStart)));
 			}

@@ -6,6 +6,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Environment;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.FunctionArguments;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.statement.BlockStatement;
@@ -26,7 +27,7 @@ public record ClassExpression(String className, ClassConstructorNode constructor
 		if (constructor == null) throw new NotImplemented("Creating classes without constructors");
 
 		final ClassConstructor constructorFunction = constructor.execute(interpreter);
-		final ObjectValue prototypeProperty = constructorFunction.prototypeProperty;
+		final ObjectValue prototypeProperty = constructorFunction.get(interpreter, Names.prototype).toObjectValue(interpreter);
 
 		for (final ClassMethodNode method : methods) {
 			prototypeProperty.put(new StringValue(method.name), method.execute(interpreter));
@@ -74,40 +75,52 @@ public record ClassExpression(String className, ClassConstructorNode constructor
 	}
 
 
-	public record ClassMethodNode(String className, String name, xyz.lebster.core.node.FunctionArguments arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
+	public record ClassMethodNode(String className, String name, FunctionArguments arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
 		@Override
 		public ClassMethod execute(Interpreter interpreter) {
 			return new ClassMethod(interpreter, interpreter.lexicalEnvironment(), this);
 		}
 	}
 
-	public record ClassConstructorNode(String className, String name, xyz.lebster.core.node.FunctionArguments arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
+	public record ClassConstructorNode(String className, FunctionArguments arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
 		@Override
 		public ClassConstructor execute(Interpreter interpreter) throws AbruptCompletion {
 			return new ClassConstructor(interpreter, interpreter.lexicalEnvironment(), this, className);
 		}
+
+		@Override
+		public String name() {
+			return "constructor";
+		}
 	}
 
+	// A wrapper of core.value.function.Function, without the call method - class constructors cannot be called without 'new'
 	private static final class ClassConstructor extends Constructor {
-		private final Environment environment;
-		private final ClassConstructorNode code;
-		private final ObjectValue prototypeProperty;
+		private final Function wrappedFunction;
 
 		public ClassConstructor(Interpreter interpreter, Environment environment, ClassConstructorNode code, String name) throws AbruptCompletion {
 			super(interpreter.intrinsics.objectPrototype, interpreter.intrinsics.functionPrototype, name == null ? Names.EMPTY : new StringValue(name));
-			this.environment = environment;
-			this.code = code;
-			this.prototypeProperty = this.get(interpreter, Names.prototype).toObjectValue(interpreter);
+			this.wrappedFunction = new Function(interpreter, environment, code);
 		}
 
 		@Override
 		public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-			this.display(representation);
+			wrappedFunction.displayRecursive(representation, parents, singleLine);
 		}
 
 		@Override
 		public StringValue toStringMethod() {
-			return new StringValue(code.toRepresentationString());
+			return wrappedFunction.toStringMethod();
+		}
+
+		public ObjectValue construct(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+			final Value<?> prop = this.get(interpreter, Names.prototype);
+			final ObjectValue prototype = prop instanceof ObjectValue proto ? proto : interpreter.intrinsics.objectPrototype;
+			final ObjectValue newInstance = new ObjectValue(prototype);
+
+			final Value<?> returnValue = wrappedFunction.call(interpreter, newInstance, arguments);
+			if (returnValue instanceof final ObjectValue asObject) return asObject;
+			return newInstance;
 		}
 
 		@Override
@@ -118,44 +131,36 @@ public record ClassExpression(String className, ClassConstructorNode constructor
 			throw AbruptCompletion.error(new TypeError(interpreter, message));
 		}
 
-		@Override
-		public ObjectValue construct(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-			final ObjectValue newInstance = new ObjectValue(this.prototypeProperty);
-			final var returnValue = new Function(interpreter, environment, code).call(interpreter, newInstance, args);
-			if (returnValue instanceof final ObjectValue asObject) return asObject;
-			return newInstance;
-		}
+		// call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) is handled by Executable
 	}
 
-	// A copy of core.value.function.Function, without the construct method - class methods cannot be constructed
+	// A wrapper of core.value.function.Function, without the construct method - class methods cannot be constructed
 	private static final class ClassMethod extends Executable {
-		private final Environment environment;
-		private final FunctionNode code;
+		private final Function wrappedFunction;
 
 		public ClassMethod(Interpreter interpreter, Environment environment, ClassExpression.ClassMethodNode code) {
 			super(interpreter.intrinsics.functionPrototype, new StringValue(code.name));
-			this.environment = environment;
-			this.code = code;
+			this.wrappedFunction = new Function(interpreter, environment, code);
 		}
 
 		@Override
 		public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-			this.display(representation);
+			wrappedFunction.displayRecursive(representation, parents, singleLine);
 		}
 
 		@Override
 		public StringValue toStringMethod() {
-			return new StringValue(code.toRepresentationString());
+			return wrappedFunction.toStringMethod();
 		}
 
 		@Override
 		public Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
-			return new Function(interpreter, environment, code).call(interpreter, arguments);
+			return wrappedFunction.call(interpreter, arguments);
 		}
 
 		@Override
 		public Value<?> call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) throws AbruptCompletion {
-			return new Function(interpreter, environment, code).call(interpreter, newThisValue, arguments);
+			return wrappedFunction.call(interpreter, newThisValue, arguments);
 		}
 	}
 }

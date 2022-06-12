@@ -27,6 +27,7 @@ object.new = "New";
 object.null = "Null";
 object.return = "Return";
 object.super = "Super";
+object.static = "Static";
 object.switch = "Switch";
 object.this = "This";
 object.throw = "Throw";
@@ -71,6 +72,7 @@ const literal = {
 	null: "Null",
 	return: "Return",
 	super: "Super",
+	static: "Static",
 	switch: "Switch",
 	this: "This",
 	throw: "Throw",

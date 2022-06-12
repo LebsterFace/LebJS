@@ -16,18 +16,45 @@ import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.Constructor;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.Function;
+import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
 import java.util.HashSet;
+import java.util.List;
 
-public record ClassExpression(String className, ClassConstructorNode constructor, ClassMethodNode[] methods, SourceRange range) implements Expression {
+public record ClassExpression(
+	String className,
+	Expression heritage,
+	ClassConstructorNode constructor,
+	ClassMethodNode[] methods,
+	ClassFieldNode[] fields,
+	SourceRange range
+) implements Expression {
+	public ClassExpression(String className, Expression heritage, ClassConstructorNode constructor, List<ClassMethodNode> methods, List<ClassFieldNode> fields, SourceRange range) {
+		this(className, heritage, constructor, methods.toArray(new ClassMethodNode[0]), fields.toArray(new ClassFieldNode[0]), range);
+	}
+
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		if (constructor == null) throw new NotImplemented("Creating classes without constructors");
 
 		final ClassConstructor constructorFunction = constructor.execute(interpreter);
 		final ObjectValue prototypeProperty = constructorFunction.get(interpreter, Names.prototype).toObjectValue(interpreter);
+
+		if (heritage != null) {
+			Value<?> execute = heritage.execute(interpreter);
+			if (execute == Null.instance) {
+				constructorFunction.setPrototype(Null.instance);
+				prototypeProperty.setPrototype(Null.instance);
+			} else {
+				// FIXME: No implicit super
+				final ObjectValue parentClass = execute.toObjectValue(interpreter);
+				constructorFunction.setPrototype(parentClass);
+				final ObjectValue parentClassPrototypeProperty = parentClass.get(interpreter, Names.prototype).toObjectValue(interpreter);
+				prototypeProperty.setPrototype(parentClassPrototypeProperty);
+			}
+		}
 
 		for (final ClassMethodNode method : methods) {
 			prototypeProperty.put(new StringValue(method.name), method.execute(interpreter));
@@ -92,6 +119,10 @@ public record ClassExpression(String className, ClassConstructorNode constructor
 		public String name() {
 			return "constructor";
 		}
+	}
+
+	public record ClassFieldNode(String name, Expression initializer, SourceRange range) {
+
 	}
 
 	// A wrapper of core.value.function.Function, without the call method - class constructors cannot be called without 'new'

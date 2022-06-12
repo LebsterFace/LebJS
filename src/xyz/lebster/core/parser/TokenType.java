@@ -14,5 +14,6 @@ public enum TokenType {
 	StrictNotEqual, StringLiteral, Super, Switch, This, Throw, Tilde, True, Try, Typeof, Undefined,
 	UnsignedRightShift, UnsignedRightShiftEquals, Var, Void, While, With, Yield, RegexpLiteral,
 
-	TemplateStart, TemplateEnd, TemplateSpan, TemplateExpressionStart, BigIntLiteral, PrivateIdentifier, TemplateExpressionEnd
+	TemplateStart, TemplateEnd, TemplateSpan, TemplateExpressionStart, BigIntLiteral, PrivateIdentifier, TemplateExpressionEnd,
+	Static
 }

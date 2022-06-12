@@ -38,6 +38,7 @@ public final class Lexer {
 		keywords.put("new", TokenType.New);
 		keywords.put("null", TokenType.Null);
 		keywords.put("return", TokenType.Return);
+		keywords.put("static", TokenType.Static);
 		keywords.put("super", TokenType.Super);
 		keywords.put("switch", TokenType.Switch);
 		keywords.put("this", TokenType.This);
@@ -50,6 +51,7 @@ public final class Lexer {
 		keywords.put("while", TokenType.While);
 		keywords.put("with", TokenType.With);
 		keywords.put("yield", TokenType.Yield);
+		// TODO: get / set keywords
 
 		final HashMap<String, TokenType> symbols_length_1 = new HashMap<>();
 		final HashMap<String, TokenType> symbols_length_2 = new HashMap<>();

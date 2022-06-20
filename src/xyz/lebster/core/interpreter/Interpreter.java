@@ -4,25 +4,24 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.RangeError;
 import xyz.lebster.core.value.error.ReferenceError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
+
+import java.util.ArrayDeque;
 
 public final class Interpreter {
 	public final Intrinsics intrinsics;
 	public final GlobalObject globalObject;
 	public final int stackSize;
-	private final ExecutionContext[] executionContextStack;
+	private final ArrayDeque<ExecutionContext> executionContextStack = new ArrayDeque<>();
 	private final Mode mode;
-	private int currentExecutionContext = 0;
 
 	public Interpreter() {
 		this.intrinsics = new Intrinsics();
 		this.globalObject = new GlobalObject(intrinsics);
 		this.stackSize = 32;
-		this.executionContextStack = new ExecutionContext[stackSize];
-		this.executionContextStack[0] = new ExecutionContext(new GlobalEnvironment(globalObject), globalObject);
+		executionContextStack.addFirst(new ExecutionContext(new GlobalEnvironment(globalObject), globalObject));
 		this.mode = Mode.Strict;
 	}
 
@@ -43,7 +42,7 @@ public final class Interpreter {
 	@NonStandard
 	// FIXME: Environment records
 	public void declareVariable(VariableDeclaration.Kind kind, StringValue name, Value<?> value) throws AbruptCompletion {
-		final Environment environment = executionContextStack[currentExecutionContext].environment();
+		final Environment environment = executionContextStack.getFirst().environment();
 		if (environment.hasBinding(name)) {
 			// FIXME: This should be a Syntax Error at parse-time
 			throw AbruptCompletion.error(new ReferenceError(this, "Identifier '" + name.value + "' has already been declared"));
@@ -52,49 +51,45 @@ public final class Interpreter {
 		}
 	}
 
-	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {
-		if (currentExecutionContext + 1 == stackSize) {
-			throw AbruptCompletion.error(new RangeError(this, "Maximum call stack size exceeded"));
-		}
-
-		executionContextStack[++currentExecutionContext] = context;
+	public void enterExecutionContext(ExecutionContext context) {
+		executionContextStack.addFirst(context);
 	}
 
-	public void exitExecutionContext(ExecutionContext frame) {
-		if (currentExecutionContext == 0 || executionContextStack[currentExecutionContext] != frame) {
+	public void exitExecutionContext(ExecutionContext context) {
+		if (executionContextStack.size() == 0 || executionContextStack.getFirst() != context) {
 			throw new ShouldNotHappen("Attempting to exit from an invalid ExecutionContext");
 		}
 
-		executionContextStack[currentExecutionContext--] = null;
+		executionContextStack.removeFirst();
 	}
 
 	public Value<?> thisValue() {
-		return executionContextStack[currentExecutionContext].thisValue();
+		return executionContextStack.getFirst().thisValue();
 	}
 
 	public Environment lexicalEnvironment() {
-		return executionContextStack[currentExecutionContext].environment();
+		return executionContextStack.getFirst().environment();
 	}
 
 	public ExecutionContext executionContext() {
-		return executionContextStack[currentExecutionContext];
+		return executionContextStack.getFirst();
 	}
 
 
-	public ExecutionContext pushEnvironmentAndThisValue(Environment env, Value<?> thisValue) throws AbruptCompletion {
+	public ExecutionContext pushEnvironmentAndThisValue(Environment env, Value<?> thisValue) {
 		final ExecutionContext context = new ExecutionContext(env, thisValue);
 		this.enterExecutionContext(context);
 		return context;
 	}
 
-	public ExecutionContext pushThisValue(Value<?> thisValue) throws AbruptCompletion {
+	public ExecutionContext pushThisValue(Value<?> thisValue) {
 		final LexicalEnvironment env = new LexicalEnvironment(new ObjectValue(null), lexicalEnvironment());
 		final ExecutionContext context = new ExecutionContext(env, thisValue);
 		this.enterExecutionContext(context);
 		return context;
 	}
 
-	public ExecutionContext pushLexicalEnvironment(Environment env) throws AbruptCompletion {
+	public ExecutionContext pushLexicalEnvironment(Environment env) {
 		final ExecutionContext context = new ExecutionContext(env, thisValue());
 		this.enterExecutionContext(context);
 		return context;

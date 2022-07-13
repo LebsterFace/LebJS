@@ -39,10 +39,69 @@ public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayCon
 		putMethod(fp, Names.toString, ArrayPrototype::toStringMethod);
 		putMethod(fp, Names.forEach, ArrayPrototype::forEach);
 		putMethod(fp, Names.reverse, ArrayPrototype::reverse);
+		putMethod(fp, Names.slice, ArrayPrototype::slice);
 		putMethod(fp, Names.pop, ArrayPrototype::pop);
 
 		final NativeFunction values = putMethod(fp, Names.values, ArrayPrototype::values);
 		put(SymbolValue.iterator, values);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.slice")
+	private static ArrayObject slice(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.26 Array.prototype.slice ( start, end )
+		final Value<?> start = argument(0, arguments);
+		final Value<?> end = argument(1, arguments);
+
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(O, interpreter);
+		// 3. Let relativeStart be ? ToIntegerOrInfinity(start).
+		final int relativeStart = NumberPrototype.toIntegerOrInfinity(interpreter, start);
+		long k;
+		// 4. If relativeStart is -∞, let k be 0.
+		if (relativeStart == Integer.MIN_VALUE) k = 0;
+			// 5. Else if relativeStart < 0, let k be max(len + relativeStart, 0).
+		else if (relativeStart < 0) k = Math.max(len + relativeStart, 0);
+			// 6. Else, let k be min(relativeStart, len).
+		else k = Math.min(relativeStart, len);
+		// 7. If end is undefined, let relativeEnd be len; else let relativeEnd be ? ToIntegerOrInfinity(end).
+		final long relativeEnd = end == Undefined.instance ? len : NumberPrototype.toIntegerOrInfinity(interpreter, end);
+		long final_;
+		// 8. If relativeEnd is -∞, let final be 0.
+		if (relativeEnd == Integer.MIN_VALUE) final_ = 0;
+		// 9. Else if relativeEnd < 0, let final be max(len + relativeEnd, 0).
+		if (relativeEnd < 0) final_ = Math.max(len + relativeEnd, 0);
+			// 10. Else, let final be min(relativeEnd, len).
+		else final_ = Math.min(relativeEnd, len);
+		// 11. Let count be max(final - k, 0).
+		final long count = Math.max(final_ - k, 0);
+		// FIXME: 12. Let A be ? ArraySpeciesCreate(O, count).
+		final Value<?>[] A = new Value<?>[(int) count];
+		// 13. Let n be 0.
+		int n = 0;
+		// 14. Repeat, while k < final,
+		while (k < final_) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final var PK = new StringValue(k);
+			// b. Let kPresent be ? HasProperty(O, Pk).
+			final boolean kPresent = O.hasProperty(PK);
+			// c. If kPresent is true, then
+			if (kPresent) {
+				// i. Let kValue be ? Get(O, Pk).
+				final Value<?> kValue = O.get(interpreter, PK);
+				// ii. Perform ? CreateDataPropertyOrThrow(A, ! ToString(𝔽(n)), kValue).
+				A[n] = kValue;
+			}
+			// d. Set k to k + 1.
+			k = k + 1;
+			// e. Set n to n + 1.
+			n = n + 1;
+		}
+
+		// 15. Perform ? Set(A, "length", 𝔽(n), true).
+		// 16. Return A.
+		return new ArrayObject(interpreter, A);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.includes")

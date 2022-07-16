@@ -1095,6 +1095,8 @@ public final class Parser {
 				}
 
 				consumeAllSeparators();
+			} else {
+				state.unexpected();
 			}
 		}
 

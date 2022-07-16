@@ -445,12 +445,25 @@ public final class Parser {
 	private TryStatement parseTryStatement() throws SyntaxError, CannotParse {
 		state.require(TokenType.Try);
 		final BlockStatement body = parseBlockStatement();
-		state.require(TokenType.Catch);
-		state.require(TokenType.LParen);
-		final String parameter = state.require(TokenType.Identifier);
-		state.require(TokenType.RParen);
-		final BlockStatement catchBody = parseBlockStatement();
-		return new TryStatement(body, new CatchClause(parameter, catchBody));
+
+		String catchParameter = null;
+		BlockStatement catchBody = null;
+		final boolean hasCatch = state.optional(TokenType.Catch);
+		if (hasCatch) {
+			state.require(TokenType.LParen);
+			catchParameter = state.require(TokenType.Identifier);
+			state.require(TokenType.RParen);
+			catchBody = parseBlockStatement();
+		}
+
+		BlockStatement finallyBody = null;
+		if (state.optional(TokenType.Finally)) {
+			finallyBody = parseBlockStatement();
+		} else if (!hasCatch) {
+			throw new SyntaxError("Missing catch or finally after try", position());
+		}
+
+		return new TryStatement(body, catchParameter, catchBody, finallyBody);
 	}
 
 	private IfStatement parseIfStatement() throws SyntaxError, CannotParse {

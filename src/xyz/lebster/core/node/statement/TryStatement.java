@@ -1,20 +1,24 @@
 package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.DumpBuilder;
+import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.value.Value;
 
-public record TryStatement(BlockStatement body, CatchClause handler) implements Statement {
-
+public record TryStatement(BlockStatement body, String catchParameter, BlockStatement catchBody, BlockStatement finallyBody) implements Statement {
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.begin(indent)
+		final var builder = DumpBuilder.begin(indent)
 			.self(this)
-			.child("Body", body)
-			.child("Handler", handler);
+			.child("Body", body);
+
+		Dumper.dumpIndicator(indent + 1, "Catch");
+		Dumper.dumpParameterized(indent + 2, "CatchClause", catchParameter);
+		catchBody.dump(indent + 3);
+		builder.child("Finally", finallyBody);
 	}
 
 	@Override
@@ -24,12 +28,14 @@ public record TryStatement(BlockStatement body, CatchClause handler) implements 
 		} catch (AbruptCompletion completion) {
 			if (completion.type != AbruptCompletion.Type.Throw) throw completion;
 			final ExecutionContext context = interpreter.pushNewEnvironment();
-			interpreter.declareVariable(handler.parameter(), completion.value);
+			interpreter.declareVariable(catchParameter, completion.value);
 			try {
-				return handler.body().executeWithoutNewContext(interpreter);
+				return catchBody.executeWithoutNewContext(interpreter);
 			} finally {
 				interpreter.exitExecutionContext(context);
 			}
+		} finally {
+			if (finallyBody != null) finallyBody.execute(interpreter);
 		}
 	}
 
@@ -38,6 +44,9 @@ public record TryStatement(BlockStatement body, CatchClause handler) implements 
 		representation.append("try ");
 		body.represent(representation);
 		representation.append(' ');
-		handler.represent(representation);
+		representation.append("catch (");
+		representation.append(catchParameter);
+		representation.append(") ");
+		catchBody.represent(representation);
 	}
 }

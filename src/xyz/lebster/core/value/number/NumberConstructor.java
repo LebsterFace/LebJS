@@ -11,6 +11,7 @@ import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectPrototype;
+import xyz.lebster.core.value.object.ObjectValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-constructor")
 public final class NumberConstructor extends BuiltinConstructor<NumberWrapper, NumberPrototype> {
@@ -38,7 +39,7 @@ public final class NumberConstructor extends BuiltinConstructor<NumberWrapper, N
 		return new NumberRange(interpreter.intrinsics.functionPrototype, first, second, third);
 	}
 
-	public NumberWrapper construct(Interpreter interpreter, Value<?>[] arguments) {
+	public NumberWrapper construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) {
 		throw new NotImplemented("new Number()");
 	}
 

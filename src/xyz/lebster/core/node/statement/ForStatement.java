@@ -2,7 +2,7 @@ package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.ExecutionContext;
+import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
@@ -12,7 +12,7 @@ import xyz.lebster.core.value.globals.Undefined;
 public record ForStatement(Statement init, Expression test, Expression update, Statement body) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
+		final ExecutionContext context = interpreter.pushNewEnvironment();
 		try {
 			if (init != null) init.execute(interpreter);
 			final Value<?> result = Undefined.instance;

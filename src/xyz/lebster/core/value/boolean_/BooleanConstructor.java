@@ -9,6 +9,7 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.ObjectPrototype;
+import xyz.lebster.core.value.object.ObjectValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
@@ -18,7 +19,7 @@ public class BooleanConstructor extends BuiltinConstructor<BooleanWrapper, Boole
 		super(objectPrototype, functionPrototype, Names.Boolean);
 	}
 
-	public BooleanWrapper construct(Interpreter interpreter, Value<?>[] arguments) {
+	public BooleanWrapper construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) {
 		throw new NotImplemented("new Boolean()");
 	}
 

@@ -12,6 +12,7 @@ import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectPrototype;
+import xyz.lebster.core.value.object.ObjectValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentInt;
@@ -37,7 +38,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 	}
 
 	@Override
-	public ArrayObject construct(Interpreter interpreter, Value<?>[] arguments) {
+	public ArrayObject construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) {
 		throw new NotImplemented("new Array()");
 	}
 

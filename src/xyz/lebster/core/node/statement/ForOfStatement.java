@@ -3,7 +3,7 @@ package xyz.lebster.core.node.statement;
 import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.ExecutionContext;
+import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Assignable;
@@ -20,7 +20,7 @@ public record ForOfStatement(Assignable left, Expression right, Statement body) 
 
 		Value<?> lastValue = Undefined.instance;
 		for (IteratorHelper.IteratorResult next = iterator.next(); !next.done; next = iterator.next()) {
-			final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
+			final ExecutionContext context = interpreter.pushNewEnvironment();
 
 			try {
 				left.assign(interpreter, next.value);

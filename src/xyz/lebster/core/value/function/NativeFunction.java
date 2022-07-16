@@ -57,9 +57,4 @@ public final class NativeFunction extends Executable {
 			return e.value;
 		}
 	}
-
-	@Override
-	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		this.display(representation);
-	}
 }

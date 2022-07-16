@@ -199,6 +199,7 @@ public final class Parser {
 			case If -> parseIfStatement();
 			case Try -> parseTryStatement();
 			case Switch -> parseSwitchStatement();
+			case Super -> parseSuperCall();
 
 			case Return -> {
 				state.consume();
@@ -879,7 +880,6 @@ public final class Parser {
 			case Async -> throw new ParserNotImplemented(position(), "Parsing `async` functions");
 			case RegexpLiteral -> throw new ParserNotImplemented(position(), "Parsing RegExp literals");
 			case Class -> parseClassExpression();
-			case Super -> parseSuperCall();
 
 			case LParen -> {
 				final SourcePosition start = state.consume().position;
@@ -951,11 +951,11 @@ public final class Parser {
 	}
 
 	// FIXME: Correctly handle super in all cases
-	private SuperCall parseSuperCall() throws SyntaxError, CannotParse {
+	private SuperCallStatement parseSuperCall() throws SyntaxError, CannotParse {
 		final SourcePosition start = position();
 		state.require(TokenType.Super);
 		final ExpressionList args = parseExpressionList(true);
-		return new SuperCall(args, range(start));
+		return new SuperCallStatement(args, range(start));
 	}
 
 	private ClassExpression parseClassExpression() throws SyntaxError, CannotParse {
@@ -1036,6 +1036,8 @@ public final class Parser {
 		state.require(TokenType.LBrace);
 		consumeAllSeparators();
 
+		final boolean isDerived = heritage != null;
+
 		while (state.currentToken.type != TokenType.RBrace) {
 			consumeAllSeparators();
 			final boolean isStatic = state.optional(TokenType.Static);
@@ -1073,7 +1075,7 @@ public final class Parser {
 					final BlockStatement body = parseFunctionBody();
 
 					if (isConstructor) {
-						constructor = new ClassConstructorNode(className, arguments, body, range(elementStart));
+						constructor = new ClassConstructorNode(className, arguments, body, isDerived, range(elementStart));
 					} else {
 						methods.add(new ClassMethodNode(className, name.value, arguments, body, range(elementStart)));
 					}

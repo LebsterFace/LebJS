@@ -2,7 +2,7 @@ package xyz.lebster.core.node;
 
 import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.ExecutionContext;
+import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.statement.BlockStatement;
@@ -28,7 +28,7 @@ public interface FunctionNode extends ASTNode {
 	}
 
 	default Value<?> executeBody(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
+		final ExecutionContext context = interpreter.pushNewEnvironment();
 		try {
 			arguments().declareArguments(interpreter, passedArguments);
 			body().executeWithoutNewContext(interpreter);

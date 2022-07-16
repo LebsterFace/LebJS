@@ -8,6 +8,7 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.ObjectPrototype;
+import xyz.lebster.core.value.object.ObjectValue;
 
 public final class ShadowRealmConstructor extends BuiltinConstructor<ShadowRealm, ShadowRealmPrototype> {
 	public ShadowRealmConstructor(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
@@ -15,7 +16,7 @@ public final class ShadowRealmConstructor extends BuiltinConstructor<ShadowRealm
 	}
 
 	@Override
-	public ShadowRealm construct(Interpreter interpreter, Value<?>[] arguments) {
+	public ShadowRealm construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) {
 		return new ShadowRealm(interpreter.intrinsics.shadowRealmPrototype);
 	}
 

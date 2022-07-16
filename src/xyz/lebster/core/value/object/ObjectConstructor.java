@@ -161,7 +161,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
-	public ObjectValue construct(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	public ObjectValue construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
 		// 20.1.1.1 Object ( [ value ] )
 		final Value<?> value = argument(0, arguments);
 

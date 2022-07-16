@@ -8,6 +8,7 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.ObjectPrototype;
+import xyz.lebster.core.value.object.ObjectValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-constructor")
 public class StringConstructor extends BuiltinConstructor<StringWrapper, StringPrototype> {
@@ -15,7 +16,7 @@ public class StringConstructor extends BuiltinConstructor<StringWrapper, StringP
 		super(objectPrototype, functionPrototype, Names.String);
 	}
 
-	public StringWrapper construct(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	public StringWrapper construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
 		final StringValue data = arguments.length == 0 ? StringValue.EMPTY : arguments[0].toStringValue(interpreter);
 		return new StringWrapper(interpreter.intrinsics.stringPrototype, data);
 	}

@@ -1,5 +1,9 @@
-package xyz.lebster.core.interpreter;
+package xyz.lebster.core.interpreter.environment;
 
+import xyz.lebster.core.interpreter.GlobalObject;
+import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Reference;
+import xyz.lebster.core.interpreter.environment.Environment;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;

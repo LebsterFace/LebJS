@@ -3,7 +3,7 @@ package xyz.lebster.core.value.function;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.ExecutionContext;
+import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.FunctionNode;
@@ -17,6 +17,8 @@ import xyz.lebster.core.value.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
+
+import java.util.HashSet;
 
 public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	public StringValue name;
@@ -51,7 +53,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
+	public final void display(StringRepresentation representation) {
 		representation.append(ANSI.MAGENTA);
 		representation.append("[Function: ");
 		representation.append(ANSI.BRIGHT_MAGENTA);
@@ -61,10 +63,15 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		representation.append(ANSI.RESET);
 	}
 
+	@Override
+	public final void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
+		this.display(representation);
+	}
+
 	public abstract StringValue toStringMethod();
 
 	public Value<?> call(Interpreter interpreter, Value<?> thisValue, Value<?>... args) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushThisValue(thisValue);
+		final ExecutionContext context = interpreter.pushFunctionEnvironment(thisValue, this, this);
 		try {
 			return this.call(interpreter, args);
 		} finally {

@@ -1,7 +1,7 @@
 package xyz.lebster.core.value.function;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.ExecutionContext;
+import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.ArrowFunctionExpression;
@@ -26,17 +26,12 @@ public final class ArrowFunction extends Executable {
 	}
 
 	@Override
-	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		this.display(representation);
-	}
-
-	@Override
 	public StringValue toStringMethod() {
 		return new StringValue(expression.toRepresentationString());
 	}
 
 	private Value<?> executeCode(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushNewLexicalEnvironment();
+		final ExecutionContext context = interpreter.pushNewEnvironment();
 
 		try {
 			expression.arguments.declareArguments(interpreter, passedArguments);

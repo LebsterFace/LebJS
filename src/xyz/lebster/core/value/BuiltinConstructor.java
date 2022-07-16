@@ -26,5 +26,5 @@ public abstract class BuiltinConstructor<T extends ObjectValue, P extends Builti
 	}
 
 	@Override
-	public abstract T construct(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion;
+	public abstract T construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion;
 }

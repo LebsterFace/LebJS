@@ -1,10 +1,13 @@
 package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.NonStandard;
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
+import xyz.lebster.core.interpreter.environment.*;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.ReferenceError;
+import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
@@ -13,15 +16,13 @@ import java.util.ArrayDeque;
 public final class Interpreter {
 	public final Intrinsics intrinsics;
 	public final GlobalObject globalObject;
-	public final int stackSize;
 	private final ArrayDeque<ExecutionContext> executionContextStack = new ArrayDeque<>();
 	private final Mode mode;
 
 	public Interpreter() {
 		this.intrinsics = new Intrinsics();
 		this.globalObject = new GlobalObject(intrinsics);
-		this.stackSize = 32;
-		executionContextStack.addFirst(new ExecutionContext(new GlobalEnvironment(globalObject), globalObject));
+		executionContextStack.addFirst(new ExecutionContext(new GlobalEnvironment(globalObject)));
 		this.mode = Mode.Strict;
 	}
 
@@ -64,10 +65,51 @@ public final class Interpreter {
 	}
 
 	public Value<?> thisValue() {
-		return executionContextStack.getFirst().thisValue();
+		final FunctionEnvironment thisEnvironment = getThisEnvironment();
+		if (thisEnvironment == null) return globalObject;
+		Value<?> thisValue = thisEnvironment.thisValue;
+		return thisValue;
 	}
 
-	public Environment lexicalEnvironment() {
+	public ObjectValue getNewTarget() {
+		final FunctionEnvironment thisEnvironment = getThisEnvironment();
+		if (thisEnvironment == null) return null;
+		return thisEnvironment.newTarget;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getsuperconstructor")
+	public Value<?> getSuperConstructor() {
+		// 1. Let envRec be GetThisEnvironment().
+		final FunctionEnvironment envRec = getThisEnvironment();
+		// 2. Assert: envRec is a function Environment Record.
+		if (envRec == null) {
+			throw new ShouldNotHappen("getSuperConstructor() called when getThisEnvironment() returns null");
+		}
+
+		// 3. Let activeFunction be envRec.[[FunctionObject]].
+		final Executable activeFunction = envRec.functionObject;
+		// 4. Assert: activeFunction is an ECMAScript function object.
+		// 5. Let superConstructor be ! activeFunction.[[GetPrototypeOf]]().
+		// 6. Return superConstructor.
+		return activeFunction.getPrototype();
+	}
+
+	public FunctionEnvironment getThisEnvironment() {
+		for (final ExecutionContext context : executionContextStack) {
+			Environment env = context.environment();
+			while (env != null) {
+				if (env instanceof final FunctionEnvironment result) {
+					return result;
+				}
+
+				env = env.parent();
+			}
+		}
+
+		return null;
+	}
+
+	public Environment environment() {
 		return executionContextStack.getFirst().environment();
 	}
 
@@ -76,34 +118,22 @@ public final class Interpreter {
 	}
 
 
-	public ExecutionContext pushEnvironmentAndThisValue(Environment env, Value<?> thisValue) {
-		final ExecutionContext context = new ExecutionContext(env, thisValue);
+	public ExecutionContext pushEnvironment(Environment env) {
+		final ExecutionContext context = new ExecutionContext(env);
 		this.enterExecutionContext(context);
 		return context;
 	}
 
-	public ExecutionContext pushThisValue(Value<?> thisValue) {
-		final LexicalEnvironment env = new LexicalEnvironment(new ObjectValue(null), lexicalEnvironment());
-		final ExecutionContext context = new ExecutionContext(env, thisValue);
-		this.enterExecutionContext(context);
-		return context;
+	public ExecutionContext pushFunctionEnvironment(Value<?> thisValue, ObjectValue newTarget, Executable functionObject) {
+		return this.pushEnvironment(new FunctionEnvironment(environment(), thisValue, newTarget, functionObject));
 	}
 
-	public ExecutionContext pushLexicalEnvironment(Environment env) {
-		final ExecutionContext context = new ExecutionContext(env, thisValue());
-		this.enterExecutionContext(context);
-		return context;
-	}
-
-	public ExecutionContext pushNewLexicalEnvironment() throws AbruptCompletion {
-		final LexicalEnvironment env = new LexicalEnvironment(new ObjectValue(null), lexicalEnvironment());
-		final ExecutionContext context = new ExecutionContext(env, thisValue());
-		this.enterExecutionContext(context);
-		return context;
+	public ExecutionContext pushNewEnvironment() throws AbruptCompletion {
+		return this.pushEnvironment(new DeclarativeEnvironment(environment()));
 	}
 
 	public Reference getBinding(StringValue name) {
-		Environment env = this.lexicalEnvironment();
+		Environment env = this.environment();
 		while (env != null) {
 			// 2. Let exists be ? env.HasBinding(name).
 			// 3. If exists is true, then

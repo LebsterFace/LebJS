@@ -450,9 +450,11 @@ public final class Parser {
 		BlockStatement catchBody = null;
 		final boolean hasCatch = state.optional(TokenType.Catch);
 		if (hasCatch) {
-			state.require(TokenType.LParen);
-			catchParameter = state.require(TokenType.Identifier);
-			state.require(TokenType.RParen);
+			if (state.optional(TokenType.LParen)) {
+				catchParameter = state.require(TokenType.Identifier);
+				state.require(TokenType.RParen);
+			}
+
 			catchBody = parseBlockStatement();
 		}
 

@@ -8,6 +8,8 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.value.Value;
 
+import java.util.Objects;
+
 public record TryStatement(BlockStatement body, String catchParameter, BlockStatement catchBody, BlockStatement finallyBody) implements Statement {
 	@Override
 	public void dump(int indent) {
@@ -16,7 +18,7 @@ public record TryStatement(BlockStatement body, String catchParameter, BlockStat
 			.child("Body", body);
 
 		Dumper.dumpIndicator(indent + 1, "Catch");
-		Dumper.dumpParameterized(indent + 2, "CatchClause", catchParameter);
+		Dumper.dumpParameterized(indent + 2, "CatchClause", Objects.requireNonNullElse(catchParameter, "No Parameter"));
 		catchBody.dump(indent + 3);
 		builder.child("Finally", finallyBody);
 	}
@@ -28,7 +30,8 @@ public record TryStatement(BlockStatement body, String catchParameter, BlockStat
 		} catch (AbruptCompletion completion) {
 			if (completion.type != AbruptCompletion.Type.Throw) throw completion;
 			final ExecutionContext context = interpreter.pushNewEnvironment();
-			interpreter.declareVariable(catchParameter, completion.value);
+			if (catchParameter != null)
+				interpreter.declareVariable(catchParameter, completion.value);
 			try {
 				return catchBody.executeWithoutNewContext(interpreter);
 			} finally {

@@ -36,6 +36,7 @@ public final class Names {
 	public static final StringValue indexOf = new StringValue("indexOf");
 	public static final StringValue info = new StringValue("info");
 	public static final StringValue input = new StringValue("input");
+	public static final StringValue is = new StringValue("is");
 	public static final StringValue isArray = new StringValue("isArray");
 	public static final StringValue isFinite = new StringValue("isFinite");
 	public static final StringValue isNaN = new StringValue("isNaN");

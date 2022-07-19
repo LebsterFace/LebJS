@@ -8,6 +8,7 @@ import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
+import xyz.lebster.core.value.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
@@ -21,16 +22,27 @@ import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
 public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, ObjectPrototype> {
-	public ObjectConstructor(ObjectPrototype objectPrototype, FunctionPrototype fp) {
-		super(objectPrototype, fp, Names.Object);
+	public ObjectConstructor(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
+		super(objectPrototype, functionPrototype, Names.Object);
 
-		this.putMethod(fp, Names.setPrototypeOf, ObjectConstructor::setPrototypeOf);
-		this.putMethod(fp, Names.getPrototypeOf, ObjectConstructor::getPrototypeOf);
-		this.putMethod(fp, Names.create, ObjectConstructor::create);
-		this.putMethod(fp, Names.keys, ObjectConstructor::keys);
-		this.putMethod(fp, Names.values, ObjectConstructor::values);
-		this.putMethod(fp, Names.entries, ObjectConstructor::entries);
-		this.putMethod(fp, Names.fromEntries, ObjectConstructor::fromEntries);
+		this.putMethod(functionPrototype, Names.setPrototypeOf, ObjectConstructor::setPrototypeOf);
+		this.putMethod(functionPrototype, Names.getPrototypeOf, ObjectConstructor::getPrototypeOf);
+		this.putMethod(functionPrototype, Names.create, ObjectConstructor::create);
+		this.putMethod(functionPrototype, Names.keys, ObjectConstructor::keys);
+		this.putMethod(functionPrototype, Names.values, ObjectConstructor::values);
+		this.putMethod(functionPrototype, Names.entries, ObjectConstructor::entries);
+		this.putMethod(functionPrototype, Names.fromEntries, ObjectConstructor::fromEntries);
+		this.putMethod(functionPrototype, Names.is, ObjectConstructor::is);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.is")
+	private static BooleanValue is(Interpreter interpreter, Value<?>[] arguments) {
+		// 20.1.2.14 Object.is ( value1, value2 )
+		final Value<?> value1 = argument(0, arguments);
+		final Value<?> value2 = argument(1, arguments);
+
+		// 1. Return SameValue(value1, value2).
+		return BooleanValue.of(value1.sameValue(value2));
 	}
 
 

@@ -1,5 +1,6 @@
 package xyz.lebster.core.value;
 
+import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
 public final class Names {
@@ -35,6 +36,7 @@ public final class Names {
 	public static final StringValue indexOf = new StringValue("indexOf");
 	public static final StringValue info = new StringValue("info");
 	public static final StringValue input = new StringValue("input");
+	public static final StringValue isArray = new StringValue("isArray");
 	public static final StringValue isFinite = new StringValue("isFinite");
 	public static final StringValue isNaN = new StringValue("isNaN");
 	public static final StringValue join = new StringValue("join");

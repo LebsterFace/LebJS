@@ -1,6 +1,5 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
 public final class Names {
@@ -30,6 +29,7 @@ public final class Names {
 	public static final StringValue fromEntries = new StringValue("fromEntries");
 	public static final StringValue getPrototypeOf = new StringValue("getPrototypeOf");
 	public static final StringValue globalThis = new StringValue("globalThis");
+	public static final StringValue group = new StringValue("group");
 	public static final StringValue hasOwnProperty = new StringValue("hasOwnProperty");
 	public static final StringValue hasProperty = new StringValue("hasProperty");
 	public static final StringValue includes = new StringValue("includes");

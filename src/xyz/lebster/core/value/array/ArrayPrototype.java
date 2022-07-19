@@ -1,6 +1,7 @@
 package xyz.lebster.core.value.array;
 
 import xyz.lebster.core.NonCompliant;
+import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -20,7 +21,9 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 import xyz.lebster.core.value.symbol.SymbolValue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentString;
@@ -28,22 +31,96 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayConstructor> {
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
 
-	public ArrayPrototype(ObjectPrototype objectPrototype, FunctionPrototype fp) {
+	public ArrayPrototype(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
 		super(objectPrototype);
-		putMethod(fp, Names.push, ArrayPrototype::push);
-		putMethod(fp, Names.map, ArrayPrototype::map);
-		putMethod(fp, Names.reduce, ArrayPrototype::reduce);
-		putMethod(fp, Names.filter, ArrayPrototype::filter);
-		putMethod(fp, Names.join, ArrayPrototype::join);
-		putMethod(fp, Names.includes, ArrayPrototype::includes);
-		putMethod(fp, Names.toString, ArrayPrototype::toStringMethod);
-		putMethod(fp, Names.forEach, ArrayPrototype::forEach);
-		putMethod(fp, Names.reverse, ArrayPrototype::reverse);
-		putMethod(fp, Names.slice, ArrayPrototype::slice);
-		putMethod(fp, Names.pop, ArrayPrototype::pop);
+		putMethod(functionPrototype, Names.filter, ArrayPrototype::filter);
+		putMethod(functionPrototype, Names.forEach, ArrayPrototype::forEach);
+		putMethod(functionPrototype, Names.group, ArrayPrototype::group);
+		putMethod(functionPrototype, Names.includes, ArrayPrototype::includes);
+		putMethod(functionPrototype, Names.join, ArrayPrototype::join);
+		putMethod(functionPrototype, Names.map, ArrayPrototype::map);
+		putMethod(functionPrototype, Names.pop, ArrayPrototype::pop);
+		putMethod(functionPrototype, Names.push, ArrayPrototype::push);
+		putMethod(functionPrototype, Names.reduce, ArrayPrototype::reduce);
+		putMethod(functionPrototype, Names.reverse, ArrayPrototype::reverse);
+		putMethod(functionPrototype, Names.slice, ArrayPrototype::slice);
+		putMethod(functionPrototype, Names.toString, ArrayPrototype::toStringMethod);
+		putMethod(functionPrototype, Names.toString, ArrayPrototype::toStringMethod);
 
-		final NativeFunction values = putMethod(fp, Names.values, ArrayPrototype::values);
+		final NativeFunction values = putMethod(functionPrototype, Names.values, ArrayPrototype::values);
 		put(SymbolValue.iterator, values);
+	}
+
+	private record ArrayGroup(Key<?> key, ArrayList<Value<?>> elements) {
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-array.prototype.group")
+	private static ObjectValue group(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 2.1 Array.prototype.group ( callbackfn [ , thisArg ] )
+		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
+
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(O, interpreter);
+		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
+		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
+		// 4. Let k be 0.
+		int k = 0;
+		// 5. Let groups be a new empty List.
+		final ArrayList<ArrayGroup> groups = new ArrayList<>();
+		// 6. Repeat, while k < len
+		while (k < len) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final var Pk = new StringValue(k);
+			// b. Let kValue be ? Get(O, Pk).
+			final Value<?> kValue = O.get(interpreter, Pk);
+			// c. Let propertyKey be ? ToPropertyKey(? Call(callbackfn, thisArg, « kValue, 𝔽(k), O »)).
+			final Key<?> propertyKey = executable.call(interpreter, thisArg, kValue, new NumberValue(k), O).toPropertyKey(interpreter);
+			// d. Perform AddValueToKeyedGroup(groups, propertyKey, kValue).
+			addValueToKeyedGroup(groups, propertyKey, kValue);
+			// e. Set k to k + 1.
+			k = k + 1;
+		}
+
+		// 7. Let obj be OrdinaryObjectCreate(null).
+		final var obj = new ObjectValue(null);
+		// 8. For each Record { [[Key]], [[Elements]] } g of groups, do
+		for (final ArrayGroup g : groups) {
+			// a. Let elements be CreateArrayFromList(g.[[Elements]]).
+			final var elements = new ArrayObject(interpreter, g.elements);
+			// FIXME: b. Perform ! CreateDataPropertyOrThrow(obj, g.[[Key]], elements).
+			obj.set(interpreter, g.key, elements);
+		}
+
+		// 9. Return obj.
+		return obj;
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-add-value-to-keyed-group")
+	private static void addValueToKeyedGroup(ArrayList<ArrayGroup> groups, Key<?> key, Value<?> value) {
+		// 2.3 AddValueToKeyedGroup ( groups, key, value )
+
+		// 1. For each Record { [[Key]], [[Elements]] } g of groups, do
+		for (final ArrayGroup g : groups) {
+			// a. If SameValue(g.[[Key]], key) is true, then
+			if (g.key.sameValue(key)) {
+				// i. Assert: exactly one element of groups meets this criteria.
+				// ii. Append value as the last element of g.[[Elements]].
+				g.elements.add(value);
+				// iii. Return unused.
+				return;
+			}
+		}
+
+		// 2. Let group be the Record { [[Key]]: key, [[Elements]]: « value » }.
+		final var group = new ArrayGroup(key, new ArrayList<>(List.of(value)));
+		// 3. Append group as the last element of groups.
+		groups.add(group);
+		// 4. Return unused.
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.slice")

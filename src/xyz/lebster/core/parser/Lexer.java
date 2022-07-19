@@ -3,6 +3,7 @@ package xyz.lebster.core.parser;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.SourcePosition;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public final class Lexer {
@@ -389,13 +390,15 @@ public final class Lexer {
 				collect();
 			}
 
-			if (acceptCollect('e', 'E')) {
+			final boolean hasExponent = acceptCollect('e', 'E');
+			if (hasExponent) {
 				acceptCollect('-');
 				while (isDigit(currentChar)) {
 					collect();
 				}
 			}
 
+			if (isInteger && !hasExponent) return potentialBigInt(10);
 			return new Token(TokenType.NumericLiteral, builder.toString(), position());
 		} else if (currentChar == '/' && !slashMeansDivision()) {
 			return consumeRegexpLiteral();
@@ -451,7 +454,6 @@ public final class Lexer {
 	}
 
 	private Token numericLiteralRadix(int radix, String name) throws SyntaxError {
-		long result = 0;
 		boolean isEmpty = true;
 		while (isDigit(currentChar) || isAlphabetical(currentChar)) {
 			if (!isDigit(currentChar, radix)) {
@@ -459,14 +461,17 @@ public final class Lexer {
 			}
 
 			isEmpty = false;
-			int digit = Character.digit(consume(), radix);
-			result *= radix;
-			result -= digit;
-
+			collect();
 		}
 
 		if (isEmpty) throw new SyntaxError(name + " numeric literal requires at least one digit", position());
-		return new Token(TokenType.NumericLiteral, Long.toString(-result), position());
+		return potentialBigInt(radix);
+	}
+
+	private Token potentialBigInt(int radix) {
+		final String integerString = builder.toString();
+		final TokenType type = accept('n') ? TokenType.BigIntLiteral : TokenType.NumericLiteral;
+		return new Token(type, new BigInteger(integerString, radix).toString(), position());
 	}
 
 	private void consumeTerminator() {

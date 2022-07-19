@@ -34,7 +34,7 @@ public final class Lexer {
 		keywords.put("if", TokenType.If);
 		keywords.put("import", TokenType.Import);
 		keywords.put("in", TokenType.In);
-		keywords.put("instanceof", TokenType.Instanceof);
+		keywords.put("instanceof", TokenType.InstanceOf);
 		keywords.put("let", TokenType.Let);
 		keywords.put("new", TokenType.New);
 		keywords.put("null", TokenType.Null);
@@ -272,7 +272,7 @@ public final class Lexer {
 			|| currentToken.type == TokenType.RBracket
 			|| currentToken.type == TokenType.Identifier
 			|| currentToken.type == TokenType.In
-			|| currentToken.type == TokenType.Instanceof
+			|| currentToken.type == TokenType.InstanceOf
 			|| currentToken.type == TokenType.MinusMinus
 			|| currentToken.type == TokenType.Null
 			|| currentToken.type == TokenType.NumericLiteral

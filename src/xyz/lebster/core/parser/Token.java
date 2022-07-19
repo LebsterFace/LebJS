@@ -53,7 +53,7 @@ public final class Token {
 			   || type == TokenType.If
 			   || type == TokenType.Import
 			   || type == TokenType.In
-			   || type == TokenType.Instanceof
+			   || type == TokenType.InstanceOf
 			   || type == TokenType.New
 			   || type == TokenType.Null
 			   || type == TokenType.Return
@@ -173,7 +173,7 @@ public final class Token {
 			   type == TokenType.GreaterThan ||
 			   type == TokenType.GreaterThanEqual ||
 			   type == TokenType.In ||
-			   type == TokenType.Instanceof ||
+			   type == TokenType.InstanceOf ||
 			   type == TokenType.Period ||
 			   type == TokenType.LBracket ||
 			   type == TokenType.Comma;

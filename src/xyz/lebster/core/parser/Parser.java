@@ -49,7 +49,7 @@ public final class Parser {
 			case Star, Slash, Percent -> 15;
 			case Plus, Minus -> 14;
 			case LeftShift, RightShift, UnsignedRightShift -> 13;
-			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, Instanceof -> 12;
+			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf -> 12;
 			case LooseEqual, NotEqual, StrictEqual, StrictNotEqual -> 11;
 			case Ampersand -> 10;
 			case Caret -> 9;
@@ -71,7 +71,7 @@ public final class Parser {
 	private Associativity associativityForTokenType(TokenType type) {
 		return switch (type) {
 			case Period, LBracket, LParen, OptionalChain, Star, Slash, Percent, Plus, Minus, LeftShift, RightShift,
-				UnsignedRightShift, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, Instanceof, LooseEqual,
+				UnsignedRightShift, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf, LooseEqual,
 				NotEqual, StrictEqual, StrictNotEqual, Typeof, Void, Delete, Await, Ampersand, Caret, Pipe,
 				NullishCoalescing, LogicalAnd, LogicalOr, Comma -> Associativity.Left;
 
@@ -832,7 +832,7 @@ public final class Parser {
 			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
 			case GreaterThanEqual -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThanEquals);
 			case In -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.In);
-			case Instanceof -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.InstanceOf);
+			case InstanceOf -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.InstanceOf);
 
 			case Period -> {
 				if (!state.currentToken.matchIdentifierName()) state.expected("IdentifierName");

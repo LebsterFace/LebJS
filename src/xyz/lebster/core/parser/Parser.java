@@ -171,9 +171,9 @@ public final class Parser {
 	}
 
 	private Statement parseAny() throws SyntaxError, CannotParse {
-		if (matchDeclaration()) {
+		if (state.currentToken.matchDeclaration()) {
 			return parseDeclaration();
-		} else if (matchStatementOrExpression()) {
+		} else if (state.currentToken.matchStatementOrExpression()) {
 			return parseStatementOrExpression();
 		} else {
 			throw new CannotParse(state.currentToken);
@@ -204,7 +204,7 @@ public final class Parser {
 			case Return -> {
 				state.consume();
 				// FIXME: Proper automatic semicolon insertion
-				yield new ReturnStatement(matchPrimaryExpression() ? parseExpression() : null);
+				yield new ReturnStatement(state.currentToken.matchPrimaryExpression() ? parseExpression() : null);
 			}
 
 			case Break -> parseBreakStatement();
@@ -218,7 +218,7 @@ public final class Parser {
 			}
 
 			default -> {
-				if (matchPrimaryExpression()) {
+				if (state.currentToken.matchPrimaryExpression()) {
 					yield new ExpressionStatement(parseExpression());
 				} else {
 					throw new CannotParse(state.currentToken, "Statement");
@@ -390,13 +390,13 @@ public final class Parser {
 
 		Statement init = null;
 		if (state.currentToken.type != TokenType.Semicolon) {
-			if (matchVariableDeclaration()) {
+			if (state.currentToken.matchVariableDeclaration()) {
 				// TODO: for_loop_variable_declaration
 				final VariableDeclaration declaration = parseVariableDeclaration(/* true */);
 				if (state.match(TokenType.Identifier, "of")) return parseForOfStatement(declaration);
 				if (state.currentToken.type == TokenType.In) return parseForInStatement(declaration);
 				else init = declaration;
-			} else if (matchPrimaryExpression()) {
+			} else if (state.currentToken.matchPrimaryExpression()) {
 				final Expression expression = parseExpression(0, Associativity.Right, Collections.singleton(TokenType.In));
 				if (state.match(TokenType.Identifier, "of")) return parseForOfStatement(expression);
 				if (state.currentToken.type == TokenType.In) return parseForInStatement(expression);
@@ -408,11 +408,11 @@ public final class Parser {
 		state.require(TokenType.Semicolon);
 		consumeAllLineTerminators();
 
-		final Expression test = matchPrimaryExpression() ? parseExpression() : null;
+		final Expression test = state.currentToken.matchPrimaryExpression() ? parseExpression() : null;
 		state.require(TokenType.Semicolon);
 		consumeAllLineTerminators();
 
-		final Expression update = matchPrimaryExpression() ? parseExpression() : null;
+		final Expression update = state.currentToken.matchPrimaryExpression() ? parseExpression() : null;
 		state.require(TokenType.RParen);
 
 		final Statement body = parseContextualStatement(true, true);
@@ -541,7 +541,7 @@ public final class Parser {
 			while (state.currentToken.type != TokenType.RBrace) {
 				if (state.optional(TokenType.DotDotDot)) {
 					consumeAllLineTerminators();
-					if (matchIdentifierName()) {
+					if (state.currentToken.matchIdentifierName()) {
 						restName = new StringValue(state.consume().value);
 						consumeAllLineTerminators();
 						if (!state.optional(TokenType.Comma)) break;
@@ -552,7 +552,7 @@ public final class Parser {
 					}
 				}
 
-				if (matchIdentifierName()) {
+				if (state.currentToken.matchIdentifierName()) {
 					final StringValue key = new StringValue(state.consume().value);
 					consumeAllLineTerminators();
 
@@ -606,7 +606,7 @@ public final class Parser {
 
 			state.require(TokenType.RBracket);
 			return new ArrayDestructuring(restTarget, children.toArray(new AssignmentTarget[0]));
-		} else if (matchIdentifierName()) {
+		} else if (state.currentToken.matchIdentifierName()) {
 			return new IdentifierExpression(state.consume().value);
 		} else {
 			state.unexpected();
@@ -677,7 +677,7 @@ public final class Parser {
 		if (expectParens) state.require(TokenType.LParen);
 		consumeAllLineTerminators();
 
-		while (matchPrimaryExpression() || state.currentToken.type == TokenType.DotDotDot) {
+		while (state.currentToken.matchPrimaryExpression() || state.currentToken.type == TokenType.DotDotDot) {
 			consumeAllLineTerminators();
 			if (state.currentToken.type == TokenType.DotDotDot) {
 				state.consume();
@@ -754,7 +754,7 @@ public final class Parser {
 		Expression latestExpr = parsePrimaryExpression();
 		consumeAllLineTerminators();
 
-		while (matchSecondaryExpression(forbidden)) {
+		while (state.currentToken.matchSecondaryExpression(forbidden)) {
 			final int newPrecedence = precedenceForTokenType(state.currentToken.type);
 
 			if (newPrecedence < minPrecedence || newPrecedence == minPrecedence && assoc == Left)
@@ -835,7 +835,7 @@ public final class Parser {
 			case Instanceof -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.InstanceOf);
 
 			case Period -> {
-				if (!matchIdentifierName()) state.expected("IdentifierName");
+				if (!state.currentToken.matchIdentifierName()) state.expected("IdentifierName");
 				yield new MemberExpression(left, new StringLiteral(new StringValue(state.consume().value)), false);
 			}
 
@@ -884,9 +884,9 @@ public final class Parser {
 	}
 
 	private Expression parsePrimaryExpression() throws SyntaxError, CannotParse {
-		if (matchPrefixedUpdateExpression()) {
+		if (state.currentToken.matchPrefixedUpdateExpression()) {
 			return parsePrefixedUpdateExpression();
-		} else if (matchUnaryPrefixedExpression()) {
+		} else if (state.currentToken.matchUnaryPrefixedExpression()) {
 			return parseUnaryPrefixedExpression();
 		}
 
@@ -1006,7 +1006,7 @@ public final class Parser {
 			}
 
 			// TODO: Remove duplication with parseClassElementName
-			boolean isIdentifier = matchIdentifierName();
+			boolean isIdentifier = state.currentToken.matchIdentifierName();
 			if (isIdentifier || state.is(TokenType.NumericLiteral, TokenType.StringLiteral)) {
 				final String propertyName = state.consume().value;
 				consumeAllLineTerminators();
@@ -1063,7 +1063,7 @@ public final class Parser {
 				throw new ParserNotImplemented(position(), "Class `static` blocks");
 			} else if (state.optional(TokenType.Star)) {
 				throw new ParserNotImplemented(position(), "Class generator methods");
-			} else if (matchClassElementName()) {
+			} else if (state.currentToken.matchClassElementName()) {
 				final SourcePosition elementStart = position();
 				final Token name = state.consume();
 				consumeAllLineTerminators();
@@ -1106,10 +1106,6 @@ public final class Parser {
 		return new ClassExpression(className, heritage, constructor, methods, fields, range(start));
 	}
 
-	private boolean matchClassElementName() {
-		return matchIdentifierName() || state.currentToken.type == TokenType.StringLiteral || state.currentToken.type == TokenType.NumericLiteral || state.currentToken.type == TokenType.LBracket || state.currentToken.type == TokenType.PrivateIdentifier;
-	}
-
 	// FIXME: ClassDeclaration
 	private VariableDeclaration parseClassDeclaration() throws SyntaxError, CannotParse {
 		final ClassExpression classExpression = parseClassExpression();
@@ -1119,7 +1115,7 @@ public final class Parser {
 	private Expression parseClassHeritage() throws SyntaxError, CannotParse {
 		if (!state.optional(TokenType.Extends)) return null;
 		consumeAllLineTerminators();
-		if (!matchPrimaryExpression()) state.unexpected();
+		if (!state.currentToken.matchPrimaryExpression()) state.unexpected();
 		return parseExpression();
 	}
 
@@ -1172,7 +1168,7 @@ public final class Parser {
 	private ArrowFunctionExpression parseArrowFunctionBody(FunctionArguments arguments) throws CannotParse, SyntaxError {
 		if (state.currentToken.type == TokenType.LBrace) {
 			return new ArrowFunctionExpression(parseBlockStatement(), arguments);
-		} else if (matchPrimaryExpression()) {
+		} else if (state.currentToken.matchPrimaryExpression()) {
 			return new ArrowFunctionExpression(parseSpecAssignmentExpression(), arguments);
 		} else {
 			state.unexpected();
@@ -1186,136 +1182,5 @@ public final class Parser {
 		final ExpressionList elements = parseExpressionList(false);
 		state.require(TokenType.RBracket);
 		return new ArrayExpression(range(start), elements);
-	}
-
-	private boolean matchIdentifierName() {
-		final TokenType t = state.currentToken.type;
-		return t == TokenType.Identifier ||
-			   t == TokenType.Let ||
-			   t == TokenType.Async ||
-			   t == TokenType.Await ||
-			   t == TokenType.Break ||
-			   t == TokenType.Case ||
-			   t == TokenType.Catch ||
-			   t == TokenType.Class ||
-			   t == TokenType.Const || t == TokenType.Continue || t == TokenType.Debugger || t == TokenType.Default || t == TokenType.Delete || t == TokenType.Do || t == TokenType.Else || t == TokenType.Enum || t == TokenType.Export || t == TokenType.Extends || t == TokenType.False || t == TokenType.Finally || t == TokenType.For || t == TokenType.Function || t == TokenType.If || t == TokenType.Import || t == TokenType.In || t == TokenType.Instanceof || t == TokenType.New || t == TokenType.Null || t == TokenType.Return || t == TokenType.Super || t == TokenType.Static || t == TokenType.Switch || t == TokenType.This || t == TokenType.Throw || t == TokenType.True || t == TokenType.Try || t == TokenType.Typeof || t == TokenType.Var || t == TokenType.Void || t == TokenType.While || t == TokenType.With || t == TokenType.Yield;
-	}
-
-	private boolean matchDeclaration() {
-		final TokenType t = state.currentToken.type;
-		return t == TokenType.Function ||
-			   t == TokenType.Class ||
-			   t == TokenType.Let ||
-			   t == TokenType.Var ||
-			   t == TokenType.Const;
-	}
-
-	private boolean matchStatementOrExpression() {
-		final TokenType t = state.currentToken.type;
-		return matchPrimaryExpression() ||
-			   t == TokenType.Return ||
-			   t == TokenType.Yield ||
-			   t == TokenType.Do ||
-			   t == TokenType.If ||
-			   t == TokenType.Throw ||
-			   t == TokenType.Try ||
-			   t == TokenType.While ||
-			   t == TokenType.With ||
-			   t == TokenType.For ||
-			   t == TokenType.LBrace ||
-			   t == TokenType.Switch ||
-			   t == TokenType.Break ||
-			   t == TokenType.Continue ||
-			   t == TokenType.Var ||
-			   t == TokenType.Import ||
-			   t == TokenType.Export ||
-			   t == TokenType.Debugger ||
-			   t == TokenType.Semicolon;
-	}
-
-	private boolean matchPrimaryExpression() {
-		final TokenType t = state.currentToken.type;
-		return t == TokenType.LParen || t == TokenType.Async || t == TokenType.TemplateStart || t == TokenType.Identifier || t == TokenType.StringLiteral || t == TokenType.NumericLiteral || t == TokenType.Super || t == TokenType.True || t == TokenType.False || t == TokenType.Class || t == TokenType.Function || t == TokenType.LBracket || t == TokenType.LBrace || t == TokenType.This || t == TokenType.RegexpLiteral || t == TokenType.Null || t == TokenType.New ||
-			   t == TokenType.Infinity ||
-			   t == TokenType.NaN ||
-			   t == TokenType.Undefined ||
-			   matchUnaryPrefixedExpression() ||
-			   matchPrefixedUpdateExpression();
-	}
-
-	private boolean matchSecondaryExpression(Set<TokenType> forbidden) {
-		final TokenType t = state.currentToken.type;
-		if (forbidden.contains(t)) return false;
-		return t == TokenType.Plus ||
-			   t == TokenType.Minus ||
-			   t == TokenType.Star ||
-			   t == TokenType.Slash ||
-			   t == TokenType.Percent ||
-			   t == TokenType.Exponent ||
-			   t == TokenType.Pipe ||
-			   t == TokenType.Ampersand ||
-			   t == TokenType.Caret ||
-			   t == TokenType.LeftShift ||
-			   t == TokenType.RightShift ||
-			   t == TokenType.UnsignedRightShift ||
-			   t == TokenType.QuestionMark ||
-			   t == TokenType.LParen ||
-			   t == TokenType.StrictEqual ||
-			   t == TokenType.LooseEqual ||
-			   t == TokenType.StrictNotEqual ||
-			   t == TokenType.NotEqual ||
-			   t == TokenType.LogicalOr ||
-			   t == TokenType.LogicalAnd ||
-			   t == TokenType.NullishCoalescing ||
-			   t == TokenType.Equals ||
-			   t == TokenType.LogicalAndEquals ||
-			   t == TokenType.LogicalOrEquals ||
-			   t == TokenType.NullishCoalescingEquals ||
-			   t == TokenType.MultiplyEquals ||
-			   t == TokenType.DivideEquals ||
-			   t == TokenType.PercentEquals ||
-			   t == TokenType.PlusEquals ||
-			   t == TokenType.MinusEquals ||
-			   t == TokenType.LeftShiftEquals ||
-			   t == TokenType.RightShiftEquals ||
-			   t == TokenType.UnsignedRightShiftEquals ||
-			   t == TokenType.AmpersandEquals ||
-			   t == TokenType.CaretEquals ||
-			   t == TokenType.PipeEquals ||
-			   t == TokenType.ExponentEquals ||
-			   t == TokenType.MinusMinus ||
-			   t == TokenType.PlusPlus ||
-			   t == TokenType.LessThan ||
-			   t == TokenType.LessThanEqual ||
-			   t == TokenType.GreaterThan ||
-			   t == TokenType.GreaterThanEqual ||
-			   t == TokenType.In ||
-			   t == TokenType.Instanceof ||
-			   t == TokenType.Period ||
-			   t == TokenType.LBracket ||
-			   t == TokenType.Comma;
-	}
-
-	private boolean matchPrefixedUpdateExpression() {
-		return state.currentToken.type == TokenType.PlusPlus ||
-			   state.currentToken.type == TokenType.MinusMinus;
-	}
-
-	private boolean matchUnaryPrefixedExpression() {
-		final TokenType t = state.currentToken.type;
-		return t == TokenType.Bang ||
-			   t == TokenType.Tilde ||
-			   t == TokenType.Plus ||
-			   t == TokenType.Minus ||
-			   t == TokenType.Typeof ||
-			   t == TokenType.Void ||
-			   t == TokenType.Delete;
-	}
-
-	private boolean matchVariableDeclaration() {
-		final TokenType t = state.currentToken.type;
-		return t == TokenType.Var ||
-			   t == TokenType.Let ||
-			   t == TokenType.Const;
 	}
 }

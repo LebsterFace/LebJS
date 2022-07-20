@@ -1,7 +1,6 @@
 package xyz.lebster.core.node.expression.literal;
 
 import xyz.lebster.core.DumpBuilder;
-import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.boolean_.BooleanValue;
 

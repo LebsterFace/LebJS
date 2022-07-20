@@ -128,7 +128,7 @@ public final class Interpreter {
 		return this.pushEnvironment(new FunctionEnvironment(environment(), thisValue, newTarget, functionObject));
 	}
 
-	public ExecutionContext pushNewEnvironment() throws AbruptCompletion {
+	public ExecutionContext pushNewEnvironment() {
 		return this.pushEnvironment(new DeclarativeEnvironment(environment()));
 	}
 

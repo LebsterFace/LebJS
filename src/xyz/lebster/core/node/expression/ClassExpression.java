@@ -115,7 +115,7 @@ public record ClassExpression(
 
 	public record ClassConstructorNode(String className, FunctionArguments arguments, BlockStatement body, boolean isDerived, SourceRange range) implements ClassFunctionNode {
 		@Override
-		public ClassConstructor execute(Interpreter interpreter) throws AbruptCompletion {
+		public ClassConstructor execute(Interpreter interpreter) {
 			return new ClassConstructor(interpreter, interpreter.environment(), this, isDerived, className);
 		}
 

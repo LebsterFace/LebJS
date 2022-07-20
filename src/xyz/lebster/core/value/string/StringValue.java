@@ -57,10 +57,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 	@Override
 	public void display(StringRepresentation representation) {
 		representation.append(ANSI.GREEN);
-		final char quoteType = this.value.contains("'") ? '"' : '\'';
-		representation.append(quoteType);
-		representation.append(StringEscapeUtils.escape(value));
-		representation.append(quoteType);
+		representation.append(StringEscapeUtils.quote(value, false));
 		representation.append(ANSI.RESET);
 	}
 

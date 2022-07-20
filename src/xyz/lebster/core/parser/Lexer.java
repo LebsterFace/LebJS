@@ -412,7 +412,7 @@ public final class Lexer {
 				}
 			}
 
-			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "'"), position());
+			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "'", Set.of()), position());
 		}
 	}
 

@@ -1,11 +1,13 @@
 package xyz.lebster.core.parser;
 
+import java.util.Set;
+
 public final class StringEscapeUtils {
 	private static String hex(char character) {
 		return Integer.toHexString(character).toUpperCase();
 	}
 
-	public static String escape(String str) {
+	public static String escape(String str, Set<Character> additionalEscapes) {
 		if (str == null) return null;
 		final int length = str.length();
 		final StringBuilder res = new StringBuilder(length);
@@ -32,10 +34,27 @@ public final class StringEscapeUtils {
 					}
 				}
 			} else {
+				if (additionalEscapes.contains(ch)) res.append('\\');
 				res.append(ch);
 			}
 		}
 
 		return res.toString();
+	}
+
+	public static String quote(String str, boolean preferDoubleQuotes) {
+		final boolean containsDoubleQuotes = str.indexOf('"') != -1;
+		final boolean containsSingleQuotes = str.indexOf('\'') != -1;
+
+		if (containsSingleQuotes && containsDoubleQuotes) {
+			final char quoteType = preferDoubleQuotes ? '"' : '\'';
+			return quoteType + escape(str, Set.of(quoteType)) + quoteType;
+		}
+
+		final char quoteType;
+		if (containsDoubleQuotes) quoteType = '\'';
+		else if (containsSingleQuotes) quoteType = '"';
+		else quoteType = preferDoubleQuotes ? '"' : '\'';
+		return quoteType + escape(str, Set.of()) + quoteType;
 	}
 }

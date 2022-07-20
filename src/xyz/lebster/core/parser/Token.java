@@ -24,7 +24,7 @@ public final class Token {
 
 	@Override
 	public String toString() {
-		return value == null ? String.valueOf(type) : '"' + StringEscapeUtils.escape(value) + "\" (" + type + ")";
+		return value == null ? String.valueOf(type) : "%s (%s)".formatted(StringEscapeUtils.quote(value, true), type);
 	}
 
 	boolean matchIdentifierName() {

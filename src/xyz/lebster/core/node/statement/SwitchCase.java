@@ -27,7 +27,7 @@ public record SwitchCase(Expression test, Statement... statements) implements Du
 
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
-			.selfNamed(this, test == null ? "Default" : "")
+			.selfParameterized(this, test == null ? "Default" : "")
 			.optionalHidden("Test", test)
 			.children("Statements", statements);
 	}

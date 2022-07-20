@@ -6,6 +6,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.expression.Expression;
+import xyz.lebster.core.parser.StringEscapeUtils;
 import xyz.lebster.core.value.string.StringValue;
 
 import java.util.ArrayList;
@@ -61,8 +62,7 @@ public class TemplateLiteral implements Expression {
 		@Override
 		public void dump(int indent) {
 			DumpBuilder.begin(indent)
-				.self(this)
-				.singleChild("Value", string);
+				.value(this, StringEscapeUtils.quote(string, false));
 		}
 
 		@Override

@@ -1,5 +1,6 @@
 package xyz.lebster.core.node.expression.literal;
 
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.boolean_.BooleanValue;
@@ -7,7 +8,8 @@ import xyz.lebster.core.value.boolean_.BooleanValue;
 public record BooleanLiteral(BooleanValue value) implements Literal<BooleanValue> {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpValue(indent, "Boolean", value == BooleanValue.TRUE ? "true" : "false");
+		DumpBuilder.begin(indent)
+			.value(this, value == BooleanValue.TRUE ? "true" : "false");
 	}
 
 	@Override

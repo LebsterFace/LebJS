@@ -13,10 +13,7 @@ public record EqualityExpression(Expression left, Expression right, EqualityOp o
 	@Override
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Left", left)
-			.operator(op)
-			.child("Right", right);
+			.binaryExpression(this, left, op, right);
 	}
 
 	@Override

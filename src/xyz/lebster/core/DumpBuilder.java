@@ -26,7 +26,7 @@ public final class DumpBuilder {
 		return this;
 	}
 
-	public DumpBuilder selfNamed(Dumpable self, String name) {
+	public DumpBuilder selfParameterized(Dumpable self, String name) {
 		Dumper.dumpParameterized(rootIndentation, self.getClass().getSimpleName(), name);
 		return this;
 	}
@@ -130,10 +130,8 @@ public final class DumpBuilder {
 		child("Right", right);
 	}
 
-	public DumpBuilder value(String indicator, Value<?> value) {
-		Dumper.dumpIndicator(rootIndentation, indicator);
-		Dumper.dumpValue(rootIndentation + 1, value.getClass().getSimpleName(), value.toDisplayString());
-		return this;
+	public void value(Dumpable self, String data) {
+		Dumper.dumpValue(rootIndentation, self.getClass().getSimpleName(), data);
 	}
 
 	public DumpBuilder optionalValue(String name, Value<?> value) {

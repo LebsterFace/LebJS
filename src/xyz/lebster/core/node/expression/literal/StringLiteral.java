@@ -1,13 +1,15 @@
 package xyz.lebster.core.node.expression.literal;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.parser.StringEscapeUtils;
 import xyz.lebster.core.value.string.StringValue;
 
 public record StringLiteral(StringValue value) implements Literal<StringValue> {
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpValue(indent, "String", value.value);
+		DumpBuilder.begin(indent)
+			.value(this, StringEscapeUtils.quote(value.value, false));
 	}
 
 	@Override

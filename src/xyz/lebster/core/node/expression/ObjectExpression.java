@@ -134,7 +134,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 		@Override
 		public void dump(int indent) {
 			DumpBuilder.begin(indent)
-				.selfNamed(this, key.value);
+				.selfParameterized(this, key.value);
 		}
 
 		@Override

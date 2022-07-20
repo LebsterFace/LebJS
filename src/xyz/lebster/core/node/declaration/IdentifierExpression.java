@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.declaration;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -29,7 +29,8 @@ public record IdentifierExpression(StringValue name) implements AssignmentTarget
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpValue(indent, "Identifier", name.value);
+		DumpBuilder.begin(indent)
+			.value(this, name.value);
 	}
 
 	@Override

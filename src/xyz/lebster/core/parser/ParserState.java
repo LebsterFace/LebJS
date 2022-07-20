@@ -4,7 +4,7 @@ import xyz.lebster.core.exception.SyntaxError;
 
 public final class ParserState {
 	public final Token[] tokens;
-	public Token currentToken;
+	public Token token;
 	public int index = -1;
 	public boolean inBreakContext = false;
 	public boolean inContinueContext = false;
@@ -14,52 +14,61 @@ public final class ParserState {
 		this.consume();
 	}
 
-	private ParserState(Token[] tokens, int index, Token currentToken) {
+	private ParserState(Token[] tokens, int index, Token token) {
 		this.tokens = tokens;
-		this.currentToken = currentToken;
+		this.token = token;
 		this.index = index;
 	}
 
 	public void expected(TokenType type) throws SyntaxError {
-		throw new SyntaxError("Unexpected token %s. Expected %s".formatted(currentToken, type), currentToken.position);
+		throw new SyntaxError("Unexpected token %s. Expected %s".formatted(token, type), token.position);
 	}
 
 	public void expected(String value) throws SyntaxError {
-		throw new SyntaxError("Unexpected token %s. Expected '%s'".formatted(currentToken, value), currentToken.position);
+		throw new SyntaxError("Unexpected token %s. Expected '%s'".formatted(token, value), token.position);
 	}
 
 	public void unexpected() throws SyntaxError {
-		throw new SyntaxError("Unexpected token " + currentToken, currentToken.position);
+		throw new SyntaxError("Unexpected token " + token, token.position);
 	}
 
 	Token consume() {
-		final Token oldToken = currentToken;
+		final Token oldToken = token;
 		if (index + 1 != tokens.length) index++;
-		currentToken = tokens[index];
+		token = tokens[index];
 		return oldToken;
 	}
 
 	String require(TokenType type) throws SyntaxError {
-		if (currentToken.type != type) expected(type);
+		if (token.type != type) expected(type);
 		return consume().value;
 	}
 
 	void require(TokenType type, String value) throws SyntaxError {
-		if (currentToken.type != type) expected(type);
-		if (!currentToken.value.equals(value)) expected(value);
+		if (token.type != type) expected(type);
+		if (!token.value.equals(value)) expected(value);
 		consume();
 	}
 
 	Token accept(TokenType type) {
-		return currentToken.type == type ? consume() : null;
+		return token.type == type ? consume() : null;
 	}
 
 	boolean match(TokenType type, String value) {
-		return currentToken.type == type && currentToken.value.equals(value);
+		return token.type == type && token.value.equals(value);
 	}
 
 	boolean optional(TokenType type) {
-		if (currentToken.type == type) {
+		if (token.type == type) {
+			consume();
+			return true;
+		}
+
+		return false;
+	}
+
+	boolean optional(TokenType... types) {
+		if (is(types)) {
 			consume();
 			return true;
 		}
@@ -69,15 +78,19 @@ public final class ParserState {
 
 	boolean is(TokenType... types) {
 		for (final TokenType type : types) {
-			if (currentToken.type == type)
+			if (token.type == type)
 				return true;
 		}
 
 		return false;
 	}
 
+	boolean is(TokenType type) {
+		return token.type == type;
+	}
+
 	void consumeAll(TokenType t) {
-		while (currentToken.type == t) consume();
+		while (token.type == t) consume();
 	}
 
 	boolean isFinished() {
@@ -85,7 +98,7 @@ public final class ParserState {
 	}
 
 	public ParserState copy() {
-		final ParserState cloned = new ParserState(tokens, index, currentToken);
+		final ParserState cloned = new ParserState(tokens, index, token);
 		cloned.inContinueContext = this.inContinueContext;
 		cloned.inBreakContext = this.inBreakContext;
 		return cloned;

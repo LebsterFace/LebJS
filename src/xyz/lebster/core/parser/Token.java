@@ -1,12 +1,14 @@
 package xyz.lebster.core.parser;
 
+import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.node.SourcePosition;
 
 import java.util.Set;
 
 public final class Token {
 	public final TokenType type;
-	public final String value;
+	final String value;
 
 	public final SourcePosition position;
 
@@ -24,13 +26,58 @@ public final class Token {
 
 	@Override
 	public String toString() {
-		return value == null ? String.valueOf(type) : "%s (%s)".formatted(StringEscapeUtils.quote(value, true), type);
+		if (value == null) return String.valueOf(type);
+		return "%s (%s)".formatted(StringEscapeUtils.quote(value, true), type);
+	}
+
+	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
+	int precedence() {
+		return switch (type) {
+			case Period, LBracket, LParen, OptionalChain -> 20;
+			case New -> 19;
+			case PlusPlus, MinusMinus -> 18;
+			case Bang, Tilde, Typeof, Void, Delete, Await -> 17;
+			case Exponent -> 16;
+			case Star, Slash, Percent -> 15;
+			case Plus, Minus -> 14;
+			case LeftShift, RightShift, UnsignedRightShift -> 13;
+			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf -> 12;
+			case LooseEqual, NotEqual, StrictEqual, StrictNotEqual -> 11;
+			case Ampersand -> 10;
+			case Caret -> 9;
+			case Pipe -> 8;
+			case NullishCoalescing -> 7;
+			case LogicalAnd -> 6;
+			case LogicalOr -> 5;
+			case QuestionMark -> 4;
+			case Equals, PlusEquals, MinusEquals, ExponentEquals, NullishCoalescingEquals, LogicalOrEquals,
+				LogicalAndEquals, PipeEquals, CaretEquals, AmpersandEquals, UnsignedRightShiftEquals, RightShiftEquals,
+				LeftShiftEquals, PercentEquals, DivideEquals, MultiplyEquals -> 3;
+			case Yield -> 2;
+			case Comma -> 1;
+			default -> throw new ShouldNotHappen("Attempting to get precedence for token type '" + type + "'");
+		};
+	}
+
+	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
+	Associativity associativity() {
+		return switch (type) {
+			case Period, LBracket, LParen, OptionalChain, Star, Slash, Percent, Plus, Minus, LeftShift, RightShift,
+				UnsignedRightShift, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf, LooseEqual,
+				NotEqual, StrictEqual, StrictNotEqual, Typeof, Void, Delete, Await, Ampersand, Caret, Pipe,
+				NullishCoalescing, LogicalAnd, LogicalOr, Comma -> Associativity.Left;
+
+			case New, PlusPlus, MinusMinus, Bang, Tilde, Exponent, QuestionMark, Equals, PlusEquals, MinusEquals,
+				ExponentEquals, NullishCoalescingEquals, LogicalOrEquals, LogicalAndEquals, PipeEquals, CaretEquals,
+				AmpersandEquals, UnsignedRightShiftEquals, RightShiftEquals, LeftShiftEquals, PercentEquals,
+				DivideEquals, MultiplyEquals, Yield -> Associativity.Right;
+
+			default -> throw new ShouldNotHappen("Attempting to get associativity for token type '" + type + "'");
+		};
 	}
 
 	boolean matchIdentifierName() {
-		return type == TokenType.Identifier
-			   || type == TokenType.Let
-			   || type == TokenType.Async
+		return type == TokenType.Async
 			   || type == TokenType.Await
 			   || type == TokenType.Break
 			   || type == TokenType.Case
@@ -50,15 +97,17 @@ public final class Token {
 			   || type == TokenType.Finally
 			   || type == TokenType.For
 			   || type == TokenType.Function
+			   || type == TokenType.Identifier
 			   || type == TokenType.If
 			   || type == TokenType.Import
 			   || type == TokenType.In
 			   || type == TokenType.InstanceOf
+			   || type == TokenType.Let
 			   || type == TokenType.New
 			   || type == TokenType.Null
 			   || type == TokenType.Return
-			   || type == TokenType.Super
 			   || type == TokenType.Static
+			   || type == TokenType.Super
 			   || type == TokenType.Switch
 			   || type == TokenType.This
 			   || type == TokenType.Throw
@@ -73,110 +122,108 @@ public final class Token {
 	}
 
 	boolean matchDeclaration() {
-		return type == TokenType.Function ||
-			   type == TokenType.Class ||
-			   type == TokenType.Let ||
-			   type == TokenType.Var ||
-			   type == TokenType.Const;
+		return type == TokenType.Function
+			   || type == TokenType.Class
+			   || type == TokenType.Let
+			   || type == TokenType.Var
+			   || type == TokenType.Const;
 	}
 
-	boolean matchStatementOrExpression() {
-		return matchPrimaryExpression() ||
-			   type == TokenType.Return ||
-			   type == TokenType.Yield ||
-			   type == TokenType.Do ||
-			   type == TokenType.If ||
-			   type == TokenType.Throw ||
-			   type == TokenType.Try ||
-			   type == TokenType.While ||
-			   type == TokenType.With ||
-			   type == TokenType.For ||
-			   type == TokenType.LBrace ||
-			   type == TokenType.Switch ||
-			   type == TokenType.Break ||
-			   type == TokenType.Continue ||
-			   type == TokenType.Var ||
-			   type == TokenType.Import ||
-			   type == TokenType.Export ||
-			   type == TokenType.Debugger ||
-			   type == TokenType.Semicolon;
+	boolean matchStatement() {
+		return type == TokenType.Return
+			   || type == TokenType.Yield
+			   || type == TokenType.Do
+			   || type == TokenType.If
+			   || type == TokenType.Throw
+			   || type == TokenType.Try
+			   || type == TokenType.While
+			   || type == TokenType.With
+			   || type == TokenType.For
+			   || type == TokenType.LBrace
+			   || type == TokenType.Switch
+			   || type == TokenType.Break
+			   || type == TokenType.Continue
+			   || type == TokenType.Var
+			   || type == TokenType.Import
+			   || type == TokenType.Export
+			   || type == TokenType.Debugger
+			   || type == TokenType.Semicolon;
 	}
 
 	boolean matchPrimaryExpression() {
-		return type == TokenType.LParen
-			   || type == TokenType.Async
-			   || type == TokenType.TemplateStart
-			   || type == TokenType.Identifier
-			   || type == TokenType.StringLiteral
-			   || type == TokenType.NumericLiteral
-			   || type == TokenType.Super
-			   || type == TokenType.True
-			   || type == TokenType.False
+		if (matchUnaryPrefixedExpression() || matchPrefixedUpdateExpression()) return true;
+		return type == TokenType.Async
 			   || type == TokenType.Class
+			   || type == TokenType.False
 			   || type == TokenType.Function
-			   || type == TokenType.LBracket
-			   || type == TokenType.LBrace
-			   || type == TokenType.This
-			   || type == TokenType.RegexpLiteral
-			   || type == TokenType.Null
-			   || type == TokenType.New
+			   || type == TokenType.Identifier
 			   || type == TokenType.Infinity
+			   || type == TokenType.LBrace
+			   || type == TokenType.LBracket
+			   || type == TokenType.LParen
 			   || type == TokenType.NaN
-			   || type == TokenType.Undefined
-			   || matchUnaryPrefixedExpression()
-			   || matchPrefixedUpdateExpression();
+			   || type == TokenType.New
+			   || type == TokenType.Null
+			   || type == TokenType.NumericLiteral
+			   || type == TokenType.RegexpLiteral
+			   || type == TokenType.StringLiteral
+			   || type == TokenType.Super
+			   || type == TokenType.TemplateStart
+			   || type == TokenType.This
+			   || type == TokenType.True
+			   || type == TokenType.Undefined;
 	}
 
 	boolean matchSecondaryExpression(Set<TokenType> forbidden) {
 		if (forbidden.contains(type)) return false;
-		return type == TokenType.Plus ||
-			   type == TokenType.Minus ||
-			   type == TokenType.Star ||
-			   type == TokenType.Slash ||
-			   type == TokenType.Percent ||
-			   type == TokenType.Exponent ||
-			   type == TokenType.Pipe ||
-			   type == TokenType.Ampersand ||
-			   type == TokenType.Caret ||
-			   type == TokenType.LeftShift ||
-			   type == TokenType.RightShift ||
-			   type == TokenType.UnsignedRightShift ||
-			   type == TokenType.QuestionMark ||
-			   type == TokenType.LParen ||
-			   type == TokenType.StrictEqual ||
-			   type == TokenType.LooseEqual ||
-			   type == TokenType.StrictNotEqual ||
-			   type == TokenType.NotEqual ||
-			   type == TokenType.LogicalOr ||
-			   type == TokenType.LogicalAnd ||
-			   type == TokenType.NullishCoalescing ||
-			   type == TokenType.Equals ||
-			   type == TokenType.LogicalAndEquals ||
-			   type == TokenType.LogicalOrEquals ||
-			   type == TokenType.NullishCoalescingEquals ||
-			   type == TokenType.MultiplyEquals ||
-			   type == TokenType.DivideEquals ||
-			   type == TokenType.PercentEquals ||
-			   type == TokenType.PlusEquals ||
-			   type == TokenType.MinusEquals ||
-			   type == TokenType.LeftShiftEquals ||
-			   type == TokenType.RightShiftEquals ||
-			   type == TokenType.UnsignedRightShiftEquals ||
-			   type == TokenType.AmpersandEquals ||
-			   type == TokenType.CaretEquals ||
-			   type == TokenType.PipeEquals ||
-			   type == TokenType.ExponentEquals ||
-			   type == TokenType.MinusMinus ||
-			   type == TokenType.PlusPlus ||
-			   type == TokenType.LessThan ||
-			   type == TokenType.LessThanEqual ||
-			   type == TokenType.GreaterThan ||
-			   type == TokenType.GreaterThanEqual ||
-			   type == TokenType.In ||
-			   type == TokenType.InstanceOf ||
-			   type == TokenType.Period ||
-			   type == TokenType.LBracket ||
-			   type == TokenType.Comma;
+		return type == TokenType.Ampersand
+			   || type == TokenType.AmpersandEquals
+			   || type == TokenType.Caret
+			   || type == TokenType.CaretEquals
+			   || type == TokenType.Comma
+			   || type == TokenType.DivideEquals
+			   || type == TokenType.Equals
+			   || type == TokenType.Exponent
+			   || type == TokenType.ExponentEquals
+			   || type == TokenType.GreaterThan
+			   || type == TokenType.GreaterThanEqual
+			   || type == TokenType.In
+			   || type == TokenType.InstanceOf
+			   || type == TokenType.LBracket
+			   || type == TokenType.LParen
+			   || type == TokenType.LeftShift
+			   || type == TokenType.LeftShiftEquals
+			   || type == TokenType.LessThan
+			   || type == TokenType.LessThanEqual
+			   || type == TokenType.LogicalAnd
+			   || type == TokenType.LogicalAndEquals
+			   || type == TokenType.LogicalOr
+			   || type == TokenType.LogicalOrEquals
+			   || type == TokenType.LooseEqual
+			   || type == TokenType.Minus
+			   || type == TokenType.MinusEquals
+			   || type == TokenType.MinusMinus
+			   || type == TokenType.MultiplyEquals
+			   || type == TokenType.NotEqual
+			   || type == TokenType.NullishCoalescing
+			   || type == TokenType.NullishCoalescingEquals
+			   || type == TokenType.Percent
+			   || type == TokenType.PercentEquals
+			   || type == TokenType.Period
+			   || type == TokenType.Pipe
+			   || type == TokenType.PipeEquals
+			   || type == TokenType.Plus
+			   || type == TokenType.PlusEquals
+			   || type == TokenType.PlusPlus
+			   || type == TokenType.QuestionMark
+			   || type == TokenType.RightShift
+			   || type == TokenType.RightShiftEquals
+			   || type == TokenType.Slash
+			   || type == TokenType.Star
+			   || type == TokenType.StrictEqual
+			   || type == TokenType.StrictNotEqual
+			   || type == TokenType.UnsignedRightShift
+			   || type == TokenType.UnsignedRightShiftEquals;
 	}
 
 	boolean matchPrefixedUpdateExpression() {
@@ -185,13 +232,13 @@ public final class Token {
 	}
 
 	boolean matchUnaryPrefixedExpression() {
-		return type == TokenType.Bang ||
-			   type == TokenType.Tilde ||
-			   type == TokenType.Plus ||
-			   type == TokenType.Minus ||
-			   type == TokenType.Typeof ||
-			   type == TokenType.Void ||
-			   type == TokenType.Delete;
+		return type == TokenType.Bang
+			   || type == TokenType.Delete
+			   || type == TokenType.Minus
+			   || type == TokenType.Plus
+			   || type == TokenType.Tilde
+			   || type == TokenType.Typeof
+			   || type == TokenType.Void;
 	}
 
 	boolean matchVariableDeclaration() {
@@ -202,9 +249,9 @@ public final class Token {
 
 	boolean matchClassElementName() {
 		return matchIdentifierName()
-			   || type == TokenType.StringLiteral
-			   || type == TokenType.NumericLiteral
 			   || type == TokenType.LBracket
-			   || type == TokenType.PrivateIdentifier;
+			   || type == TokenType.NumericLiteral
+			   || type == TokenType.PrivateIdentifier
+			   || type == TokenType.StringLiteral;
 	}
 }

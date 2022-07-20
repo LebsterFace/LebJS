@@ -5,29 +5,29 @@ import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.ASTNode;
-import xyz.lebster.core.node.FunctionArguments;
+import xyz.lebster.core.node.FunctionParameters;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.function.ArrowFunction;
 
 public final class ArrowFunctionExpression implements Expression {
-	public final FunctionArguments arguments;
+	public final FunctionParameters parameters;
 	public final BlockStatement body;
 	public final Expression implicitReturnExpression;
 	public final boolean hasFullBody;
 
-	public ArrowFunctionExpression(FunctionArguments arguments, BlockStatement body, Expression implicitReturnExpression, boolean hasFullBody) {
-		this.arguments = arguments;
+	public ArrowFunctionExpression(FunctionParameters parameters, BlockStatement body, Expression implicitReturnExpression, boolean hasFullBody) {
+		this.parameters = parameters;
 		this.body = body;
 		this.implicitReturnExpression = implicitReturnExpression;
 		this.hasFullBody = hasFullBody;
 	}
 
-	public ArrowFunctionExpression(BlockStatement body, FunctionArguments arguments) {
-		this(arguments, body, null, true);
+	public ArrowFunctionExpression(BlockStatement body, FunctionParameters parameters) {
+		this(parameters, body, null, true);
 	}
 
-	public ArrowFunctionExpression(Expression implicitReturnExpression, FunctionArguments arguments) {
-		this(arguments, null, implicitReturnExpression, false);
+	public ArrowFunctionExpression(Expression implicitReturnExpression, FunctionParameters parameters) {
+		this(parameters, null, implicitReturnExpression, false);
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public final class ArrowFunctionExpression implements Expression {
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
 			.self(this)
-			.child("Arguments", arguments);
+			.child("Parameters", parameters);
 
 		if (this.hasFullBody) {
 			assert body != null;
@@ -55,7 +55,7 @@ public final class ArrowFunctionExpression implements Expression {
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		arguments.represent(representation);
+		parameters.represent(representation);
 		representation.append(" => ");
 
 		if (this.hasFullBody) {

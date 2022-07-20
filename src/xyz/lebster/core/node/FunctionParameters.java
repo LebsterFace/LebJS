@@ -14,19 +14,28 @@ import xyz.lebster.core.value.globals.Undefined;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class FunctionArguments implements Dumpable {
-	private final List<ArgumentNode> arguments = new ArrayList<>();
+public final class FunctionParameters implements Dumpable {
+	private final List<Parameter> parameterList = new ArrayList<>();
 	public AssignmentTarget rest;
 
 	public void addWithDefault(AssignmentTarget target, Expression defaultExpression) {
-		this.arguments.add(new ArgumentNode(target, defaultExpression));
+		this.parameterList.add(new Parameter(target, defaultExpression));
 	}
 
 	public void add(AssignmentTarget target) {
-		this.arguments.add(new ArgumentNode(target, null));
+		this.parameterList.add(new Parameter(target, null));
 	}
 
-	private record ArgumentNode(AssignmentTarget target, Expression defaultExpression) implements Dumpable {
+	public FunctionParameters() {
+	}
+
+	public FunctionParameters(AssignmentTarget... assignmentTargets) {
+		for (final AssignmentTarget p : assignmentTargets) {
+			this.add(p);
+		}
+	}
+
+	private record Parameter(AssignmentTarget target, Expression defaultExpression) implements Dumpable {
 		@Override
 		public void dump(int indent) {
 			DumpBuilder.begin(indent)
@@ -62,27 +71,27 @@ public final class FunctionArguments implements Dumpable {
 		DumpBuilder
 			.begin(indent)
 			.self(this)
-			.children("Arguments", arguments);
+			.children("Arguments", parameterList);
 	}
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		if (arguments.size() > 0) {
-			representation.append(arguments.get(0));
-			for (int i = 1; i < arguments.size(); i++) {
+		if (parameterList.size() > 0) {
+			representation.append(parameterList.get(0));
+			for (int i = 1; i < parameterList.size(); i++) {
 				representation.append(", ");
-				representation.append(arguments.get(i));
+				representation.append(parameterList.get(i));
 			}
 		}
 	}
 
 	public void declareArguments(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
 		int i = 0;
-		for (; i < arguments.size() && i < passedArguments.length; i++)
-			arguments.get(i).declare(interpreter, passedArguments[i]);
+		for (; i < parameterList.size() && i < passedArguments.length; i++)
+			parameterList.get(i).declare(interpreter, passedArguments[i]);
 		if (rest == null) {
-			for (; i < arguments.size(); i++)
-				arguments.get(i).declare(interpreter);
+			for (; i < parameterList.size(); i++)
+				parameterList.get(i).declare(interpreter);
 		} else {
 			final ArrayList<Value<?>> restValues = new ArrayList<>();
 			for (; i < passedArguments.length; i++)

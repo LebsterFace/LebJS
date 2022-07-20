@@ -9,7 +9,7 @@ import xyz.lebster.core.interpreter.environment.Environment;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
-import xyz.lebster.core.node.FunctionArguments;
+import xyz.lebster.core.node.FunctionParameters;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.statement.BlockStatement;
@@ -106,14 +106,14 @@ public record ClassExpression(
 	}
 
 
-	public record ClassMethodNode(String className, String name, FunctionArguments arguments, BlockStatement body, SourceRange range) implements ClassFunctionNode {
+	public record ClassMethodNode(String className, String name, FunctionParameters parameters, BlockStatement body, SourceRange range) implements ClassFunctionNode {
 		@Override
 		public ClassMethod execute(Interpreter interpreter) {
 			return new ClassMethod(interpreter, interpreter.environment(), this);
 		}
 	}
 
-	public record ClassConstructorNode(String className, FunctionArguments arguments, BlockStatement body, boolean isDerived, SourceRange range) implements ClassFunctionNode {
+	public record ClassConstructorNode(String className, FunctionParameters parameters, BlockStatement body, boolean isDerived, SourceRange range) implements ClassFunctionNode {
 		@Override
 		public ClassConstructor execute(Interpreter interpreter) {
 			return new ClassConstructor(interpreter, interpreter.environment(), this, isDerived, className);
@@ -191,7 +191,7 @@ public record ClassExpression(
 			throw AbruptCompletion.error(new TypeError(interpreter, message));
 		}
 
-		// call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) is handled by Executable
+		// call(Interpreter interpreter, Value<?> newThisValue, Value<?>... parameters) is handled by Executable
 	}
 
 	// A wrapper of core.value.function.Function, without the construct method - class methods cannot be constructed

@@ -12,7 +12,7 @@ import xyz.lebster.core.value.globals.Undefined;
 public interface FunctionNode extends ASTNode {
 	String name();
 
-	FunctionArguments arguments();
+	FunctionParameters parameters();
 
 	BlockStatement body();
 
@@ -22,7 +22,7 @@ public interface FunctionNode extends ASTNode {
 		if (name != null) representation.append(name);
 
 		representation.append('(');
-		arguments().represent(representation);
+		parameters().represent(representation);
 		representation.append(')');
 		return representation.toString();
 	}
@@ -30,7 +30,7 @@ public interface FunctionNode extends ASTNode {
 	default Value<?> executeBody(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
 		final ExecutionContext context = interpreter.pushNewEnvironment();
 		try {
-			arguments().declareArguments(interpreter, passedArguments);
+			parameters().declareArguments(interpreter, passedArguments);
 			body().executeWithoutNewContext(interpreter);
 			return Undefined.instance;
 		} catch (AbruptCompletion e) {
@@ -45,7 +45,7 @@ public interface FunctionNode extends ASTNode {
 	default void dump(int indent) {
 		DumpBuilder.begin(indent)
 			.self(this)
-			.child("Arguments", arguments())
+			.child("Arguments", parameters())
 			.child("Body", body());
 	}
 }

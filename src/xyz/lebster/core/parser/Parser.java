@@ -558,10 +558,10 @@ public final class Parser {
 		}
 	}
 
-	private FunctionArguments parseFunctionArguments(boolean expectLParen) throws SyntaxError, CannotParse {
+	private FunctionParameters parseFunctionParameters(boolean expectLParen) throws SyntaxError, CannotParse {
 		if (expectLParen) state.require(TokenType.LParen);
 
-		final FunctionArguments result = new FunctionArguments();
+		final FunctionParameters result = new FunctionParameters();
 		consumeAllLineTerminators();
 		while (!state.is(TokenType.RParen)) {
 			consumeAllLineTerminators();
@@ -602,9 +602,9 @@ public final class Parser {
 
 		final String name = state.consume().value;
 		consumeAllLineTerminators();
-		final FunctionArguments arguments = parseFunctionArguments(true);
+		final FunctionParameters parameters = parseFunctionParameters(true);
 		consumeAllLineTerminators();
-		return new FunctionDeclaration(parseFunctionBody(), name, arguments);
+		return new FunctionDeclaration(parseFunctionBody(), name, parameters);
 	}
 
 	private FunctionExpression parseFunctionExpression() throws SyntaxError, CannotParse {
@@ -612,8 +612,8 @@ public final class Parser {
 		if (state.is(TokenType.Star)) throw new ParserNotImplemented(position(), "Generator function expressions");
 		final Token potentialName = state.accept(TokenType.Identifier);
 		final String name = potentialName == null ? null : potentialName.value;
-		final FunctionArguments arguments = parseFunctionArguments(true);
-		return new FunctionExpression(parseFunctionBody(), name, arguments);
+		final FunctionParameters parameters = parseFunctionParameters(true);
+		return new FunctionExpression(parseFunctionBody(), name, parameters);
 	}
 
 	private ExpressionList parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {
@@ -863,13 +863,8 @@ public final class Parser {
 
 			case Identifier -> {
 				final var identifier = new IdentifierExpression(state.consume().value);
-				if (state.optional(TokenType.Arrow)) {
-					final var arguments = new FunctionArguments();
-					arguments.add(identifier);
-					yield parseArrowFunctionBody(arguments);
-				} else {
-					yield identifier;
-				}
+				if (!state.optional(TokenType.Arrow)) yield identifier;
+				yield parseArrowFunctionBody(new FunctionParameters(identifier));
 			}
 
 			case StringLiteral -> new StringLiteral(new StringValue(state.consume().value));
@@ -1029,14 +1024,14 @@ public final class Parser {
 					final boolean isConstructor = name.value.equals("constructor");
 					if (isConstructor && constructor != null) throw new SyntaxError("A class may only have one constructor", elementStart);
 
-					final FunctionArguments arguments = parseFunctionArguments(true);
+					final FunctionParameters parameters = parseFunctionParameters(true);
 					consumeAllLineTerminators();
 					final BlockStatement body = parseFunctionBody();
 
 					if (isConstructor) {
-						constructor = new ClassConstructorNode(className, arguments, body, isDerived, range(elementStart));
+						constructor = new ClassConstructorNode(className, parameters, body, isDerived, range(elementStart));
 					} else {
-						methods.add(new ClassMethodNode(className, name.value, arguments, body, range(elementStart)));
+						methods.add(new ClassMethodNode(className, name.value, parameters, body, range(elementStart)));
 					}
 				}
 
@@ -1088,9 +1083,9 @@ public final class Parser {
 	private ArrowFunctionExpression tryParseArrowFunctionExpression() throws CannotParse, SyntaxError {
 		save();
 
-		final FunctionArguments arguments;
+		final FunctionParameters parameters;
 		try {
-			arguments = parseFunctionArguments(false);
+			parameters = parseFunctionParameters(false);
 		} catch (SyntaxError | CannotParse e) {
 			load();
 			return null;
@@ -1103,14 +1098,14 @@ public final class Parser {
 
 		// At this point, we know it's an arrow function
 		consumeAllLineTerminators();
-		return parseArrowFunctionBody(arguments);
+		return parseArrowFunctionBody(parameters);
 	}
 
-	private ArrowFunctionExpression parseArrowFunctionBody(FunctionArguments arguments) throws CannotParse, SyntaxError {
+	private ArrowFunctionExpression parseArrowFunctionBody(FunctionParameters parameters) throws CannotParse, SyntaxError {
 		if (state.is(TokenType.LBrace)) {
-			return new ArrowFunctionExpression(parseBlockStatement(), arguments);
+			return new ArrowFunctionExpression(parseBlockStatement(), parameters);
 		} else if (state.token.matchPrimaryExpression()) {
-			return new ArrowFunctionExpression(parseSpecAssignmentExpression(), arguments);
+			return new ArrowFunctionExpression(parseSpecAssignmentExpression(), parameters);
 		} else {
 			state.unexpected();
 			return null;

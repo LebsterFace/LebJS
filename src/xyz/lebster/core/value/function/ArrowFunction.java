@@ -30,7 +30,7 @@ public final class ArrowFunction extends Executable {
 		final ExecutionContext context = interpreter.pushNewEnvironment();
 
 		try {
-			expression.arguments.declareArguments(interpreter, passedArguments);
+			expression.parameters.declareArguments(interpreter, passedArguments);
 
 			if (expression.hasFullBody) {
 				expression.body.executeWithoutNewContext(interpreter);

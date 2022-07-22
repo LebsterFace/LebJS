@@ -105,8 +105,8 @@ public final class DumpBuilder {
 	}
 
 	public void container(ExpressionList expressionList) {
-		if (expressionList != null && !expressionList.isEmpty())
-			expressionList.dumpWithoutIndices(rootIndentation + 1);
+		if (expressionList == null || expressionList.isEmpty()) return;
+		expressionList.dumpWithoutIndices(rootIndentation + 1);
 	}
 
 	public DumpBuilder optionalHidden(String indicator, Dumpable node) {

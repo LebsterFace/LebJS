@@ -45,7 +45,7 @@ public interface FunctionNode extends ASTNode {
 	default void dump(int indent) {
 		DumpBuilder.begin(indent)
 			.self(this)
-			.child("Arguments", parameters())
+			.children("Parameters", parameters())
 			.child("Body", body());
 	}
 }

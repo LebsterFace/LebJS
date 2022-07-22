@@ -12,9 +12,10 @@ import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.globals.Undefined;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public final class FunctionParameters implements Dumpable {
+public final class FunctionParameters implements Dumpable, Iterable<FunctionParameters.Parameter> {
 	private final List<Parameter> parameterList = new ArrayList<>();
 	public AssignmentTarget rest;
 
@@ -37,10 +38,9 @@ public final class FunctionParameters implements Dumpable {
 
 	@Override
 	public void dump(int indent) {
-		DumpBuilder
-			.begin(indent)
-			.self(this)
-			.children("Arguments", parameterList);
+		for (final var parameter : parameterList) {
+			parameter.dump(indent + 1);
+		}
 	}
 
 	@Override
@@ -70,7 +70,12 @@ public final class FunctionParameters implements Dumpable {
 		}
 	}
 
-	private record Parameter(AssignmentTarget target, Expression defaultExpression) implements Dumpable {
+	@Override
+	public Iterator<Parameter> iterator() {
+		return parameterList.iterator();
+	}
+
+	public record Parameter(AssignmentTarget target, Expression defaultExpression) implements Dumpable {
 		@Override
 		public void dump(int indent) {
 			DumpBuilder.begin(indent)

@@ -10,6 +10,7 @@ import xyz.lebster.core.node.expression.*;
 import xyz.lebster.core.node.expression.ClassExpression.ClassConstructorNode;
 import xyz.lebster.core.node.expression.ClassExpression.ClassFieldNode;
 import xyz.lebster.core.node.expression.ClassExpression.ClassMethodNode;
+import xyz.lebster.core.node.expression.UpdateExpression.UpdateOp;
 import xyz.lebster.core.node.expression.literal.*;
 import xyz.lebster.core.node.statement.*;
 import xyz.lebster.core.value.boolean_.BooleanValue;
@@ -37,8 +38,6 @@ public final class Parser {
 		this(sourceText, new Lexer(sourceText).tokenize());
 	}
 
-
-
 	private void save() {
 		this.saved = state.copy();
 	}
@@ -55,7 +54,7 @@ public final class Parser {
 		return program;
 	}
 
-	private <T extends AppendableNode> void populateAppendableNode(T root, TokenType end) throws CannotParse, SyntaxError {
+	private <T extends AppendableNode> void populateAppendableNode(T root, TokenType... end) throws CannotParse, SyntaxError {
 		boolean isFirstStatement = true;
 		while (state.index < state.tokens.length && !state.is(end)) {
 			if (isFirstStatement) {
@@ -277,54 +276,20 @@ public final class Parser {
 		}
 	}
 
-	private ForOfStatement parseForOfStatement(VariableDeclaration declaration) throws SyntaxError, CannotParse {
-		// for ( LetOrConst ForBinding of AssignmentExpression ) Statement
-		if (declaration.declarations().length != 1)
-			throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.", position());
-		if (declaration.declarations()[0].init() != null)
-			throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
-
-		final BindingPattern bindingPattern = new BindingPattern(declaration);
+	private ForOfStatement parseForOfStatement(Assignable left) throws SyntaxError, CannotParse {
 		state.require(TokenType.Identifier, "of");
 		final Expression expression = parseExpression();
 		state.require(TokenType.RParen);
 		final Statement body = parseContextualStatement(true, true);
-		return new ForOfStatement(bindingPattern, expression, body);
+		return new ForOfStatement(left, expression, body);
 	}
 
-	private ForOfStatement parseForOfStatement(Expression left_expression) throws SyntaxError, CannotParse {
-		// for ( LeftHandSideExpression of AssignmentExpression ) Statement
-		final LeftHandSideExpression lhs = ensureLHS(left_expression, "Invalid left-hand side in for-loop");
-		state.require(TokenType.Identifier, "of");
-		final Expression expression = parseExpression();
-		state.require(TokenType.RParen);
-		final Statement body = parseContextualStatement(true, true);
-		return new ForOfStatement(lhs, expression, body);
-	}
-
-	private ForInStatement parseForInStatement(VariableDeclaration declaration) throws SyntaxError, CannotParse {
-		// for ( LetOrConst ForBinding in Expression ) Statement
-		if (declaration.declarations().length != 1)
-			throw new SyntaxError("Invalid left-hand side in for-in loop: Must have a single binding.", position());
-		if (declaration.declarations()[0].init() != null)
-			throw new SyntaxError("for-in loop variable declaration may not have an init.", position());
-
-		final BindingPattern bindingPattern = new BindingPattern(declaration);
+	private ForInStatement parseForInStatement(Assignable left) throws SyntaxError, CannotParse {
 		state.require(TokenType.In);
 		final Expression expression = parseExpression();
 		state.require(TokenType.RParen);
 		final Statement body = parseContextualStatement(true, true);
-		return new ForInStatement(bindingPattern, expression, body);
-	}
-
-	private ForInStatement parseForInStatement(Expression left_expression) throws SyntaxError, CannotParse {
-		// for ( LeftHandSideExpression in Expression ) Statement
-		final LeftHandSideExpression lhs = ensureLHS(left_expression, "Invalid left-hand side in for-loop");
-		state.require(TokenType.In);
-		final Expression expression = parseExpression();
-		state.require(TokenType.RParen);
-		final Statement body = parseContextualStatement(true, true);
-		return new ForInStatement(lhs, expression, body);
+		return new ForInStatement(left, expression, body);
 	}
 
 	private Statement parseForStatement() throws SyntaxError, CannotParse {
@@ -338,18 +303,35 @@ public final class Parser {
 			if (state.token.matchVariableDeclaration()) {
 				// TODO: for_loop_variable_declaration
 				final VariableDeclaration declaration = parseVariableDeclaration(/* true */);
-				if (state.match(TokenType.Identifier, "of")) return parseForOfStatement(declaration);
-				if (state.is(TokenType.In)) return parseForInStatement(declaration);
-				else init = declaration;
+				if (state.match(TokenType.Identifier, "of")) {
+					// for ( LetOrConst ForBinding of AssignmentExpression ) Statement
+					if (declaration.declarations().length != 1) throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.", position());
+					if (declaration.declarations()[0].init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
+
+					return parseForOfStatement(new BindingPattern(declaration));
+				} else if (state.is(TokenType.In)) {
+					// for ( LetOrConst ForBinding in Expression ) Statement
+					if (declaration.declarations().length != 1) throw new SyntaxError("Invalid left-hand side in for-in loop: Must have a single binding.", position());
+					if (declaration.declarations()[0].init() != null) throw new SyntaxError("for-in loop variable declaration may not have an init.", position());
+
+					return parseForInStatement(new BindingPattern(declaration));
+				} else {
+					init = declaration;
+				}
 			} else if (state.token.matchPrimaryExpression()) {
 				final Expression expression = parseExpression(0, Associativity.Right, Collections.singleton(TokenType.In));
-				if (state.match(TokenType.Identifier, "of")) return parseForOfStatement(expression);
-				if (state.is(TokenType.In)) return parseForInStatement(expression);
-				else init = new ExpressionStatement(expression);
+				if (state.match(TokenType.Identifier, "of")) {
+					return parseForOfStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
+				} else if (state.is(TokenType.In)) {
+					return parseForInStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
+				} else {
+					init = new ExpressionStatement(expression);
+				}
 			} else {
 				state.unexpected();
 			}
 		}
+
 		state.require(TokenType.Semicolon);
 		consumeAllLineTerminators();
 
@@ -364,13 +346,18 @@ public final class Parser {
 		return new ForStatement(init, test, update, body);
 	}
 
-	private WhileStatement parseWhileStatement() throws SyntaxError, CannotParse {
+	private Expression parseWhileCondition() throws SyntaxError, CannotParse {
 		state.require(TokenType.While);
 		consumeAllLineTerminators();
 		state.require(TokenType.LParen);
 		consumeAllLineTerminators();
 		final Expression condition = parseExpression();
 		state.require(TokenType.RParen);
+		return condition;
+	}
+
+	private WhileStatement parseWhileStatement() throws SyntaxError, CannotParse {
+		final Expression condition = parseWhileCondition();
 		final Statement body = parseContextualStatement(true, true);
 		return new WhileStatement(condition, body);
 	}
@@ -378,12 +365,7 @@ public final class Parser {
 	private DoWhileStatement parseDoWhileStatement() throws SyntaxError, CannotParse {
 		state.require(TokenType.Do);
 		final Statement body = parseContextualStatement(true, true);
-		state.require(TokenType.While);
-		consumeAllLineTerminators();
-		state.require(TokenType.LParen);
-		consumeAllLineTerminators();
-		final Expression condition = parseExpression();
-		state.require(TokenType.RParen);
+		final Expression condition = parseWhileCondition();
 		return new DoWhileStatement(body, condition);
 	}
 
@@ -498,23 +480,17 @@ public final class Parser {
 				}
 
 				if (state.token.matchIdentifierName()) {
-					final StringValue key = new StringValue(state.consume().value);
+					final StringLiteral key = parseAsStringLiteral();
 					consumeAllLineTerminators();
 
 					if (state.optional(TokenType.Colon)) {
 						consumeAllLineTerminators();
-						pairs.put(new StringLiteral(key), parseAssignmentTarget());
+						pairs.put(key, parseAssignmentTarget());
 					} else {
-						pairs.put(new StringLiteral(key), new IdentifierExpression(key));
+						pairs.put(key, new IdentifierExpression(key.value()));
 					}
 				} else {
-					state.require(TokenType.LBracket);
-					final Expression keyExpression = parseExpression();
-					state.require(TokenType.RBracket);
-					consumeAllLineTerminators();
-					state.require(TokenType.Colon);
-					consumeAllLineTerminators();
-					pairs.put(keyExpression, parseAssignmentTarget());
+					pairs.put(parseComputedKeyExpression(), parseAssignmentTarget());
 				}
 
 				consumeAllLineTerminators();
@@ -538,8 +514,7 @@ public final class Parser {
 					consumeAllLineTerminators();
 					restTarget = parseAssignmentTarget();
 					consumeAllLineTerminators();
-					if (state.optional(TokenType.Comma))
-						throw new SyntaxError("Rest element must be last element", position());
+					if (state.optional(TokenType.Comma)) throw new SyntaxError("Rest element must be last element", position());
 					break;
 				} else {
 					children.add(parseAssignmentTarget());
@@ -558,6 +533,16 @@ public final class Parser {
 		}
 	}
 
+	private Expression parseComputedKeyExpression() throws SyntaxError, CannotParse {
+		state.require(TokenType.LBracket);
+		final Expression keyExpression = parseExpression();
+		state.require(TokenType.RBracket);
+		consumeAllLineTerminators();
+		state.require(TokenType.Colon);
+		consumeAllLineTerminators();
+		return keyExpression;
+	}
+
 	private FunctionParameters parseFunctionParameters(boolean expectLParen) throws SyntaxError, CannotParse {
 		if (expectLParen) state.require(TokenType.LParen);
 
@@ -570,8 +555,7 @@ public final class Parser {
 				consumeAllLineTerminators();
 				result.rest = parseAssignmentTarget();
 				consumeAllLineTerminators();
-				if (state.optional(TokenType.Comma))
-					throw new SyntaxError("Rest parameter must be last formal parameter", position());
+				if (state.optional(TokenType.Comma)) throw new SyntaxError("Rest parameter must be last formal parameter", position());
 				break;
 			} else {
 				final AssignmentTarget target = parseAssignmentTarget();
@@ -672,9 +656,9 @@ public final class Parser {
 		final Associativity assoc = token.associativity();
 		final int minPrecedence = token.precedence();
 
-		final UpdateExpression.UpdateOp op = switch (token.type) {
-			case PlusPlus -> UpdateExpression.UpdateOp.PreIncrement;
-			case MinusMinus -> UpdateExpression.UpdateOp.PreDecrement;
+		final UpdateOp op = switch (token.type) {
+			case PlusPlus -> UpdateOp.PreIncrement;
+			case MinusMinus -> UpdateOp.PreDecrement;
 			default -> throw new CannotParse(token, "Prefix update Operator");
 		};
 
@@ -700,8 +684,7 @@ public final class Parser {
 		while (state.token.matchSecondaryExpression(forbidden)) {
 			final int newPrecedence = state.token.precedence();
 
-			if (newPrecedence < minPrecedence || newPrecedence == minPrecedence && assoc == Left)
-				break;
+			if (newPrecedence < minPrecedence || newPrecedence == minPrecedence && assoc == Left) break;
 
 			final Associativity newAssoc = state.token.associativity();
 			latestExpr = parseSecondaryExpression(latestExpr, newPrecedence, newAssoc);
@@ -724,83 +707,36 @@ public final class Parser {
 		consumeAllLineTerminators();
 
 		return switch (token.type) {
-			case Plus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Add);
-			case Minus -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Subtract);
-			case Star -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Multiply);
-			case Slash -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Divide);
-			case Percent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Remainder);
-			case Exponent -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.Exponentiate);
-
-			case Pipe -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseOR);
-			case Ampersand -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseAND);
-			case Caret -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.BitwiseXOR);
-			case LeftShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.LeftShift);
-			case RightShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.SignedRightShift);
-			case UnsignedRightShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), BinaryExpression.BinaryOp.UnsignedRightShift);
+			case Plus, Minus, Star, Slash, Percent, Exponent, Pipe, Ampersand, Caret, LeftShift, RightShift, UnsignedRightShift ->
+				new BinaryExpression(left, parseExpression(minPrecedence, assoc), token.getBinaryOp());
+			case StrictEqual, LooseEqual, StrictNotEqual, NotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), token.getEqualityOp());
+			case LogicalOr, LogicalAnd, NullishCoalescing -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), token.getLogicOp());
+			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), token.getRelationalOp());
+			case MinusMinus, PlusPlus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), token.getUpdateOp());
+			case Equals, LogicalAndEquals, LogicalOrEquals, NullishCoalescingEquals, MultiplyEquals,
+				DivideEquals, PercentEquals, PlusEquals, MinusEquals, LeftShiftEquals, RightShiftEquals,
+				UnsignedRightShiftEquals, AmpersandEquals, CaretEquals, PipeEquals, ExponentEquals ->
+				new AssignmentExpression(ensureAssignable(left, token.getAssignmentOp()), parseExpression(minPrecedence, assoc), token.getAssignmentOp());
 
 			case QuestionMark -> parseConditionalExpression(left);
 			case LParen -> parseCallExpression(left);
-
-			case StrictEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictEquals);
-			case LooseEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.LooseEquals);
-			case StrictNotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.StrictNotEquals);
-			case NotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), EqualityExpression.EqualityOp.LooseNotEquals);
-
-			case LogicalOr -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Or);
-			case LogicalAnd -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.And);
-			case NullishCoalescing -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), LogicalExpression.LogicOp.Coalesce);
-
-			case Equals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.Assign);
-			case LogicalAndEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.LogicalAndAssign);
-			case LogicalOrEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.LogicalOrAssign);
-			case NullishCoalescingEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.NullishCoalesceAssign);
-			case MultiplyEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.MultiplyAssign);
-			case DivideEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.DivideAssign);
-			case PercentEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.RemainderAssign);
-			case PlusEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.PlusAssign);
-			case MinusEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.MinusAssign);
-			case LeftShiftEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.LeftShiftAssign);
-			case RightShiftEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.RightShiftAssign);
-			case UnsignedRightShiftEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.UnsignedRightShiftAssign);
-			case AmpersandEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.BitwiseAndAssign);
-			case CaretEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.BitwiseExclusiveOrAssign);
-			case PipeEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.BitwiseOrAssign);
-			case ExponentEquals -> parseAssignmentExpression(left, minPrecedence, assoc, AssignmentOp.ExponentAssign);
-
-			case MinusMinus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), UpdateExpression.UpdateOp.PostDecrement);
-			case PlusPlus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), UpdateExpression.UpdateOp.PostIncrement);
-
-			case LessThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThan);
-			case LessThanEqual -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.LessThanEquals);
-			case GreaterThan -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThan);
-			case GreaterThanEqual -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.GreaterThanEquals);
-			case In -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.In);
-			case InstanceOf -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), RelationalExpression.RelationalOp.InstanceOf);
-
-			case Period -> {
-				if (!state.token.matchIdentifierName()) state.expected("IdentifierName");
-				yield new MemberExpression(left, new StringLiteral(new StringValue(state.consume().value)), false);
-			}
-
-			case LBracket -> {
-				final Expression prop = parseExpression();
-				state.require(TokenType.RBracket);
-				yield new MemberExpression(left, prop, true);
-			}
-
-			case Comma -> {
-				final Expression next = parseExpression();
-				yield new SequenceExpression(left, next);
-			}
+			case Period -> parseNonComputedMemberExpression(left);
+			case LBracket -> parseComputedMemberExpression(left);
+			case Comma -> new SequenceExpression(left, parseExpression());
 
 			default -> throw new CannotParse(token, "SecondaryExpression");
 		};
 	}
 
-	private Expression parseAssignmentExpression(Expression left_expr, int minPrecedence, Associativity assoc, AssignmentOp op) throws SyntaxError, CannotParse {
-		final Assignable left = ensureAssignable(left_expr, op);
-		final Expression right = parseExpression(minPrecedence, assoc);
-		return new AssignmentExpression(left, right, op);
+	private MemberExpression parseComputedMemberExpression(Expression left) throws SyntaxError, CannotParse {
+		final Expression prop = parseExpression();
+		state.require(TokenType.RBracket);
+		return new MemberExpression(left, prop, true);
+	}
+
+	private MemberExpression parseNonComputedMemberExpression(Expression left) throws SyntaxError {
+		if (!state.token.matchIdentifierName()) state.expected("IdentifierName");
+		return new MemberExpression(left, parseAsStringLiteral(), false);
 	}
 
 	private Assignable ensureAssignable(Expression left_expr, AssignmentOp op) throws SyntaxError, CannotParse {
@@ -844,30 +780,10 @@ public final class Parser {
 			case LBrace -> parseObjectExpression();
 			case TemplateStart -> parseTemplateLiteral();
 			case New -> parseNewExpression();
+			case LParen -> parseParenthesizedExpressionOrArrowFunctionExpression();
+			case Identifier -> parseIdentifierExpressionOrArrowFunctionExpression();
 
-			case LParen -> {
-				final SourcePosition start = state.consume().position;
-
-				consumeAllLineTerminators();
-				if (state.is(TokenType.RParen, TokenType.Identifier, TokenType.DotDotDot, TokenType.LBrace, TokenType.LBracket)) {
-					final ArrowFunctionExpression result = tryParseArrowFunctionExpression();
-					if (result != null) yield result;
-				}
-
-				consumeAllLineTerminators();
-				final Expression expression = parseExpression();
-				consumeAllLineTerminators();
-				state.require(TokenType.RParen);
-				yield new ParenthesizedExpression(expression, range(start));
-			}
-
-			case Identifier -> {
-				final var identifier = new IdentifierExpression(state.consume().value);
-				if (!state.optional(TokenType.Arrow)) yield identifier;
-				yield parseArrowFunctionBody(new FunctionParameters(identifier));
-			}
-
-			case StringLiteral -> new StringLiteral(new StringValue(state.consume().value));
+			case StringLiteral -> parseAsStringLiteral();
 			case NumericLiteral -> new NumericLiteral(new NumberValue(Double.parseDouble(state.consume().value)));
 
 			case True -> {
@@ -893,6 +809,32 @@ public final class Parser {
 			case TemplateExpressionEnd -> throw new SyntaxError("Unexpected end of template expression", position());
 			default -> throw new CannotParse(state.token, "PrimaryExpression");
 		};
+	}
+
+	private Expression parseIdentifierExpressionOrArrowFunctionExpression() throws CannotParse, SyntaxError {
+		final var identifier = new IdentifierExpression(state.consume().value);
+		if (!state.optional(TokenType.Arrow)) return identifier;
+		return parseArrowFunctionBody(new FunctionParameters(identifier));
+	}
+
+	private Expression parseParenthesizedExpressionOrArrowFunctionExpression() throws CannotParse, SyntaxError {
+		final SourcePosition start = state.consume().position;
+
+		consumeAllLineTerminators();
+		if (state.is(TokenType.RParen, TokenType.Identifier, TokenType.DotDotDot, TokenType.LBrace, TokenType.LBracket)) {
+			final ArrowFunctionExpression result = tryParseArrowFunctionExpression();
+			if (result != null) return result;
+		}
+
+		consumeAllLineTerminators();
+		final Expression expression = parseExpression();
+		consumeAllLineTerminators();
+		state.require(TokenType.RParen);
+		return new ParenthesizedExpression(expression, range(start));
+	}
+
+	private StringLiteral parseAsStringLiteral() {
+		return new StringLiteral(new StringValue(state.consume().value));
 	}
 
 	private NewExpression parseNewExpression() throws SyntaxError, CannotParse {
@@ -959,13 +901,7 @@ public final class Parser {
 					entries.add(ObjectExpression.staticEntry(new StringValue(propertyName), parseSpecAssignmentExpression()));
 				}
 			} else {
-				state.require(TokenType.LBracket);
-				final Expression keyExpression = parseExpression();
-				state.require(TokenType.RBracket);
-				consumeAllLineTerminators();
-				state.require(TokenType.Colon);
-				consumeAllLineTerminators();
-				entries.add(ObjectExpression.computedKeyEntry(keyExpression, parseSpecAssignmentExpression()));
+				entries.add(ObjectExpression.computedKeyEntry(parseComputedKeyExpression(), parseSpecAssignmentExpression()));
 			}
 
 			consumeAllLineTerminators();

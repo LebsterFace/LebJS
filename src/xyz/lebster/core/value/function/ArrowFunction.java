@@ -1,8 +1,8 @@
 package xyz.lebster.core.value.function;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.node.expression.ArrowFunctionExpression;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;

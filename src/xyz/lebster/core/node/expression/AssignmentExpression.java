@@ -18,25 +18,13 @@ import static xyz.lebster.core.node.expression.LogicalExpression.LogicOp.*;
 public record AssignmentExpression(Assignable left, Expression right, AssignmentOp op) implements Expression {
 	public static final String invalidLHS = "Invalid left-hand side in assignment";
 
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Left", left)
-			.operator(op)
-			.child("Right", right);
-	}
-
 	private static Value<?> applyOperator(Interpreter interpreter, Value<?> left_value, AssignmentOp op, Value<?> right_value) throws AbruptCompletion {
 		return switch (op) {
-			case Assign ->
-				throw new ShouldNotHappen("AssignmentExpression#applyOperator called on AssignmentOp.Assign");
+			case Assign -> throw new ShouldNotHappen("AssignmentExpression#applyOperator called on AssignmentOp.Assign");
 
-			case LogicalAndAssign, LogicalOrAssign, NullishCoalesceAssign ->
-				LogicalExpression.applyOperator(interpreter, left_value, lookupLogicOp(op), right_value);
+			case LogicalAndAssign, LogicalOrAssign, NullishCoalesceAssign -> LogicalExpression.applyOperator(interpreter, left_value, lookupLogicOp(op), right_value);
 
-			default ->
-				BinaryExpression.applyOperator(interpreter, left_value, lookupBinaryOp(op), right_value);
+			default -> BinaryExpression.applyOperator(interpreter, left_value, lookupBinaryOp(op), right_value);
 		};
 	}
 
@@ -65,6 +53,15 @@ public record AssignmentExpression(Assignable left, Expression right, Assignment
 			case NullishCoalesceAssign -> Coalesce;
 			default -> throw new ShouldNotHappen("AssignmentExpression#lookupLogicOp called on " + op.name());
 		};
+	}
+
+	@Override
+	public void dump(int indent) {
+		DumpBuilder.begin(indent)
+			.self(this)
+			.child("Left", left)
+			.operator(op)
+			.child("Right", right);
 	}
 
 	@Override

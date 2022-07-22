@@ -40,7 +40,7 @@ public final class DataDescriptor implements PropertyDescriptor {
 			return;
 		}
 
-		//noinspection unchecked
+		// noinspection unchecked
 		object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone(), singleLine);
 	}
 

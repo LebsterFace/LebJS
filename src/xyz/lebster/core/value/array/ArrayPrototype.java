@@ -51,9 +51,6 @@ public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayCon
 		put(SymbolValue.iterator, values);
 	}
 
-	private record ArrayGroup(Key<?> key, ArrayList<Value<?>> elements) {
-	}
-
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-array.prototype.group")
 	private static ObjectValue group(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
@@ -574,6 +571,9 @@ public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayCon
 
 		// 6. Return O.
 		return O;
+	}
+
+	private record ArrayGroup(Key<?> key, ArrayList<Value<?>> elements) {
 	}
 
 	private static final class ArrayIterator extends ObjectValue {

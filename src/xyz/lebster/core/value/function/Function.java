@@ -2,7 +2,8 @@ package xyz.lebster.core.value.function;
 
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.interpreter.*;
+import xyz.lebster.core.interpreter.AbruptCompletion;
+import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.environment.Environment;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.node.FunctionNode;

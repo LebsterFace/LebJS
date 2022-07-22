@@ -17,14 +17,16 @@ import static xyz.lebster.core.node.expression.AssignmentExpression.AssignmentOp
 import static xyz.lebster.core.node.expression.BinaryExpression.BinaryOp.*;
 import static xyz.lebster.core.node.expression.EqualityExpression.EqualityOp.*;
 import static xyz.lebster.core.node.expression.LogicalExpression.LogicOp.*;
-import static xyz.lebster.core.node.expression.RelationalExpression.RelationalOp.*;
-import static xyz.lebster.core.node.expression.UpdateExpression.UpdateOp.*;
-import static xyz.lebster.core.parser.TokenType.*;
-import static xyz.lebster.core.parser.TokenType.GreaterThan;
-import static xyz.lebster.core.parser.TokenType.InstanceOf;
+import static xyz.lebster.core.node.expression.RelationalExpression.RelationalOp.GreaterThanEquals;
+import static xyz.lebster.core.node.expression.RelationalExpression.RelationalOp.LessThanEquals;
+import static xyz.lebster.core.node.expression.UpdateExpression.UpdateOp.PostDecrement;
+import static xyz.lebster.core.node.expression.UpdateExpression.UpdateOp.PostIncrement;
+import static xyz.lebster.core.parser.TokenType.Class;
+import static xyz.lebster.core.parser.TokenType.Enum;
 import static xyz.lebster.core.parser.TokenType.LeftShift;
-import static xyz.lebster.core.parser.TokenType.LessThan;
 import static xyz.lebster.core.parser.TokenType.UnsignedRightShift;
+import static xyz.lebster.core.parser.TokenType.Void;
+import static xyz.lebster.core.parser.TokenType.*;
 
 public final class Token {
 	public final TokenType type;

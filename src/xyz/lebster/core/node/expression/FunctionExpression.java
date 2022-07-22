@@ -2,8 +2,8 @@ package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.FunctionParameters;
 import xyz.lebster.core.node.FunctionNode;
+import xyz.lebster.core.node.FunctionParameters;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Function;

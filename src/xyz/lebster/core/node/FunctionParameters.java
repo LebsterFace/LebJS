@@ -18,14 +18,6 @@ public final class FunctionParameters implements Dumpable {
 	private final List<Parameter> parameterList = new ArrayList<>();
 	public AssignmentTarget rest;
 
-	public void addWithDefault(AssignmentTarget target, Expression defaultExpression) {
-		this.parameterList.add(new Parameter(target, defaultExpression));
-	}
-
-	public void add(AssignmentTarget target) {
-		this.parameterList.add(new Parameter(target, null));
-	}
-
 	public FunctionParameters() {
 	}
 
@@ -35,35 +27,12 @@ public final class FunctionParameters implements Dumpable {
 		}
 	}
 
-	private record Parameter(AssignmentTarget target, Expression defaultExpression) implements Dumpable {
-		@Override
-		public void dump(int indent) {
-			DumpBuilder.begin(indent)
-				.self(this)
-				.child("Target", target)
-				.optional("Default Expression", defaultExpression);
-		}
+	public void addWithDefault(AssignmentTarget target, Expression defaultExpression) {
+		this.parameterList.add(new Parameter(target, defaultExpression));
+	}
 
-		@Override
-		public void represent(StringRepresentation representation) {
-			target.represent(representation);
-			if (defaultExpression != null) {
-				representation.append(" = ");
-				defaultExpression.represent(representation);
-			}
-		}
-
-		public void declare(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
-			target.declare(interpreter, VariableDeclaration.Kind.Let, value);
-		}
-
-		public void declare(Interpreter interpreter) throws AbruptCompletion {
-			if (defaultExpression != null) {
-				target.declare(interpreter, VariableDeclaration.Kind.Let, defaultExpression);
-			} else {
-				target.declare(interpreter, VariableDeclaration.Kind.Let, Undefined.instance);
-			}
-		}
+	public void add(AssignmentTarget target) {
+		this.parameterList.add(new Parameter(target, null));
 	}
 
 	@Override
@@ -98,6 +67,37 @@ public final class FunctionParameters implements Dumpable {
 				restValues.add(passedArguments[i]);
 			final ArrayObject restArray = new ArrayObject(interpreter, restValues);
 			rest.declare(interpreter, VariableDeclaration.Kind.Let, restArray);
+		}
+	}
+
+	private record Parameter(AssignmentTarget target, Expression defaultExpression) implements Dumpable {
+		@Override
+		public void dump(int indent) {
+			DumpBuilder.begin(indent)
+				.self(this)
+				.child("Target", target)
+				.optional("Default Expression", defaultExpression);
+		}
+
+		@Override
+		public void represent(StringRepresentation representation) {
+			target.represent(representation);
+			if (defaultExpression != null) {
+				representation.append(" = ");
+				defaultExpression.represent(representation);
+			}
+		}
+
+		public void declare(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
+			target.declare(interpreter, VariableDeclaration.Kind.Let, value);
+		}
+
+		public void declare(Interpreter interpreter) throws AbruptCompletion {
+			if (defaultExpression != null) {
+				target.declare(interpreter, VariableDeclaration.Kind.Let, defaultExpression);
+			} else {
+				target.declare(interpreter, VariableDeclaration.Kind.Let, Undefined.instance);
+			}
 		}
 	}
 }

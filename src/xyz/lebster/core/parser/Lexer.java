@@ -385,16 +385,20 @@ public final class Lexer {
 			if (accept("0o")) return numericLiteralRadix(8, "Octal");
 
 			boolean isInteger = true;
-			while (isDigit(currentChar) || (currentChar == '.' && isInteger)) {
+			boolean lastWasNumericSeparator = false;
+			while (isDigit(currentChar) || (currentChar == '.' && isInteger) || currentChar == '_') {
 				if (currentChar == '.') isInteger = false;
-				collect();
+				lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
+				if (!lastWasNumericSeparator) collect();
 			}
 
 			final boolean hasExponent = acceptCollect('e', 'E');
 			if (hasExponent) {
 				acceptCollect('-');
-				while (isDigit(currentChar)) {
-					collect();
+				lastWasNumericSeparator = false;
+				while (isDigit(currentChar) || currentChar == '_') {
+					lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
+					if (!lastWasNumericSeparator) collect();
 				}
 			}
 
@@ -413,6 +417,19 @@ public final class Lexer {
 			}
 
 			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "'", Set.of()), position());
+		}
+	}
+
+	private boolean handleNumericSeparator(boolean lastWasNumericSeparator) throws SyntaxError {
+		if (currentChar == '_') {
+			if (lastWasNumericSeparator) {
+				throw new SyntaxError("Only one underscore is allowed as numeric separator", position());
+			}
+
+			consume();
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -455,13 +472,17 @@ public final class Lexer {
 
 	private Token numericLiteralRadix(int radix, String name) throws SyntaxError {
 		boolean isEmpty = true;
-		while (isDigit(currentChar) || isAlphabetical(currentChar)) {
-			if (!isDigit(currentChar, radix)) {
-				throw new SyntaxError("Invalid digit '" + currentChar + "' in " + name.toLowerCase() + " numeric literal", position());
-			}
+		boolean lastWasNumericSeparator = false;
+		while (isDigit(currentChar) || isAlphabetical(currentChar) || currentChar == '_') {
+			lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
+			if (!lastWasNumericSeparator) {
+				if (!isDigit(currentChar, radix)) {
+					throw new SyntaxError("Invalid digit '" + currentChar + "' in " + name.toLowerCase() + " numeric literal", position());
+				}
 
-			isEmpty = false;
-			collect();
+				isEmpty = false;
+				collect();
+			}
 		}
 
 		if (isEmpty) throw new SyntaxError(name + " numeric literal requires at least one digit", position());

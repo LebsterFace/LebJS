@@ -20,11 +20,12 @@ public record ForStatement(Statement init, Expression test, Expression update, S
 			while (test.execute(interpreter).isTruthy(interpreter)) {
 				try {
 					body.execute(interpreter);
-					update.execute(interpreter);
 				} catch (AbruptCompletion completion) {
 					if (completion.type == AbruptCompletion.Type.Continue) continue;
 					else if (completion.type == AbruptCompletion.Type.Break) break;
 					else throw completion;
+				} finally {
+					update.execute(interpreter);
 				}
 			}
 

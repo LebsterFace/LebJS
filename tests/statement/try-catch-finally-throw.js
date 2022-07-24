@@ -29,7 +29,8 @@ try {
 	try {
 		error
 		Test.fail()
-	} catch (e) {
+	}
+	catch (e) {
 		alsoError
 		Test.fail()
 	}

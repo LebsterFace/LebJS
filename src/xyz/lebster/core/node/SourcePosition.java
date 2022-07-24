@@ -18,7 +18,7 @@ public final class SourcePosition {
 		}
 
 		this.line = lineNumber;
-		this.column = index - indexOfLastNewline - 1;
+		this.column = index - indexOfLastNewline;
 	}
 
 	@Override

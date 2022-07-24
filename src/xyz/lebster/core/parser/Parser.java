@@ -139,6 +139,9 @@ public final class Parser {
 
 	private Statement parseStatementOrExpression() throws SyntaxError, CannotParse {
 		return switch (state.token.type) {
+			case Import, Export -> throw new ParserNotImplemented(position(), "Parsing import / export statements");
+			case With -> throw new ParserNotImplemented(position(), "Parsing with statements");
+
 			case Function -> parseFunctionDeclaration();
 			case Semicolon -> new EmptyStatement();
 			case LBrace -> parseBlockStatement();
@@ -149,17 +152,14 @@ public final class Parser {
 			case Try -> parseTryStatement();
 			case Switch -> parseSwitchStatement();
 			case Super -> parseSuperCall();
+			case Break -> parseBreakStatement();
+			case Continue -> parseContinueStatement();
 
 			case Return -> {
 				state.consume();
 				// FIXME: Proper automatic semicolon insertion
 				yield new ReturnStatement(state.token.matchPrimaryExpression() ? parseExpression() : null);
 			}
-
-			case Break -> parseBreakStatement();
-			case Continue -> parseContinueStatement();
-
-			case Import, Export -> throw new ParserNotImplemented(position(), "Parsing import / export statements");
 
 			case Throw -> {
 				state.consume();
@@ -372,6 +372,7 @@ public final class Parser {
 	private TryStatement parseTryStatement() throws SyntaxError, CannotParse {
 		state.require(TokenType.Try);
 		final BlockStatement body = parseBlockStatement();
+		consumeAllLineTerminators();
 
 		String catchParameter = null;
 		BlockStatement catchBody = null;
@@ -383,6 +384,7 @@ public final class Parser {
 			}
 
 			catchBody = parseBlockStatement();
+			consumeAllLineTerminators();
 		}
 
 		BlockStatement finallyBody = null;
@@ -499,6 +501,7 @@ public final class Parser {
 			}
 
 			consumeAllLineTerminators();
+			if (state.is(TokenType.Equals)) throw new ParserNotImplemented(position(), "Parsing destructuring assignment targets with defaults");
 			state.require(TokenType.RBrace);
 			return new ObjectDestructuring(pairs, restName);
 		} else if (state.optional(TokenType.LBracket)) {
@@ -523,6 +526,7 @@ public final class Parser {
 				}
 			}
 
+			if (state.is(TokenType.Equals)) throw new ParserNotImplemented(position(), "Parsing destructuring assignment targets with defaults");
 			state.require(TokenType.RBracket);
 			return new ArrayDestructuring(restTarget, children.toArray(new AssignmentTarget[0]));
 		} else if (state.token.matchIdentifierName()) {
@@ -605,7 +609,11 @@ public final class Parser {
 		if (expectParens) state.require(TokenType.LParen);
 		consumeAllLineTerminators();
 
-		while (state.token.matchPrimaryExpression() || state.is(TokenType.DotDotDot)) {
+		while (state.token.matchPrimaryExpression() || state.is(TokenType.DotDotDot, TokenType.Comma)) {
+			if (state.is(TokenType.Comma)) {
+				throw new ParserNotImplemented(position(), "Parsing arrays with holes");
+			}
+
 			consumeAllLineTerminators();
 			if (state.optional(TokenType.DotDotDot)) {
 				result.addSpreadExpression(parseSpecAssignmentExpression());
@@ -724,6 +732,7 @@ public final class Parser {
 			case LBracket -> parseComputedMemberExpression(left);
 			case Comma -> new SequenceExpression(left, parseExpression());
 
+			case OptionalChain -> throw new ParserNotImplemented(position(), "Parsing optional chaining");
 			default -> throw new CannotParse(token, "SecondaryExpression");
 		};
 	}
@@ -773,6 +782,8 @@ public final class Parser {
 			case Await -> throw new ParserNotImplemented(position(), "Parsing `await` expressions");
 			case Async -> throw new ParserNotImplemented(position(), "Parsing `async` functions");
 			case RegexpLiteral -> throw new ParserNotImplemented(position(), "Parsing RegExp literals");
+			case BigIntLiteral -> throw new ParserNotImplemented(position(), "Parsing BigIntLiterals");
+			case Super -> throw new ParserNotImplemented(position(), "Parsing Super property access");
 
 			case Class -> parseClassExpression();
 			case Function -> parseFunctionExpression();
@@ -813,6 +824,7 @@ public final class Parser {
 
 	private Expression parseIdentifierExpressionOrArrowFunctionExpression() throws CannotParse, SyntaxError {
 		final var identifier = new IdentifierExpression(state.consume().value);
+		if (state.is(TokenType.TemplateStart)) throw new ParserNotImplemented(position(), "Parsing tagged template literals");
 		if (!state.optional(TokenType.Arrow)) return identifier;
 		return parseArrowFunctionBody(new FunctionParameters(identifier));
 	}
@@ -837,9 +849,11 @@ public final class Parser {
 		return new StringLiteral(new StringValue(state.consume().value));
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-new-operator")
 	private NewExpression parseNewExpression() throws SyntaxError, CannotParse {
 		final Token newOperator = state.consume();
-		// https://tc39.es/ecma262/multipage#sec-new-operator
+		consumeAllLineTerminators();
+		if (state.is(TokenType.Period)) throw new ParserNotImplemented(position(), "Parsing new.target");
 		final Expression constructExpr = parseExpression(newOperator.precedence(), newOperator.associativity(), Collections.singleton(TokenType.LParen));
 		final boolean hasArguments = state.is(TokenType.LParen);
 		final ExpressionList arguments = hasArguments ? parseExpressionList(true) : null;
@@ -892,6 +906,8 @@ public final class Parser {
 				final String propertyName = state.consume().value;
 				consumeAllLineTerminators();
 
+				if (state.is(TokenType.LParen)) throw new ParserNotImplemented(position(), "Parsing object literal methods");
+
 				if (isIdentifier && !state.is(TokenType.Colon)) {
 					entries.add(ObjectExpression.shorthandEntry(new StringValue(propertyName)));
 					couldBeGetterSetter = propertyName.equals("get") || propertyName.equals("set");
@@ -901,7 +917,14 @@ public final class Parser {
 					entries.add(ObjectExpression.staticEntry(new StringValue(propertyName), parseSpecAssignmentExpression()));
 				}
 			} else {
-				entries.add(ObjectExpression.computedKeyEntry(parseComputedKeyExpression(), parseSpecAssignmentExpression()));
+				state.require(TokenType.LBracket);
+				final Expression keyExpression = parseExpression();
+				state.require(TokenType.RBracket);
+				consumeAllLineTerminators();
+				if (state.is(TokenType.LParen)) throw new ParserNotImplemented(position(), "Parsing object literal methods");
+				state.require(TokenType.Colon);
+				consumeAllLineTerminators();
+				entries.add(ObjectExpression.computedKeyEntry(keyExpression, parseSpecAssignmentExpression()));
 			}
 
 			consumeAllLineTerminators();
@@ -931,13 +954,13 @@ public final class Parser {
 		while (!state.is(TokenType.RBrace)) {
 			consumeAllSeparators();
 			final boolean isStatic = state.optional(TokenType.Static);
-			if (isStatic) consumeAllLineTerminators();
+			if (isStatic) throw new ParserNotImplemented(position(), "Parsing class `static` methods / fields");
 
 			if (state.optional(TokenType.LBrace)) {
 				// TODO: Class static blocks
-				throw new ParserNotImplemented(position(), "Class `static` blocks");
+				throw new ParserNotImplemented(position(), "Parsing class `static` blocks");
 			} else if (state.optional(TokenType.Star)) {
-				throw new ParserNotImplemented(position(), "Class generator methods");
+				throw new ParserNotImplemented(position(), "Parsing class generator methods");
 			} else if (state.token.matchClassElementName()) {
 				final SourcePosition elementStart = position();
 				final Token name = state.consume();
@@ -951,14 +974,18 @@ public final class Parser {
 					fields.add(new ClassFieldNode(name.value, initializer, range(elementStart)));
 				} else {
 					if (name.type == TokenType.Async) {
-						throw new ParserNotImplemented(position(), "Class async methods");
+						throw new ParserNotImplemented(position(), "Parsing class async methods");
 					} else if (name.value.equals("get") || name.value.equals("set")) {
 						// FIXME: Methods named get / set
-						throw new ParserNotImplemented(position(), "Class getter / setters");
+						throw new ParserNotImplemented(position(), "Parsing class getter / setters");
 					}
 
 					final boolean isConstructor = name.value.equals("constructor");
 					if (isConstructor && constructor != null) throw new SyntaxError("A class may only have one constructor", elementStart);
+
+					if (state.is(TokenType.Equals, TokenType.Semicolon)) {
+						throw new ParserNotImplemented(position(), "Parsing class fields");
+					}
 
 					final FunctionParameters parameters = parseFunctionParameters(true);
 					consumeAllLineTerminators();
@@ -972,6 +999,8 @@ public final class Parser {
 				}
 
 				consumeAllSeparators();
+			} else if (state.is(TokenType.Hashtag)) {
+				throw new ParserNotImplemented(position(), "Parsing private class fields");
 			} else {
 				state.unexpected();
 			}

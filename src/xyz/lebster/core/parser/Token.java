@@ -185,6 +185,7 @@ public final class Token {
 			   || type == NaN
 			   || type == New
 			   || type == Null
+			   || type == BigIntLiteral
 			   || type == NumericLiteral
 			   || type == RegexpLiteral
 			   || type == StringLiteral
@@ -244,6 +245,7 @@ public final class Token {
 			   || type == StrictEqual
 			   || type == StrictNotEqual
 			   || type == UnsignedRightShift
+			   || type == OptionalChain
 			   || type == UnsignedRightShiftEquals;
 	}
 

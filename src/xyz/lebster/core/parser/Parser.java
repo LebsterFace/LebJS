@@ -35,7 +35,7 @@ public final class Parser {
 	}
 
 	public Parser(String sourceText) throws SyntaxError {
-		this(sourceText, new Lexer(sourceText).tokenize());
+		this(sourceText, Lexer.tokenize(sourceText));
 	}
 
 	private void save() {

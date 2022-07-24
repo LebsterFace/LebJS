@@ -4,7 +4,10 @@ import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.SourcePosition;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public final class Lexer {
 	private static final HashMap<String, TokenType> keywords = new HashMap<>();
@@ -54,13 +57,10 @@ public final class Lexer {
 		keywords.put("yield", TokenType.Yield);
 		// TODO: get / set keywords
 
-		final HashMap<String, TokenType> symbols_length_1 = new HashMap<>();
-		final HashMap<String, TokenType> symbols_length_2 = new HashMap<>();
-		final HashMap<String, TokenType> symbols_length_3 = new HashMap<>();
 		final HashMap<String, TokenType> symbols_length_4 = new HashMap<>();
-
 		symbols_length_4.put(">>>=", TokenType.UnsignedRightShiftEquals);
 
+		final HashMap<String, TokenType> symbols_length_3 = new HashMap<>();
 		symbols_length_3.put("||=", TokenType.LogicalOrEquals);
 		symbols_length_3.put(">>>", TokenType.UnsignedRightShift);
 		symbols_length_3.put(">>=", TokenType.RightShiftEquals);
@@ -72,6 +72,7 @@ public final class Lexer {
 		symbols_length_3.put("!==", TokenType.StrictNotEqual);
 		symbols_length_3.put("...", TokenType.DotDotDot);
 
+		final HashMap<String, TokenType> symbols_length_2 = new HashMap<>();
 		symbols_length_2.put("||", TokenType.LogicalOr);
 		symbols_length_2.put("|=", TokenType.PipeEquals);
 		symbols_length_2.put(">>", TokenType.RightShift);
@@ -95,6 +96,7 @@ public final class Lexer {
 		symbols_length_2.put("-=", TokenType.MinusEquals);
 		symbols_length_2.put("--", TokenType.MinusMinus);
 
+		final HashMap<String, TokenType> symbols_length_1 = new HashMap<>();
 		symbols_length_1.put("~", TokenType.Tilde);
 		symbols_length_1.put("|", TokenType.Pipe);
 		symbols_length_1.put(">", TokenType.GreaterThan);
@@ -129,164 +131,138 @@ public final class Lexer {
 		symbols.add(symbols_length_1);
 	}
 
-	private final String source;
-	private final StringBuilder builder = new StringBuilder();
-	private final int length;
+	private final String sourceText;
+	private final int[] codePoints;
 	private final ArrayDeque<TemplateLiteralState> templateLiteralStates = new ArrayDeque<>();
+	private int codePoint;
 	private int index = -1;
-	private char currentChar = '\0';
-	private Token currentToken;
+	private TokenType lastTokenType;
 
-	public Lexer(String source) {
-		this.source = source;
-		this.length = source.length();
+	private Lexer(String sourceText) {
+		this.codePoints = sourceText.codePoints().toArray();
+		this.sourceText = sourceText;
 		consume();
-		if (accept("#!")) {
-			while (!isTerminator()) {
-				consume();
-			}
-		}
 	}
 
-	public boolean isFinished() {
-		return index > length;
+	private boolean isFinished() {
+		return index >= codePoints.length;
 	}
 
-	private boolean isDigit(char c) {
+	private boolean isDigit(int c) {
 		return c >= '0' && c <= '9';
 	}
 
-	private boolean isDigit(char digit, int radix) {
+	private boolean isDigit(int ch, int radix) {
 		if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX) {
 			return false;
 		}
 
-		if (digit >= '0' && digit <= '9') {
-			return digit - '0' < radix;
-		} else if (digit >= 'A' && digit <= 'Z') {
-			return digit - 'A' + 10 < radix;
-		} else if (digit >= 'a' && digit <= 'z') {
-			return digit - 'a' + 10 < radix;
+		if (ch >= '0' && ch <= '9') {
+			return ch - '0' < radix;
+		} else if (ch >= 'A' && ch <= 'Z') {
+			return ch - 'A' + 10 < radix;
+		} else if (ch >= 'a' && ch <= 'z') {
+			return ch - 'a' + 10 < radix;
 		} else {
 			return false;
 		}
 	}
 
-	private boolean isAlphabetical(char c) {
+	private boolean isAlphabetical(int c) {
 		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 	}
 
-	private boolean isTerminator() {
-		return peek("\r\n") || currentChar == '\n' || index == length;
+	private boolean isLineTerminator() {
+		return peek("\r\n") || codePoint == '\n';
 	}
 
-	private char consume() {
-		final char old = currentChar;
-		if (++index >= length) {
-			currentChar = '\0';
-		} else {
-			currentChar = source.charAt(index);
-		}
-
+	private int consume() {
+		final int old = codePoint;
+		consume(1);
 		return old;
 	}
 
-	private void consume(int size) {
-		index += size;
-
-		if (index >= length) {
-			currentChar = '\0';
-		} else {
-			currentChar = source.charAt(index);
-		}
-
+	private void consume(int count) {
+		index += count;
+		codePoint = isFinished() ? -1 : codePoints[index];
 	}
 
-	private void collect() {
-		builder.append(consume());
-	}
-
-	private void consumeThenAppend(char special) {
-		consume();
-		builder.append(special);
+	private void collect(StringBuilder builder) {
+		builder.appendCodePoint(consume());
 	}
 
 	private void consumeWhitespace() {
-		while (currentChar == '\t' || currentChar == 0xB || currentChar == 0xC || currentChar == ' ') {
+		while (codePoint == '\t'      // Tab
+			   || codePoint == '\013' // Vertical tab
+			   || codePoint == '\014' // Form feed
+			   || codePoint == ' '    // Space
+		) {
 			consume();
 		}
 	}
 
 	private boolean peek(String compare) {
-		return source.startsWith(compare, index);
+		return sourceText.startsWith(compare, sourceText.offsetByCodePoints(0, index));
 	}
 
 	private boolean accept(String s) {
 		final boolean result = peek(s);
-		if (result) consume(s.length());
-		return result;
-	}
-
-	private boolean accept(char c) {
-		final boolean result = currentChar == c;
-		if (result) consume();
+		if (result) consume(s.codePointCount(0, s.length()));
 		return result;
 	}
 
 	private boolean isIdentifierStart() {
-		if (currentChar == '\\') {
+		if (codePoint == '\\') {
 			return false;
-		} else if (isAlphabetical(currentChar) || currentChar == '_' || currentChar == '$') {
+		} else if (isAlphabetical(codePoint) || codePoint == '_' || codePoint == '$') {
 			return true;
-		} else if (currentChar < 0x80) {
+		} else if (codePoint < 0x80) {
 			// Optimization: the first codepoint with the ID_Start property after A-Za-z is outside the
 			// ASCII range (0x00AA), so we can skip isUnicodeIdentifierStart() for any ASCII characters.
 			// (Thanks Serenity!)
 			return false;
 		} else {
-			return Character.isUnicodeIdentifierStart(currentChar);
+			return Character.isUnicodeIdentifierStart(codePoint);
 		}
 	}
 
 	private boolean isIdentifierMiddle() {
-		if (currentChar == '\\') {
+		if (codePoint == '\\') {
 			return false;
-		} else if (isAlphabetical(currentChar) || isDigit(currentChar) || currentChar == '_' || currentChar == '$') {
+		} else if (isAlphabetical(codePoint) || isDigit(codePoint) || codePoint == '_' || codePoint == '$') {
 			return true;
-		} else if (currentChar < 0x80) {
+		} else if (codePoint < 0x80) {
 			// Optimization: the first codepoint with the ID_Continue property after A-Za-z0-9_ is outside the
 			// ASCII range (0x00AA), so we can skip isUnicodeIdentifierPart() for any ASCII characters.
 			// (Thanks Serenity!)
 			return false;
 		} else {
-			return Character.isUnicodeIdentifierPart(currentChar);
+			return Character.isUnicodeIdentifierPart(codePoint);
 		}
 	}
 
 	private boolean slashMeansDivision() {
-		return currentToken != null && (
-			currentToken.type == TokenType.BigIntLiteral
-			|| currentToken.type == TokenType.True
-			|| currentToken.type == TokenType.False
-			|| currentToken.type == TokenType.RBrace
-			|| currentToken.type == TokenType.RBracket
-			|| currentToken.type == TokenType.Identifier
-			|| currentToken.type == TokenType.In
-			|| currentToken.type == TokenType.InstanceOf
-			|| currentToken.type == TokenType.MinusMinus
-			|| currentToken.type == TokenType.Null
-			|| currentToken.type == TokenType.NumericLiteral
-			|| currentToken.type == TokenType.RParen
-			|| currentToken.type == TokenType.PlusPlus
-			|| currentToken.type == TokenType.PrivateIdentifier
-			|| currentToken.type == TokenType.RegexpLiteral
-			|| currentToken.type == TokenType.StringLiteral
-			|| currentToken.type == TokenType.TemplateExpressionEnd
-			|| currentToken.type == TokenType.This);
+		return lastTokenType != null && (lastTokenType == TokenType.BigIntLiteral
+										 || lastTokenType == TokenType.True
+										 || lastTokenType == TokenType.False
+										 || lastTokenType == TokenType.RBrace
+										 || lastTokenType == TokenType.RBracket
+										 || lastTokenType == TokenType.Identifier
+										 || lastTokenType == TokenType.In
+										 || lastTokenType == TokenType.InstanceOf
+										 || lastTokenType == TokenType.MinusMinus
+										 || lastTokenType == TokenType.Null
+										 || lastTokenType == TokenType.NumericLiteral
+										 || lastTokenType == TokenType.RParen
+										 || lastTokenType == TokenType.PlusPlus
+										 || lastTokenType == TokenType.PrivateIdentifier
+										 || lastTokenType == TokenType.RegexpLiteral
+										 || lastTokenType == TokenType.StringLiteral
+										 || lastTokenType == TokenType.TemplateExpressionEnd
+										 || lastTokenType == TokenType.This);
 	}
 
-	private Token next() throws SyntaxError {
-		builder.setLength(0);
+	public Token next() throws SyntaxError {
 		final boolean inTemplateLiteral = !templateLiteralStates.isEmpty();
 
 		if (!inTemplateLiteral || templateLiteralStates.getFirst().inExpression) {
@@ -295,133 +271,45 @@ public final class Lexer {
 			consumeWhitespace();
 		}
 
-		if (accept('`')) {
-			if (!inTemplateLiteral || templateLiteralStates.getFirst().inExpression) {
-				templateLiteralStates.push(new TemplateLiteralState());
-				return new Token(TokenType.TemplateStart, position());
-			} else {
-				templateLiteralStates.pop();
-				return new Token(TokenType.TemplateEnd, position());
+		if (accept("`")) {
+			return tokenizeTemplateLiteralStart(inTemplateLiteral);
+		} else if (inTemplateLiteral) {
+			if (currentTemplateLiteralIsEnding()) {
+				return tokenizeTemplateLiteralEnd();
 			}
-		} else if (
-			inTemplateLiteral &&
-			templateLiteralStates.getFirst().inExpression &&
-			templateLiteralStates.getFirst().bracketCount == 0 &&
-			accept('}')
-		) {
-			templateLiteralStates.getFirst().inExpression = false;
-			return new Token(TokenType.TemplateExpressionEnd, position());
-		} else if (inTemplateLiteral && !templateLiteralStates.getFirst().inExpression) {
-			if (isFinished()) {
-				throw new SyntaxError("Unterminated template literal", position());
-			} else if (accept("${")) {
-				templateLiteralStates.getFirst().inExpression = true;
-				return new Token(TokenType.TemplateExpressionStart, position());
-			} else {
-				boolean escaped = false;
 
-				while (!(isFinished() || peek("${") && !escaped)) {
-					if (escaped) {
-						escaped = false;
-						if (isTerminator()) {
-							consumeTerminator();
-						} else {
-							collectEscapedCharacter();
-						}
-					} else if (currentChar == '\\') {
-						escaped = true;
-						consume();
-					} else if (currentChar == '`') {
-						break;
-					} else {
-						collect();
-					}
+			if (!templateLiteralStates.getFirst().inExpression) {
+				if (isFinished()) throw new SyntaxError("Unterminated template literal", position());
+
+				if (accept("${")) {
+					templateLiteralStates.getFirst().inExpression = true;
+					return new Token(TokenType.TemplateExpressionStart, position());
 				}
-				if (isFinished() && !templateLiteralStates.isEmpty()) {
-					throw new SyntaxError("Unterminated template literal", position());
-				} else {
-					return new Token(TokenType.TemplateSpan, builder.toString(), position());
-				}
+
+				return tokenizeTemplateLiteralSpan();
 			}
 		}
 
 		if (isFinished()) return null;
 
-		if (isTerminator()) {
-			while (isTerminator()) consume();
+		if (isLineTerminator()) {
+			while (isLineTerminator() && hasNext()) consume();
 			return new Token(TokenType.LineTerminator, position());
 		} else if (isIdentifierStart()) {
-			while (isIdentifierMiddle()) collect();
-			final String value = builder.toString();
-			final TokenType type = keywords.getOrDefault(value, TokenType.Identifier);
-			return new Token(type, value, position());
-		} else if (currentChar == '"' || currentChar == '\'') {
-			final char stringType = currentChar;
-			consume();
-
-			boolean escaped = false;
-			while (true) {
-				if (isFinished())
-					throw new SyntaxError("Unterminated string literal", position());
-
-				if (escaped) {
-					escaped = false;
-					collectEscapedCharacter();
-				} else if (currentChar == '\\') {
-					escaped = true;
-					consume();
-				} else if (currentChar == stringType) {
-					break;
-				} else {
-					collect();
-				}
-			}
-
-			consume();
-			return new Token(TokenType.StringLiteral, builder.toString(), position());
-		} else if (isDigit(currentChar)) {
-			if (accept("0x")) return numericLiteralRadix(16, "Hexadecimal");
-			if (accept("0b")) return numericLiteralRadix(2, "Binary");
-			if (accept("0o")) return numericLiteralRadix(8, "Octal");
-
-			boolean isInteger = true;
-			boolean lastWasNumericSeparator = false;
-			while (isDigit(currentChar) || (currentChar == '.' && isInteger) || currentChar == '_') {
-				if (currentChar == '.') isInteger = false;
-				lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
-				if (!lastWasNumericSeparator) collect();
-			}
-
-			final boolean hasExponent = acceptCollect('e', 'E');
-			if (hasExponent) {
-				acceptCollect('-');
-				lastWasNumericSeparator = false;
-				while (isDigit(currentChar) || currentChar == '_') {
-					lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
-					if (!lastWasNumericSeparator) collect();
-				}
-			}
-
-			if (isInteger && !hasExponent) return potentialBigInt(10);
-			return new Token(TokenType.NumericLiteral, builder.toString(), position());
-		} else if (currentChar == '/' && !slashMeansDivision()) {
+			return tokenizeKeywordOrIdentifier();
+		} else if (isDigit(codePoint)) {
+			return tokenizeNumericLiteral();
+		} else if (codePoint == '"' || codePoint == '\'') {
+			return tokenizeStringLiteral();
+		} else if (codePoint == '/' && !slashMeansDivision()) {
 			return consumeRegexpLiteral();
 		} else {
-			for (Map<String, TokenType> symbolSize : symbols) {
-				for (Map.Entry<String, TokenType> entry : symbolSize.entrySet()) {
-					final String key = entry.getKey();
-					if (accept(key)) {
-						return new Token(entry.getValue(), key, position());
-					}
-				}
-			}
-
-			throw new SyntaxError(StringEscapeUtils.escape("Cannot tokenize character '" + currentChar + "'", Set.of()), position());
+			return tokenizeSymbol();
 		}
 	}
 
 	private boolean handleNumericSeparator(boolean lastWasNumericSeparator) throws SyntaxError {
-		if (currentChar == '_') {
+		if (codePoint == '_') {
 			if (lastWasNumericSeparator) {
 				throw new SyntaxError("Only one underscore is allowed as numeric separator", position());
 			}
@@ -433,185 +321,297 @@ public final class Lexer {
 		}
 	}
 
-	private boolean acceptCollect(char... characters) {
-		for (final char c : characters) {
-			if (currentChar == c) {
-				collect();
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	private Token consumeRegexpLiteral() {
-		collect();
+		final StringBuilder builder = new StringBuilder();
+		collect(builder);
 
 		boolean escaped = false;
-		while (!isFinished()) {
+		while (hasNext()) {
 			if (escaped) {
 				escaped = false;
-				collect();
-			} else if (currentChar == '\\') {
+				collect(builder);
+			} else if (codePoint == '\\') {
 				escaped = true;
 				consume();
-			} else if (currentChar == '/') {
-				collect();
+			} else if (codePoint == '/') {
+				collect(builder);
 				break;
 			} else {
-				collect();
+				collect(builder);
 			}
 		}
 
-		while (isAlphabetical(currentChar)) {
-			collect();
+		// Flags
+		while (isAlphabetical(codePoint)) {
+			collect(builder);
 		}
 
 		return new Token(TokenType.RegexpLiteral, builder.toString(), position());
 	}
 
-	private Token numericLiteralRadix(int radix, String name) throws SyntaxError {
-		boolean isEmpty = true;
-		boolean lastWasNumericSeparator = false;
-		while (isDigit(currentChar) || isAlphabetical(currentChar) || currentChar == '_') {
-			lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
-			if (!lastWasNumericSeparator) {
-				if (!isDigit(currentChar, radix)) {
-					throw new SyntaxError("Invalid digit '" + currentChar + "' in " + name.toLowerCase() + " numeric literal", position());
-				}
-
-				isEmpty = false;
-				collect();
-			}
-		}
-
-		if (isEmpty) throw new SyntaxError(name + " numeric literal requires at least one digit", position());
-		return potentialBigInt(radix);
-	}
-
-	private Token potentialBigInt(int radix) {
-		final String integerString = builder.toString();
-		final TokenType type = accept('n') ? TokenType.BigIntLiteral : TokenType.NumericLiteral;
-		return new Token(type, new BigInteger(integerString, radix).toString(), position());
-	}
-
-	private void consumeTerminator() {
-		if (peek("\r\n")) {
-			consume(2);
-		} else if (currentChar == '\n') {
-			consume();
-		}
-	}
-
-	private void collectEscapedCharacter() throws SyntaxError {
-		switch (currentChar) {
-			case '0' -> consumeThenAppend('\0');
-			case '\'' -> consumeThenAppend('\'');
-			case '\\' -> consumeThenAppend('\\');
-			case 'b' -> consumeThenAppend('\b');
-			case 'f' -> consumeThenAppend('\f');
-			case 'n' -> consumeThenAppend('\n');
-			case 'r' -> consumeThenAppend('\r');
-			case 't' -> consumeThenAppend('\t');
-			case 'v' -> consumeThenAppend('\13');
-			case 'u' -> {
-				consume();
-				if (this.currentChar == '{') {
-					consume();
-					if (this.currentChar == '}')
-						throw new SyntaxError("Invalid unicode escape sequence: No digits", position());
-					int result = 0;
-					final StringBuilder sequence = new StringBuilder();
-					for (int i = 0; i < 6 && this.currentChar != '}'; i++) {
-						result *= 16;
-						final char digit = consumeHexDigit();
-						sequence.append(digit);
-						result += Character.digit(digit, 16);
-					}
-
-					char last = consume();
-					sequence.append(last);
-					if (last != '}')
-						throw new SyntaxError("Invalid Unicode escape sequence '" + sequence + "'", position());
-					this.builder.append((char) result);
-				} else {
-					int result = 0;
-					for (int i = 0; i < 4; i++) {
-						result *= 16;
-						result += Character.digit(consumeHexDigit(), 16);
-					}
-					this.builder.append((char) result);
-				}
-			}
-
-			case 'x' -> {
-				consume();
-				builder.append((char) (
-					Character.digit(consumeHexDigit(), 16) * 16 +
-					Character.digit(consumeHexDigit(), 16)
-				));
-			}
-
-			default -> collect();
-		}
-	}
-
-	private SourcePosition position() {
-		return new SourcePosition(source, index - 1);
-	}
-
-	private char consumeHexDigit() throws SyntaxError {
-		final char c = consume();
-		if ((c < 'a' || c > 'f') && (c < 'A' || c > 'F') && (c < '0' || c > '9'))
-			throw new SyntaxError("Invalid Unicode escape sequence (invalid character '" + c + "')", position());
-		return c;
+	private boolean hasNext() {
+		return index < codePoints.length;
 	}
 
 	private void consumeComment() {
 		if (accept("//")) {
-			while (!isTerminator()) consume();
+			while (!isLineTerminator() && hasNext()) consume();
 		} else if (accept("/*")) {
-			while (!isFinished()) {
+			while (hasNext()) {
 				if (accept("*/")) break;
 				consume();
 			}
 		}
 	}
 
-	public Token[] tokenize() throws SyntaxError {
-		final List<Token> result = new ArrayList<>();
-		boolean lastWasTerminator = true;
-
-		while (!isFinished()) {
-			final Token token = next();
-			currentToken = token;
-			if (token == null) break;
-			if (token.type == TokenType.LineTerminator) {
-				if (lastWasTerminator) {
-					continue;
+	private Token tokenizeTemplateLiteralSpan() throws SyntaxError {
+		final StringBuilder builder = new StringBuilder();
+		boolean escaped = false;
+		while (hasNext() && (escaped || !peek("${"))) {
+			if (escaped) {
+				escaped = false;
+				if (isLineTerminator()) {
+					while (isLineTerminator() && hasNext()) consume();
 				} else {
-					lastWasTerminator = true;
+					builder.appendCodePoint(readEscapedCharacter());
 				}
+			} else if (codePoint == '\\') {
+				escaped = true;
+				consume();
+			} else if (codePoint == '`') {
+				break;
 			} else {
-				lastWasTerminator = false;
+				collect(builder);
 			}
-
-			if (!templateLiteralStates.isEmpty() && templateLiteralStates.getFirst().inExpression) {
-				if (token.type == TokenType.LBrace) {
-					templateLiteralStates.getFirst().bracketCount++;
-				} else if (token.type == TokenType.RBrace) {
-					templateLiteralStates.getFirst().bracketCount--;
-				}
-			}
-
-			result.add(token);
 		}
 
-		result.add(new Token(TokenType.EOF, position()));
-		return result.toArray(new Token[0]);
+		if (isFinished() && !templateLiteralStates.isEmpty()) {
+			throw new SyntaxError("Unterminated template literal", position());
+		}
+
+		return new Token(TokenType.TemplateSpan, builder.toString(), position());
+	}
+
+	private boolean currentTemplateLiteralIsEnding() {
+		return templateLiteralStates.getFirst().inExpression && templateLiteralStates.getFirst().bracketCount == 0 && accept("}");
+	}
+
+	private Token tokenizeTemplateLiteralEnd() {
+		templateLiteralStates.getFirst().inExpression = false;
+		return new Token(TokenType.TemplateExpressionEnd, position());
+	}
+
+	private Token tokenizeTemplateLiteralStart(boolean inTemplateLiteral) {
+		if (!inTemplateLiteral || templateLiteralStates.getFirst().inExpression) {
+			templateLiteralStates.push(new TemplateLiteralState());
+			return new Token(TokenType.TemplateStart, position());
+		} else {
+			templateLiteralStates.pop();
+			return new Token(TokenType.TemplateEnd, position());
+		}
+	}
+
+	private Token tokenizeStringLiteral() throws SyntaxError {
+		final StringBuilder builder = new StringBuilder();
+		final int stringType = codePoint;
+		consume();
+
+		boolean escaped = false;
+		while (true) {
+			if (isFinished()) throw new SyntaxError("Unterminated string literal", position());
+
+			if (escaped) {
+				escaped = false;
+				builder.appendCodePoint(readEscapedCharacter());
+			} else if (codePoint == '\\') {
+				escaped = true;
+				consume();
+			} else if (codePoint == stringType) {
+				break;
+			} else {
+				collect(builder);
+			}
+		}
+
+		consume();
+		return new Token(TokenType.StringLiteral, builder.toString(), position());
+	}
+
+	private int readEscapedCharacter() throws SyntaxError {
+		final int initialConsumed = consume();
+		return switch (initialConsumed) {
+			case '0' -> '\0';
+			case '\'' -> '\'';
+			case '\\' -> '\\';
+			case 'b' -> '\b';
+			case 'f' -> '\f';
+			case 'n' -> '\n';
+			case 'r' -> '\r';
+			case 't' -> '\t';
+			case 'v' -> '\13';
+			case 'u' -> codePoint == '{' ? readUnicodeEscape() : readUnicodeBMPEscape();
+			case 'x' -> readHexEscape();
+			default -> initialConsumed;
+		};
+	}
+
+	private int readHexEscape() throws SyntaxError {
+		return Character.digit(consumeHexDigit(), 16) * 16 + Character.digit(consumeHexDigit(), 16);
+	}
+
+	private int readUnicodeEscape() throws SyntaxError {
+		consume(); // Consume '{'
+		if (codePoint == '}') throw new SyntaxError("Invalid unicode escape sequence: No digits", position());
+
+		int result = 0;
+		final StringBuilder sequence = new StringBuilder();
+		for (int i = 0; i < 6 && codePoint != '}'; i++) {
+			result *= 16;
+			final char digit = consumeHexDigit();
+			sequence.append(digit);
+			result += Character.digit(digit, 16);
+		}
+
+		final int last = consume();
+		sequence.appendCodePoint(last);
+
+		if (last != '}') {
+			final String quoted = StringEscapeUtils.quote(sequence.toString(), false);
+			throw new SyntaxError("Invalid Unicode escape sequence %s (missing ending '}')".formatted(quoted), position());
+		}
+
+		return result;
+	}
+
+	private int readUnicodeBMPEscape() throws SyntaxError {
+		int result = 0;
+		for (int i = 0; i < 4; i++) {
+			result *= 16;
+			result += Character.digit(consumeHexDigit(), 16);
+		}
+		return result;
+	}
+
+	private char consumeHexDigit() throws SyntaxError {
+		final int c = consume();
+		if ((c < 'a' || c > 'f') && (c < 'A' || c > 'F') && (c < '0' || c > '9')) {
+			throw new SyntaxError("Invalid Unicode escape sequence (invalid character %s)".formatted(quoteCodePoint(c)), position());
+		}
+
+		return (char) c;
+	}
+
+	private Token tokenizeNumericLiteral() throws SyntaxError {
+		if (accept("0x")) return numericLiteralRadix(16, "Hexadecimal");
+		if (accept("0b")) return numericLiteralRadix(2, "Binary");
+		if (accept("0o")) return numericLiteralRadix(8, "Octal");
+
+		final StringBuilder builder = new StringBuilder();
+		boolean isInteger = true;
+		boolean lastWasNumericSeparator = false;
+		while (isDigit(codePoint) || (codePoint == '.' && isInteger) || codePoint == '_') {
+			if (codePoint == '.') isInteger = false;
+			lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
+			if (!lastWasNumericSeparator) collect(builder);
+		}
+
+		final boolean hasExponent = codePoint == 'e' || codePoint == 'E';
+		if (hasExponent) {
+			collect(builder);
+			if (codePoint == '-') collect(builder);
+
+			lastWasNumericSeparator = false;
+			while (codePoint == '_' || isDigit(codePoint)) {
+				lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
+				if (!lastWasNumericSeparator) collect(builder);
+			}
+		}
+
+		if (isInteger && !hasExponent) return potentialBigInt(builder.toString(), 10);
+		return new Token(TokenType.NumericLiteral, builder.toString(), position());
+	}
+
+	private Token numericLiteralRadix(int radix, String name) throws SyntaxError {
+		final StringBuilder builder = new StringBuilder();
+		boolean isEmpty = true;
+		boolean lastWasNumericSeparator = false;
+		while (codePoint == '_' || isDigit(codePoint) || isAlphabetical(codePoint)) {
+			lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
+			if (!lastWasNumericSeparator) {
+				if (!isDigit(codePoint, radix)) {
+					throw new SyntaxError("Invalid digit %s in %s numeric literal".formatted(quoteCodePoint(codePoint), name.toLowerCase()), position());
+				}
+
+				isEmpty = false;
+				collect(builder);
+			}
+		}
+
+		if (isEmpty) throw new SyntaxError(name + " numeric literal requires at least one digit", position());
+		return potentialBigInt(builder.toString(), radix);
+	}
+
+	private String quoteCodePoint(int ch) {
+		return StringEscapeUtils.quote(codePoint == -1 ? "[-1]" : Character.toString(ch), false);
+	}
+
+	private Token potentialBigInt(String integerString, int radix) {
+		final TokenType type = accept("n") ? TokenType.BigIntLiteral : TokenType.NumericLiteral;
+		return new Token(type, new BigInteger(integerString, radix).toString(), position());
+	}
+
+	private Token tokenizeKeywordOrIdentifier() {
+		final var builder = new StringBuilder();
+		while (isIdentifierMiddle()) collect(builder);
+		final String value = builder.toString();
+		final TokenType type = keywords.getOrDefault(value, TokenType.Identifier);
+		return new Token(type, value, position());
+	}
+
+	private Token tokenizeSymbol() throws SyntaxError {
+		for (final var symbolSize : symbols) {
+			for (final var entry : symbolSize.entrySet()) {
+				final String key = entry.getKey();
+				if (accept(key)) {
+					return new Token(entry.getValue(), key, position());
+				}
+			}
+		}
+
+		throw new SyntaxError("Cannot tokenize character %s".formatted(quoteCodePoint(codePoint)), position());
+	}
+
+	public static Token[] tokenize(String sourceText) throws SyntaxError {
+		final var instance = new Lexer(sourceText);
+		final ArrayList<Token> tokens = new ArrayList<>();
+		while (instance.hasNext()) {
+			final Token next = instance.next();
+			if (next == null) {
+				break;
+			} else {
+				instance.lastTokenType = next.type;
+				if (!instance.templateLiteralStates.isEmpty() && instance.templateLiteralStates.getFirst().inExpression) {
+					if (next.type == TokenType.LBrace) {
+						instance.templateLiteralStates.getFirst().bracketCount++;
+					} else if (next.type == TokenType.RBrace) {
+						instance.templateLiteralStates.getFirst().bracketCount--;
+					}
+				}
+
+				tokens.add(next);
+			}
+		}
+
+		tokens.add(new Token(TokenType.EOF, null));
+		return tokens.toArray(new Token[0]);
+	}
+
+	private SourcePosition position() {
+		return new SourcePosition(sourceText, index - 1);
 	}
 
 	private static final class TemplateLiteralState {
+
 		public boolean inExpression = false;
 		public int bracketCount = 0;
 	}

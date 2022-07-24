@@ -6,7 +6,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Token;
-import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.string.StringValue;
 
@@ -69,7 +68,7 @@ public final class REPL {
 			if (result.length() != 0) result.append('\n');
 			final String line = readLine(indent);
 			if (line == null) return null;
-			final Token[] tokens = new Lexer(line).tokenize();
+			final Token[] tokens = Lexer.tokenize(line);
 			for (final Token token : tokens) {
 				switch (token.type) {
 					case LParen, LBrace, LBracket -> indent++;

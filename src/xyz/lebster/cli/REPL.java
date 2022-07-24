@@ -6,7 +6,9 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Token;
+import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.string.StringValue;
 
 import java.util.Scanner;
 
@@ -22,6 +24,7 @@ public final class REPL {
 	public void run() {
 		System.out.println("Starting REPL...");
 		final Realm realm = new Realm(interpreter);
+		int result = 0;
 
 		while (true) {
 			try {
@@ -35,6 +38,9 @@ public final class REPL {
 				}
 
 				final Value<?> lastValue = realm.execute(input, options.showAST());
+				interpreter.globalObject.set(interpreter, new StringValue("$"), lastValue);
+				interpreter.globalObject.set(interpreter, new StringValue("$" + result), lastValue);
+				result += 1;
 				System.out.println(lastValue.toDisplayString());
 			} catch (Throwable e) {
 				Main.handleError(e, System.out, options.hideStackTrace());

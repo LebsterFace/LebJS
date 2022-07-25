@@ -112,6 +112,7 @@ public final class Names {
 	public static final StringValue Math = new StringValue("Math");
 	public static final StringValue Number = new StringValue("Number");
 	public static final StringValue Object = new StringValue("Object");
+	public static final StringValue RegExp = new StringValue("RegExp");
 	public static final StringValue ShadowRealm = new StringValue("ShadowRealm");
 	public static final StringValue String = new StringValue("String");
 	public static final StringValue Symbol = new StringValue("Symbol");

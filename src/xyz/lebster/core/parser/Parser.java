@@ -781,7 +781,6 @@ public final class Parser {
 		return switch (state.token.type) {
 			case Await -> throw new ParserNotImplemented(position(), "Parsing `await` expressions");
 			case Async -> throw new ParserNotImplemented(position(), "Parsing `async` functions");
-			case RegexpLiteral -> throw new ParserNotImplemented(position(), "Parsing RegExp literals");
 			case BigIntLiteral -> throw new ParserNotImplemented(position(), "Parsing BigIntLiterals");
 			case Super -> throw new ParserNotImplemented(position(), "Parsing Super property access");
 
@@ -794,6 +793,7 @@ public final class Parser {
 			case LParen -> parseParenthesizedExpressionOrArrowFunctionExpression();
 			case Identifier -> parseIdentifierExpressionOrArrowFunctionExpression();
 
+			case RegexpLiteral -> parseRegexpLiteral();
 			case StringLiteral -> parseAsStringLiteral();
 			case NumericLiteral -> new NumericLiteral(new NumberValue(Double.parseDouble(state.consume().value)));
 
@@ -820,6 +820,11 @@ public final class Parser {
 			case TemplateExpressionEnd -> throw new SyntaxError("Unexpected end of template expression", position());
 			default -> throw new CannotParse(state.token, "PrimaryExpression");
 		};
+	}
+
+	private RegExpLiteral parseRegexpLiteral() throws SyntaxError {
+		final String pattern = state.require(TokenType.RegexpLiteral);
+		return new RegExpLiteral(pattern);
 	}
 
 	private Expression parseIdentifierExpressionOrArrowFunctionExpression() throws CannotParse, SyntaxError {

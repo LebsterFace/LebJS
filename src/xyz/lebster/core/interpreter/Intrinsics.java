@@ -1,5 +1,6 @@
 package xyz.lebster.core.interpreter;
 
+import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayConstructor;
 import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.boolean_.BooleanConstructor;
@@ -15,6 +16,8 @@ import xyz.lebster.core.value.number.NumberConstructor;
 import xyz.lebster.core.value.number.NumberPrototype;
 import xyz.lebster.core.value.object.ObjectConstructor;
 import xyz.lebster.core.value.object.ObjectPrototype;
+import xyz.lebster.core.value.regexp.RegExpConstructor;
+import xyz.lebster.core.value.regexp.RegExpPrototype;
 import xyz.lebster.core.value.shadowrealm.ShadowRealmConstructor;
 import xyz.lebster.core.value.shadowrealm.ShadowRealmPrototype;
 import xyz.lebster.core.value.string.StringConstructor;
@@ -23,16 +26,18 @@ import xyz.lebster.core.value.symbol.SymbolConstructor;
 import xyz.lebster.core.value.symbol.SymbolPrototype;
 
 public final class Intrinsics {
-	public final ObjectPrototype objectPrototype;
-	public final FunctionPrototype functionPrototype;
-	public final FunctionConstructor functionConstructor;
-	public final ObjectConstructor objectConstructor;
 	public final ArrayConstructor arrayConstructor;
 	public final ArrayPrototype arrayPrototype;
 	public final BooleanConstructor booleanConstructor;
 	public final BooleanPrototype booleanPrototype;
+	public final FunctionConstructor functionConstructor;
+	public final FunctionPrototype functionPrototype;
 	public final NumberConstructor numberConstructor;
 	public final NumberPrototype numberPrototype;
+	public final ObjectConstructor objectConstructor;
+	public final ObjectPrototype objectPrototype;
+	public final RegExpConstructor regExpConstructor;
+	public final RegExpPrototype regExpPrototype;
 	public final ShadowRealmConstructor shadowRealmConstructor;
 	public final ShadowRealmPrototype shadowRealmPrototype;
 	public final StringConstructor stringConstructor;
@@ -85,6 +90,10 @@ public final class Intrinsics {
 		errorPrototype = new ErrorPrototype(objectPrototype);
 		errorConstructor = new ErrorConstructor(objectPrototype, functionPrototype);
 		errorConstructor.linkToPrototype(errorPrototype);
+
+		regExpPrototype = new RegExpPrototype(objectPrototype);
+		regExpConstructor = new RegExpConstructor(objectPrototype, functionPrototype);
+		regExpConstructor.linkToPrototype(regExpPrototype);
 
 		mathObject = new MathObject(objectPrototype, functionPrototype);
 		testObject = new TestObject(functionPrototype);

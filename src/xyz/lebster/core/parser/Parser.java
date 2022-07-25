@@ -795,7 +795,11 @@ public final class Parser {
 
 			case RegexpLiteral -> parseRegexpLiteral();
 			case StringLiteral -> parseAsStringLiteral();
-			case NumericLiteral -> new NumericLiteral(new NumberValue(Double.parseDouble(state.consume().value)));
+			case NumericLiteral -> parseNumericLiteral(false);
+			case Period -> {
+				state.consume();
+				yield parseNumericLiteral(true);
+			}
 
 			case True -> {
 				state.consume();
@@ -820,6 +824,11 @@ public final class Parser {
 			case TemplateExpressionEnd -> throw new SyntaxError("Unexpected end of template expression", position());
 			default -> throw new CannotParse(state.token, "PrimaryExpression");
 		};
+	}
+
+	private NumericLiteral parseNumericLiteral(boolean leadingDecimal) throws SyntaxError {
+		final String value = (leadingDecimal ? "." : "") + state.require(TokenType.NumericLiteral);
+		return new NumericLiteral(new NumberValue(Double.parseDouble(value)));
 	}
 
 	private RegExpLiteral parseRegexpLiteral() throws SyntaxError {

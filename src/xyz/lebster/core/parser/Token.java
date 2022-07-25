@@ -184,6 +184,7 @@ public final class Token {
 			   || type == LParen
 			   || type == NaN
 			   || type == New
+			   || type == Period
 			   || type == Null
 			   || type == BigIntLiteral
 			   || type == NumericLiteral

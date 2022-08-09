@@ -3,6 +3,7 @@ package xyz.lebster.core.value.array;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.BuiltinPrototype;
@@ -33,22 +34,195 @@ public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayCon
 
 	public ArrayPrototype(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
 		super(objectPrototype);
+		putMethod(functionPrototype, Names.at, ArrayPrototype::at);
+		putMethod(functionPrototype, Names.concat, ArrayPrototype::concat);
+		putMethod(functionPrototype, Names.copyWithin, ArrayPrototype::copyWithin);
+		putMethod(functionPrototype, Names.entries, ArrayPrototype::entries);
+		putMethod(functionPrototype, Names.every, ArrayPrototype::every);
+		putMethod(functionPrototype, Names.fill, ArrayPrototype::fill);
 		putMethod(functionPrototype, Names.filter, ArrayPrototype::filter);
+		putMethod(functionPrototype, Names.find, ArrayPrototype::find);
+		putMethod(functionPrototype, Names.findIndex, ArrayPrototype::findIndex);
+		putMethod(functionPrototype, Names.findLast, ArrayPrototype::findLast);
+		putMethod(functionPrototype, Names.findLastIndex, ArrayPrototype::findLastIndex);
+		putMethod(functionPrototype, Names.flat, ArrayPrototype::flat);
+		putMethod(functionPrototype, Names.flatMap, ArrayPrototype::flatMap);
 		putMethod(functionPrototype, Names.forEach, ArrayPrototype::forEach);
 		putMethod(functionPrototype, Names.group, ArrayPrototype::group);
+		putMethod(functionPrototype, Names.groupToMap, ArrayPrototype::groupToMap);
 		putMethod(functionPrototype, Names.includes, ArrayPrototype::includes);
+		putMethod(functionPrototype, Names.indexOf, ArrayPrototype::indexOf);
 		putMethod(functionPrototype, Names.join, ArrayPrototype::join);
+		putMethod(functionPrototype, Names.keys, ArrayPrototype::keys);
+		putMethod(functionPrototype, Names.lastIndexOf, ArrayPrototype::lastIndexOf);
 		putMethod(functionPrototype, Names.map, ArrayPrototype::map);
 		putMethod(functionPrototype, Names.pop, ArrayPrototype::pop);
 		putMethod(functionPrototype, Names.push, ArrayPrototype::push);
 		putMethod(functionPrototype, Names.reduce, ArrayPrototype::reduce);
+		putMethod(functionPrototype, Names.reduceRight, ArrayPrototype::reduceRight);
 		putMethod(functionPrototype, Names.reverse, ArrayPrototype::reverse);
+		putMethod(functionPrototype, Names.shift, ArrayPrototype::shift);
 		putMethod(functionPrototype, Names.slice, ArrayPrototype::slice);
+		putMethod(functionPrototype, Names.some, ArrayPrototype::some);
+		putMethod(functionPrototype, Names.sort, ArrayPrototype::sort);
+		putMethod(functionPrototype, Names.splice, ArrayPrototype::splice);
+		putMethod(functionPrototype, Names.toLocaleString, ArrayPrototype::toLocaleString);
 		putMethod(functionPrototype, Names.toString, ArrayPrototype::toStringMethod);
-		putMethod(functionPrototype, Names.toString, ArrayPrototype::toStringMethod);
+		putMethod(functionPrototype, Names.unshift, ArrayPrototype::unshift);
 
 		final NativeFunction values = putMethod(functionPrototype, Names.values, ArrayPrototype::values);
 		put(SymbolValue.iterator, values);
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.at")
+	private static Value<?> at(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.at");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.concat")
+	private static Value<?> concat(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.concat");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.copyWithin")
+	private static Value<?> copyWithin(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.copyWithin");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.entries")
+	private static Value<?> entries(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.entries");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.every")
+	private static Value<?> every(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.every");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.fill")
+	private static Value<?> fill(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.fill");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.find")
+	private static Value<?> find(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.find");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findIndex")
+	private static Value<?> findIndex(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.findIndex");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findLast")
+	private static Value<?> findLast(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.findLast");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findLastIndex")
+	private static Value<?> findLastIndex(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.findLastIndex");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.flat")
+	private static Value<?> flat(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.flat");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.flatMap")
+	private static Value<?> flatMap(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.flatMap");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.groupToMap")
+	private static Value<?> groupToMap(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.groupToMap");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.indexOf")
+	private static Value<?> indexOf(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.indexOf");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.keys")
+	private static Value<?> keys(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.keys");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.lastIndexOf")
+	private static Value<?> lastIndexOf(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.lastIndexOf");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reduceRight")
+	private static Value<?> reduceRight(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.reduceRight");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.shift")
+	private static Value<?> shift(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.shift");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.some")
+	private static Value<?> some(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.some");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.sort")
+	private static Value<?> sort(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.sort");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.splice")
+	private static Value<?> splice(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.splice");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.toLocaleString")
+	private static Value<?> toLocaleString(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.toLocaleString");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.toString")
+	private static Value<?> toString(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.toString");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.unshift")
+	private static Value<?> unshift(Interpreter interpreter, Value<?>[] values) {
+		throw new NotImplemented("Array.prototype.unshift");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.values")
+	// FIXME: [...[1,2,3].values()] => [1,2,3]
+	private static Value<?> values(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
+		return new ArrayIterator(interpreter);
 	}
 
 	@Proposal
@@ -302,12 +476,6 @@ public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayCon
 
 		// 8. Return A.
 		return new ArrayObject(interpreter, Arrays.copyOfRange(A, 0, to));
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.values")
-	@NonCompliant
-	private static ArrayIterator values(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		return new ArrayIterator(interpreter);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.foreach")

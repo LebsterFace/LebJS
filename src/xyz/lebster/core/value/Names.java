@@ -4,6 +4,7 @@ import xyz.lebster.core.value.string.StringValue;
 
 public final class Names {
 	// Properties and methods
+	public static final StringValue at = new StringValue("at");
 	public static final StringValue bind = new StringValue("bind");
 	public static final StringValue call = new StringValue("call");
 	public static final StringValue charAt = new StringValue("charAt");
@@ -11,6 +12,7 @@ public final class Names {
 	public static final StringValue codePointAt = new StringValue("codePointAt");
 	public static final StringValue concat = new StringValue("concat");
 	public static final StringValue constructor = new StringValue("constructor");
+	public static final StringValue copyWithin = new StringValue("copyWithin");
 	public static final StringValue create = new StringValue("create");
 	public static final StringValue declare = new StringValue("declare");
 	public static final StringValue description = new StringValue("description");
@@ -21,15 +23,24 @@ public final class Names {
 	public static final StringValue error = new StringValue("error");
 	public static final StringValue eval = new StringValue("eval");
 	public static final StringValue evaluate = new StringValue("evaluate");
+	public static final StringValue every = new StringValue("every");
 	public static final StringValue expect = new StringValue("expect");
 	public static final StringValue expectError = new StringValue("expectError");
 	public static final StringValue fail = new StringValue("fail");
+	public static final StringValue fill = new StringValue("fill");
 	public static final StringValue filter = new StringValue("filter");
+	public static final StringValue find = new StringValue("find");
+	public static final StringValue findIndex = new StringValue("findIndex");
+	public static final StringValue findLast = new StringValue("findLast");
+	public static final StringValue findLastIndex = new StringValue("findLastIndex");
+	public static final StringValue flat = new StringValue("flat");
+	public static final StringValue flatMap = new StringValue("flatMap");
 	public static final StringValue forEach = new StringValue("forEach");
 	public static final StringValue fromEntries = new StringValue("fromEntries");
 	public static final StringValue getPrototypeOf = new StringValue("getPrototypeOf");
 	public static final StringValue globalThis = new StringValue("globalThis");
 	public static final StringValue group = new StringValue("group");
+	public static final StringValue groupToMap = new StringValue("groupToMap");
 	public static final StringValue hasOwnProperty = new StringValue("hasOwnProperty");
 	public static final StringValue hasProperty = new StringValue("hasProperty");
 	public static final StringValue includes = new StringValue("includes");
@@ -62,11 +73,16 @@ public final class Names {
 	public static final StringValue random = new StringValue("random");
 	public static final StringValue range = new StringValue("range");
 	public static final StringValue reduce = new StringValue("reduce");
+	public static final StringValue reduceRight = new StringValue("reduceRight");
 	public static final StringValue repeat = new StringValue("repeat");
 	public static final StringValue replaceAll = new StringValue("replaceAll");
 	public static final StringValue reverse = new StringValue("reverse");
 	public static final StringValue setPrototypeOf = new StringValue("setPrototypeOf");
+	public static final StringValue shift = new StringValue("shift");
 	public static final StringValue slice = new StringValue("slice");
+	public static final StringValue some = new StringValue("some");
+	public static final StringValue sort = new StringValue("sort");
+	public static final StringValue splice = new StringValue("splice");
 	public static final StringValue startsWith = new StringValue("startsWith");
 	public static final StringValue substring = new StringValue("substring");
 	public static final StringValue toLocaleLowerCase = new StringValue("toLocaleLowerCase");
@@ -78,6 +94,7 @@ public final class Names {
 	public static final StringValue trim = new StringValue("trim");
 	public static final StringValue trimEnd = new StringValue("trimEnd");
 	public static final StringValue trimStart = new StringValue("trimStart");
+	public static final StringValue unshift = new StringValue("unshift");
 	public static final StringValue value = new StringValue("value");
 	public static final StringValue valueOf = new StringValue("valueOf");
 	public static final StringValue values = new StringValue("values");

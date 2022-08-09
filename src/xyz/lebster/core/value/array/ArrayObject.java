@@ -30,7 +30,12 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		super(interpreter.intrinsics.arrayPrototype);
 		this.arrayValues = new ArrayList<>(initialValues.length);
 		for (final Value<?> value : initialValues) {
-			this.arrayValues.add(new DataDescriptor(value, true, true, true));
+			if (value == null) {
+				// null indicates missing value
+				this.arrayValues.add(null);
+			} else {
+				this.arrayValues.add(new DataDescriptor(value, true, true, true));
+			}
 		}
 
 		this.value.put(Names.length, new NativeAccessorDescriptor(false, false) {
@@ -58,6 +63,23 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 	public ArrayObject(Interpreter interpreter, ArrayList<Value<?>> arrayValues) {
 		this(interpreter, arrayValues.toArray(new Value[0]));
+	}
+
+	public ArrayObject(Interpreter interpreter, int length) {
+		this(interpreter, new Value<?>[length]);
+	}
+
+	private static void representValueEnder(boolean moreElements, StringRepresentation representation, boolean singleLine) {
+		if (moreElements) representation.append(',');
+		if (singleLine) representation.append(' ');
+		else representation.appendLine();
+	}
+
+	private static void representEmpty(StringRepresentation representation, boolean singleLine, boolean moreElements, int emptyCount) {
+		representation.append(ANSI.BRIGHT_BLACK);
+		representation.append(emptyCount == 1 ? "empty" : "empty x " + emptyCount);
+		representation.append(ANSI.RESET);
+		representValueEnder(moreElements, representation, singleLine);
 	}
 
 	@Override
@@ -148,16 +170,25 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> mapIterator = nonLengthMapIterator.iterator();
 
+		int emptyCount = 0;
 		while (iterator.hasNext()) {
 			if (!singleLine) representation.appendIndent();
 			PropertyDescriptor next = iterator.next();
-			if (next != null) {
-				next.display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
-			}
+			if (next == null) {
+				emptyCount++;
+			} else {
+				if (emptyCount > 0) {
+					representEmpty(representation, singleLine, true, emptyCount);
+					emptyCount = 0;
+				}
 
-			if (iterator.hasNext() || mapIterator.hasNext()) representation.append(',');
-			if (singleLine) representation.append(' ');
-			else representation.appendLine();
+				next.display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
+				representValueEnder(iterator.hasNext() || mapIterator.hasNext(), representation, singleLine);
+			}
+		}
+
+		if (emptyCount > 0) {
+			representEmpty(representation, singleLine, mapIterator.hasNext(), emptyCount);
 		}
 
 		while (mapIterator.hasNext()) {
@@ -169,9 +200,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 			representation.append(": ");
 
 			entry.getValue().display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
-			if (iterator.hasNext()) representation.append(',');
-			if (singleLine) representation.append(' ');
-			else representation.appendLine();
+			representValueEnder(iterator.hasNext(), representation, singleLine);
 		}
 	}
 

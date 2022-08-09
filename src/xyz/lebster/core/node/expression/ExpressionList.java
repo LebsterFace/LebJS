@@ -1,6 +1,7 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.Dumper;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -12,8 +13,10 @@ import java.util.Iterator;
 
 public final class ExpressionList {
 	private final ArrayList<ExpressionNode> backingList;
+	private final boolean canHaveEmpty;
 
-	public ExpressionList() {
+	public ExpressionList(boolean canHaveEmpty) {
+		this.canHaveEmpty = canHaveEmpty;
 		this.backingList = new ArrayList<>();
 	}
 
@@ -25,13 +28,21 @@ public final class ExpressionList {
 		this.backingList.add(new ExpressionNode(expressions, ExpressionNode.Type.SPREAD));
 	}
 
+	public void addEmpty() {
+		if (this.canHaveEmpty) {
+			this.backingList.add(new ExpressionNode(null, ExpressionNode.Type.EMPTY));
+		} else {
+			throw new ShouldNotHappen("Attempting to add an empty node to an ExpressionList which cannot have empty nodes");
+		}
+	}
+
 	public ArrayList<Value<?>> executeAll(Interpreter interpreter) throws AbruptCompletion {
 		final ArrayList<Value<?>> result = new ArrayList<>(backingList.size());
 		for (final ExpressionNode node : backingList) {
-			if (node.type == ExpressionNode.Type.SINGLE) {
-				result.add(node.expression.execute(interpreter));
-			} else {
-				IteratorHelper.getIterator(interpreter, node.expression).collect(result);
+			switch (node.type) {
+				case SINGLE -> result.add(node.expression.execute(interpreter));
+				case EMPTY -> result.add(null);
+				case SPREAD -> IteratorHelper.getIterator(interpreter, node.expression).collect(result);
 			}
 		}
 
@@ -69,6 +80,8 @@ public final class ExpressionList {
 			if (type == Type.SPREAD) {
 				Dumper.dumpIndicator(indent, "Spread");
 				expression.dump(indent + 1);
+			} else if (type == Type.EMPTY) {
+				Dumper.dumpSingle(indent, "Empty");
 			} else {
 				expression.dump(indent);
 			}
@@ -79,7 +92,7 @@ public final class ExpressionList {
 			expression.represent(representation);
 		}
 
-		private enum Type { SINGLE, SPREAD }
+		private enum Type { SINGLE, EMPTY, SPREAD }
 	}
 }
 

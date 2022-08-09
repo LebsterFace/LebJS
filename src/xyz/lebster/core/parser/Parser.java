@@ -604,19 +604,19 @@ public final class Parser {
 		return new FunctionExpression(parseFunctionBody(), name, parameters);
 	}
 
-	private ExpressionList parseExpressionList(boolean expectParens) throws SyntaxError, CannotParse {
-		final ExpressionList result = new ExpressionList();
+	private ExpressionList parseExpressionList(boolean expectParens, boolean canHaveEmpty) throws SyntaxError, CannotParse {
+		final ExpressionList result = new ExpressionList(canHaveEmpty);
 		if (expectParens) state.require(TokenType.LParen);
 		consumeAllLineTerminators();
 
 		while (state.token.matchPrimaryExpression() || state.is(TokenType.DotDotDot, TokenType.Comma)) {
-			if (state.is(TokenType.Comma)) {
-				throw new ParserNotImplemented(position(), "Parsing arrays with holes");
-			}
-
 			consumeAllLineTerminators();
 			if (state.optional(TokenType.DotDotDot)) {
 				result.addSpreadExpression(parseSpecAssignmentExpression());
+			} else if (canHaveEmpty && state.optional(TokenType.Comma)) {
+				result.addEmpty();
+				consumeAllLineTerminators();
+				continue;
 			} else {
 				result.addSingleExpression(parseSpecAssignmentExpression());
 			}
@@ -632,7 +632,7 @@ public final class Parser {
 	}
 
 	private CallExpression parseCallExpression(Expression left) throws SyntaxError, CannotParse {
-		final ExpressionList arguments = parseExpressionList(false);
+		final ExpressionList arguments = parseExpressionList(false, false);
 		state.require(TokenType.RParen);
 		return new CallExpression(left, arguments);
 	}
@@ -870,7 +870,7 @@ public final class Parser {
 		if (state.is(TokenType.Period)) throw new ParserNotImplemented(position(), "Parsing new.target");
 		final Expression constructExpr = parseExpression(newOperator.precedence(), newOperator.associativity(), Collections.singleton(TokenType.LParen));
 		final boolean hasArguments = state.is(TokenType.LParen);
-		final ExpressionList arguments = hasArguments ? parseExpressionList(true) : null;
+		final ExpressionList arguments = hasArguments ? parseExpressionList(true, false) : null;
 		return new NewExpression(constructExpr, arguments);
 	}
 
@@ -878,7 +878,7 @@ public final class Parser {
 	private SuperCallStatement parseSuperCall() throws SyntaxError, CannotParse {
 		final SourcePosition start = position();
 		state.require(TokenType.Super);
-		final ExpressionList args = parseExpressionList(true);
+		final ExpressionList args = parseExpressionList(true, false);
 		return new SuperCallStatement(args, range(start));
 	}
 
@@ -1094,7 +1094,7 @@ public final class Parser {
 	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {
 		final SourcePosition start = position();
 		state.require(TokenType.LBracket);
-		final ExpressionList elements = parseExpressionList(false);
+		final ExpressionList elements = parseExpressionList(false, true);
 		state.require(TokenType.RBracket);
 		return new ArrayExpression(range(start), elements);
 	}

@@ -55,6 +55,11 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
+	public boolean equalsKey(ObjectValue.Key<?> other) {
+		return other instanceof final StringValue stringValue && stringValue.value.equals(value);
+	}
+
+	@Override
 	public void display(StringRepresentation representation) {
 		representation.append(ANSI.GREEN);
 		representation.append(StringEscapeUtils.quote(value, false));

@@ -451,5 +451,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		public abstract StringValue toFunctionName();
 
 		public abstract int toIndex();
+
+		public abstract boolean equalsKey(Key<?> other);
 	}
 }

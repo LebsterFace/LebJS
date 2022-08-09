@@ -99,6 +99,11 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 	}
 
 	@Override
+	public boolean equalsKey(ObjectValue.Key<?> other) {
+		return other == this;
+	}
+
+	@Override
 	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
 		throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert a Symbol value to a string"));
 	}

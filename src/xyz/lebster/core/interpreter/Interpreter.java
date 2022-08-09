@@ -78,14 +78,12 @@ public final class Interpreter {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getsuperconstructor")
-	public Value<?> getSuperConstructor() {
+	public ObjectValue getSuperConstructor() {
 		// 1. Let envRec be GetThisEnvironment().
 		final FunctionEnvironment envRec = getThisEnvironment();
 		// 2. Assert: envRec is a function Environment Record.
-		if (envRec == null) {
+		if (envRec == null)
 			throw new ShouldNotHappen("getSuperConstructor() called when getThisEnvironment() returns null");
-		}
-
 		// 3. Let activeFunction be envRec.[[FunctionObject]].
 		final Executable activeFunction = envRec.functionObject;
 		// 4. Assert: activeFunction is an ECMAScript function object.

@@ -7,7 +7,6 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.PrimitiveValue;
-import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.boolean_.BooleanValue;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
@@ -20,7 +19,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;
 	public static final long POSITIVE_ZERO_BITS = 0;
 	public static final NumberValue NaN = new NumberValue(Double.NaN);
-	public static final Value<?> ZERO = new NumberValue(0.0D);
+	public static final NumberValue ZERO = new NumberValue(0.0D);
 
 	public NumberValue(double num) {
 		super(num);

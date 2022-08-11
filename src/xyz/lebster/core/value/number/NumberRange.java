@@ -8,39 +8,51 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.symbol.SymbolValue;
 
 public final class NumberRange extends ObjectValue {
+	private final boolean isValid;
+	private final boolean isDecreasing;
+
 	private final double end;
 	private final double step;
 	private double current;
 
 	public NumberRange(FunctionPrototype functionPrototype, double end) {
-		super(null);
-		this.initialise(functionPrototype);
-		this.current = 0;
-		this.end = end;
-		this.step = 1;
+		this(functionPrototype, 0, end, 1);
 	}
 
 	public NumberRange(FunctionPrototype functionPrototype, double start, double end) {
-		super(null);
-		this.initialise(functionPrototype);
-		this.current = start;
-		this.end = end;
-		this.step = 1;
+		this(functionPrototype, start, end, 1);
 	}
 
 	public NumberRange(FunctionPrototype functionPrototype, double start, double end, double step) {
 		super(null);
 		this.initialise(functionPrototype);
+
+		if (start < end) {
+			this.isValid = step > 0;
+			this.isDecreasing = false;
+		} else if (start > end) {
+			this.isValid = step < 0;
+			this.isDecreasing = true;
+		} else {
+			this.isValid = false;
+			this.isDecreasing = false;
+		}
+
 		this.current = start;
 		this.end = end;
 		this.step = step;
+	}
+
+	private boolean done() {
+		if (!this.isValid) return true;
+		return this.isDecreasing ? current <= end : current >= end;
 	}
 
 	private void initialise(FunctionPrototype functionPrototype) {
 		this.putMethod(functionPrototype, SymbolValue.iterator, ($, $$) -> this);
 		this.putMethod(functionPrototype, Names.next, (interpreter, arguments) -> {
 			final ObjectValue result = new ObjectValue(interpreter.intrinsics.objectPrototype);
-			if (current > end) {
+			if (done()) {
 				result.put(Names.done, BooleanValue.TRUE);
 				result.put(Names.value, Undefined.instance);
 			} else {

@@ -10,9 +10,11 @@ import xyz.lebster.core.value.globals.Undefined;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Program(List<Statement> children) implements AppendableNode {
+public final class Program implements AppendableNode {
+	private final List<Statement> children;
+
 	public Program() {
-		this(new ArrayList<>());
+		this.children = new ArrayList<>();
 	}
 
 	public void append(Statement node) {

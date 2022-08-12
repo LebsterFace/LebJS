@@ -461,11 +461,22 @@ public final class Parser {
 		return new VariableDeclarator(lhs, value, range(declaratorStart));
 	}
 
+	private AssignmentPattern parseInitializer(final AssignmentTarget assignmentTarget) throws CannotParse, SyntaxError {
+		// =(opt) Expression(opt)
+		consumeAllLineTerminators();
+		if (!state.optional(TokenType.Equals)) // No default expression
+			return new AssignmentPattern(assignmentTarget, null);
+
+		consumeAllLineTerminators();
+		final Expression defaultExpression = parseSpecAssignmentExpression();
+		return new AssignmentPattern(assignmentTarget, defaultExpression);
+	}
+
 	private AssignmentTarget parseAssignmentTarget() throws SyntaxError, CannotParse {
 		if (state.optional(TokenType.LBrace)) {
 			consumeAllLineTerminators();
 
-			final Map<Expression, AssignmentTarget> pairs = new HashMap<>();
+			final Map<Expression, AssignmentPattern> pairs = new HashMap<>();
 			StringValue restName = null;
 			while (!state.is(TokenType.RBrace)) {
 				if (state.optional(TokenType.DotDotDot)) {
@@ -487,12 +498,12 @@ public final class Parser {
 
 					if (state.optional(TokenType.Colon)) {
 						consumeAllLineTerminators();
-						pairs.put(key, parseAssignmentTarget());
+						pairs.put(key, parseInitializer(parseAssignmentTarget()));
 					} else {
-						pairs.put(key, new IdentifierExpression(key.value()));
+						pairs.put(key, parseInitializer(new IdentifierExpression(key.value())));
 					}
 				} else {
-					pairs.put(parseComputedKeyExpression(), parseAssignmentTarget());
+					pairs.put(parseComputedKeyExpression(), parseInitializer(parseAssignmentTarget()));
 				}
 
 				consumeAllLineTerminators();
@@ -501,11 +512,10 @@ public final class Parser {
 			}
 
 			consumeAllLineTerminators();
-			if (state.is(TokenType.Equals)) throw new ParserNotImplemented(position(), "Parsing destructuring assignment targets with defaults");
 			state.require(TokenType.RBrace);
 			return new ObjectDestructuring(pairs, restName);
 		} else if (state.optional(TokenType.LBracket)) {
-			final ArrayList<AssignmentTarget> children = new ArrayList<>();
+			final ArrayList<AssignmentPattern> children = new ArrayList<>();
 			AssignmentTarget restTarget = null;
 
 			consumeAllLineTerminators();
@@ -520,20 +530,18 @@ public final class Parser {
 					if (state.optional(TokenType.Comma)) throw new SyntaxError("Rest element must be last element", position());
 					break;
 				} else {
-					children.add(parseAssignmentTarget());
+					children.add(parseInitializer(parseAssignmentTarget()));
 					consumeAllLineTerminators();
 					if (!state.optional(TokenType.Comma)) break;
 				}
 			}
 
-			if (state.is(TokenType.Equals)) throw new ParserNotImplemented(position(), "Parsing destructuring assignment targets with defaults");
 			state.require(TokenType.RBracket);
-			return new ArrayDestructuring(restTarget, children.toArray(new AssignmentTarget[0]));
+			return new ArrayDestructuring(restTarget, children.toArray(new AssignmentPattern[0]));
 		} else if (state.token.matchIdentifierName()) {
 			return new IdentifierExpression(state.consume().value);
 		} else {
-			state.unexpected();
-			return null;
+			throw new SyntaxError("Unexpected token " + state.token, state.token.position);
 		}
 	}
 
@@ -717,10 +725,19 @@ public final class Parser {
 		return switch (token.type) {
 			case Plus, Minus, Star, Slash, Percent, Exponent, Pipe, Ampersand, Caret, LeftShift, RightShift, UnsignedRightShift ->
 				new BinaryExpression(left, parseExpression(minPrecedence, assoc), token.getBinaryOp());
-			case StrictEqual, LooseEqual, StrictNotEqual, NotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), token.getEqualityOp());
-			case LogicalOr, LogicalAnd, NullishCoalescing -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), token.getLogicOp());
-			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), token.getRelationalOp());
-			case MinusMinus, PlusPlus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), token.getUpdateOp());
+
+			case StrictEqual, LooseEqual, StrictNotEqual, NotEqual ->
+				new EqualityExpression(left, parseExpression(minPrecedence, assoc), token.getEqualityOp());
+
+			case LogicalOr, LogicalAnd, NullishCoalescing ->
+				new LogicalExpression(left, parseExpression(minPrecedence, assoc), token.getLogicOp());
+
+			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf ->
+				new RelationalExpression(left, parseExpression(minPrecedence, assoc), token.getRelationalOp());
+
+			case MinusMinus, PlusPlus ->
+				new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), token.getUpdateOp());
+
 			case Equals, LogicalAndEquals, LogicalOrEquals, NullishCoalescingEquals, MultiplyEquals,
 				DivideEquals, PercentEquals, PlusEquals, MinusEquals, LeftShiftEquals, RightShiftEquals,
 				UnsignedRightShiftEquals, AmpersandEquals, CaretEquals, PipeEquals, ExponentEquals ->
@@ -920,9 +937,16 @@ public final class Parser {
 				final String propertyName = state.consume().value;
 				consumeAllLineTerminators();
 
-				if (state.is(TokenType.LParen)) throw new ParserNotImplemented(position(), "Parsing object literal methods");
-
-				if (isIdentifier && !state.is(TokenType.Colon)) {
+				// FIXME: This is necessary to allow the re-parsing of DestructuringAssignmentTarget
+				//        It covers shorthand entries with defaults
+				//        Static entries (with colons) with defaults are mis-parsed as AssignmentExpressions
+				if (isIdentifier && state.optional(TokenType.Equals)) {
+					// Not a valid object literal, but a valid destructuring pattern
+					// Parse the expression and throw it away
+					parseSpecAssignmentExpression();
+				} else if (state.is(TokenType.LParen)) {
+					throw new ParserNotImplemented(position(), "Parsing object literal methods");
+				} else if (isIdentifier && !state.is(TokenType.Colon)) {
 					entries.add(ObjectExpression.shorthandEntry(new StringValue(propertyName)));
 					couldBeGetterSetter = propertyName.equals("get") || propertyName.equals("set");
 				} else {

@@ -8,12 +8,13 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
 import java.util.*;
 
-public record ObjectDestructuring(Map<Expression, AssignmentTarget> pairs, StringValue restName) implements AssignmentTarget {
+public record ObjectDestructuring(Map<Expression, AssignmentPattern> pairs, StringValue restName) implements AssignmentTarget {
 	@Override
 	public List<BindingPair> getBindings(Interpreter interpreter, Value<?> input) throws AbruptCompletion {
 		final ObjectValue objectValue = input.toObjectValue(interpreter);
@@ -23,7 +24,11 @@ public record ObjectDestructuring(Map<Expression, AssignmentTarget> pairs, Strin
 		for (final var entry : pairs.entrySet()) {
 			final ObjectValue.Key<?> key = entry.getKey().execute(interpreter).toPropertyKey(interpreter);
 			final Value<?> property = objectValue.get(interpreter, key);
-			result.addAll(entry.getValue().getBindings(interpreter, property));
+			final Expression defaultExpression = entry.getValue().defaultExpression();
+			final Value<?> x = property == Undefined.instance && defaultExpression != null ?
+				defaultExpression.execute(interpreter) : property;
+
+			result.addAll(entry.getValue().assignmentTarget().getBindings(interpreter, x));
 			visitedKeys.add(key);
 		}
 

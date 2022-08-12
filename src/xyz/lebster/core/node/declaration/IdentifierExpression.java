@@ -44,6 +44,7 @@ public record IdentifierExpression(StringValue name) implements AssignmentTarget
 		representation.append(name.value);
 	}
 
+	// Fast-path
 	public Value<?> assign(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 		final Reference ref = this.toReference(interpreter);
 		ref.putValue(interpreter, value);

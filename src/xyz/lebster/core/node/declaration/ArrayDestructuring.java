@@ -54,7 +54,7 @@ public record ArrayDestructuring(AssignmentTarget restTarget, AssignmentTarget..
 	public void represent(StringRepresentation representation) {
 		representation.append('[');
 		for (int i = 0; i < children.length; i++) {
-			children[i].represent(representation);
+			if (children[i] != null) children[i].represent(representation);
 			if (restTarget != null || i + 1 < children.length) representation.append(", ");
 		}
 

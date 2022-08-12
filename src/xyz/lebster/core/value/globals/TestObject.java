@@ -1,9 +1,12 @@
 package xyz.lebster.core.value.globals;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.ShouldNotHappen;
+import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
@@ -22,6 +25,22 @@ public final class TestObject extends ObjectValue {
 		this.putMethod(functionPrototype, Names.equals, TestObject::equalsMethod);
 		this.putMethod(functionPrototype, Names.fail, TestObject::fail);
 		this.putMethod(functionPrototype, Names.expectError, TestObject::expectError);
+		this.putMethod(functionPrototype, Names.parse, TestObject::parse);
+	}
+
+	private static Undefined parse(Interpreter interpreter, Value<?>[] arguments) {
+		if (arguments.length != 1)
+			throw new ShouldNotHappen("Test.parse should be called with only one argument");
+		if (!(arguments[0] instanceof final StringValue sourceTextSV))
+			throw new ShouldNotHappen("Test.parse not called with a string");
+
+		try {
+			Realm.parse(sourceTextSV.value);
+		} catch (SyntaxError | CannotParse e) {
+			throw new RuntimeException(e);
+		}
+
+		return Undefined.instance;
 	}
 
 	private static Undefined expectError(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
@@ -43,7 +62,7 @@ public final class TestObject extends ObjectValue {
 			final StringValue messageProperty = error.get(interpreter, Names.message).toStringValue(interpreter);
 			TestObject.expect(interpreter, name, nameProperty);
 			if (!messageProperty.value.startsWith(messageStarter.value))
-				assertionFailed(messageProperty, messageStarter);
+				assertionFailed(messageStarter, messageProperty);
 
 
 			return Undefined.instance;

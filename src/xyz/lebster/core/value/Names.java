@@ -1,5 +1,6 @@
 package xyz.lebster.core.value;
 
+import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
 public final class Names {
@@ -65,6 +66,7 @@ public final class Names {
 	public static final StringValue of = new StringValue("of");
 	public static final StringValue padEnd = new StringValue("padEnd");
 	public static final StringValue padStart = new StringValue("padStart");
+	public static final StringValue parse = new StringValue("parse");
 	public static final StringValue parseFloat = new StringValue("parseFloat");
 	public static final StringValue parseInt = new StringValue("parseInt");
 	public static final StringValue pop = new StringValue("pop");

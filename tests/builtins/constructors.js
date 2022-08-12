@@ -6,6 +6,14 @@ Test.expect(true, "Object" in globalThis);
 Test.expect(true, "ShadowRealm" in globalThis);
 Test.expect(true, "Symbol" in globalThis);
 
+Test.expect("String", String.name);
+Test.expect("Number", Number.name);
+Test.expect("Boolean", Boolean.name);
+Test.expect("Symbol", Symbol.name);
+Test.expect("Object", Object.name);
+Test.expect("ShadowRealm", ShadowRealm.name);
+Test.expect("Symbol", Symbol.name);
+
 Test.expect(String(true), 'true');
 Test.expect(String(false), 'false');
 Test.expect(String(null), 'null');

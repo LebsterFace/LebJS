@@ -125,10 +125,10 @@ public final class Lexer {
 		symbols_length_1.put("@", TokenType.At);
 		symbols_length_1.put("#", TokenType.Hashtag);
 
-		symbols.add(symbols_length_4);
-		symbols.add(symbols_length_3);
-		symbols.add(symbols_length_2);
 		symbols.add(symbols_length_1);
+		symbols.add(symbols_length_2);
+		symbols.add(symbols_length_3);
+		symbols.add(symbols_length_4);
 	}
 
 	private final String sourceText;
@@ -204,6 +204,10 @@ public final class Lexer {
 		) {
 			consume();
 		}
+	}
+
+	private String next(int length) {
+		return sourceText.substring(sourceText.offsetByCodePoints(0, index), sourceText.offsetByCodePoints(0, Integer.min(index + length, this.codePoints.length)));
 	}
 
 	private boolean peek(String compare) {
@@ -574,12 +578,13 @@ public final class Lexer {
 	}
 
 	private Token tokenizeSymbol() throws SyntaxError {
-		for (final var symbolSize : symbols) {
-			for (final var entry : symbolSize.entrySet()) {
-				final String key = entry.getKey();
-				if (accept(key)) {
-					return new Token(entry.getValue(), key, position());
-				}
+		for (int i = 4; i >= 1; i--) {
+			final HashMap<String, TokenType> symbolSize = symbols.get(i - 1);
+			final String key = next(i);
+			final TokenType value = symbolSize.get(key);
+			if (value != null) {
+				consume(i);
+				return new Token(value, key, position());
 			}
 		}
 

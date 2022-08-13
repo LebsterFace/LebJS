@@ -1100,11 +1100,11 @@ public final class Parser {
 		}
 
 		// At this point, we know it's an arrow function
-		consumeAllLineTerminators();
 		return parseArrowFunctionBody(parameters);
 	}
 
 	private ArrowFunctionExpression parseArrowFunctionBody(FunctionParameters parameters) throws CannotParse, SyntaxError {
+		consumeAllLineTerminators();
 		if (state.is(TokenType.LBrace)) {
 			return new ArrowFunctionExpression(parseBlockStatement(), parameters);
 		} else if (state.token.matchPrimaryExpression()) {

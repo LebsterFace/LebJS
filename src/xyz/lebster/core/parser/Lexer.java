@@ -142,6 +142,11 @@ public final class Lexer {
 		this.codePoints = sourceText.codePoints().toArray();
 		this.sourceText = sourceText;
 		consume();
+		if (accept("#!")) {
+			while (!isLineTerminator()) {
+				consume();
+			}
+		}
 	}
 
 	private boolean isFinished() {

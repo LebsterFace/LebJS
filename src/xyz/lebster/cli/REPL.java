@@ -1,6 +1,7 @@
 package xyz.lebster.cli;
 
 import xyz.lebster.Main;
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
@@ -34,7 +35,19 @@ public final class REPL {
 				final String input = this.readNextInput();
 				if (input == null || input.equals(".exit")) break;
 				if (input.isBlank()) continue;
-				if (input.equals(".clear")) {
+				if (input.equals(".help")) {
+					System.out.printf("""
+						%s.help%s                      Display this message
+						%s.clear%s                     Clear the screen
+						%s.inspect%s [expression]%s      Deep print the result of %s[expression]%s
+						%s.dump%s [code]%s               Dump the parsed AST of %s[code]%s
+						""",
+						ANSI.CYAN, ANSI.RESET,
+						ANSI.CYAN, ANSI.RESET,
+						ANSI.CYAN, ANSI.BRIGHT_GREEN, ANSI.RESET, ANSI.BRIGHT_GREEN, ANSI.RESET,
+						ANSI.CYAN, ANSI.BRIGHT_GREEN, ANSI.RESET, ANSI.BRIGHT_GREEN, ANSI.RESET
+					);
+				} else if (input.equals(".clear")) {
 					System.out.print("\033[H\033[2J");
 					System.out.flush();
 				} else if (input.startsWith(".inspect ")) {

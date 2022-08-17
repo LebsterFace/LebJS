@@ -4,11 +4,15 @@ import xyz.lebster.Main;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
+import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.Program;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Token;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
+import java.util.HashSet;
 import java.util.Scanner;
 
 public final class REPL {
@@ -33,14 +37,26 @@ public final class REPL {
 				if (input.equals(".clear")) {
 					System.out.print("\033[H\033[2J");
 					System.out.flush();
-					continue;
+				} else if (input.startsWith(".inspect ")) {
+					final Value<?> lastValue = realm.execute(input.substring(".inspect ".length()), options.showAST());
+					if (lastValue instanceof final ObjectValue LVO) {
+						final var representation = new StringRepresentation();
+						ObjectValue.staticDisplayRecursive(LVO, representation, new HashSet<>(), false);
+						System.out.println(representation);
+					} else {
+						System.out.println(lastValue.toDisplayString());
+					}
+				} else if (input.startsWith(".dump ")) {
+					final Program program = Realm.parse(input.substring(".dump ".length()));
+					program.dump(0);
+					System.out.println();
+				} else {
+					final Value<?> lastValue = realm.execute(input, options.showAST());
+					interpreter.globalObject.set(interpreter, new StringValue("$"), lastValue);
+					interpreter.globalObject.set(interpreter, new StringValue("$" + result), lastValue);
+					result += 1;
+					System.out.println(lastValue.toDisplayString());
 				}
-
-				final Value<?> lastValue = realm.execute(input, options.showAST());
-				interpreter.globalObject.set(interpreter, new StringValue("$"), lastValue);
-				interpreter.globalObject.set(interpreter, new StringValue("$" + result), lastValue);
-				result += 1;
-				System.out.println(lastValue.toDisplayString());
 			} catch (Throwable e) {
 				Main.handleError(e, System.out, options.hideStackTrace());
 			}

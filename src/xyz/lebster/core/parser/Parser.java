@@ -80,7 +80,7 @@ public final class Parser {
 				if (done) {
 					return;
 				} else {
-					state.unexpected();
+					throw state.unexpected();
 				}
 			}
 		}
@@ -125,7 +125,7 @@ public final class Parser {
 		} else if (state.token.matchPrimaryExpression() || state.token.matchStatement()) {
 			return parseStatementOrExpression();
 		} else {
-			throw new CannotParse(state.token);
+			throw state.unexpected();
 		}
 	}
 
@@ -206,7 +206,7 @@ public final class Parser {
 				state.require(TokenType.Colon);
 				cases.add(new SwitchCase(test, parseSwitchCaseStatements()));
 			} else {
-				state.expected(TokenType.Case);
+				throw state.expected(TokenType.Case);
 			}
 
 			consumeAllSeparators();
@@ -328,7 +328,7 @@ public final class Parser {
 					init = new ExpressionStatement(expression);
 				}
 			} else {
-				state.unexpected();
+				throw state.unexpected();
 			}
 		}
 
@@ -437,7 +437,7 @@ public final class Parser {
 			case Var -> VariableDeclaration.Kind.Var;
 			case Let -> VariableDeclaration.Kind.Let;
 			case Const -> VariableDeclaration.Kind.Const;
-			default -> throw new SyntaxError("Unexpected token " + state.token, state.token.position);
+			default -> throw state.unexpected();
 		};
 
 		state.consume();
@@ -541,7 +541,7 @@ public final class Parser {
 		} else if (state.token.matchIdentifierName()) {
 			return new IdentifierExpression(state.consume().value);
 		} else {
-			throw new SyntaxError("Unexpected token " + state.token, state.token.position);
+			throw state.unexpected();
 		}
 	}
 
@@ -761,7 +761,7 @@ public final class Parser {
 	}
 
 	private MemberExpression parseNonComputedMemberExpression(Expression left) throws SyntaxError {
-		if (!state.token.matchIdentifierName()) state.expected("IdentifierName");
+		if (!state.token.matchIdentifierName()) throw state.expected("IdentifierName");
 		return new MemberExpression(left, parseAsStringLiteral(), false);
 	}
 
@@ -1040,7 +1040,7 @@ public final class Parser {
 			} else if (state.is(TokenType.Hashtag)) {
 				throw new ParserNotImplemented(position(), "Parsing private class fields");
 			} else {
-				state.unexpected();
+				throw state.unexpected();
 			}
 		}
 
@@ -1057,7 +1057,7 @@ public final class Parser {
 	private Expression parseClassHeritage() throws SyntaxError, CannotParse {
 		if (!state.optional(TokenType.Extends)) return null;
 		consumeAllLineTerminators();
-		if (!state.token.matchPrimaryExpression()) state.unexpected();
+		if (!state.token.matchPrimaryExpression()) throw state.unexpected();
 		return parseExpression();
 	}
 
@@ -1075,7 +1075,7 @@ public final class Parser {
 			} else if (state.is(TokenType.TemplateEnd)) {
 				break;
 			} else {
-				state.unexpected();
+				throw state.unexpected();
 			}
 		}
 
@@ -1110,8 +1110,7 @@ public final class Parser {
 		} else if (state.token.matchPrimaryExpression()) {
 			return new ArrowFunctionExpression(parseSpecAssignmentExpression(), parameters);
 		} else {
-			state.unexpected();
-			return null;
+			throw state.unexpected();
 		}
 	}
 

@@ -20,16 +20,16 @@ public final class ParserState {
 		this.index = index;
 	}
 
-	public void expected(TokenType type) throws SyntaxError {
-		throw new SyntaxError("Unexpected token %s. Expected %s".formatted(token, type), token.position);
+	public SyntaxError expected(TokenType type) {
+		return new SyntaxError("Unexpected token %s. Expected %s".formatted(token, type), token.position);
 	}
 
-	public void expected(String value) throws SyntaxError {
-		throw new SyntaxError("Unexpected token %s. Expected '%s'".formatted(token, value), token.position);
+	public SyntaxError expected(String value) {
+		return new SyntaxError("Unexpected token %s. Expected '%s'".formatted(token, value), token.position);
 	}
 
-	public void unexpected() throws SyntaxError {
-		throw new SyntaxError("Unexpected token " + token, token.position);
+	public SyntaxError unexpected() {
+		return new SyntaxError("Unexpected token " + token, token.position);
 	}
 
 	Token consume() {
@@ -40,13 +40,13 @@ public final class ParserState {
 	}
 
 	String require(TokenType type) throws SyntaxError {
-		if (token.type != type) expected(type);
+		if (token.type != type) throw expected(type);
 		return consume().value;
 	}
 
 	void require(TokenType type, String value) throws SyntaxError {
-		if (token.type != type) expected(type);
-		if (!token.value.equals(value)) expected(value);
+		if (token.type != type) throw expected(type);
+		if (!token.value.equals(value)) throw expected(value);
 		consume();
 	}
 

@@ -19,12 +19,27 @@ public class BooleanConstructor extends BuiltinConstructor<BooleanWrapper, Boole
 		super(objectPrototype, functionPrototype, Names.Boolean);
 	}
 
-	public BooleanWrapper construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) {
-		throw new NotImplemented("new Boolean()");
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean-constructor-boolean-value")
+	public BooleanWrapper construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
+		// 20.3.1.1 Boolean ( value )
+		final Value<?> value = argument(0, arguments);
+
+		// 1. Let b be ToBoolean(value).
+		final BooleanValue b = value.toBooleanValue(interpreter);
+		// FIXME: 3. Let O be ? OrdinaryCreateFromConstructor(NewTarget, "%Boolean.prototype%", « [[BooleanData]] »).
+		// 4. Set O.[[BooleanData]] to b.
+		// 5. Return O.
+		return new BooleanWrapper(interpreter.intrinsics.booleanPrototype, b);
 	}
 
 	@Override
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean-constructor-boolean-value")
 	public BooleanValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
-		return argument(0, arguments).toBooleanValue(interpreter);
+		// 20.3.1.1 Boolean ( value )
+		final Value<?> value = argument(0, arguments);
+
+		// 1. Let b be ToBoolean(value).
+		// 2. If NewTarget is undefined, return b.
+		return value.toBooleanValue(interpreter);
 	}
 }

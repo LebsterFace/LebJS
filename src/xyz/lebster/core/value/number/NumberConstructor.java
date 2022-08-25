@@ -39,7 +39,7 @@ public final class NumberConstructor extends BuiltinConstructor<NumberWrapper, N
 
 	public NumberWrapper construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
 		final NumberValue n = this.call(interpreter, arguments);
-		// 4. Let O be ? OrdinaryCreateFromConstructor(NewTarget, "%Number.prototype%", « [[NumberData]] »).
+		// FIXME: 4. Let O be ? OrdinaryCreateFromConstructor(NewTarget, "%Number.prototype%", « [[NumberData]] »).
 		// 5. Set O.[[NumberData]] to n.
 		// 6. Return O.
 		return new NumberWrapper(interpreter.intrinsics.numberPrototype, n);

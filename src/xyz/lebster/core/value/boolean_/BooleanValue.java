@@ -3,16 +3,20 @@ package xyz.lebster.core.value.boolean_;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.PrimitiveValue;
 import xyz.lebster.core.value.number.NumberValue;
 import xyz.lebster.core.value.string.StringValue;
 
 public final class BooleanValue extends PrimitiveValue<Boolean> {
-	public static final BooleanValue TRUE = new BooleanValue(Boolean.TRUE);
-	public static final BooleanValue FALSE = new BooleanValue(Boolean.FALSE);
+	public static final BooleanValue TRUE = new BooleanValue(Boolean.TRUE, Names.true_);
+	public static final BooleanValue FALSE = new BooleanValue(Boolean.FALSE, Names.false_);
 
-	private BooleanValue(boolean value) {
+	public final StringValue stringValue;
+
+	private BooleanValue(boolean value, StringValue stringValue) {
 		super(value);
+		this.stringValue = stringValue;
 	}
 
 	public static BooleanValue of(boolean b) {

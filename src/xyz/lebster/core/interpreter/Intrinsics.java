@@ -66,7 +66,7 @@ public final class Intrinsics {
 		arrayConstructor = new ArrayConstructor(objectPrototype, functionPrototype);
 		arrayConstructor.linkToPrototype(arrayPrototype);
 
-		booleanPrototype = new BooleanPrototype(objectPrototype);
+		booleanPrototype = new BooleanPrototype(objectPrototype, functionPrototype);
 		booleanConstructor = new BooleanConstructor(objectPrototype, functionPrototype);
 		booleanConstructor.linkToPrototype(booleanPrototype);
 

@@ -106,8 +106,10 @@ public final class Names {
 
 	// Values
 	public static final StringValue default_ = new StringValue("default");
-	public static final StringValue string = new StringValue("string");
+	public static final StringValue false_ = new StringValue("false");
 	public static final StringValue number = new StringValue("number");
+	public static final StringValue string = new StringValue("string");
+	public static final StringValue true_ = new StringValue("true");
 
 	// Math constants
 	public static final StringValue E = new StringValue("E");

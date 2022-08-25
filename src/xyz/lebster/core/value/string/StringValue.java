@@ -4,7 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.parser.StringEscapeUtils;
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.value.boolean_.BooleanValue;
 import xyz.lebster.core.value.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectValue;

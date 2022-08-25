@@ -1,6 +1,7 @@
 package xyz.lebster.core.parser;
 
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.node.SourcePosition;

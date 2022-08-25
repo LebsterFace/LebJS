@@ -1,5 +1,6 @@
 package xyz.lebster.core.parser;
 
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.SourcePosition;
 

@@ -88,10 +88,7 @@ public final class Main {
 			return;
 		}
 
-		if (
-			throwable instanceof final AbruptCompletion abruptCompletion &&
-			abruptCompletion.type == AbruptCompletion.Type.Throw
-		) {
+		if (throwable instanceof final AbruptCompletion abruptCompletion && abruptCompletion.type == AbruptCompletion.Type.Throw) {
 			if (abruptCompletion.value instanceof final EvalError evalError) {
 				handleError(evalError.wrappedThrowable, stream, false);
 				return;

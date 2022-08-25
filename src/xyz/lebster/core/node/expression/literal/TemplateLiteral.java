@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.parser.StringEscapeUtils;
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.value.string.StringValue;
 
 import java.util.ArrayList;

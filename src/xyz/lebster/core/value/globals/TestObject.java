@@ -7,7 +7,7 @@ import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
-import xyz.lebster.core.parser.StringEscapeUtils;
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;

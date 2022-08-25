@@ -1,4 +1,4 @@
-package xyz.lebster.core.parser;
+package xyz.lebster.core;
 
 import java.util.Set;
 
@@ -34,7 +34,7 @@ public final class StringEscapeUtils {
 					}
 				}
 			} else {
-				if (additionalEscapes.contains(ch)) res.append('\\');
+				if (additionalEscapes != null && additionalEscapes.contains(ch)) res.append('\\');
 				res.append(ch);
 			}
 		}
@@ -55,6 +55,6 @@ public final class StringEscapeUtils {
 		if (containsDoubleQuotes) quoteType = '\'';
 		else if (containsSingleQuotes) quoteType = '"';
 		else quoteType = preferDoubleQuotes ? '"' : '\'';
-		return quoteType + escape(str, Set.of()) + quoteType;
+		return quoteType + escape(str, null) + quoteType;
 	}
 }

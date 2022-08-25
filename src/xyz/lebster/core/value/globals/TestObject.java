@@ -1,16 +1,18 @@
 package xyz.lebster.core.value.globals;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
-import xyz.lebster.core.StringEscapeUtils;
+import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
+import xyz.lebster.core.value.error.EvalError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -26,6 +28,7 @@ public final class TestObject extends ObjectValue {
 		this.putMethod(functionPrototype, Names.equals, TestObject::equalsMethod);
 		this.putMethod(functionPrototype, Names.fail, TestObject::fail);
 		this.putMethod(functionPrototype, Names.expectError, TestObject::expectError);
+		this.putMethod(functionPrototype, Names.expectSyntaxError, TestObject::expectSyntaxError);
 		this.putMethod(functionPrototype, Names.parse, TestObject::parse);
 	}
 
@@ -70,6 +73,27 @@ public final class TestObject extends ObjectValue {
 		}
 
 		throw new ShouldNotHappen("Callback did not throw. Expecting " + StringEscapeUtils.quote(name.value + ": " + messageStarter.value, true));
+	}
+
+	private static Undefined expectSyntaxError(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		final StringValue messageStarter = argument(0, arguments).toStringValue(interpreter);
+		final StringValue sourceText = argument(1, arguments).toStringValue(interpreter);
+
+		final ExecutionContext context = interpreter.pushNewEnvironment();
+		try {
+			Realm.executeWith(sourceText.value, interpreter);
+		} catch (SyntaxError error) {
+			if (!error.getMessage().startsWith(messageStarter.value))
+				assertionFailed(messageStarter, new StringValue(error.getMessage()));
+
+			return Undefined.instance;
+		} catch (Throwable e) {
+			throw AbruptCompletion.error(new EvalError(interpreter, e));
+		} finally {
+			interpreter.exitExecutionContext(context);
+		}
+
+		throw new ShouldNotHappen("Callback did not throw. Expecting " + StringEscapeUtils.quote("SyntaxError: " + messageStarter.value, true));
 	}
 
 	private static Undefined equalsMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {

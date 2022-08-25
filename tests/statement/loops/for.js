@@ -8,13 +8,7 @@ for (
     num += i
 }
 
-try {
-	i
-	Test.fail()
-} catch (e) {
-	Test.expect("i is not defined", e.message)
-	Test.expect("ReferenceError", e.name);
-}
+Test.expectError("ReferenceError", "i is not defined", () => i);
 
 Test.expect(21, num)
 num = null;

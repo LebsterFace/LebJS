@@ -1,5 +1,6 @@
 package xyz.lebster.core.value;
 
+import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
 public final class Names {
@@ -26,6 +27,7 @@ public final class Names {
 	public static final StringValue every = new StringValue("every");
 	public static final StringValue expect = new StringValue("expect");
 	public static final StringValue expectError = new StringValue("expectError");
+	public static final StringValue expectSyntaxError = new StringValue("expectSyntaxError");
 	public static final StringValue fail = new StringValue("fail");
 	public static final StringValue fill = new StringValue("fill");
 	public static final StringValue filter = new StringValue("filter");

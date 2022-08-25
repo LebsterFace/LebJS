@@ -11,10 +11,7 @@ Test.expect(16, double(double(4)));
 let num = double(4);
 Test.expect(16, double(num));
 
-try { x; Test.fail(); } catch(e) {
-    Test.expect(e.name, 'ReferenceError');
-    Test.expect(e.message, 'x is not defined');
-}
+Test.expectError('ReferenceError', 'x is not defined', () => x);
 
 function doubleSquare(x) {
     return double(x) * double(x);

@@ -47,11 +47,4 @@ Test.expect(`foo\
     bar`, "foo    bar");
 
 // reference error from expressions
-try {
-	`${b}`
-	Test.fail();
-} catch (err) {
-	// FIXME: Test.expect(err instanceof ReferenceError);
-	Test.expect(err.name, "ReferenceError");
-	Test.expect(err.message, "b is not defined");
-}
+Test.expectError("ReferenceError", "b is not defined", () => `${b}`);

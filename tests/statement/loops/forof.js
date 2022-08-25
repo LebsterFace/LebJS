@@ -13,13 +13,7 @@ Test.expect(3, object.property)
 for (
     const property of [1,1,1,1,1,1,1]
 ) {}
-try {
-	property
-	Test.fail()
-} catch (e) {
-	Test.expect("property is not defined", e.message)
-	Test.expect("ReferenceError", e.name);
-}
+Test.expectError("ReferenceError", "property is not defined", () => property);
 
 let str = "hello world ❤️👨‍👨‍👧‍👧"
 let newstr = ""

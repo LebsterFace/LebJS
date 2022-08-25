@@ -1,13 +1,12 @@
 package xyz.lebster.core.value.number;
 
-import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.boolean_.BooleanValue;
-import xyz.lebster.core.value.function.FunctionPrototype;
+import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.value.Generator;
+import xyz.lebster.core.value.IteratorResult;
+import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.symbol.SymbolValue;
 
-public final class NumberRange extends ObjectValue {
+public final class NumberRange extends Generator {
 	private final boolean isValid;
 	private final boolean isDecreasing;
 
@@ -15,17 +14,16 @@ public final class NumberRange extends ObjectValue {
 	private final double step;
 	private double current;
 
-	public NumberRange(FunctionPrototype functionPrototype, double end) {
-		this(functionPrototype, 0, end, 1);
+	public NumberRange(Interpreter interpreter, double end) {
+		this(interpreter, 0, end, 1);
 	}
 
-	public NumberRange(FunctionPrototype functionPrototype, double start, double end) {
-		this(functionPrototype, start, end, 1);
+	public NumberRange(Interpreter interpreter, double start, double end) {
+		this(interpreter, start, end, 1);
 	}
 
-	public NumberRange(FunctionPrototype functionPrototype, double start, double end, double step) {
-		super(null);
-		this.initialise(functionPrototype);
+	public NumberRange(Interpreter interpreter, double start, double end, double step) {
+		super(interpreter.intrinsics.objectPrototype, interpreter.intrinsics.functionPrototype);
 
 		if (start < end) {
 			this.isValid = step > 0;
@@ -43,25 +41,17 @@ public final class NumberRange extends ObjectValue {
 		this.step = step;
 	}
 
+	@Override
+	public IteratorResult nextMethod(Interpreter interpreter, Value<?>[] arguments) {
+		if (done()) return new IteratorResult(Undefined.instance, true);
+
+		final var result = new IteratorResult(new NumberValue(current), false);
+		current += step;
+		return result;
+	}
+
 	private boolean done() {
 		if (!this.isValid) return true;
 		return this.isDecreasing ? current <= end : current >= end;
-	}
-
-	private void initialise(FunctionPrototype functionPrototype) {
-		this.putMethod(functionPrototype, SymbolValue.iterator, ($, $$) -> this);
-		this.putMethod(functionPrototype, Names.next, (interpreter, arguments) -> {
-			final ObjectValue result = new ObjectValue(interpreter.intrinsics.objectPrototype);
-			if (done()) {
-				result.put(Names.done, BooleanValue.TRUE);
-				result.put(Names.value, Undefined.instance);
-			} else {
-				result.put(Names.done, BooleanValue.FALSE);
-				result.put(Names.value, new NumberValue(current));
-				current += step;
-			}
-
-			return result;
-		});
 	}
 }

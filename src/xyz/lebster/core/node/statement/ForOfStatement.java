@@ -9,6 +9,7 @@ import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.node.Assignable;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.IteratorHelper;
+import xyz.lebster.core.value.IteratorResult;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 
@@ -19,11 +20,11 @@ public record ForOfStatement(Assignable left, Expression right, Statement body) 
 		final IteratorHelper.ObjectIterator iterator = IteratorHelper.getIterator(interpreter, right);
 
 		Value<?> lastValue = Undefined.instance;
-		for (IteratorHelper.IteratorResult next = iterator.next(); !next.done; next = iterator.next()) {
+		for (var next = iterator.next(); !next.done(); next = iterator.next()) {
 			final ExecutionContext context = interpreter.pushNewEnvironment();
 
 			try {
-				left.assign(interpreter, next.value);
+				left.assign(interpreter, next.value());
 				try {
 					lastValue = body.execute(interpreter);
 				} catch (AbruptCompletion completion) {

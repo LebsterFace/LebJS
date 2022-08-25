@@ -1,6 +1,5 @@
 package xyz.lebster.core.interpreter;
 
-import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayConstructor;
 import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.boolean_.BooleanConstructor;

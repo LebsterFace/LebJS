@@ -6,16 +6,13 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.BuiltinPrototype;
-import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.*;
 import xyz.lebster.core.value.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectPrototype;
-import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.symbol.SymbolValue;
 
 import java.util.PrimitiveIterator;
@@ -545,28 +542,26 @@ public final class StringPrototype extends BuiltinPrototype<StringWrapper, Strin
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype-@@iterator")
-	private static class StringIterator extends ObjectValue {
+	private static class StringIterator extends Generator {
 		private final PrimitiveIterator.OfInt primitiveIterator;
 
 		@NonCompliant
 		public StringIterator(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-			super(null);
+			super(interpreter.intrinsics.objectPrototype, interpreter.intrinsics.functionPrototype);
 			final String value = thisStringValue(interpreter, interpreter.thisValue()).value;
 			this.primitiveIterator = value.codePoints().iterator();
-			this.putMethod(interpreter.intrinsics.functionPrototype, Names.next, this::next);
 		}
 
-		private ObjectValue next(Interpreter interpreter, Value<?>[] arguments) {
-			final ObjectValue result = new ObjectValue(interpreter.intrinsics.objectPrototype);
+		@Override
+		public IteratorResult nextMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 			if (!primitiveIterator.hasNext()) {
-				result.put(Names.done, BooleanValue.TRUE);
-				result.put(Names.value, Undefined.instance);
-				return result;
+				return new IteratorResult(Undefined.instance, true);
 			}
 
-			result.put(Names.done, BooleanValue.FALSE);
-			result.put(Names.value, new StringValue(new String(new int[] { primitiveIterator.nextInt() }, 0, 1)));
-			return result;
+			return new IteratorResult(
+				new StringValue(new String(new int[] { primitiveIterator.nextInt() }, 0, 1)),
+				false
+			);
 		}
 	}
 }

@@ -4,8 +4,8 @@ import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.IteratorHelper;
+import xyz.lebster.core.value.IteratorResult;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.globals.Undefined;
@@ -19,10 +19,10 @@ public record ArrayDestructuring(AssignmentTarget restTarget, AssignmentPattern.
 		final var iterator = IteratorHelper.getIterator(interpreter, input);
 
 		final ArrayList<BindingPair> result = new ArrayList<>();
-		IteratorHelper.IteratorResult next = iterator.next();
+		IteratorResult next = iterator.next();
 		for (final var child : children) {
 			if (child != null) {
-				final Value<?> v = next.done ? Undefined.instance : next.value;
+				final Value<?> v = next.done() ? Undefined.instance : next.value();
 				final Value<?> x = v == Undefined.instance && child.defaultExpression() != null ?
 					child.defaultExpression().execute(interpreter) : v;
 				result.addAll(child.assignmentTarget().getBindings(interpreter, x));
@@ -33,8 +33,8 @@ public record ArrayDestructuring(AssignmentTarget restTarget, AssignmentPattern.
 
 		if (restTarget != null) {
 			final ArrayList<Value<?>> restValues = new ArrayList<>();
-			while (!next.done) {
-				restValues.add(next.value);
+			while (!next.done()) {
+				restValues.add(next.value());
 				next = iterator.next();
 			}
 

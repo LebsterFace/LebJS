@@ -6,9 +6,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.BuiltinPrototype;
-import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.*;
 import xyz.lebster.core.value.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.Executable;
@@ -220,7 +218,6 @@ public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayCon
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.values")
-	// FIXME: [...[1,2,3].values()] => [1,2,3]
 	private static Value<?> values(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
 		return new ArrayIterator(interpreter);
 	}
@@ -744,24 +741,24 @@ public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayCon
 	private record ArrayGroup(Key<?> key, ArrayList<Value<?>> elements) {
 	}
 
-	private static final class ArrayIterator extends ObjectValue {
+	private static final class ArrayIterator extends Generator {
 		private final ObjectValue O;
 		private final long len;
 		private int index;
 
 		public ArrayIterator(Interpreter interpreter) throws AbruptCompletion {
-			super(null);
+			super(interpreter.intrinsics.objectPrototype, interpreter.intrinsics.functionPrototype);
 			this.O = interpreter.thisValue().toObjectValue(interpreter);
 			this.len = lengthOfArrayLike(O, interpreter);
 			this.index = 0;
-			this.putMethod(interpreter.intrinsics.functionPrototype, Names.next, this::next);
 		}
 
-		private Value<?> next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-			final ObjectValue result = new ObjectValue(interpreter.intrinsics.objectPrototype);
-			result.put(Names.value, index > len ? Undefined.instance : O.get(interpreter, new StringValue(index++)));
-			result.put(Names.done, BooleanValue.of(index > len));
-			return result;
+		@Override
+		public IteratorResult nextMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+			return new IteratorResult(
+				index > len ? Undefined.instance : O.get(interpreter, new StringValue(index++)),
+				index > len
+			);
 		}
 	}
 }

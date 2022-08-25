@@ -85,20 +85,10 @@ public final class IteratorHelper {
 
 		public void collect(List<Value<?>> result) throws AbruptCompletion {
 			IteratorResult next = this.next();
-			while (!next.done) {
-				result.add(next.value);
+			while (!next.done()) {
+				result.add(next.value());
 				next = this.next();
 			}
-		}
-	}
-
-	public static final class IteratorResult {
-		public final Value<?> value;
-		public final boolean done;
-
-		private IteratorResult(Value<?> value, boolean done) {
-			this.value = value;
-			this.done = done;
 		}
 	}
 }

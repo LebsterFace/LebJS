@@ -130,9 +130,11 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 
 	@Override
 	public void display(StringRepresentation representation) {
-		representation.append("Symbol(");
-		if (description != null) representation.append(description.value);
-		representation.append(')');
+		representation.append(this.symbolDescriptiveString());
+	}
+
+	public String symbolDescriptiveString() {
+		return "Symbol(" + (description != null ? description.value : "") + ")";
 	}
 
 	@Override

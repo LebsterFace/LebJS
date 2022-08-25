@@ -82,7 +82,7 @@ public final class Intrinsics {
 		shadowRealmConstructor = new ShadowRealmConstructor(objectPrototype, functionPrototype);
 		shadowRealmConstructor.linkToPrototype(shadowRealmPrototype);
 
-		symbolPrototype = new SymbolPrototype(objectPrototype);
+		symbolPrototype = new SymbolPrototype(objectPrototype, functionPrototype);
 		symbolConstructor = new SymbolConstructor(functionPrototype);
 		symbolConstructor.linkToPrototype(symbolPrototype);
 

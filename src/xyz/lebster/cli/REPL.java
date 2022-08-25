@@ -77,13 +77,11 @@ public final class REPL {
 	}
 
 	private String readLine(int indent) {
-		if (!options.hidePrompt()) {
-			if (indent == 0) {
-				System.out.print("> ");
-			} else {
-				for (int i = 0; i < indent; i++)
-					System.out.print('\t');
-			}
+		if (indent == 0) {
+			System.out.print("> ");
+		} else {
+			for (int i = 0; i < indent; i++)
+				System.out.print('\t');
 		}
 
 		return this.scanner.hasNextLine() ? this.scanner.nextLine() : null;

@@ -91,7 +91,7 @@ public final class Testing {
 
 		try {
 			System.out.printf("%n%s%s\t\tPassing Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_GREEN, ANSI.BLACK, successfulTests, totalTests, ANSI.RESET);
-			passedOutput.writeTo(System.out);
+			if (!arguments.options().hidePassing()) passedOutput.writeTo(System.out);
 			System.out.printf("%n%s%s\t\tFailing Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_RED, ANSI.BLACK, totalTests - successfulTests, totalTests, ANSI.RESET);
 			failedOutput.writeTo(System.out);
 			if (totalTests != successfulTests)

@@ -1,6 +1,0 @@
-Test.expect(String, String.prototype.constructor)
-Test.expect(Number, Number.prototype.constructor)
-Test.expect(Boolean, Boolean.prototype.constructor)
-Test.expect(Object, Object.prototype.constructor)
-Test.expect(Array, Array.prototype.constructor)
-Test.expect(Function, Function.prototype.constructor)

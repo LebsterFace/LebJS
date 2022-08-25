@@ -4,7 +4,13 @@ Test.expect(true, "Boolean" in globalThis);
 Test.expect(true, "Symbol" in globalThis);
 Test.expect(true, "Object" in globalThis);
 Test.expect(true, "ShadowRealm" in globalThis);
-Test.expect(true, "Symbol" in globalThis);
+
+Test.expect(String, String.prototype.constructor);
+Test.expect(Number, Number.prototype.constructor);
+Test.expect(Boolean, Boolean.prototype.constructor);
+Test.expect(Object, Object.prototype.constructor);
+Test.expect(Array, Array.prototype.constructor);
+Test.expect(Function, Function.prototype.constructor);
 
 Test.expect("String", String.name);
 Test.expect("Number", Number.name);
@@ -12,7 +18,6 @@ Test.expect("Boolean", Boolean.name);
 Test.expect("Symbol", Symbol.name);
 Test.expect("Object", Object.name);
 Test.expect("ShadowRealm", ShadowRealm.name);
-Test.expect("Symbol", Symbol.name);
 
 Test.expect(String(true), 'true');
 Test.expect(String(false), 'false');
@@ -42,6 +47,19 @@ Test.expect(Boolean, Boolean.prototype.constructor);
 
 Test.expect(Symbol, Symbol.prototype.constructor);
 
+Test.expect(true, Object(true) instanceof Boolean);
+Test.expect(true, Object(true).valueOf());
+Test.expect(true, Object(null) instanceof Object);
+Test.expect(true, Object(undefined) instanceof Object);
+Test.expect(true, Object(0) instanceof Number);
+Test.expect(0, Object(0).valueOf());
+Test.expect(true, Object("hello") instanceof String);
+Test.expect("hello", Object("hello").valueOf());
+const symb = Symbol();
+Test.expect(true, Object(symb) instanceof Symbol);
+Test.expect(symb, Object(symb).valueOf());
+const obj = [];
+Test.expect(obj, Object(obj));
 Test.expect(Object, Object.prototype.constructor);
 
 Test.expect(ShadowRealm, ShadowRealm.prototype.constructor);

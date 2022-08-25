@@ -4,6 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.array.ArrayObject;
 
 import java.util.HashSet;
 
@@ -29,11 +30,17 @@ public final class DataDescriptor implements PropertyDescriptor {
 		if (parents.contains(object)) {
 			representation.append(ANSI.RED);
 
-			if (object.getClass() != parent.getClass()) {
-				object.representClassName(representation);
-			} else {
-				// TODO: <ref *1>
+			if (
+				object.getClass() == ObjectValue.class ||
+				object.getClass() == ArrayObject.class ||
+				object.getClass() == parent.getClass()
+			) {
+				// TODO: Shortest-path property collapsing
+				//       e.g. obj = { self: <obj>, child: {}, array: [<obj.child>] }
+				//       or '<ref *1>' & '[Circular *1]'
 				representation.append(value == parent ? "[self]" : "[parent]");
+			} else {
+				ObjectValue.representClassName(representation, object.getClass().getSimpleName());
 			}
 
 			representation.append(ANSI.RESET);
@@ -79,6 +86,10 @@ public final class DataDescriptor implements PropertyDescriptor {
 		return this.value;
 	}
 
+	public Value<?> value() {
+		return this.value;
+	}
+
 	@Override
 	public void set(Interpreter interpreter, ObjectValue thisValue, Value<?> newValue) {
 		this.value = newValue;
@@ -90,6 +101,7 @@ public final class DataDescriptor implements PropertyDescriptor {
 
 	@Override
 	public void display(StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
+		parents.add(parent);
 		DataDescriptor.display(this.value, representation, parent, parents, singleLine);
 	}
 }

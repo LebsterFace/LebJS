@@ -44,19 +44,28 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 	@SuppressWarnings("unchecked")
 	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		// TODO: Display class name if prototype is not Object.prototype
-		if (objectValue.getClass() != ObjectValue.class) {
-			objectValue.representClassName(representation);
+		if (
+			// Avoid 'Object { }':
+			!(objectValue.prototypeSlot instanceof ObjectPrototype) &&
+			objectValue.prototypeSlot.getProperty(Names.constructor) instanceof final DataDescriptor constructorProperty &&
+			constructorProperty.value() instanceof final ObjectValue constructor &&
+			constructor.getProperty(Names.name) instanceof final DataDescriptor nameProperty &&
+			nameProperty.value() instanceof final StringValue name
+		) {
+			representClassName(representation, name.value);
+			representation.append(' ');
+		} else if (objectValue.getClass() != ObjectValue.class) {
+			representClassName(representation, objectValue.getClass().getSimpleName());
 			representation.append(' ');
 		}
 
-		representation.append('{');
-		representation.append(' ');
+			representation.append('{');
 		if (objectValue.value.isEmpty()) {
 			representation.append('}');
 			return;
 		}
 
+		representation.append(' ');
 		parents.add(objectValue);
 		if (!singleLine) {
 			representation.appendLine();
@@ -84,6 +93,12 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		}
 
 		representation.append('}');
+	}
+
+	public static void representClassName(StringRepresentation representation, String className) {
+		representation.append(ANSI.CYAN);
+		representation.append(className);
+		representation.append(ANSI.RESET);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarygetprototypeof")
@@ -415,12 +430,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		}
 
 		return result;
-	}
-
-	public final void representClassName(StringRepresentation representation) {
-		representation.append(ANSI.CYAN);
-		representation.append(this.getClass().getSimpleName());
-		representation.append(ANSI.RESET);
 	}
 
 	@Override

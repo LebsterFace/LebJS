@@ -810,7 +810,7 @@ public final class Parser {
 			case LParen -> parseParenthesizedExpressionOrArrowFunctionExpression();
 			case Identifier -> parseIdentifierExpressionOrArrowFunctionExpression();
 
-			case RegexpLiteral -> parseRegexpLiteral();
+			case RegexpPattern -> parseRegexpLiteral();
 			case StringLiteral -> parseAsStringLiteral();
 			case NumericLiteral -> parseNumericLiteral(false);
 			case Period -> {
@@ -849,8 +849,9 @@ public final class Parser {
 	}
 
 	private RegExpLiteral parseRegexpLiteral() throws SyntaxError {
-		final String pattern = state.require(TokenType.RegexpLiteral);
-		return new RegExpLiteral(pattern);
+		final String pattern = state.require(TokenType.RegexpPattern);
+		final String flags = state.require(TokenType.RegexpFlags);
+		return new RegExpLiteral(pattern, flags);
 	}
 
 	private Expression parseIdentifierExpressionOrArrowFunctionExpression() throws CannotParse, SyntaxError {

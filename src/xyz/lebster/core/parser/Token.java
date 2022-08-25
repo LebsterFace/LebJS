@@ -188,7 +188,7 @@ public final class Token {
 			   || type == Null
 			   || type == BigIntLiteral
 			   || type == NumericLiteral
-			   || type == RegexpLiteral
+			   || type == RegexpPattern
 			   || type == StringLiteral
 			   || type == Super
 			   || type == TemplateStart

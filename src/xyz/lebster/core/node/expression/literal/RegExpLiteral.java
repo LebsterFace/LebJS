@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.regexp.RegExpObject;
 
-public record RegExpLiteral(String pattern) implements Expression {
+public record RegExpLiteral(String pattern, String flags) implements Expression {
 	@Override
 	public void dump(int indent) {
 		DumpBuilder.begin(indent).value(this, pattern);
@@ -18,6 +18,6 @@ public record RegExpLiteral(String pattern) implements Expression {
 	}
 
 	public RegExpObject execute(Interpreter interpreter) {
-		return new RegExpObject(interpreter.intrinsics.regExpPrototype, pattern);
+		return new RegExpObject(interpreter.intrinsics.regExpPrototype, pattern, flags);
 	}
 }

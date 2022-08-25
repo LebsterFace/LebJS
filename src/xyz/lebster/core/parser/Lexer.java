@@ -220,6 +220,18 @@ public final class Lexer {
 		return result;
 	}
 
+	private boolean anyOf(int[] codePoints) {
+		for (final int i : codePoints)
+			if (codePoint == i)
+				return true;
+
+		return false;
+	}
+
+	private boolean anyOf(String codePoints) {
+		return anyOf(codePoints.codePoints().toArray());
+	}
+
 	private boolean isIdentifierStart() {
 		if (codePoint == '\\') {
 			return false;
@@ -265,13 +277,22 @@ public final class Lexer {
 										 || lastTokenType == TokenType.RParen
 										 || lastTokenType == TokenType.PlusPlus
 										 || lastTokenType == TokenType.PrivateIdentifier
-										 || lastTokenType == TokenType.RegexpLiteral
+										 || lastTokenType == TokenType.RegexpPattern
 										 || lastTokenType == TokenType.StringLiteral
 										 || lastTokenType == TokenType.TemplateExpressionEnd
 										 || lastTokenType == TokenType.This);
 	}
 
 	public Token next() throws SyntaxError {
+		if (lastTokenType == TokenType.RegexpPattern) {
+			final StringBuilder regexpFlags = new StringBuilder();
+			while (anyOf("dgimsuy")) {
+				collect(regexpFlags);
+			}
+
+			return new Token(TokenType.RegexpFlags, regexpFlags.toString(), position());
+		}
+
 		final boolean inTemplateLiteral = !templateLiteralStates.isEmpty();
 
 		if (!inTemplateLiteral || templateLiteralStates.getFirst().inExpression) {
@@ -350,12 +371,7 @@ public final class Lexer {
 			}
 		}
 
-		// Flags
-		while (isAlphabetical(codePoint)) {
-			collect(builder);
-		}
-
-		return new Token(TokenType.RegexpLiteral, builder.toString(), position());
+		return new Token(TokenType.RegexpPattern, builder.toString(), position());
 	}
 
 	private boolean hasNext() {

@@ -474,75 +474,83 @@ public final class Parser {
 
 	private AssignmentTarget parseAssignmentTarget() throws SyntaxError, CannotParse {
 		if (state.optional(TokenType.LBrace)) {
-			consumeAllLineTerminators();
-
-			final Map<Expression, AssignmentPattern> pairs = new HashMap<>();
-			StringValue restName = null;
-			while (!state.is(TokenType.RBrace)) {
-				if (state.optional(TokenType.DotDotDot)) {
-					consumeAllLineTerminators();
-					if (state.token.matchIdentifierName()) {
-						restName = new StringValue(state.consume().value);
-						consumeAllLineTerminators();
-						if (!state.optional(TokenType.Comma)) break;
-						consumeAllLineTerminators();
-						continue;
-					} else {
-						throw new SyntaxError("`...` must be followed by an identifier in declaration contexts", position());
-					}
-				}
-
-				if (state.token.matchIdentifierName()) {
-					final StringLiteral key = parseAsStringLiteral();
-					consumeAllLineTerminators();
-
-					if (state.optional(TokenType.Colon)) {
-						consumeAllLineTerminators();
-						pairs.put(key, parseInitializer(parseAssignmentTarget()));
-					} else {
-						pairs.put(key, parseInitializer(new IdentifierExpression(key.value())));
-					}
-				} else {
-					pairs.put(parseComputedKeyExpression(), parseInitializer(parseAssignmentTarget()));
-				}
-
-				consumeAllLineTerminators();
-				if (!state.optional(TokenType.Comma)) break;
-				consumeAllLineTerminators();
-			}
-
-			consumeAllLineTerminators();
-			state.require(TokenType.RBrace);
-			return new ObjectDestructuring(pairs, restName);
+			return parseObjectDestructuring();
 		} else if (state.optional(TokenType.LBracket)) {
-			final ArrayList<AssignmentPattern> children = new ArrayList<>();
-			AssignmentTarget restTarget = null;
-
-			consumeAllLineTerminators();
-			while (true) {
-				consumeAllLineTerminators();
-				if (state.optional(TokenType.Comma)) {
-					children.add(null);
-				} else if (state.optional(TokenType.DotDotDot)) {
-					consumeAllLineTerminators();
-					restTarget = parseAssignmentTarget();
-					consumeAllLineTerminators();
-					if (state.optional(TokenType.Comma)) throw new SyntaxError("Rest element must be last element", position());
-					break;
-				} else {
-					children.add(parseInitializer(parseAssignmentTarget()));
-					consumeAllLineTerminators();
-					if (!state.optional(TokenType.Comma)) break;
-				}
-			}
-
-			state.require(TokenType.RBracket);
-			return new ArrayDestructuring(restTarget, children.toArray(new AssignmentPattern[0]));
+			return parseArrayDestructuring();
 		} else if (state.token.matchIdentifierName()) {
 			return new IdentifierExpression(state.consume().value);
 		} else {
 			throw state.unexpected();
 		}
+	}
+
+	private ArrayDestructuring parseArrayDestructuring() throws SyntaxError, CannotParse {
+		final ArrayList<AssignmentPattern> children = new ArrayList<>();
+		AssignmentTarget restTarget = null;
+
+		consumeAllLineTerminators();
+		while (true) {
+			consumeAllLineTerminators();
+			if (state.optional(TokenType.Comma)) {
+				children.add(null);
+			} else if (state.optional(TokenType.DotDotDot)) {
+				consumeAllLineTerminators();
+				restTarget = parseAssignmentTarget();
+				consumeAllLineTerminators();
+				if (state.optional(TokenType.Comma)) throw new SyntaxError("Rest element must be last element", position());
+				break;
+			} else {
+				children.add(parseInitializer(parseAssignmentTarget()));
+				consumeAllLineTerminators();
+				if (!state.optional(TokenType.Comma)) break;
+			}
+		}
+
+		state.require(TokenType.RBracket);
+		return new ArrayDestructuring(restTarget, children.toArray(new AssignmentPattern[0]));
+	}
+
+	private ObjectDestructuring parseObjectDestructuring() throws SyntaxError, CannotParse {
+		consumeAllLineTerminators();
+
+		final Map<Expression, AssignmentPattern> pairs = new HashMap<>();
+		StringValue restName = null;
+		while (!state.is(TokenType.RBrace)) {
+			if (state.optional(TokenType.DotDotDot)) {
+				consumeAllLineTerminators();
+				if (state.token.matchIdentifierName()) {
+					restName = new StringValue(state.consume().value);
+					consumeAllLineTerminators();
+					if (!state.optional(TokenType.Comma)) break;
+					consumeAllLineTerminators();
+					continue;
+				} else {
+					throw new SyntaxError("`...` must be followed by an identifier in declaration contexts", position());
+				}
+			}
+
+			if (state.token.matchIdentifierName()) {
+				final StringLiteral key = parseAsStringLiteral();
+				consumeAllLineTerminators();
+
+				if (state.optional(TokenType.Colon)) {
+					consumeAllLineTerminators();
+					pairs.put(key, parseInitializer(parseAssignmentTarget()));
+				} else {
+					pairs.put(key, parseInitializer(new IdentifierExpression(key.value())));
+				}
+			} else {
+				pairs.put(parseComputedKeyExpression(), parseInitializer(parseAssignmentTarget()));
+			}
+
+			consumeAllLineTerminators();
+			if (!state.optional(TokenType.Comma)) break;
+			consumeAllLineTerminators();
+		}
+
+		consumeAllLineTerminators();
+		state.require(TokenType.RBrace);
+		return new ObjectDestructuring(pairs, restName);
 	}
 
 	private Expression parseComputedKeyExpression() throws SyntaxError, CannotParse {

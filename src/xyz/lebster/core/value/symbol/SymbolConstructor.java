@@ -4,6 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.Names;
+import xyz.lebster.core.value.PrimitiveConstructor;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionPrototype;
@@ -12,9 +13,10 @@ import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.string.StringValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol-constructor")
-public final class SymbolConstructor extends Executable {
+public final class SymbolConstructor extends PrimitiveConstructor {
 	public SymbolConstructor(FunctionPrototype functionPrototype) {
 		super(functionPrototype, Names.Symbol);
+		// FIXME: { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: false }
 		this.putNonWritable(Names.asyncIterator, SymbolValue.asyncIterator);
 		this.putNonWritable(Names.hasInstance, SymbolValue.hasInstance);
 		this.putNonWritable(Names.isConcatSpreadable, SymbolValue.isConcatSpreadable);
@@ -31,11 +33,6 @@ public final class SymbolConstructor extends Executable {
 	}
 
 	@Override
-	public StringValue toStringMethod() {
-		return NativeFunction.toStringForName(Names.Symbol.value);
-	}
-
-	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol-description")
 	public SymbolValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		// 20.4.1.1 Symbol ( [ description ] )
@@ -46,10 +43,5 @@ public final class SymbolConstructor extends Executable {
 		final StringValue descString = description == Undefined.instance ? null : description.toStringValue(interpreter);
 		// 4. Return a new unique Symbol value whose [[Description]] value is descString.
 		return new SymbolValue(descString);
-	}
-
-	public void linkToPrototype(SymbolPrototype prototype) {
-		this.putFrozen(Names.prototype, prototype);
-		prototype.put(Names.constructor, this);
 	}
 }

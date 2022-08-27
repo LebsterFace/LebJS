@@ -1,21 +1,21 @@
 package xyz.lebster.core.value.number;
 
+import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
+import xyz.lebster.core.value.PrimitiveConstructor;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
-import xyz.lebster.core.value.object.ObjectPrototype;
-import xyz.lebster.core.value.object.ObjectValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-number-constructor")
-public final class NumberConstructor extends BuiltinConstructor<NumberWrapper, NumberPrototype> {
-	public NumberConstructor(ObjectPrototype objectPrototype, FunctionPrototype fp) {
-		super(objectPrototype, fp, Names.Number);
-		this.putMethod(fp, Names.range, NumberConstructor::range);
+@NonStandard
+public final class NumberConstructor extends PrimitiveConstructor {
+	public NumberConstructor(FunctionPrototype functionPrototype) {
+		super(functionPrototype, Names.Number);
+		this.putMethod(functionPrototype, Names.range, NumberConstructor::range);
 	}
 
 	private static NumberRange range(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
@@ -35,14 +35,6 @@ public final class NumberConstructor extends BuiltinConstructor<NumberWrapper, N
 		if (Double.isNaN(third))
 			throw AbruptCompletion.error(new TypeError(interpreter, "NaN passed as third argument of Number.range"));
 		return new NumberRange(interpreter, first, second, third);
-	}
-
-	public NumberWrapper construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
-		final NumberValue n = this.call(interpreter, arguments);
-		// FIXME: 4. Let O be ? OrdinaryCreateFromConstructor(NewTarget, "%Number.prototype%", « [[NumberData]] »).
-		// 5. Set O.[[NumberData]] to n.
-		// 6. Return O.
-		return new NumberWrapper(interpreter.intrinsics.numberPrototype, n);
 	}
 
 	@Override

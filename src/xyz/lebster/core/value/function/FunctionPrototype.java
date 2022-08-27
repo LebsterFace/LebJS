@@ -6,6 +6,7 @@ import xyz.lebster.core.value.BuiltinPrototype;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectPrototype;
+import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
 import java.util.Arrays;

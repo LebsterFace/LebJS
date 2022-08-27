@@ -19,12 +19,6 @@ public abstract class BuiltinConstructor<T extends ObjectValue, P extends Builti
 		return NativeFunction.toStringForName(this.name.value);
 	}
 
-
-	public final void linkToPrototype(P prototype) {
-		this.putFrozen(Names.prototype, prototype);
-		prototype.put(Names.constructor, this);
-	}
-
 	@Override
 	public abstract T construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion;
 }

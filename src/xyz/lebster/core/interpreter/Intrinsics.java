@@ -1,11 +1,13 @@
 package xyz.lebster.core.interpreter;
 
+import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.array.ArrayConstructor;
 import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.boolean_.BooleanConstructor;
 import xyz.lebster.core.value.boolean_.BooleanPrototype;
 import xyz.lebster.core.value.error.ErrorConstructor;
 import xyz.lebster.core.value.error.ErrorPrototype;
+import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionConstructor;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.ConsoleObject;
@@ -15,6 +17,7 @@ import xyz.lebster.core.value.number.NumberConstructor;
 import xyz.lebster.core.value.number.NumberPrototype;
 import xyz.lebster.core.value.object.ObjectConstructor;
 import xyz.lebster.core.value.object.ObjectPrototype;
+import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.regexp.RegExpConstructor;
 import xyz.lebster.core.value.regexp.RegExpPrototype;
 import xyz.lebster.core.value.shadowrealm.ShadowRealmConstructor;
@@ -53,49 +56,63 @@ public final class Intrinsics {
 
 	Intrinsics() {
 		objectPrototype = new ObjectPrototype();
-
 		functionPrototype = new FunctionPrototype(objectPrototype);
-		functionConstructor = new FunctionConstructor(objectPrototype, functionPrototype);
-		functionConstructor.linkToPrototype(functionPrototype);
+		linkPrototypeAndConstructor(
+			functionConstructor = new FunctionConstructor(objectPrototype, functionPrototype),
+			functionPrototype
+		);
 
 		objectPrototype.populateMethods(functionPrototype);
 		objectConstructor = new ObjectConstructor(objectPrototype, functionPrototype);
-		objectConstructor.linkToPrototype(objectPrototype);
+		linkPrototypeAndConstructor(objectConstructor, objectPrototype);
 
-		arrayPrototype = new ArrayPrototype(objectPrototype, functionPrototype);
-		arrayConstructor = new ArrayConstructor(objectPrototype, functionPrototype);
-		arrayConstructor.linkToPrototype(arrayPrototype);
+		linkPrototypeAndConstructor(
+			arrayConstructor = new ArrayConstructor(objectPrototype, functionPrototype),
+			arrayPrototype = new ArrayPrototype(objectPrototype, functionPrototype)
+		);
 
-		booleanPrototype = new BooleanPrototype(objectPrototype, functionPrototype);
-		booleanConstructor = new BooleanConstructor(objectPrototype, functionPrototype);
-		booleanConstructor.linkToPrototype(booleanPrototype);
+		linkPrototypeAndConstructor(
+			booleanConstructor = new BooleanConstructor(functionPrototype),
+			booleanPrototype = new BooleanPrototype(objectPrototype, functionPrototype)
+		);
 
-		numberPrototype = new NumberPrototype(objectPrototype, functionPrototype);
-		numberConstructor = new NumberConstructor(objectPrototype, functionPrototype);
-		numberConstructor.linkToPrototype(numberPrototype);
+		linkPrototypeAndConstructor(
+			numberConstructor = new NumberConstructor(functionPrototype),
+			numberPrototype = new NumberPrototype(objectPrototype, functionPrototype)
+		);
 
-		stringPrototype = new StringPrototype(objectPrototype, functionPrototype);
-		stringConstructor = new StringConstructor(objectPrototype, functionPrototype);
-		stringConstructor.linkToPrototype(stringPrototype);
+		linkPrototypeAndConstructor(
+			stringConstructor = new StringConstructor(functionPrototype),
+			stringPrototype = new StringPrototype(objectPrototype, functionPrototype)
+		);
 
-		shadowRealmPrototype = new ShadowRealmPrototype(objectPrototype, functionPrototype);
-		shadowRealmConstructor = new ShadowRealmConstructor(objectPrototype, functionPrototype);
-		shadowRealmConstructor.linkToPrototype(shadowRealmPrototype);
+		linkPrototypeAndConstructor(
+			shadowRealmConstructor = new ShadowRealmConstructor(objectPrototype, functionPrototype),
+			shadowRealmPrototype = new ShadowRealmPrototype(objectPrototype, functionPrototype)
+		);
 
-		symbolPrototype = new SymbolPrototype(objectPrototype, functionPrototype);
-		symbolConstructor = new SymbolConstructor(functionPrototype);
-		symbolConstructor.linkToPrototype(symbolPrototype);
+		linkPrototypeAndConstructor(
+			symbolConstructor = new SymbolConstructor(functionPrototype),
+			symbolPrototype = new SymbolPrototype(objectPrototype, functionPrototype)
+		);
 
-		errorPrototype = new ErrorPrototype(objectPrototype);
-		errorConstructor = new ErrorConstructor(objectPrototype, functionPrototype);
-		errorConstructor.linkToPrototype(errorPrototype);
+		linkPrototypeAndConstructor(
+			errorConstructor = new ErrorConstructor(objectPrototype, functionPrototype),
+			errorPrototype = new ErrorPrototype(objectPrototype)
+		);
 
-		regExpPrototype = new RegExpPrototype(objectPrototype);
-		regExpConstructor = new RegExpConstructor(objectPrototype, functionPrototype);
-		regExpConstructor.linkToPrototype(regExpPrototype);
+		linkPrototypeAndConstructor(
+			regExpConstructor = new RegExpConstructor(objectPrototype, functionPrototype),
+			regExpPrototype = new RegExpPrototype(objectPrototype)
+		);
 
 		mathObject = new MathObject(objectPrototype, functionPrototype);
 		testObject = new TestObject(functionPrototype);
 		consoleObject = new ConsoleObject(functionPrototype);
+	}
+
+	private static void linkPrototypeAndConstructor(Executable constructor, ObjectValue prototype) {
+		constructor.putFrozen(Names.prototype, prototype);
+		prototype.put(Names.constructor, constructor);
 	}
 }

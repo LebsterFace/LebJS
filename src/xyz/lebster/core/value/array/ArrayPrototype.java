@@ -27,7 +27,7 @@ import java.util.List;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 
-public final class ArrayPrototype extends BuiltinPrototype<ArrayObject, ArrayConstructor> {
+public final class ArrayPrototype extends ObjectValue {
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
 
 	public ArrayPrototype(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {

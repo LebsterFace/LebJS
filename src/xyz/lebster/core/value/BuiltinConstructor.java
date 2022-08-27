@@ -9,7 +9,7 @@ import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
-public abstract class BuiltinConstructor<T extends ObjectValue, P extends BuiltinPrototype<T, ?>> extends Constructor {
+public abstract class BuiltinConstructor<T extends ObjectValue, P extends ObjectValue> extends Constructor {
 	public BuiltinConstructor(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype, StringValue name) {
 		super(objectPrototype, functionPrototype, name);
 	}

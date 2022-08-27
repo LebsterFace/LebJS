@@ -4,18 +4,18 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.BuiltinPrototype;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectPrototype;
+import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
-public final class NumberPrototype extends BuiltinPrototype<NumberWrapper, NumberConstructor> {
+public final class NumberPrototype extends ObjectValue {
 	public NumberPrototype(ObjectPrototype objectPrototype, FunctionPrototype fp) {
 		super(objectPrototype);
 		this.putMethod(fp, Names.toString, NumberPrototype::toStringMethod);

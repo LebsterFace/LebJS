@@ -13,6 +13,7 @@ import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectPrototype;
+import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.symbol.SymbolValue;
 
 import java.util.PrimitiveIterator;
@@ -23,7 +24,7 @@ import static xyz.lebster.core.value.number.NumberPrototype.toIntegerOrInfinity;
 import static xyz.lebster.core.value.object.ObjectPrototype.requireObjectCoercible;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-string-prototype-object")
-public final class StringPrototype extends BuiltinPrototype<StringWrapper, StringConstructor> {
+public final class StringPrototype extends ObjectValue {
 
 	public StringPrototype(ObjectPrototype objectPrototype, FunctionPrototype fp) {
 		super(objectPrototype);

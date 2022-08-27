@@ -3,7 +3,6 @@ package xyz.lebster.core.value.symbol;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.BuiltinPrototype;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
@@ -14,7 +13,7 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-symbol-prototype-object")
-public final class SymbolPrototype extends BuiltinPrototype<SymbolWrapper, SymbolConstructor> {
+public final class SymbolPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype.description")
 	private static final NativeAccessorDescriptor DESCRIPTION = new NativeAccessorDescriptor(false, true) {
 		@Override

@@ -7,7 +7,7 @@ import xyz.lebster.core.value.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.string.StringValue;
 
-public abstract class PrimitiveWrapper<T extends PrimitiveValue<?>, P extends BuiltinPrototype<?, ?>> extends ObjectValue {
+public abstract class PrimitiveWrapper<T extends PrimitiveValue<?>, P extends ObjectValue> extends ObjectValue {
 	public final T data;
 
 	public PrimitiveWrapper(P prototype, T data) {

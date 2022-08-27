@@ -3,7 +3,6 @@ package xyz.lebster.core.value.object;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.BuiltinPrototype;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
@@ -16,7 +15,7 @@ import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.string.StringValue;
 import xyz.lebster.core.value.symbol.SymbolValue;
 
-public final class ObjectPrototype extends BuiltinPrototype<ObjectValue, ObjectConstructor> {
+public final class ObjectPrototype extends ObjectValue {
 	public NativeFunction toStringMethod;
 
 	public ObjectPrototype() {

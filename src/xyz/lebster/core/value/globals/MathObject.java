@@ -24,14 +24,22 @@ public final class MathObject extends ObjectValue {
 		put(SymbolValue.toStringTag, Names.Math);
 
 		// 21.3.1 Value Properties of the Math Object
-		this.putFrozen(Names.E, new NumberValue(2.7182818284590452354D)); // e, the base of the natural logarithms
-		this.putFrozen(Names.LN10, new NumberValue(2.302585092994046D)); // the natural logarithm of 10
-		this.putFrozen(Names.LN2, new NumberValue(0.6931471805599453D)); // the natural logarithm of 2
-		this.putFrozen(Names.LOG10E, new NumberValue(0.4342944819032518D)); // the base-10 logarithm of e, the base of the natural logarithms
-		this.putFrozen(Names.LOG2E, new NumberValue(1.4426950408889634D)); // the base-2 logarithm of e, the base of the natural logarithms
-		this.putFrozen(Names.PI, new NumberValue(3.1415926535897932D)); // π, the ratio of the circumference of a circle to its diameter
-		this.putFrozen(Names.SQRT1_2, new NumberValue(0.7071067811865476D)); // the square root of ½
-		this.putFrozen(Names.SQRT2, new NumberValue(1.4142135623730951D)); // the square root of 2
+		// e, the base of the natural logarithms
+		put(Names.E, new NumberValue(2.7182818284590452354D), false, false, false);
+		// the natural logarithm of 10
+		put(Names.LN10, new NumberValue(2.302585092994046D), false, false, false);
+		// the natural logarithm of 2
+		put(Names.LN2, new NumberValue(0.6931471805599453D), false, false, false);
+		// the base-10 logarithm of e, the base of the natural logarithms
+		put(Names.LOG10E, new NumberValue(0.4342944819032518D), false, false, false);
+		// the base-2 logarithm of e, the base of the natural logarithms
+		put(Names.LOG2E, new NumberValue(1.4426950408889634D), false, false, false);
+		// π, the ratio of the circumference of a circle to its diameter
+		put(Names.PI, new NumberValue(3.1415926535897932D), false, false, false);
+		// the square root of ½
+		put(Names.SQRT1_2, new NumberValue(0.7071067811865476D), false, false, false);
+		// the square root of 2
+		put(Names.SQRT2, new NumberValue(1.4142135623730951D), false, false, false);
 
 		// (double) -> double
 		addWrapper(fp, "abs", (DoubleUnaryOperator) Math::abs);

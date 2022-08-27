@@ -112,7 +112,7 @@ public final class Intrinsics {
 	}
 
 	private static void linkPrototypeAndConstructor(Executable constructor, ObjectValue prototype) {
-		constructor.putFrozen(Names.prototype, prototype);
+		constructor.put(Names.prototype, prototype, false, false, false);
 		prototype.put(Names.constructor, constructor);
 	}
 }

@@ -59,7 +59,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			representation.append(' ');
 		}
 
-			representation.append('{');
+		representation.append('{');
 		if (objectValue.value.isEmpty()) {
 			representation.append('}');
 			return;
@@ -384,20 +384,12 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return this.ordinaryDelete(P);
 	}
 
+	public void put(Key<?> key, Value<?> value, boolean writable, boolean enumerable, boolean configurable) {
+		this.value.put(key, new DataDescriptor(value, writable, enumerable, configurable));
+	}
+
 	public void put(Key<?> key, Value<?> value) {
 		this.value.put(key, new DataDescriptor(value, true, false, true));
-	}
-
-	public void putEnumerable(Key<?> key, Value<?> value) {
-		this.value.put(key, new DataDescriptor(value, true, true, true));
-	}
-
-	public void putNonWritable(Key<?> key, Value<?> value) {
-		this.value.put(key, new DataDescriptor(value, false, false, true));
-	}
-
-	protected void putFrozen(Key<?> key, Value<?> value) {
-		this.value.put(key, new DataDescriptor(value, false, false, false));
 	}
 
 	public NativeFunction putMethod(FunctionPrototype functionPrototype, ObjectValue.Key<?> key, NativeCode code) {

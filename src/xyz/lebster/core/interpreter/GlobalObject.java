@@ -24,9 +24,9 @@ public final class GlobalObject extends ObjectValue {
 		// 19.1 Value Properties of the Global Object
 		put(Names.globalThis, this);
 
-		putNonWritable(Names.NaN, NumberValue.NaN);
-		putNonWritable(Names.Infinity, new NumberValue(Double.POSITIVE_INFINITY));
-		putNonWritable(Names.undefined, Undefined.instance);
+		put(Names.NaN, NumberValue.NaN, false, false, true);
+		put(Names.Infinity, new NumberValue(Double.POSITIVE_INFINITY), false, false, true);
+		put(Names.undefined, Undefined.instance, false, false, true);
 
 		// 19.2 Function Properties of the Global Object
 		putMethod(intrinsics.functionPrototype, Names.eval, GlobalObject::eval);

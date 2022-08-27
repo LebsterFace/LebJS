@@ -37,7 +37,7 @@ public final class SymbolPrototype extends BuiltinPrototype<SymbolWrapper, Symbo
 		putMethod(fp, Names.toString, SymbolPrototype::toStringMethod);
 		putMethod(fp, Names.valueOf, SymbolPrototype::valueOf);
 		putMethod(fp, SymbolValue.toPrimitive, SymbolPrototype::toPrimitiveMethod);
-		putNonWritable(SymbolValue.toStringTag, Names.Symbol);
+		put(SymbolValue.toStringTag, Names.Symbol, false, false, true);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype.valueof")

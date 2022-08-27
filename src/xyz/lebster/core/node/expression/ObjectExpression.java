@@ -75,7 +75,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 				function.updateName(key.toFunctionName());
 			}
 
-			result.putEnumerable(key, executedValue);
+			result.put(key, executedValue, true, true, true);
 		}
 
 		@Override
@@ -105,7 +105,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 				function.updateName(executedKey.toFunctionName());
 			}
 
-			result.putEnumerable(executedKey, executedValue);
+			result.put(executedKey, executedValue, true, true, true);
 		}
 
 		@Override
@@ -128,7 +128,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 	private record ShorthandEntryNode(StringValue key) implements ObjectEntryNode {
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
-			result.putEnumerable(key, interpreter.getBinding(key).getValue(interpreter));
+			result.put(key, interpreter.getBinding(key).getValue(interpreter), true, true, true);
 		}
 
 		@Override

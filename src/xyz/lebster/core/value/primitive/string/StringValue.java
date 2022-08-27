@@ -1,12 +1,12 @@
-package xyz.lebster.core.value.string;
+package xyz.lebster.core.value.primitive.string;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.StringEscapeUtils;
-import xyz.lebster.core.value.boolean_.BooleanValue;
-import xyz.lebster.core.value.number.NumberValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectValue;
 
 public final class StringValue extends ObjectValue.Key<String> {

@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.LeftHandSideExpression;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.List;
 

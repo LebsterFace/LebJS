@@ -4,7 +4,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 public class DeclarativeEnvironment implements Environment {
 	private final ObjectValue variables;

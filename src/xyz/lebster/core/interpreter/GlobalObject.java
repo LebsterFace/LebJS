@@ -7,12 +7,12 @@ import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.EvalError;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.number.NumberValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 

@@ -11,12 +11,12 @@ import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.number.NumberValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.DataDescriptor;
 import xyz.lebster.core.value.object.NativeAccessorDescriptor;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.object.PropertyDescriptor;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.ArrayList;
 import java.util.HashSet;

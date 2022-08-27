@@ -10,7 +10,7 @@ import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-function-objects")
 public final class Function extends Constructor {

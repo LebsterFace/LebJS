@@ -11,7 +11,7 @@ import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Token;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.HashSet;
 import java.util.Scanner;

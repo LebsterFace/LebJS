@@ -7,7 +7,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 
 public record EqualityExpression(Expression left, Expression right, EqualityOp op) implements Expression {
 	@Override

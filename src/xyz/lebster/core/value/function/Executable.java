@@ -13,10 +13,10 @@ import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.HashSet;
 

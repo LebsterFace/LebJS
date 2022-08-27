@@ -8,12 +8,12 @@ import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
-import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.ArrayList;
 import java.util.Map;

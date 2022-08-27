@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 public abstract class Constructor extends Executable {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-makeconstructor")

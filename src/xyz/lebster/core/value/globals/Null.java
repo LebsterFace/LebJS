@@ -3,12 +3,12 @@ package xyz.lebster.core.value.globals;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.value.PrimitiveValue;
-import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.PrimitiveValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
-import xyz.lebster.core.value.number.NumberValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 public final class Null extends PrimitiveValue<Void> {
 	public static final Null instance = new Null();

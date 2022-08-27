@@ -1,4 +1,4 @@
-package xyz.lebster.core.value.number;
+package xyz.lebster.core.value.primitive.number;
 
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.Generator;

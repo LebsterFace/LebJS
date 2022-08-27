@@ -1,4 +1,4 @@
-package xyz.lebster.core.value.number;
+package xyz.lebster.core.value.primitive.number;
 
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
@@ -11,7 +11,7 @@ import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 

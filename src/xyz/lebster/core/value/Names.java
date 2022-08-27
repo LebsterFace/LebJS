@@ -1,7 +1,6 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 public final class Names {
 	// Properties and methods

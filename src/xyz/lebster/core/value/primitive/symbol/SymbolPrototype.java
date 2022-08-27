@@ -1,4 +1,4 @@
-package xyz.lebster.core.value.symbol;
+package xyz.lebster.core.value.primitive.symbol;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -10,7 +10,7 @@ import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.NativeAccessorDescriptor;
 import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-symbol-prototype-object")
 public final class SymbolPrototype extends ObjectValue {

@@ -4,18 +4,18 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.function.FunctionPrototype;
-import xyz.lebster.core.value.number.NumberValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
-import xyz.lebster.core.value.symbol.SymbolValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
+import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
 
 import static xyz.lebster.core.value.function.NativeFunction.argumentDouble;
-import static xyz.lebster.core.value.number.NumberValue.isNegativeZero;
-import static xyz.lebster.core.value.number.NumberValue.isPositiveZero;
+import static xyz.lebster.core.value.primitive.number.NumberValue.isNegativeZero;
+import static xyz.lebster.core.value.primitive.number.NumberValue.isPositiveZero;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-math-object")
 public final class MathObject extends ObjectValue {

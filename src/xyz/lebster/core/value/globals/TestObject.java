@@ -16,7 +16,7 @@ import xyz.lebster.core.value.error.EvalError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 

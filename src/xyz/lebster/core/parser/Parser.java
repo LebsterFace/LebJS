@@ -13,9 +13,9 @@ import xyz.lebster.core.node.expression.ClassExpression.ClassMethodNode;
 import xyz.lebster.core.node.expression.UpdateExpression.UpdateOp;
 import xyz.lebster.core.node.expression.literal.*;
 import xyz.lebster.core.node.statement.*;
-import xyz.lebster.core.value.boolean_.BooleanValue;
-import xyz.lebster.core.value.number.NumberValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.*;
 

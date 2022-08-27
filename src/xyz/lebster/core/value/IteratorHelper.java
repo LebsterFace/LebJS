@@ -11,7 +11,7 @@ import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.object.PropertyDescriptor;
-import xyz.lebster.core.value.symbol.SymbolValue;
+import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.util.List;
 

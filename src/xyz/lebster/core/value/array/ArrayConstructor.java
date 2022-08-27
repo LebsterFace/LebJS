@@ -8,14 +8,14 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.RangeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionPrototype;
-import xyz.lebster.core.value.number.NumberValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentInt;

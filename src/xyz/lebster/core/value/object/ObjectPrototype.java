@@ -6,14 +6,14 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.string.StringValue;
-import xyz.lebster.core.value.symbol.SymbolValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
+import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 public final class ObjectPrototype extends ObjectValue {
 	public NativeFunction toStringMethod;

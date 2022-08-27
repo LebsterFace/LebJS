@@ -1,12 +1,12 @@
-package xyz.lebster.core.value.boolean_;
+package xyz.lebster.core.value.primitive.boolean_;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.PrimitiveValue;
-import xyz.lebster.core.value.number.NumberValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.PrimitiveValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 public final class BooleanValue extends PrimitiveValue<Boolean> {
 	public static final BooleanValue TRUE = new BooleanValue(Boolean.TRUE, Names.true_);

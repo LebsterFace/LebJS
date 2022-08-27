@@ -1,11 +1,10 @@
-package xyz.lebster.core.value;
+package xyz.lebster.core.value.primitive;
 
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
-import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 @NonStandard
 public abstract class PrimitiveConstructor extends Executable {

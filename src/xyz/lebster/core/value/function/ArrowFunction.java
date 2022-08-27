@@ -7,7 +7,7 @@ import xyz.lebster.core.node.expression.ArrowFunctionExpression;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 public final class ArrowFunction extends Executable {
 	private final ExecutionContext context;

@@ -7,7 +7,7 @@ import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 public abstract class BuiltinConstructor<T extends ObjectValue, P extends ObjectValue> extends Constructor {
 	public BuiltinConstructor(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype, StringValue name) {

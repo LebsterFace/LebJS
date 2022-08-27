@@ -6,10 +6,10 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.number.NumberValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
-import static xyz.lebster.core.value.number.NumberValue.UINT32_LIMIT;
+import static xyz.lebster.core.value.primitive.number.NumberValue.UINT32_LIMIT;
 
 public record BinaryExpression(Expression left, Expression right, BinaryOp op) implements Expression {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-applystringornumericbinaryoperator")

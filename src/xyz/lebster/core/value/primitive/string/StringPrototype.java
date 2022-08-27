@@ -1,4 +1,4 @@
-package xyz.lebster.core.value.string;
+package xyz.lebster.core.value.primitive.string;
 
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.NonStandard;
@@ -7,20 +7,20 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.*;
-import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.number.NumberValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.symbol.SymbolValue;
+import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.util.PrimitiveIterator;
 import java.util.regex.Pattern;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
-import static xyz.lebster.core.value.number.NumberPrototype.toIntegerOrInfinity;
+import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
 import static xyz.lebster.core.value.object.ObjectPrototype.requireObjectCoercible;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-string-prototype-object")

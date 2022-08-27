@@ -1,11 +1,11 @@
-package xyz.lebster.core.value.string;
+package xyz.lebster.core.value.primitive.string;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.PrimitiveWrapper;
-import xyz.lebster.core.value.number.NumberValue;
+import xyz.lebster.core.value.primitive.PrimitiveWrapper;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.DataDescriptor;
 import xyz.lebster.core.value.object.PropertyDescriptor;
 

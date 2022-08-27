@@ -9,9 +9,9 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.PrimitiveValue;
+import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.CheckedError;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.Executable;
@@ -20,9 +20,9 @@ import xyz.lebster.core.value.function.NativeCode;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.number.NumberValue;
-import xyz.lebster.core.value.string.StringValue;
-import xyz.lebster.core.value.symbol.SymbolValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
+import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.util.*;
 

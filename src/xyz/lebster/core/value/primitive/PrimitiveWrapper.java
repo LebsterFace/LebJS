@@ -1,11 +1,11 @@
-package xyz.lebster.core.value;
+package xyz.lebster.core.value.primitive;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.boolean_.BooleanValue;
-import xyz.lebster.core.value.number.NumberValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 public abstract class PrimitiveWrapper<T extends PrimitiveValue<?>, P extends ObjectValue> extends ObjectValue {
 	public final T data;

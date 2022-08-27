@@ -1,10 +1,10 @@
-package xyz.lebster.core.value.boolean_;
+package xyz.lebster.core.value.primitive.boolean_;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.value.HasBuiltinTag;
-import xyz.lebster.core.value.PrimitiveWrapper;
+import xyz.lebster.core.value.primitive.PrimitiveWrapper;
 
-@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-objects")
+@SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean-objects")
 public final class BooleanWrapper extends PrimitiveWrapper<BooleanValue, BooleanPrototype> implements HasBuiltinTag {
 	public BooleanWrapper(BooleanPrototype prototype, BooleanValue data) {
 		super(prototype, data);

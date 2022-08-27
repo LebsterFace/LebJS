@@ -21,7 +21,7 @@ import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.Function;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.string.StringValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.List;
 

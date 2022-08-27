@@ -1,8 +1,8 @@
-package xyz.lebster.core.value.number;
+package xyz.lebster.core.value.primitive.number;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.value.HasBuiltinTag;
-import xyz.lebster.core.value.PrimitiveWrapper;
+import xyz.lebster.core.value.primitive.PrimitiveWrapper;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-number-objects")
 public final class NumberWrapper extends PrimitiveWrapper<NumberValue, NumberPrototype> implements HasBuiltinTag {

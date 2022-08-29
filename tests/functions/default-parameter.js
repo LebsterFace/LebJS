@@ -3,6 +3,7 @@
     let foo = (param = 'hello') => param
 
     Test.expect('hello', foo())
+    Test.expect('hello', foo(undefined))
     Test.expect(1234, foo(1234))
 }
 

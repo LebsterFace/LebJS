@@ -12,11 +12,12 @@ import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.globals.Undefined;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 public final class FunctionParameters implements Dumpable, Iterable<FunctionParameters.Parameter> {
-	private final List<Parameter> parameterList = new ArrayList<>();
+	private final List<Parameter> formalParameters = new ArrayList<>();
 	public AssignmentTarget rest;
 
 	public FunctionParameters() {
@@ -29,50 +30,55 @@ public final class FunctionParameters implements Dumpable, Iterable<FunctionPara
 	}
 
 	public void addWithDefault(AssignmentTarget target, Expression defaultExpression) {
-		this.parameterList.add(new Parameter(target, defaultExpression));
+		this.formalParameters.add(new Parameter(target, defaultExpression));
 	}
 
 	public void add(AssignmentTarget target) {
-		this.parameterList.add(new Parameter(target, null));
+		this.formalParameters.add(new Parameter(target, null));
 	}
 
 	@Override
 	public void dump(int indent) {
-		for (final var parameter : parameterList) {
+		for (final var parameter : formalParameters) {
 			parameter.dump(indent + 1);
 		}
 	}
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		if (parameterList.size() > 0) {
-			representation.append(parameterList.get(0));
-			for (int i = 1; i < parameterList.size(); i++) {
+		if (formalParameters.size() > 0) {
+			representation.append(formalParameters.get(0));
+			for (int i = 1; i < formalParameters.size(); i++) {
 				representation.append(", ");
-				representation.append(parameterList.get(i));
+				representation.append(formalParameters.get(i));
 			}
 		}
 	}
 
 	public void declareArguments(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
 		int i = 0;
-		for (; i < parameterList.size() && i < passedArguments.length; i++)
-			parameterList.get(i).declare(interpreter, passedArguments[i]);
+		while (i < formalParameters.size() && i < passedArguments.length) {
+			formalParameters.get(i).declare(interpreter, passedArguments[i]);
+			i++;
+		}
+
 		if (rest == null) {
-			for (; i < parameterList.size(); i++)
-				parameterList.get(i).declare(interpreter);
+			// For any remaining formal parameters
+			while (i < formalParameters.size()) {
+				formalParameters.get(i).declare(interpreter, Undefined.instance);
+				i++;
+			}
 		} else {
-			final ArrayList<Value<?>> restValues = new ArrayList<>();
-			for (; i < passedArguments.length; i++)
-				restValues.add(passedArguments[i]);
-			final ArrayObject restArray = new ArrayObject(interpreter, restValues);
-			rest.declare(interpreter, VariableDeclaration.Kind.Let, restArray);
+			// let rest = passedArguments.slice(i)
+			rest.declare(interpreter, VariableDeclaration.Kind.Let, new ArrayObject(interpreter,
+				Arrays.copyOfRange(passedArguments, i, passedArguments.length)
+			));
 		}
 	}
 
 	@Override
 	public Iterator<Parameter> iterator() {
-		return parameterList.iterator();
+		return formalParameters.iterator();
 	}
 
 	public record Parameter(AssignmentTarget target, Expression defaultExpression) implements Dumpable {
@@ -94,14 +100,10 @@ public final class FunctionParameters implements Dumpable, Iterable<FunctionPara
 		}
 
 		public void declare(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
-			target.declare(interpreter, VariableDeclaration.Kind.Let, value);
-		}
-
-		public void declare(Interpreter interpreter) throws AbruptCompletion {
-			if (defaultExpression != null) {
+			if (value == Undefined.instance && defaultExpression != null) {
 				target.declare(interpreter, VariableDeclaration.Kind.Let, defaultExpression);
 			} else {
-				target.declare(interpreter, VariableDeclaration.Kind.Let, Undefined.instance);
+				target.declare(interpreter, VariableDeclaration.Kind.Let, value);
 			}
 		}
 	}

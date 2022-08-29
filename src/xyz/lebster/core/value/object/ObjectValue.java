@@ -42,7 +42,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		this.prototypeSlot = prototype;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
 		if (objectValue.prototypeSlot == null) {
 			representClassName(representation, "[" + objectValue.getClass().getSimpleName() + ": null prototype]");
@@ -75,20 +74,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			representation.indent();
 		}
 
-		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> iterator = objectValue.value.entrySet().iterator();
-		while (iterator.hasNext()) {
-			final Map.Entry<Key<?>, PropertyDescriptor> entry = iterator.next();
-			if (!singleLine) representation.appendIndent();
-			representation.append(ANSI.BRIGHT_BLACK);
-			entry.getKey().displayForObjectKey(representation);
-			representation.append(ANSI.RESET);
-			representation.append(": ");
-
-			entry.getValue().display(representation, objectValue, (HashSet<ObjectValue>) parents.clone(), singleLine);
-			if (iterator.hasNext()) representation.append(',');
-			if (singleLine) representation.append(' ');
-			else representation.appendLine();
-		}
+		objectValue.representProperties(representation, parents, singleLine, objectValue.value.entrySet().iterator());
 
 		if (!singleLine) {
 			representation.unindent();
@@ -102,6 +88,27 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		representation.append(ANSI.CYAN);
 		representation.append(className);
 		representation.append(ANSI.RESET);
+	}
+
+	protected static void representPropertyDelimiter(boolean moreElements, StringRepresentation representation, boolean singleLine) {
+		if (moreElements) representation.append(',');
+		if (singleLine) representation.append(' ');
+		else representation.appendLine();
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void representProperties(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine, Iterator<Map.Entry<Key<?>, PropertyDescriptor>> iterator) {
+		while (iterator.hasNext()) {
+			final Map.Entry<Key<?>, PropertyDescriptor> entry = iterator.next();
+			if (!singleLine) representation.appendIndent();
+			representation.append(ANSI.BRIGHT_BLACK);
+			entry.getKey().displayForObjectKey(representation);
+			representation.append(ANSI.RESET);
+			representation.append(": ");
+
+			entry.getValue().display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
+			representPropertyDelimiter(iterator.hasNext(), representation, singleLine);
+		}
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarygetprototypeof")

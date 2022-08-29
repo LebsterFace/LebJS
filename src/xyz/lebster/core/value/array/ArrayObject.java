@@ -69,17 +69,10 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		this(interpreter, new Value<?>[length]);
 	}
 
-	private static void representValueEnder(boolean moreElements, StringRepresentation representation, boolean singleLine) {
-		if (moreElements) representation.append(',');
-		if (singleLine) representation.append(' ');
-		else representation.appendLine();
-	}
-
-	private static void representEmpty(StringRepresentation representation, boolean singleLine, boolean moreElements, int emptyCount) {
+	private static void representEmpty(StringRepresentation representation, int emptyCount) {
 		representation.append(ANSI.BRIGHT_BLACK);
 		representation.append(emptyCount == 1 ? "empty" : "empty x " + emptyCount);
 		representation.append(ANSI.RESET);
-		representValueEnder(moreElements, representation, singleLine);
 	}
 
 	@Override
@@ -161,47 +154,43 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 	@SuppressWarnings("unchecked")
 	private void representValues(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		final Iterator<PropertyDescriptor> iterator = arrayValues.iterator();
-		final ArrayList<Map.Entry<Key<?>, PropertyDescriptor>> nonLengthMapIterator = new ArrayList<>();
-		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : value.entrySet()) {
-			if (entry.getKey() == Names.length) continue;
-			nonLengthMapIterator.add(entry);
-		}
-
-		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> mapIterator = nonLengthMapIterator.iterator();
-
+		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> propertiesIterator = nonLengthProperties().iterator();
+		final Iterator<PropertyDescriptor> elementsIterator = arrayValues.iterator();
 		int emptyCount = 0;
-		while (iterator.hasNext()) {
+		while (elementsIterator.hasNext()) {
 			if (!singleLine) representation.appendIndent();
-			PropertyDescriptor next = iterator.next();
+			final PropertyDescriptor next = elementsIterator.next();
 			if (next == null) {
 				emptyCount++;
-			} else {
-				if (emptyCount > 0) {
-					representEmpty(representation, singleLine, true, emptyCount);
-					emptyCount = 0;
-				}
-
-				next.display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
-				representValueEnder(iterator.hasNext() || mapIterator.hasNext(), representation, singleLine);
+				continue;
 			}
+
+			if (emptyCount > 0) {
+				representEmpty(representation, emptyCount);
+				representPropertyDelimiter(true, representation, singleLine);
+				emptyCount = 0;
+			}
+
+			next.display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
+			representPropertyDelimiter(elementsIterator.hasNext() || propertiesIterator.hasNext(), representation, singleLine);
 		}
 
 		if (emptyCount > 0) {
-			representEmpty(representation, singleLine, mapIterator.hasNext(), emptyCount);
+			representEmpty(representation, emptyCount);
+			representPropertyDelimiter(propertiesIterator.hasNext(), representation, singleLine);
 		}
 
-		while (mapIterator.hasNext()) {
-			final Map.Entry<Key<?>, PropertyDescriptor> entry = mapIterator.next();
-			if (!singleLine) representation.appendIndent();
-			representation.append(ANSI.BRIGHT_BLACK);
-			entry.getKey().displayForObjectKey(representation);
-			representation.append(ANSI.RESET);
-			representation.append(": ");
+		representProperties(representation, parents, singleLine, propertiesIterator);
+	}
 
-			entry.getValue().display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
-			representValueEnder(iterator.hasNext(), representation, singleLine);
+	private ArrayList<Map.Entry<Key<?>, PropertyDescriptor>> nonLengthProperties() {
+		final ArrayList<Map.Entry<Key<?>, PropertyDescriptor>> nonLengthProperties = new ArrayList<>();
+		for (final var entry : value.entrySet()) {
+			if (entry.getKey().equalsKey(Names.length)) continue;
+			nonLengthProperties.add(entry);
 		}
+
+		return nonLengthProperties;
 	}
 
 	public Value<?>[] values(Interpreter interpreter) throws AbruptCompletion {

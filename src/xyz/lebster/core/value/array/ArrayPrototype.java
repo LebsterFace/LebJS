@@ -72,10 +72,24 @@ public final class ArrayPrototype extends ObjectValue {
 		put(SymbolValue.iterator, values);
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.at")
-	private static Value<?> at(Interpreter interpreter, Value<?>[] values) {
-		throw new NotImplemented("Array.prototype.at");
+	private static Value<?> at(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.1 Array.prototype.at ( index )
+		final Value<?> index = argument(0, arguments);
+
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(O, interpreter);
+		// 3. Let relativeIndex be ? ToIntegerOrInfinity(index).
+		final int relativeIndex = NumberPrototype.toIntegerOrInfinity(interpreter, index);
+		// 4. If relativeIndex ≥ 0, then a. Let k be relativeIndex. 5. Else, a. Let k be len + relativeIndex.
+		final long k = relativeIndex >= 0 ? relativeIndex : len + relativeIndex;
+
+		// 6. If k < 0 or k ≥ len, return undefined.
+		if (k < 0 || k >= len) return Undefined.instance;
+		// 7. Return ? Get(O, ! ToString(𝔽(k))).
+		return O.get(interpreter, new StringValue(k));
 	}
 
 	@NonCompliant

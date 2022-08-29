@@ -2,6 +2,7 @@ package xyz.lebster.core.value.primitive.number;
 
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.Names;
@@ -59,11 +60,14 @@ public final class NumberPrototype extends ObjectValue {
 			}
 		}
 		// 5. Let integer be floor(abs(ℝ(number))).
-		int integer = (int) Math.floor(Math.abs(numberValue.value));
+		long integer = (long) Math.floor(Math.abs(numberValue.value));
 		// 6. If number < +0𝔽, set integer to -integer.
 		if (numberValue.value < 0) integer = -integer;
 		// 7. Return integer.
-		return integer;
+		if (integer > Integer.MAX_VALUE)
+			throw new NotImplemented("ToIntegerOrInfinity returning values over 2^31-1");
+
+		return (int) integer;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tolocalestring")

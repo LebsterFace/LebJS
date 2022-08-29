@@ -9,7 +9,6 @@ import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.node.Assignable;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.IteratorHelper;
-import xyz.lebster.core.value.IteratorResult;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 

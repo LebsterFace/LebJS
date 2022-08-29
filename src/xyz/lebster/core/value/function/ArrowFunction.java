@@ -2,6 +2,7 @@ package xyz.lebster.core.value.function;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.node.expression.ArrowFunctionExpression;
 import xyz.lebster.core.value.Names;
@@ -13,10 +14,10 @@ public final class ArrowFunction extends Executable {
 	private final ExecutionContext context;
 	private final ArrowFunctionExpression expression;
 
-	public ArrowFunction(Interpreter interpreter, ArrowFunctionExpression expression, ExecutionContext context) {
+	public ArrowFunction(Intrinsics intrinsics, ArrowFunctionExpression expression, ExecutionContext context) {
 		// TODO: Automatic function names for arrow & non-arrow functions
 		//		e.g. ' let k = () => {} ' should be given the name 'k'
-		super(interpreter.intrinsics.functionPrototype, Names.EMPTY);
+		super(intrinsics.functionPrototype, Names.EMPTY);
 		this.expression = expression;
 		this.context = context;
 	}

@@ -6,17 +6,19 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.*;
-import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.interpreter.Intrinsics;
+import xyz.lebster.core.value.Generator;
+import xyz.lebster.core.value.IteratorResult;
+import xyz.lebster.core.value.Names;
+import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.Executable;
-import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberPrototype;
 import xyz.lebster.core.value.primitive.number.NumberValue;
-import xyz.lebster.core.value.object.ObjectPrototype;
-import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
@@ -30,45 +32,45 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 public final class ArrayPrototype extends ObjectValue {
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
 
-	public ArrayPrototype(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
-		super(objectPrototype);
-		putMethod(functionPrototype, Names.at, ArrayPrototype::at);
-		putMethod(functionPrototype, Names.concat, ArrayPrototype::concat);
-		putMethod(functionPrototype, Names.copyWithin, ArrayPrototype::copyWithin);
-		putMethod(functionPrototype, Names.entries, ArrayPrototype::entries);
-		putMethod(functionPrototype, Names.every, ArrayPrototype::every);
-		putMethod(functionPrototype, Names.fill, ArrayPrototype::fill);
-		putMethod(functionPrototype, Names.filter, ArrayPrototype::filter);
-		putMethod(functionPrototype, Names.find, ArrayPrototype::find);
-		putMethod(functionPrototype, Names.findIndex, ArrayPrototype::findIndex);
-		putMethod(functionPrototype, Names.findLast, ArrayPrototype::findLast);
-		putMethod(functionPrototype, Names.findLastIndex, ArrayPrototype::findLastIndex);
-		putMethod(functionPrototype, Names.flat, ArrayPrototype::flat);
-		putMethod(functionPrototype, Names.flatMap, ArrayPrototype::flatMap);
-		putMethod(functionPrototype, Names.forEach, ArrayPrototype::forEach);
-		putMethod(functionPrototype, Names.group, ArrayPrototype::group);
-		putMethod(functionPrototype, Names.groupToMap, ArrayPrototype::groupToMap);
-		putMethod(functionPrototype, Names.includes, ArrayPrototype::includes);
-		putMethod(functionPrototype, Names.indexOf, ArrayPrototype::indexOf);
-		putMethod(functionPrototype, Names.join, ArrayPrototype::join);
-		putMethod(functionPrototype, Names.keys, ArrayPrototype::keys);
-		putMethod(functionPrototype, Names.lastIndexOf, ArrayPrototype::lastIndexOf);
-		putMethod(functionPrototype, Names.map, ArrayPrototype::map);
-		putMethod(functionPrototype, Names.pop, ArrayPrototype::pop);
-		putMethod(functionPrototype, Names.push, ArrayPrototype::push);
-		putMethod(functionPrototype, Names.reduce, ArrayPrototype::reduce);
-		putMethod(functionPrototype, Names.reduceRight, ArrayPrototype::reduceRight);
-		putMethod(functionPrototype, Names.reverse, ArrayPrototype::reverse);
-		putMethod(functionPrototype, Names.shift, ArrayPrototype::shift);
-		putMethod(functionPrototype, Names.slice, ArrayPrototype::slice);
-		putMethod(functionPrototype, Names.some, ArrayPrototype::some);
-		putMethod(functionPrototype, Names.sort, ArrayPrototype::sort);
-		putMethod(functionPrototype, Names.splice, ArrayPrototype::splice);
-		putMethod(functionPrototype, Names.toLocaleString, ArrayPrototype::toLocaleString);
-		putMethod(functionPrototype, Names.toString, ArrayPrototype::toStringMethod);
-		putMethod(functionPrototype, Names.unshift, ArrayPrototype::unshift);
+	public ArrayPrototype(Intrinsics intrinsics) {
+		super(intrinsics);
+		putMethod(intrinsics, Names.at, ArrayPrototype::at);
+		putMethod(intrinsics, Names.concat, ArrayPrototype::concat);
+		putMethod(intrinsics, Names.copyWithin, ArrayPrototype::copyWithin);
+		putMethod(intrinsics, Names.entries, ArrayPrototype::entries);
+		putMethod(intrinsics, Names.every, ArrayPrototype::every);
+		putMethod(intrinsics, Names.fill, ArrayPrototype::fill);
+		putMethod(intrinsics, Names.filter, ArrayPrototype::filter);
+		putMethod(intrinsics, Names.find, ArrayPrototype::find);
+		putMethod(intrinsics, Names.findIndex, ArrayPrototype::findIndex);
+		putMethod(intrinsics, Names.findLast, ArrayPrototype::findLast);
+		putMethod(intrinsics, Names.findLastIndex, ArrayPrototype::findLastIndex);
+		putMethod(intrinsics, Names.flat, ArrayPrototype::flat);
+		putMethod(intrinsics, Names.flatMap, ArrayPrototype::flatMap);
+		putMethod(intrinsics, Names.forEach, ArrayPrototype::forEach);
+		putMethod(intrinsics, Names.group, ArrayPrototype::group);
+		putMethod(intrinsics, Names.groupToMap, ArrayPrototype::groupToMap);
+		putMethod(intrinsics, Names.includes, ArrayPrototype::includes);
+		putMethod(intrinsics, Names.indexOf, ArrayPrototype::indexOf);
+		putMethod(intrinsics, Names.join, ArrayPrototype::join);
+		putMethod(intrinsics, Names.keys, ArrayPrototype::keys);
+		putMethod(intrinsics, Names.lastIndexOf, ArrayPrototype::lastIndexOf);
+		putMethod(intrinsics, Names.map, ArrayPrototype::map);
+		putMethod(intrinsics, Names.pop, ArrayPrototype::pop);
+		putMethod(intrinsics, Names.push, ArrayPrototype::push);
+		putMethod(intrinsics, Names.reduce, ArrayPrototype::reduce);
+		putMethod(intrinsics, Names.reduceRight, ArrayPrototype::reduceRight);
+		putMethod(intrinsics, Names.reverse, ArrayPrototype::reverse);
+		putMethod(intrinsics, Names.shift, ArrayPrototype::shift);
+		putMethod(intrinsics, Names.slice, ArrayPrototype::slice);
+		putMethod(intrinsics, Names.some, ArrayPrototype::some);
+		putMethod(intrinsics, Names.sort, ArrayPrototype::sort);
+		putMethod(intrinsics, Names.splice, ArrayPrototype::splice);
+		putMethod(intrinsics, Names.toLocaleString, ArrayPrototype::toLocaleString);
+		putMethod(intrinsics, Names.toString, ArrayPrototype::toStringMethod);
+		putMethod(intrinsics, Names.unshift, ArrayPrototype::unshift);
 
-		final NativeFunction values = putMethod(functionPrototype, Names.values, ArrayPrototype::values);
+		final NativeFunction values = putMethod(intrinsics, Names.values, ArrayPrototype::values);
 		put(SymbolValue.iterator, values);
 	}
 
@@ -297,7 +299,7 @@ public final class ArrayPrototype extends ObjectValue {
 		}
 
 		// 7. Let obj be OrdinaryObjectCreate(null).
-		final var obj = new ObjectValue(null);
+		final var obj = new ObjectValue((ObjectValue) null);
 		// 8. For each Record { [[Key]], [[Elements]] } g of groups, do
 		for (final ArrayGroup g : groups) {
 			// a. Let elements be CreateArrayFromList(g.[[Elements]]).
@@ -790,7 +792,7 @@ public final class ArrayPrototype extends ObjectValue {
 		private int index;
 
 		public ArrayIterator(Interpreter interpreter) throws AbruptCompletion {
-			super(interpreter.intrinsics.objectPrototype, interpreter.intrinsics.functionPrototype);
+			super(interpreter.intrinsics);
 			this.O = interpreter.thisValue().toObjectValue(interpreter);
 			this.len = lengthOfArrayLike(O, interpreter);
 			this.index = 0;

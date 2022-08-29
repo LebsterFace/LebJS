@@ -2,12 +2,13 @@ package xyz.lebster.core.value.primitive.string;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.primitive.PrimitiveWrapper;
-import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.DataDescriptor;
 import xyz.lebster.core.value.object.PropertyDescriptor;
+import xyz.lebster.core.value.primitive.PrimitiveWrapper;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -15,8 +16,8 @@ import java.util.PrimitiveIterator;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-objects")
 public final class StringWrapper extends PrimitiveWrapper<StringValue, StringPrototype> implements HasBuiltinTag {
-	public StringWrapper(StringPrototype prototype, StringValue data) {
-		super(prototype, data);
+	public StringWrapper(Intrinsics intrinsics, StringValue data) {
+		super(intrinsics.stringPrototype, data);
 		this.put(Names.length, new NumberValue(data.value.length()));
 	}
 

@@ -4,16 +4,16 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.primitive.PrimitiveConstructor;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
-import xyz.lebster.core.value.function.FunctionPrototype;
+import xyz.lebster.core.value.primitive.PrimitiveConstructor;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-number-constructor")
 @NonStandard
 public final class NumberConstructor extends PrimitiveConstructor {
-	public NumberConstructor(FunctionPrototype functionPrototype) {
+	public NumberConstructor(Intrinsics functionPrototype) {
 		super(functionPrototype, Names.Number);
 		this.putMethod(functionPrototype, Names.range, NumberConstructor::range);
 	}
@@ -24,17 +24,17 @@ public final class NumberConstructor extends PrimitiveConstructor {
 		final double first = args[0].toNumberValue(interpreter).value;
 		if (Double.isNaN(first))
 			throw AbruptCompletion.error(new TypeError(interpreter, "NaN passed as first argument of Number.range"));
-		if (args.length == 1) return new NumberRange(interpreter, first);
+		if (args.length == 1) return new NumberRange(interpreter.intrinsics, first);
 
 		final double second = args[1].toNumberValue(interpreter).value;
 		if (Double.isNaN(second))
 			throw AbruptCompletion.error(new TypeError(interpreter, "NaN passed as second argument of Number.range"));
-		if (args.length == 2) return new NumberRange(interpreter, first, second);
+		if (args.length == 2) return new NumberRange(interpreter.intrinsics, first, second);
 
 		final double third = args[2].toNumberValue(interpreter).value;
 		if (Double.isNaN(third))
 			throw AbruptCompletion.error(new TypeError(interpreter, "NaN passed as third argument of Number.range"));
-		return new NumberRange(interpreter, first, second, third);
+		return new NumberRange(interpreter.intrinsics, first, second, third);
 	}
 
 	@Override

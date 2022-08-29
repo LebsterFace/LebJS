@@ -6,6 +6,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.Environment;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
@@ -109,14 +110,14 @@ public record ClassExpression(
 	public record ClassMethodNode(String className, String name, FunctionParameters parameters, BlockStatement body, SourceRange range) implements ClassFunctionNode {
 		@Override
 		public ClassMethod execute(Interpreter interpreter) {
-			return new ClassMethod(interpreter, interpreter.environment(), this);
+			return new ClassMethod(interpreter.intrinsics, interpreter.environment(), this);
 		}
 	}
 
 	public record ClassConstructorNode(String className, FunctionParameters parameters, BlockStatement body, boolean isDerived, SourceRange range) implements ClassFunctionNode {
 		@Override
 		public ClassConstructor execute(Interpreter interpreter) {
-			return new ClassConstructor(interpreter, interpreter.environment(), this, isDerived, className);
+			return new ClassConstructor(interpreter.intrinsics, interpreter.environment(), this, isDerived, className);
 		}
 
 		@Override
@@ -136,14 +137,14 @@ public record ClassExpression(
 		private final boolean isDerived;
 
 		public ClassConstructor(
-			Interpreter interpreter,
+			Intrinsics intrinsics,
 			Environment environment,
 			ClassConstructorNode code,
 			boolean isDerived,
 			String name
 		) {
 			// FIXME: Pass in proper prototype here
-			super(interpreter.intrinsics.objectPrototype, interpreter.intrinsics.functionPrototype, name == null ? Names.EMPTY : new StringValue(name));
+			super(intrinsics, name == null ? Names.EMPTY : new StringValue(name));
 			this.environment = environment;
 			this.code = code;
 			this.isDerived = isDerived;
@@ -198,9 +199,9 @@ public record ClassExpression(
 	private static final class ClassMethod extends Executable {
 		private final Function wrappedFunction;
 
-		public ClassMethod(Interpreter interpreter, Environment environment, ClassExpression.ClassMethodNode code) {
-			super(interpreter.intrinsics.functionPrototype, new StringValue(code.name));
-			this.wrappedFunction = new Function(interpreter, environment, code);
+		public ClassMethod(Intrinsics intrinsics, Environment environment, ClassExpression.ClassMethodNode code) {
+			super(intrinsics, new StringValue(code.name));
+			this.wrappedFunction = new Function(intrinsics, environment, code);
 		}
 
 		@Override

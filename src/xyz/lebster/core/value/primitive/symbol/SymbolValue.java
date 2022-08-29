@@ -5,10 +5,10 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
-import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-language-types-symbol-type")
@@ -120,7 +120,7 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 
 	@Override
 	public ObjectValue toObjectValue(Interpreter interpreter) {
-		return new SymbolWrapper(interpreter.intrinsics.symbolPrototype, this);
+		return new SymbolWrapper(interpreter.intrinsics, this);
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 public record GlobalEnvironment(ObjectValue variables, GlobalObject globalObject) implements Environment {
 	public GlobalEnvironment(GlobalObject globalObject) {
-		this(new ObjectValue(null), globalObject);
+		this(new ObjectValue((ObjectValue) null), globalObject);
 	}
 
 	@Override

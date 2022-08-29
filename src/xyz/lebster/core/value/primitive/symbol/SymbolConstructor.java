@@ -3,16 +3,16 @@ package xyz.lebster.core.value.primitive.symbol;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.primitive.PrimitiveConstructor;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.primitive.PrimitiveConstructor;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol-constructor")
 public final class SymbolConstructor extends PrimitiveConstructor {
-	public SymbolConstructor(FunctionPrototype functionPrototype) {
+	public SymbolConstructor(Intrinsics functionPrototype) {
 		super(functionPrototype, Names.Symbol);
 		put(Names.asyncIterator, SymbolValue.asyncIterator, false, false, false);
 		put(Names.hasInstance, SymbolValue.hasInstance, false, false, false);

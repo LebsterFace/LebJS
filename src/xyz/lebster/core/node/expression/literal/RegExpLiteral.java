@@ -18,6 +18,6 @@ public record RegExpLiteral(String pattern, String flags) implements Expression 
 	}
 
 	public RegExpObject execute(Interpreter interpreter) {
-		return new RegExpObject(interpreter.intrinsics.regExpPrototype, pattern, flags);
+		return new RegExpObject(interpreter.intrinsics, pattern, flags);
 	}
 }

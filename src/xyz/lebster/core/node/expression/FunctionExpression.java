@@ -11,7 +11,7 @@ import xyz.lebster.core.value.function.Function;
 public record FunctionExpression(BlockStatement body, String name, FunctionParameters parameters) implements FunctionNode, Expression {
 	@Override
 	public Value<?> execute(Interpreter interpreter) {
-		return new Function(interpreter, interpreter.environment(), this);
+		return new Function(interpreter.intrinsics, interpreter.environment(), this);
 	}
 
 	@Override

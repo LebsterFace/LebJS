@@ -6,63 +6,65 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.*;
-import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.interpreter.Intrinsics;
+import xyz.lebster.core.value.Generator;
+import xyz.lebster.core.value.IteratorResult;
+import xyz.lebster.core.value.Names;
+import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
-import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.primitive.number.NumberValue;
-import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.util.PrimitiveIterator;
 import java.util.regex.Pattern;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
-import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
 import static xyz.lebster.core.value.object.ObjectPrototype.requireObjectCoercible;
+import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-string-prototype-object")
 public final class StringPrototype extends ObjectValue {
 
-	public StringPrototype(ObjectPrototype objectPrototype, FunctionPrototype fp) {
-		super(objectPrototype);
+	public StringPrototype(Intrinsics intrinsics) {
+		super(intrinsics);
 
-		this.putMethod(fp, Names.reverse, StringPrototype::reverse);
+		this.putMethod(intrinsics, Names.reverse, StringPrototype::reverse);
 
-		this.putMethod(fp, Names.slice, StringPrototype::slice);
-		this.putMethod(fp, Names.charAt, StringPrototype::charAt);
-		this.putMethod(fp, Names.trim, StringPrototype::trim);
-		this.putMethod(fp, Names.trimStart, StringPrototype::trimStart);
-		this.putMethod(fp, Names.trimEnd, StringPrototype::trimEnd);
-		this.putMethod(fp, Names.toUpperCase, StringPrototype::toUpperCase);
-		this.putMethod(fp, Names.toLowerCase, StringPrototype::toLowerCase);
-		this.putMethod(fp, Names.valueOf, StringPrototype::valueOf);
-		this.putMethod(fp, Names.toString, StringPrototype::toStringMethod);
-		this.putMethod(fp, SymbolValue.iterator, StringIterator::new);
-		this.putMethod(fp, Names.charCodeAt, StringPrototype::charCodeAt);
-		this.putMethod(fp, Names.codePointAt, StringPrototype::codePointAt);
-		this.putMethod(fp, Names.concat, StringPrototype::concat);
-		this.putMethod(fp, Names.endsWith, StringPrototype::endsWith);
-		this.putMethod(fp, Names.includes, StringPrototype::includes);
-		this.putMethod(fp, Names.indexOf, StringPrototype::indexOf);
-		this.putMethod(fp, Names.lastIndexOf, StringPrototype::lastIndexOf);
-		this.putMethod(fp, Names.localeCompare, StringPrototype::localeCompare);
-		this.putMethod(fp, Names.match, StringPrototype::match);
-		this.putMethod(fp, Names.matchAll, StringPrototype::matchAll);
-		this.putMethod(fp, Names.normalize, StringPrototype::normalize);
-		this.putMethod(fp, Names.padEnd, StringPrototype::padEnd);
-		this.putMethod(fp, Names.padStart, StringPrototype::padStart);
-		this.putMethod(fp, Names.repeat, StringPrototype::repeat);
-		this.putMethod(fp, Names.replace, StringPrototype::replace);
-		this.putMethod(fp, Names.replaceAll, StringPrototype::replaceAll);
-		this.putMethod(fp, Names.search, StringPrototype::search);
-		this.putMethod(fp, Names.split, StringPrototype::split);
-		this.putMethod(fp, Names.startsWith, StringPrototype::startsWith);
-		this.putMethod(fp, Names.substring, StringPrototype::substring);
-		this.putMethod(fp, Names.toLocaleLowerCase, StringPrototype::toLocaleLowerCase);
-		this.putMethod(fp, Names.toLocaleUpperCase, StringPrototype::toLocaleUpperCase);
+		this.putMethod(intrinsics, Names.slice, StringPrototype::slice);
+		this.putMethod(intrinsics, Names.charAt, StringPrototype::charAt);
+		this.putMethod(intrinsics, Names.trim, StringPrototype::trim);
+		this.putMethod(intrinsics, Names.trimStart, StringPrototype::trimStart);
+		this.putMethod(intrinsics, Names.trimEnd, StringPrototype::trimEnd);
+		this.putMethod(intrinsics, Names.toUpperCase, StringPrototype::toUpperCase);
+		this.putMethod(intrinsics, Names.toLowerCase, StringPrototype::toLowerCase);
+		this.putMethod(intrinsics, Names.valueOf, StringPrototype::valueOf);
+		this.putMethod(intrinsics, Names.toString, StringPrototype::toStringMethod);
+		this.putMethod(intrinsics, SymbolValue.iterator, StringIterator::new);
+		this.putMethod(intrinsics, Names.charCodeAt, StringPrototype::charCodeAt);
+		this.putMethod(intrinsics, Names.codePointAt, StringPrototype::codePointAt);
+		this.putMethod(intrinsics, Names.concat, StringPrototype::concat);
+		this.putMethod(intrinsics, Names.endsWith, StringPrototype::endsWith);
+		this.putMethod(intrinsics, Names.includes, StringPrototype::includes);
+		this.putMethod(intrinsics, Names.indexOf, StringPrototype::indexOf);
+		this.putMethod(intrinsics, Names.lastIndexOf, StringPrototype::lastIndexOf);
+		this.putMethod(intrinsics, Names.localeCompare, StringPrototype::localeCompare);
+		this.putMethod(intrinsics, Names.match, StringPrototype::match);
+		this.putMethod(intrinsics, Names.matchAll, StringPrototype::matchAll);
+		this.putMethod(intrinsics, Names.normalize, StringPrototype::normalize);
+		this.putMethod(intrinsics, Names.padEnd, StringPrototype::padEnd);
+		this.putMethod(intrinsics, Names.padStart, StringPrototype::padStart);
+		this.putMethod(intrinsics, Names.repeat, StringPrototype::repeat);
+		this.putMethod(intrinsics, Names.replace, StringPrototype::replace);
+		this.putMethod(intrinsics, Names.replaceAll, StringPrototype::replaceAll);
+		this.putMethod(intrinsics, Names.search, StringPrototype::search);
+		this.putMethod(intrinsics, Names.split, StringPrototype::split);
+		this.putMethod(intrinsics, Names.startsWith, StringPrototype::startsWith);
+		this.putMethod(intrinsics, Names.substring, StringPrototype::substring);
+		this.putMethod(intrinsics, Names.toLocaleLowerCase, StringPrototype::toLocaleLowerCase);
+		this.putMethod(intrinsics, Names.toLocaleUpperCase, StringPrototype::toLocaleUpperCase);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charcodeat")
@@ -548,7 +550,7 @@ public final class StringPrototype extends ObjectValue {
 
 		@NonCompliant
 		public StringIterator(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-			super(interpreter.intrinsics.objectPrototype, interpreter.intrinsics.functionPrototype);
+			super(interpreter.intrinsics);
 			final String value = thisStringValue(interpreter, interpreter.thisValue()).value;
 			this.primitiveIterator = value.codePoints().iterator();
 		}

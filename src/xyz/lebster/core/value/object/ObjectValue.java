@@ -7,11 +7,10 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.CheckedError;
 import xyz.lebster.core.value.error.TypeError;
 import xyz.lebster.core.value.function.Executable;
@@ -20,6 +19,8 @@ import xyz.lebster.core.value.function.NativeCode;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.primitive.PrimitiveValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
@@ -32,19 +33,26 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 	private ObjectValue prototypeSlot;
 
-	private ObjectValue() {
-		super(null);
-		throw new ShouldNotHappen("Usage of private ObjectValue()");
-	}
-
 	public ObjectValue(ObjectValue prototype) {
 		super(new HashMap<>());
 		this.prototypeSlot = prototype;
 	}
 
+	public ObjectValue(Intrinsics intrinsics) {
+		this(intrinsics.objectPrototype);
+	}
+
 	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
 		if (objectValue.prototypeSlot == null) {
-			representClassName(representation, "[" + objectValue.getClass().getSimpleName() + ": null prototype]");
+			representation.append(ANSI.CYAN);
+			representation.append('[');
+			representation.append(objectValue.getClass().getSimpleName());
+			representation.append(": ");
+			representation.append(ANSI.BRIGHT_WHITE);
+			representation.append("null");
+			representation.append(ANSI.CYAN);
+			representation.append(" prototype]");
+			representation.append(ANSI.RESET);
 			representation.append(' ');
 		} else if (
 			// Avoid 'Object { }':
@@ -402,10 +410,14 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		this.value.put(key, new DataDescriptor(value, true, false, true));
 	}
 
-	public NativeFunction putMethod(FunctionPrototype functionPrototype, ObjectValue.Key<?> key, NativeCode code) {
+	protected NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, NativeCode code) {
 		final var function = new NativeFunction(functionPrototype, key.toFunctionName(), code);
 		this.put(key, function);
 		return function;
+	}
+
+	public NativeFunction putMethod(Intrinsics intrinsics, Key<?> key, NativeCode code) {
+		return this.putMethod(intrinsics.functionPrototype, key, code);
 	}
 
 	public Iterable<Map.Entry<Key<?>, PropertyDescriptor>> entries() {

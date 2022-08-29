@@ -7,6 +7,7 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.value.Names;
@@ -14,15 +15,14 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.EvalError;
 import xyz.lebster.core.value.function.Executable;
-import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 public final class TestObject extends ObjectValue {
-	public TestObject(FunctionPrototype functionPrototype) {
-		super(null);
+	public TestObject(Intrinsics functionPrototype) {
+		super((ObjectValue) null);
 
 		this.putMethod(functionPrototype, Names.expect, TestObject::expect);
 		this.putMethod(functionPrototype, Names.equals, TestObject::equalsMethod);

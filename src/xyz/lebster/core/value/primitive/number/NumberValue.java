@@ -6,9 +6,9 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
-import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 public final class NumberValue extends PrimitiveValue<Double> {
@@ -189,7 +189,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 
 	@Override
 	public ObjectValue toObjectValue(Interpreter interpreter) {
-		return new NumberWrapper(interpreter.intrinsics.numberPrototype, this);
+		return new NumberWrapper(interpreter.intrinsics, this);
 	}
 
 	@Override

@@ -2,11 +2,11 @@ package xyz.lebster.core.value.globals;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.function.FunctionPrototype;
-import xyz.lebster.core.value.primitive.number.NumberValue;
-import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
@@ -19,8 +19,10 @@ import static xyz.lebster.core.value.primitive.number.NumberValue.isPositiveZero
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-math-object")
 public final class MathObject extends ObjectValue {
-	public MathObject(ObjectPrototype objectPrototype, FunctionPrototype fp) {
-		super(objectPrototype);
+	public MathObject(Intrinsics intrinsics) {
+		super(intrinsics);
+		final FunctionPrototype fp = intrinsics.functionPrototype;
+
 		put(SymbolValue.toStringTag, Names.Math);
 
 		// 21.3.1 Value Properties of the Math Object

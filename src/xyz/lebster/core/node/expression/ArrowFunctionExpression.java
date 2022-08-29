@@ -32,7 +32,7 @@ public final class ArrowFunctionExpression implements Expression {
 
 	@Override
 	public ArrowFunction execute(Interpreter interpreter) {
-		return new ArrowFunction(interpreter, this, interpreter.executionContext());
+		return new ArrowFunction(interpreter.intrinsics, this, interpreter.executionContext());
 	}
 
 	@Override

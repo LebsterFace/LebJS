@@ -1,6 +1,7 @@
 package xyz.lebster.core.value.primitive.number;
 
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Generator;
 import xyz.lebster.core.value.IteratorResult;
 import xyz.lebster.core.value.Value;
@@ -14,16 +15,16 @@ public final class NumberRange extends Generator {
 	private final double step;
 	private double current;
 
-	public NumberRange(Interpreter interpreter, double end) {
-		this(interpreter, 0, end, 1);
+	public NumberRange(Intrinsics intrinsics, double end) {
+		this(intrinsics, 0, end, 1);
 	}
 
-	public NumberRange(Interpreter interpreter, double start, double end) {
-		this(interpreter, start, end, 1);
+	public NumberRange(Intrinsics intrinsics, double start, double end) {
+		this(intrinsics, start, end, 1);
 	}
 
-	public NumberRange(Interpreter interpreter, double start, double end, double step) {
-		super(interpreter.intrinsics.objectPrototype, interpreter.intrinsics.functionPrototype);
+	public NumberRange(Intrinsics intrinsics, double start, double end, double step) {
+		super(intrinsics);
 
 		if (start < end) {
 			this.isValid = step > 0;

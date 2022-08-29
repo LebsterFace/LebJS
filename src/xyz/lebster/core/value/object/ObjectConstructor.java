@@ -4,15 +4,15 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
-import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.TypeError;
-import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.ArrayList;
@@ -22,17 +22,17 @@ import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
 public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, ObjectPrototype> {
-	public ObjectConstructor(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
-		super(objectPrototype, functionPrototype, Names.Object);
+	public ObjectConstructor(Intrinsics intrinsics) {
+		super(intrinsics, Names.Object);
 
-		this.putMethod(functionPrototype, Names.setPrototypeOf, ObjectConstructor::setPrototypeOf);
-		this.putMethod(functionPrototype, Names.getPrototypeOf, ObjectConstructor::getPrototypeOf);
-		this.putMethod(functionPrototype, Names.create, ObjectConstructor::create);
-		this.putMethod(functionPrototype, Names.keys, ObjectConstructor::keys);
-		this.putMethod(functionPrototype, Names.values, ObjectConstructor::values);
-		this.putMethod(functionPrototype, Names.entries, ObjectConstructor::entries);
-		this.putMethod(functionPrototype, Names.fromEntries, ObjectConstructor::fromEntries);
-		this.putMethod(functionPrototype, Names.is, ObjectConstructor::is);
+		this.putMethod(intrinsics, Names.setPrototypeOf, ObjectConstructor::setPrototypeOf);
+		this.putMethod(intrinsics, Names.getPrototypeOf, ObjectConstructor::getPrototypeOf);
+		this.putMethod(intrinsics, Names.create, ObjectConstructor::create);
+		this.putMethod(intrinsics, Names.keys, ObjectConstructor::keys);
+		this.putMethod(intrinsics, Names.values, ObjectConstructor::values);
+		this.putMethod(intrinsics, Names.entries, ObjectConstructor::entries);
+		this.putMethod(intrinsics, Names.fromEntries, ObjectConstructor::fromEntries);
+		this.putMethod(intrinsics, Names.is, ObjectConstructor::is);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.is")
@@ -53,7 +53,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		if (!(arg instanceof ArrayObject arrayObject))
 			throw AbruptCompletion.error(new TypeError(interpreter, "Object.fromEntries call with non-array"));
 
-		final ObjectValue result = new ObjectValue(interpreter.intrinsics.objectPrototype);
+		final ObjectValue result = new ObjectValue(interpreter.intrinsics);
 		for (final PropertyDescriptor descriptor : arrayObject) {
 			final Value<?> value = descriptor.get(interpreter, arrayObject);
 
@@ -117,7 +117,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		final Value<?> O = argument(0, arguments);
 
 		if (O == Null.instance) {
-			return new ObjectValue(null);
+			return new ObjectValue((ObjectValue) null);
 		} else if (O instanceof final ObjectValue prototype) {
 			return new ObjectValue(prototype);
 		} else {
@@ -166,7 +166,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// 20.1.1.1 Object ( [ value ] )
 		final Value<?> value = argument(0, arguments);
 		// 2. If value is undefined or null, return OrdinaryObjectCreate(%Object.prototype%).
-		if (value.isNullish()) return new ObjectValue(interpreter.intrinsics.objectPrototype);
+		if (value.isNullish()) return new ObjectValue(interpreter.intrinsics);
 		// 3. Return ! ToObject(value).
 		return value.toObjectValue(interpreter);
 	}
@@ -180,7 +180,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// FIXME: 1. If NewTarget is neither undefined nor the active function, then
 		//            a. Return ? OrdinaryCreateFromConstructor(NewTarget, "%Object.prototype%").
 		// 2. If value is undefined or null, return OrdinaryObjectCreate(%Object.prototype%).
-		if (value.isNullish()) return new ObjectValue(interpreter.intrinsics.objectPrototype);
+		if (value.isNullish()) return new ObjectValue(interpreter.intrinsics);
 		// 3. Return ! ToObject(value).
 		return value.toObjectValue(interpreter);
 	}

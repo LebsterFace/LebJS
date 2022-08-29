@@ -33,7 +33,7 @@ public record ObjectDestructuring(Map<Expression, AssignmentPattern> pairs, Stri
 		}
 
 		if (restName != null) {
-			final ObjectValue restObject = new ObjectValue(interpreter.intrinsics.objectPrototype);
+			final ObjectValue restObject = new ObjectValue(interpreter.intrinsics);
 			for (final var entry : objectValue.entries()) {
 				final ObjectValue.Key<?> key = entry.getKey();
 				if (!visitedKeys.contains(key) && entry.getValue().isEnumerable()) {

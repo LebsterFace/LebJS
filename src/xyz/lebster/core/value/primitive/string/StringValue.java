@@ -2,12 +2,12 @@ package xyz.lebster.core.value.primitive.string;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.StringEscapeUtils;
+import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
-import xyz.lebster.core.value.object.ObjectValue;
 
 public final class StringValue extends ObjectValue.Key<String> {
 	public static final StringValue EMPTY = new StringValue("");
@@ -101,7 +101,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 
 	@Override
 	public StringWrapper toObjectValue(Interpreter interpreter) {
-		return new StringWrapper(interpreter.intrinsics.stringPrototype, this);
+		return new StringWrapper(interpreter.intrinsics, this);
 	}
 
 	@Override

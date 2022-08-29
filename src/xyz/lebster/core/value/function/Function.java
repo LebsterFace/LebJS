@@ -4,6 +4,7 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.environment.Environment;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.node.FunctionNode;
@@ -17,8 +18,8 @@ public final class Function extends Constructor {
 	private final Environment environment;
 	private final FunctionNode code;
 
-	public Function(Interpreter interpreter, Environment environment, FunctionNode code) {
-		super(interpreter.intrinsics.objectPrototype, interpreter.intrinsics.functionPrototype, code.name() == null ? Names.EMPTY : new StringValue(code.name()));
+	public Function(Intrinsics intrinsics, Environment environment, FunctionNode code) {
+		super(intrinsics, code.name() == null ? Names.EMPTY : new StringValue(code.name()));
 		this.environment = environment;
 		this.code = code;
 	}

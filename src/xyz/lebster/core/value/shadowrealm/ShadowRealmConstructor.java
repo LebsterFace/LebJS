@@ -2,22 +2,21 @@ package xyz.lebster.core.value.shadowrealm;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
-import xyz.lebster.core.value.function.FunctionPrototype;
-import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
 
 public final class ShadowRealmConstructor extends BuiltinConstructor<ShadowRealm, ShadowRealmPrototype> {
-	public ShadowRealmConstructor(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
-		super(objectPrototype, functionPrototype, Names.ShadowRealm);
+	public ShadowRealmConstructor(Intrinsics intrinsics) {
+		super(intrinsics, Names.ShadowRealm);
 	}
 
 	@Override
 	public ShadowRealm construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) {
-		return new ShadowRealm(interpreter.intrinsics.shadowRealmPrototype);
+		return new ShadowRealm(interpreter.intrinsics);
 	}
 
 	@Override

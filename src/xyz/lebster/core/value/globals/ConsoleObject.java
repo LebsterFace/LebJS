@@ -5,12 +5,12 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
-import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.Scanner;
@@ -21,8 +21,8 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 public final class ConsoleObject extends ObjectValue {
 	private static final Scanner scanner = new Scanner(System.in);
 
-	public ConsoleObject(FunctionPrototype functionPrototype) {
-		super(null);
+	public ConsoleObject(Intrinsics functionPrototype) {
+		super((ObjectValue) null);
 		this.putMethod(functionPrototype, Names.write, ConsoleObject::write);
 		this.putMethod(functionPrototype, Names.log, (interpreter, data) -> logger(LogLevel.Log, data));
 		this.putMethod(functionPrototype, Names.warn, (interpreter, data) -> logger(LogLevel.Warn, data));

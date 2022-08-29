@@ -3,12 +3,11 @@ package xyz.lebster.core.value.primitive.symbol;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
-import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.NativeAccessorDescriptor;
-import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -30,12 +29,12 @@ public final class SymbolPrototype extends ObjectValue {
 		}
 	};
 
-	public SymbolPrototype(ObjectPrototype objectPrototype, FunctionPrototype fp) {
-		super(objectPrototype);
+	public SymbolPrototype(Intrinsics intrinsics) {
+		super(intrinsics);
 		this.value.put(Names.description, SymbolPrototype.DESCRIPTION);
-		putMethod(fp, Names.toString, SymbolPrototype::toStringMethod);
-		putMethod(fp, Names.valueOf, SymbolPrototype::valueOf);
-		putMethod(fp, SymbolValue.toPrimitive, SymbolPrototype::toPrimitiveMethod);
+		putMethod(intrinsics, Names.toString, SymbolPrototype::toStringMethod);
+		putMethod(intrinsics, Names.valueOf, SymbolPrototype::valueOf);
+		putMethod(intrinsics, SymbolValue.toPrimitive, SymbolPrototype::toPrimitiveMethod);
 		put(SymbolValue.toStringTag, Names.Symbol, false, false, true);
 	}
 

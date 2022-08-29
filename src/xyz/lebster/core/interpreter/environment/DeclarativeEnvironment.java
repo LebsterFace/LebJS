@@ -11,7 +11,7 @@ public class DeclarativeEnvironment implements Environment {
 	private final Environment parent;
 
 	public DeclarativeEnvironment(Environment parent) {
-		this.variables = new ObjectValue(null);
+		this.variables = new ObjectValue((ObjectValue) null);
 		this.parent = parent;
 	}
 

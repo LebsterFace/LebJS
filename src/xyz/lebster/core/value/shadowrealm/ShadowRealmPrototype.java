@@ -2,23 +2,22 @@ package xyz.lebster.core.value.shadowrealm;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.TypeError;
-import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 public final class ShadowRealmPrototype extends ObjectValue {
-	public ShadowRealmPrototype(ObjectPrototype objectPrototype, FunctionPrototype functionPrototype) {
-		super(objectPrototype);
+	public ShadowRealmPrototype(Intrinsics intrinsics) {
+		super(intrinsics);
 
-		this.putMethod(functionPrototype, Names.evaluate, ShadowRealmPrototype::evaluate);
-		this.putMethod(functionPrototype, Names.declare, ShadowRealmPrototype::declare);
+		this.putMethod(intrinsics, Names.evaluate, ShadowRealmPrototype::evaluate);
+		this.putMethod(intrinsics, Names.declare, ShadowRealmPrototype::declare);
 	}
 
 	private static Value<?> evaluate(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {

@@ -47,7 +47,7 @@ public final class BooleanValue extends PrimitiveValue<Boolean> {
 
 	@Override
 	public BooleanWrapper toObjectValue(Interpreter interpreter) {
-		return new BooleanWrapper(interpreter.intrinsics.booleanPrototype, this);
+		return new BooleanWrapper(interpreter.intrinsics, this);
 	}
 
 	public BooleanValue not() {

@@ -7,11 +7,11 @@ import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.error.EvalError;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
@@ -19,7 +19,7 @@ import static xyz.lebster.core.value.function.NativeFunction.argument;
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
 public final class GlobalObject extends ObjectValue {
 	public GlobalObject(Intrinsics intrinsics) {
-		super(intrinsics.objectPrototype);
+		super(intrinsics);
 
 		// 19.1 Value Properties of the Global Object
 		put(Names.globalThis, this);
@@ -29,11 +29,11 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.undefined, Undefined.instance, false, false, true);
 
 		// 19.2 Function Properties of the Global Object
-		putMethod(intrinsics.functionPrototype, Names.eval, GlobalObject::eval);
-		putMethod(intrinsics.functionPrototype, Names.isFinite, GlobalObject::isFinite);
-		putMethod(intrinsics.functionPrototype, Names.isNaN, GlobalObject::isNaN);
-		putMethod(intrinsics.functionPrototype, Names.parseFloat, GlobalObject::parseFloat);
-		putMethod(intrinsics.functionPrototype, Names.parseInt, GlobalObject::parseInt);
+		putMethod(intrinsics, Names.eval, GlobalObject::eval);
+		putMethod(intrinsics, Names.isFinite, GlobalObject::isFinite);
+		putMethod(intrinsics, Names.isNaN, GlobalObject::isNaN);
+		putMethod(intrinsics, Names.parseFloat, GlobalObject::parseFloat);
+		putMethod(intrinsics, Names.parseInt, GlobalObject::parseInt);
 
 		// 19.3 Constructor Properties of the Global Object
 		put(Names.Array, intrinsics.arrayConstructor);

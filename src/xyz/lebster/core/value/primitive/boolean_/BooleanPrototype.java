@@ -3,20 +3,19 @@ package xyz.lebster.core.value.primitive.boolean_;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.TypeError;
-import xyz.lebster.core.value.function.FunctionPrototype;
-import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-boolean-prototype-object")
 public final class BooleanPrototype extends ObjectValue {
-	public BooleanPrototype(ObjectPrototype objectPrototype, FunctionPrototype fp) {
-		super(objectPrototype);
-		this.putMethod(fp, Names.toString, BooleanPrototype::toStringMethod);
-		this.putMethod(fp, Names.valueOf, BooleanPrototype::valueOf);
+	public BooleanPrototype(Intrinsics intrinsics) {
+		super(intrinsics);
+		this.putMethod(intrinsics, Names.toString, BooleanPrototype::toStringMethod);
+		this.putMethod(intrinsics, Names.valueOf, BooleanPrototype::valueOf);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#thisbooleanvalue")

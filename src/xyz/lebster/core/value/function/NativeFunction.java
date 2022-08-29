@@ -3,12 +3,18 @@ package xyz.lebster.core.value.function;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 public final class NativeFunction extends Executable {
 	private final NativeCode code;
+
+	public NativeFunction(Intrinsics intrinsics, StringValue name, NativeCode code) {
+		super(intrinsics, name);
+		this.code = code;
+	}
 
 	public NativeFunction(FunctionPrototype functionPrototype, StringValue name, NativeCode code) {
 		super(functionPrototype, name);

@@ -4,18 +4,18 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.primitive.PrimitiveConstructor;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.function.FunctionPrototype;
+import xyz.lebster.core.value.primitive.PrimitiveConstructor;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean-constructor")
 @NonStandard
 public class BooleanConstructor extends PrimitiveConstructor {
-	public BooleanConstructor(FunctionPrototype functionPrototype) {
-		super(functionPrototype, Names.Boolean);
+	public BooleanConstructor(Intrinsics intrinsics) {
+		super(intrinsics, Names.Boolean);
 	}
 
 	@Override

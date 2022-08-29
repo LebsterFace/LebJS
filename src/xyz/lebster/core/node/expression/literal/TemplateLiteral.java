@@ -1,12 +1,12 @@
 package xyz.lebster.core.node.expression.literal;
 
 import xyz.lebster.core.DumpBuilder;
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.ArrayList;

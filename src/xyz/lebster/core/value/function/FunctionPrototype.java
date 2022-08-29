@@ -2,9 +2,9 @@ package xyz.lebster.core.value.function;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -13,8 +13,8 @@ import java.util.Arrays;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 public final class FunctionPrototype extends ObjectValue {
-	public FunctionPrototype(ObjectPrototype objectPrototype) {
-		super(objectPrototype);
+	public FunctionPrototype(Intrinsics intrinsics) {
+		super(intrinsics);
 		this.putMethod(this, Names.call, FunctionPrototype::callMethod);
 		this.putMethod(this, Names.toString, FunctionPrototype::toStringMethod);
 	}

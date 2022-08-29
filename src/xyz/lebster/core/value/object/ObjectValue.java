@@ -44,7 +44,10 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 	@SuppressWarnings("unchecked")
 	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		if (
+		if (objectValue.prototypeSlot == null) {
+			representClassName(representation, "[" + objectValue.getClass().getSimpleName() + ": null prototype]");
+			representation.append(' ');
+		} else if (
 			// Avoid 'Object { }':
 			!(objectValue.prototypeSlot instanceof ObjectPrototype) &&
 			objectValue.prototypeSlot.getProperty(Names.constructor) instanceof final DataDescriptor constructorProperty &&

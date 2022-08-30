@@ -5,11 +5,13 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-language-types-symbol-type")
 public final class SymbolValue extends ObjectValue.Key<Void> {
@@ -105,12 +107,12 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert a Symbol value to a string"));
+		throw error(new TypeError(interpreter, "Cannot convert a Symbol value to a string"));
 	}
 
 	@Override
 	public NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert a Symbol value to a number"));
+		throw error(new TypeError(interpreter, "Cannot convert a Symbol value to a number"));
 	}
 
 	@Override

@@ -18,6 +18,7 @@ import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 public final class TestObject extends ObjectValue {
@@ -88,7 +89,7 @@ public final class TestObject extends ObjectValue {
 
 			return Undefined.instance;
 		} catch (Throwable e) {
-			throw AbruptCompletion.error(new EvalError(interpreter, e));
+			throw error(new EvalError(interpreter, e));
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}

@@ -6,8 +6,10 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Constructor;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public record NewExpression(Expression constructExpr, ExpressionList arguments) implements Expression {
 	@Override
@@ -19,7 +21,7 @@ public record NewExpression(Expression constructExpr, ExpressionList arguments) 
 			return constructor.construct(interpreter, executedArguments, constructor);
 		} else {
 			final String message = constructExpr.toRepresentationString() + " is not a constructor";
-			throw AbruptCompletion.error(new TypeError(interpreter, message));
+			throw error(new TypeError(interpreter, message));
 		}
 	}
 

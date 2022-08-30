@@ -8,8 +8,10 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public record CallExpression(Expression callee, ExpressionList arguments) implements Expression {
 	@Override
@@ -33,7 +35,7 @@ public record CallExpression(Expression callee, ExpressionList arguments) implem
 			return executable;
 
 		final String message = ANSI.stripFormatting(callee.toRepresentationString()) + " is not a function";
-		throw AbruptCompletion.error(new TypeError(interpreter, message));
+		throw error(new TypeError(interpreter, message));
 	}
 
 	@Override

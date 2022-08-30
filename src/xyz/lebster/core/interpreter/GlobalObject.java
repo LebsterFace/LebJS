@@ -14,6 +14,7 @@ import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
@@ -236,7 +237,7 @@ public final class GlobalObject extends ObjectValue {
 		try {
 			return Realm.executeWith(sourceText, interpreter);
 		} catch (CannotParse | SyntaxError e) {
-			throw AbruptCompletion.error(new EvalError(interpreter, e));
+			throw error(new EvalError(interpreter, e));
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}

@@ -9,13 +9,14 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.RangeError;
+import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentInt;
 
@@ -92,7 +93,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 				// i. Let intLen be ! ToUint32(len).
 				intLen = new NumberValue(len_number.toUint32());
 				// ii. If SameValueZero(intLen, len) is false, throw a RangeError exception.
-				if (!NumberValue.sameValueZero(intLen, len_number)) throw AbruptCompletion.error(new RangeError(interpreter, "Invalid array length"));
+				if (!NumberValue.sameValueZero(intLen, len_number)) throw error(new RangeError(interpreter, "Invalid array length"));
 			} else {
 				// i. Perform ! CreateDataPropertyOrThrow(array, "0", len).
 				array.set(interpreter, new StringValue(0), len);

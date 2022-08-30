@@ -11,9 +11,11 @@ import xyz.lebster.core.interpreter.environment.FunctionEnvironment;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.statement.Statement;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Constructor;
 import xyz.lebster.core.value.object.ObjectValue;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public record SuperCallStatement(ExpressionList arguments, SourceRange range) implements Statement {
 	@Override
@@ -33,7 +35,7 @@ public record SuperCallStatement(ExpressionList arguments, SourceRange range) im
 		final Value<?>[] argList = arguments.executeAll(interpreter).toArray(new Value[0]);
 		// 5. If IsConstructor(func) is false, throw a TypeError exception.
 		if (!(func instanceof final Constructor parentConstructor)) {
-			throw AbruptCompletion.error(new TypeError(interpreter, "Not a constructor!"));
+			throw error(new TypeError(interpreter, "Not a constructor!"));
 		}
 		// 6. Let result be ? Construct(func, argList, newTarget).
 		final ObjectValue result = parentConstructor.construct(interpreter, argList, newTarget);

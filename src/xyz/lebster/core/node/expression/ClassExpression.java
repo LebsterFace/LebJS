@@ -16,7 +16,7 @@ import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Constructor;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.Function;
@@ -25,6 +25,8 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.List;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public record ClassExpression(
 	String className,
@@ -171,8 +173,9 @@ public record ClassExpression(
 				if (returnValue instanceof final ObjectValue asObject) return asObject;
 				if (!isDerived) return newInstance;
 				final Value<?> thisFromParent = interpreter.thisValue();
-				if (!(thisFromParent instanceof final ObjectValue thisFromParentObject))
-					throw AbruptCompletion.error(new TypeError(interpreter, "Not an object!"));
+				if (!(thisFromParent instanceof final ObjectValue thisFromParentObject)) {
+					throw error(new TypeError(interpreter, "Not an object!"));
+				}
 				// FIXME: Follow spec
 				final ObjectValue original_prototype = thisFromParentObject.getPrototype();
 				prototype.setPrototype(original_prototype);
@@ -189,7 +192,7 @@ public record ClassExpression(
 			final String message = this.name.value.isEmpty() ?
 				"Class constructors cannot be invoked without 'new'" :
 				"Class constructor %s cannot be invoked without 'new'".formatted(this.name.value);
-			throw AbruptCompletion.error(new TypeError(interpreter, message));
+			throw error(new TypeError(interpreter, message));
 		}
 
 		// call(Interpreter interpreter, Value<?> newThisValue, Value<?>... parameters) is handled by Executable

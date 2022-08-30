@@ -4,12 +4,14 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public final class Null extends PrimitiveValue<Void> {
 	public static final Null instance = new Null();
@@ -47,7 +49,7 @@ public final class Null extends PrimitiveValue<Void> {
 
 	@Override
 	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert null to object"));
+		throw error(new TypeError(interpreter, "Cannot convert null to object"));
 	}
 
 	@Override

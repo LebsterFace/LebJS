@@ -11,7 +11,7 @@ import xyz.lebster.core.value.Generator;
 import xyz.lebster.core.value.IteratorResult;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
@@ -21,6 +21,7 @@ import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 import java.util.PrimitiveIterator;
 import java.util.regex.Pattern;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.object.ObjectPrototype.requireObjectCoercible;
 import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
@@ -535,7 +536,7 @@ public final class StringPrototype extends ObjectValue {
 		}
 
 		// 3. Throw a TypeError exception.
-		throw AbruptCompletion.error(new TypeError(interpreter, "This method requires that 'this' be a String"));
+		throw error(new TypeError(interpreter, "This method requires that 'this' be a String"));
 	}
 
 	@NonStandard

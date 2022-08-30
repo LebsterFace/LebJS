@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
@@ -14,6 +14,8 @@ import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public final class ObjectPrototype extends ObjectValue {
 	public NativeFunction toStringMethod;
@@ -25,7 +27,7 @@ public final class ObjectPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-requireobjectcoercible")
 	public static Value<?> requireObjectCoercible(Interpreter interpreter, Value<?> argument, String methodName) throws AbruptCompletion {
 		if (argument.isNullish()) {
-			throw AbruptCompletion.error(new TypeError(interpreter, methodName + " called on null or undefined"));
+			throw error(new TypeError(interpreter, methodName + " called on null or undefined"));
 		} else {
 			return argument;
 		}

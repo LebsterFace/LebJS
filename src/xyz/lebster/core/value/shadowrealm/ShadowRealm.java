@@ -10,6 +10,8 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.EvalError;
 import xyz.lebster.core.value.object.ObjectValue;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+
 public final class ShadowRealm extends ObjectValue {
 	private final Realm realm = new Realm(new Interpreter());
 
@@ -21,7 +23,7 @@ public final class ShadowRealm extends ObjectValue {
 		try {
 			return this.realm.execute(sourceText, false);
 		} catch (AbruptCompletion | SyntaxError | CannotParse e) {
-			throw AbruptCompletion.error(new EvalError(realm.interpreter(), e));
+			throw error(new EvalError(realm.interpreter(), e));
 		}
 	}
 

@@ -1,4 +1,4 @@
-package xyz.lebster.core.value.error;
+package xyz.lebster.core.value.error.reference;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;

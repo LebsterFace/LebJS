@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
@@ -14,6 +14,8 @@ import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override
@@ -68,7 +70,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 					left_value.display(representation);
 					representation.append("` in ");
 					right_value.display(representation);
-					throw AbruptCompletion.error(new TypeError(interpreter, representation.toString()));
+					throw error(new TypeError(interpreter, representation.toString()));
 				}
 
 				// 6. Return ? HasProperty(rval, ? ToPropertyKey(lval)).
@@ -83,7 +85,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 	private BooleanValue instanceofOperator(Interpreter interpreter, Value<?> V, Value<?> target) throws AbruptCompletion {
 		// 1. If Type(target) is not Object, throw a TypeError exception.
 		if (!(target instanceof final ObjectValue O_target))
-			throw AbruptCompletion.error(new TypeError(interpreter, "Right-hand side of `instanceof` is not an object"));
+			throw error(new TypeError(interpreter, "Right-hand side of `instanceof` is not an object"));
 		// 2. Let instOfHandler be ? GetMethod(target, @@hasInstance).
 		final Value<?> instOfHandler = O_target.getMethod(interpreter, SymbolValue.hasInstance);
 		// 3. If instOfHandler is not undefined, then
@@ -92,7 +94,7 @@ public record RelationalExpression(Expression left, Expression right, Relational
 			return executable.call(interpreter, O_target, V).toBooleanValue(interpreter);
 		// 4. If IsCallable(target) is false, throw a TypeError exception.
 		if (!(O_target instanceof final Executable executable))
-			throw AbruptCompletion.error(new TypeError(interpreter, "Not a function!"));
+			throw error(new TypeError(interpreter, "Not a function!"));
 		// 5. Return ? OrdinaryHasInstance(target, V).
 		return executable.ordinaryHasInstance(interpreter, V);
 	}

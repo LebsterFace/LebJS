@@ -6,9 +6,11 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-boolean-prototype-object")
 public final class BooleanPrototype extends ObjectValue {
@@ -35,7 +37,7 @@ public final class BooleanPrototype extends ObjectValue {
 
 		// 3. Throw a TypeError exception.
 		final String message = "Boolean.prototype.%s requires that 'this' be a Boolean".formatted(methodName);
-		throw AbruptCompletion.error(new TypeError(interpreter, message));
+		throw error(new TypeError(interpreter, message));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean.prototype.valueof")

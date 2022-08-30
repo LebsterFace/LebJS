@@ -11,7 +11,7 @@ import xyz.lebster.core.value.Generator;
 import xyz.lebster.core.value.IteratorResult;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 
@@ -625,7 +626,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 4. If len + argCount > 2^53 - 1, throw a TypeError exception.
 		if (len + argCount > MAX_LENGTH) {
 			final String message = "Pushing %d elements on an array-like of length %d is disallowed, as the total surpasses 2^53-1";
-			throw AbruptCompletion.error(new TypeError(interpreter, message.formatted(argCount, len)));
+			throw error(new TypeError(interpreter, message.formatted(argCount, len)));
 		}
 
 		// 5. For each element E of items, do
@@ -676,7 +677,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable callback = Executable.getExecutable(interpreter, callbackfn);
 		// 4. If len = 0 and initialValue is not present, throw a TypeError exception.
-		if (len == 0 && arguments.length == 1) throw AbruptCompletion.error(new TypeError(interpreter, "Reduce of empty array with no initial value"));
+		if (len == 0 && arguments.length == 1) throw error(new TypeError(interpreter, "Reduce of empty array with no initial value"));
 
 		// 5. Let k be 0.
 		int k = 0;
@@ -706,7 +707,7 @@ public final class ArrayPrototype extends ObjectValue {
 				k = k + 1;
 			}
 			// c. If kPresent is false, throw a TypeError exception.
-			if (!kPresent) throw AbruptCompletion.error(new TypeError(interpreter, "Reduce of empty array with no initial value"));
+			if (!kPresent) throw error(new TypeError(interpreter, "Reduce of empty array with no initial value"));
 		}
 
 		// 9. Repeat, while k < len,

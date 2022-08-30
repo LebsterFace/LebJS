@@ -14,12 +14,14 @@ import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.HashSet;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	public StringValue name;
@@ -38,7 +40,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		if (value instanceof final Executable executable) return executable;
 
 		final String message = ANSI.stripFormatting(value.toDisplayString()) + " is not a function";
-		throw AbruptCompletion.error(new TypeError(interpreter, message));
+		throw error(new TypeError(interpreter, message));
 	}
 
 	public static boolean isAnonymousFunctionExpression(Expression expression) {
@@ -106,7 +108,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		// 4. Let P be ? Get(C, "prototype").
 		final Value<?> P = this.get(interpreter, Names.prototype);
 		// 5. If Type(P) is not Object, throw a TypeError exception.
-		if (!(P instanceof ObjectValue)) throw AbruptCompletion.error(new TypeError(interpreter, "Not an object!"));
+		if (!(P instanceof ObjectValue)) throw error(new TypeError(interpreter, "Not an object!"));
 
 		// 6. Repeat,
 		while (true) {

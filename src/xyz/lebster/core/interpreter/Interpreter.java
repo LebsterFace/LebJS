@@ -6,12 +6,14 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.environment.*;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.ReferenceError;
+import xyz.lebster.core.value.error.reference.ReferenceError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.ArrayDeque;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public final class Interpreter {
 	public final Intrinsics intrinsics;
@@ -46,7 +48,7 @@ public final class Interpreter {
 		final Environment environment = executionContextStack.getFirst().environment();
 		if (environment.hasBinding(name)) {
 			// FIXME: This should be a Syntax Error at parse-time
-			throw AbruptCompletion.error(new ReferenceError(this, "Identifier '" + name.value + "' has already been declared"));
+			throw error(new ReferenceError(this, "Identifier '" + name.value + "' has already been declared"));
 		} else {
 			environment.createBinding(this, name, value);
 		}

@@ -6,8 +6,10 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public final class ShadowRealmConstructor extends BuiltinConstructor<ShadowRealm, ShadowRealmPrototype> {
 	public ShadowRealmConstructor(Intrinsics intrinsics) {
@@ -21,6 +23,6 @@ public final class ShadowRealmConstructor extends BuiltinConstructor<ShadowRealm
 
 	@Override
 	public Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		throw AbruptCompletion.error(new TypeError(interpreter, "ShadowRealm constructor must be called with `new`"));
+		throw error(new TypeError(interpreter, "ShadowRealm constructor must be called with `new`"));
 	}
 }

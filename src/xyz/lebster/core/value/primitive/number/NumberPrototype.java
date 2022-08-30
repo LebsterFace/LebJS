@@ -8,11 +8,12 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 public final class NumberPrototype extends ObjectValue {
@@ -40,7 +41,7 @@ public final class NumberPrototype extends ObjectValue {
 			return numberWrapper.data;
 		}
 		// 3. Throw a TypeError exception.
-		throw AbruptCompletion.error(new TypeError(interpreter, "This method requires that 'this' be a Number"));
+		throw error(new TypeError(interpreter, "This method requires that 'this' be a Number"));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tointegerorinfinity")
@@ -87,7 +88,7 @@ public final class NumberPrototype extends ObjectValue {
 		final int radixMV = radix == Undefined.instance ? 10 : toIntegerOrInfinity(interpreter, radix);
 		// 4. If radixMV < 2 or radixMV > 36, throw a RangeError exception.
 		if (radixMV < 2 || radixMV > 36)
-			throw AbruptCompletion.error(new TypeError(interpreter, "toString() radix argument must be between 2 and 36"));
+			throw error(new TypeError(interpreter, "toString() radix argument must be between 2 and 36"));
 		// 5. If radixMV = 10, return ! ToString(x).
 		if (radixMV == 10) return x.toStringValue(interpreter);
 		// 6. Return the String representation of this Number value using the radix specified by radixMV. Letters a-z

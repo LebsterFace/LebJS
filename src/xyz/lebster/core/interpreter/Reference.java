@@ -3,8 +3,10 @@ package xyz.lebster.core.interpreter;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.ReferenceError;
+import xyz.lebster.core.value.error.reference.ReferenceError;
 import xyz.lebster.core.value.object.ObjectValue;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-reference-record-specification-type")
 public record Reference(ObjectValue base, ObjectValue.Key<?> referencedName) {
@@ -13,7 +15,7 @@ public record Reference(ObjectValue base, ObjectValue.Key<?> referencedName) {
 		if (isResolvable()) {
 			return base.get(interpreter, referencedName);
 		} else {
-			throw AbruptCompletion.error(new ReferenceError(interpreter, referencedName.value + " is not defined"));
+			throw error(new ReferenceError(interpreter, referencedName.value + " is not defined"));
 		}
 	}
 
@@ -24,7 +26,7 @@ public record Reference(ObjectValue base, ObjectValue.Key<?> referencedName) {
 		if (!isResolvable()) {
 			// a. If V.[[Strict]] is true, throw a ReferenceError exception.
 			if (interpreter.isStrictMode())
-				throw AbruptCompletion.error(new ReferenceError(interpreter, referencedName.value + " is not defined"));
+				throw error(new ReferenceError(interpreter, referencedName.value + " is not defined"));
 			// b. Let globalObj be GetGlobalObject().
 			// c. Return ? Set(globalObj, V.[[ReferencedName]], W, false).
 			interpreter.globalObject.set(interpreter, referencedName, newValue);

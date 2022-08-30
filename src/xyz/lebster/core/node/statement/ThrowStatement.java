@@ -7,10 +7,12 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Value;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+
 public record ThrowStatement(Expression value) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		throw AbruptCompletion.error(value.execute(interpreter));
+		throw error(value.execute(interpreter));
 	}
 
 	@Override

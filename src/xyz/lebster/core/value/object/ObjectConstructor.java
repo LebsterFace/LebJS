@@ -9,7 +9,7 @@ import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
@@ -18,6 +18,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
@@ -51,14 +52,14 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	private static ObjectValue fromEntries(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final Value<?> arg = NativeFunction.argument(0, arguments);
 		if (!(arg instanceof ArrayObject arrayObject))
-			throw AbruptCompletion.error(new TypeError(interpreter, "Object.fromEntries call with non-array"));
+			throw error(new TypeError(interpreter, "Object.fromEntries call with non-array"));
 
 		final ObjectValue result = new ObjectValue(interpreter.intrinsics);
 		for (final PropertyDescriptor descriptor : arrayObject) {
 			final Value<?> value = descriptor.get(interpreter, arrayObject);
 
 			if (!(value instanceof final ObjectValue entry))
-				throw AbruptCompletion.error(new TypeError(interpreter, "Value is not an entry object"));
+				throw error(new TypeError(interpreter, "Value is not an entry object"));
 
 			final ObjectValue.Key<?> entryKey = entry.get(interpreter, new StringValue("0")).toPropertyKey(interpreter);
 			final Value<?> entryValue = entry.get(interpreter, new StringValue("1"));
@@ -122,7 +123,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 			return new ObjectValue(prototype);
 		} else {
 			// 1. If Type(O) is neither Object nor Null, throw a TypeError exception.
-			throw AbruptCompletion.error(new TypeError(interpreter, "Object prototype may only be an Object or null"));
+			throw error(new TypeError(interpreter, "Object prototype may only be an Object or null"));
 		}
 	}
 
@@ -134,11 +135,11 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 
 		// 1. Set O to ? RequireObjectCoercible(O).
 		if (O.isNullish())
-			throw AbruptCompletion.error(new TypeError(interpreter, "Object.setPrototypeOf called on null or undefined"));
+			throw error(new TypeError(interpreter, "Object.setPrototypeOf called on null or undefined"));
 
 		// 2. If Type(proto) is neither Object nor Null, throw a TypeError exception.
 		if (!(proto instanceof ObjectValue || proto == Null.instance))
-			throw AbruptCompletion.error(new TypeError(interpreter, "Object prototype may only be an Object or null"));
+			throw error(new TypeError(interpreter, "Object prototype may only be an Object or null"));
 
 		// 3. If Type(O) is not Object, return O.
 		if (!(O instanceof final ObjectValue O_objectValue)) return O;
@@ -146,7 +147,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		final boolean status = O_objectValue.setPrototype(proto);
 		// 5. If status is false, throw a TypeError exception.
 		if (!status)
-			throw AbruptCompletion.error(new TypeError(interpreter, "Cyclic object prototype value"));
+			throw error(new TypeError(interpreter, "Cyclic object prototype value"));
 		// 6. Return O.
 		return O;
 	}

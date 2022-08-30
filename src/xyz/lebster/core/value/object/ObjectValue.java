@@ -12,7 +12,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.CheckedError;
-import xyz.lebster.core.value.error.TypeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeCode;
@@ -26,6 +26,8 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.util.*;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescriptor>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
@@ -198,7 +200,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			// v. If Type(result) is not Object, return result.
 			if (!(result instanceof ObjectValue)) return result.toPrimitive(interpreter);
 			// vi. Throw a TypeError exception.
-			throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert object to primitive value"));
+			throw error(new TypeError(interpreter, "Cannot convert object to primitive value"));
 		}
 
 		// c. If preferredType is not present, let preferredType be number.
@@ -232,7 +234,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		}
 
 		// 6. Throw a TypeError exception.
-		throw AbruptCompletion.error(new TypeError(interpreter, "Cannot convert object to primitive value"));
+		throw error(new TypeError(interpreter, "Cannot convert object to primitive value"));
 	}
 
 	@Override
@@ -324,7 +326,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			final var representation = new StringRepresentation();
 			representation.append("Cannot assign to read-only property ");
 			key.display(representation);
-			throw AbruptCompletion.error(new TypeError(interpreter, representation.toString()));
+			throw error(new TypeError(interpreter, representation.toString()));
 		}
 	}
 
@@ -342,7 +344,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			return Undefined.instance;
 		// 3. If IsCallable(func) is false, throw a TypeError exception.
 		if (!(func instanceof Executable))
-			throw AbruptCompletion.error(new TypeError(interpreter, "Not a function!"));
+			throw error(new TypeError(interpreter, "Not a function!"));
 		// 4. Return func.
 		return func;
 	}
@@ -355,7 +357,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 				representation.append("Property ");
 				key.displayForObjectKey(representation);
 				representation.append(" does not exist on object.");
-				throw AbruptCompletion.error(new CheckedError(interpreter, representation.toString()));
+				throw error(new CheckedError(interpreter, representation.toString()));
 			} else {
 				return Undefined.instance;
 			}
@@ -371,7 +373,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		boolean success = this.delete(P);
 		// 2. If success is false, throw a TypeError exception.
 		if (!success) {
-			throw AbruptCompletion.error(new TypeError(interpreter, "Cannot assign to read only property '" + P.toDisplayString() + "' of object"));
+			throw error(new TypeError(interpreter, "Cannot assign to read only property '" + P.toDisplayString() + "' of object"));
 		}
 		// 3. Return unused.
 	}

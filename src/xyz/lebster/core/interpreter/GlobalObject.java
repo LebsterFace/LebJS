@@ -36,21 +36,98 @@ public final class GlobalObject extends ObjectValue {
 		putMethod(intrinsics, Names.parseInt, GlobalObject::parseInt);
 
 		// 19.3 Constructor Properties of the Global Object
+		// 19.3.1 AggregateError
+		// put(Names.AggregateError, intrinsics.aggregateErrorConstructor);
+		// 19.3.2 Array
 		put(Names.Array, intrinsics.arrayConstructor);
+		// 19.3.3 ArrayBuffer
+		// put(Names.ArrayBuffer, intrinsics.arrayBufferConstructor);
+		// 19.3.4 BigInt
+		// put(Names.BigInt, intrinsics.bigIntConstructor);
+		// 19.3.5 BigInt64Array
+		// put(Names.BigInt64Array, intrinsics.bigInt64ArrayConstructor);
+		// 19.3.6 BigUint64Array
+		// put(Names.BigUint64Array, intrinsics.bigUint64ArrayConstructor);
+		// 19.3.7 Boolean
 		put(Names.Boolean, intrinsics.booleanConstructor);
+		// 19.3.8 DataView
+		// put(Names.DataView, intrinsics.dataViewConstructor);
+		// 19.3.9 Date
+		// put(Names.Date, intrinsics.dateConstructor);
+		// 19.3.10 Error
 		put(Names.Error, intrinsics.errorConstructor);
-		put(Names.RegExp, intrinsics.regExpConstructor);
+		// 19.3.11 EvalError
+		// put(Names.EvalError, intrinsics.evalErrorConstructor);
+		// 19.3.12 FinalizationRegistry
+		// put(Names.FinalizationRegistry, intrinsics.finalizationRegistryConstructor);
+		// 19.3.13 Float32Array
+		// put(Names.Float32Array, intrinsics.float32ArrayConstructor);
+		// 19.3.14 Float64Array
+		// put(Names.Float64Array, intrinsics.float64ArrayConstructor);
+		// 19.3.15 Function
 		put(Names.Function, intrinsics.functionConstructor);
-		put(Names.Math, intrinsics.mathObject);
+		// 19.3.16 Int8Array
+		// put(Names.Int8Array, intrinsics.int8ArrayConstructor);
+		// 19.3.17 Int16Array
+		// put(Names.Int16Array, intrinsics.int16ArrayConstructor);
+		// 19.3.18 Int32Array
+		// put(Names.Int32Array, intrinsics.int32ArrayConstructor);
+		// 19.3.19 Map
+		// put(Names.Map, intrinsics.mapConstructor);
+		// 19.3.20 Number
 		put(Names.Number, intrinsics.numberConstructor);
+		// 19.3.21 Object
 		put(Names.Object, intrinsics.objectConstructor);
-		put(Names.ShadowRealm, intrinsics.shadowRealmConstructor);
+		// 19.3.22 Promise
+		// put(Names.Promise, intrinsics.promiseConstructor);
+		// 19.3.23 Proxy
+		// put(Names.Proxy, intrinsics.proxyConstructor);
+		// 19.3.24 RangeError
+		put(Names.RangeError, intrinsics.rangeErrorConstructor);
+		// 19.3.25 ReferenceError
+		put(Names.ReferenceError, intrinsics.referenceErrorConstructor);
+		// 19.3.26 RegExp
+		put(Names.RegExp, intrinsics.regExpConstructor);
+		// 19.3.27 Set
+		// put(Names.Set, intrinsics.setConstructor);
+		// 19.3.28 SharedArrayBuffer
+		// put(Names.SharedArrayBuffer, intrinsics.sharedArrayBufferConstructor);
+		// 19.3.29 String
 		put(Names.String, intrinsics.stringConstructor);
+		// 19.3.30 Symbol
 		put(Names.Symbol, intrinsics.symbolConstructor);
-		put(Names.Test, intrinsics.testObject);
+		// 19.3.31 SyntaxError
+		// put(Names.SyntaxError, intrinsics.syntaxErrorConstructor);
+		// 19.3.32 TypeError
+		put(Names.TypeError, intrinsics.typeErrorConstructor);
+		// 19.3.33 Uint8Array
+		// put(Names.Uint8Array, intrinsics.uint8ArrayConstructor);
+		// 19.3.34 Uint8ClampedArray
+		// put(Names.Uint8ClampedArray, intrinsics.uint8ClampedArrayConstructor);
+		// 19.3.35 Uint16Array
+		// put(Names.Uint16Array, intrinsics.uint16ArrayConstructor);
+		// 19.3.36 Uint32Array
+		// put(Names.Uint32Array, intrinsics.uint32ArrayConstructor);
+		// 19.3.37 URIError
+		// put(Names.URIError, intrinsics.uRIErrorConstructor);
+		// 19.3.38 WeakMap
+		// put(Names.WeakMap, intrinsics.weakMapConstructor);
+		// 19.3.39 WeakRef
+		// put(Names.WeakRef, intrinsics.weakRefConstructor);
+		// 19.3.40 WeakSet
+		// put(Names.WeakSet, intrinsics.weakSetConstructor);
+
+		// 19.4 Other Properties of the Global Object
+		// 19.4.1 Atomics
+		// 19.4.2 JSON
+		// 19.4.3 Math
+		put(Names.Math, intrinsics.mathObject);
+		// 19.4.4 Reflect
 
 		// Non-Standard properties
+		put(Names.Test, intrinsics.testObject);
 		put(Names.console, intrinsics.consoleObject);
+		put(Names.ShadowRealm, intrinsics.shadowRealmConstructor);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parseint-string-radix")

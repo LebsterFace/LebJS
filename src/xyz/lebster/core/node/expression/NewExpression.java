@@ -35,8 +35,10 @@ public record NewExpression(Expression constructExpr, ExpressionList arguments) 
 	public void represent(StringRepresentation representation) {
 		representation.append("new ");
 		constructExpr.represent(representation);
-		representation.append('(');
-		arguments.represent(representation);
-		representation.append(')');
+		if (arguments != null) {
+			representation.append('(');
+			arguments.represent(representation);
+			representation.append(')');
+		}
 	}
 }

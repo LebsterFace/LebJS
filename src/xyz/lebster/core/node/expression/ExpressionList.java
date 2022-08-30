@@ -88,6 +88,11 @@ public final class ExpressionList {
 		}
 
 		public void represent(StringRepresentation representation) {
+			if (type == Type.EMPTY) {
+				representation.append(' ');
+				return;
+			}
+
 			if (type == Type.SPREAD) representation.append("...");
 			expression.represent(representation);
 		}

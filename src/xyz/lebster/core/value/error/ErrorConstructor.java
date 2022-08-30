@@ -10,6 +10,7 @@ import xyz.lebster.core.value.object.ObjectValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 
+// TODO: NativeError https://tc39.es/ecma262/multipage#sec-nativeerror-constructors
 public final class ErrorConstructor extends BuiltinConstructor<ErrorObject, ErrorPrototype> {
 	public ErrorConstructor(Intrinsics intrinsics) {
 		super(intrinsics, Names.Error);
@@ -17,8 +18,7 @@ public final class ErrorConstructor extends BuiltinConstructor<ErrorObject, Erro
 
 	@Override
 	public ErrorObject construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
-		final String message = argumentString(0, "", interpreter, arguments);
-		return new ErrorObject(interpreter, message);
+		return new ErrorObject(interpreter.intrinsics.errorPrototype, argumentString(0, "", interpreter, arguments));
 	}
 
 	@Override

@@ -8,7 +8,7 @@ public final class EvalError extends ErrorObject {
 	public final Throwable wrappedThrowable;
 
 	public EvalError(Interpreter interpreter, Throwable e) {
-		super(interpreter, e.getMessage());
+		super(interpreter.intrinsics.errorPrototype, e.getMessage());
 		this.wrappedThrowable = e;
 	}
 

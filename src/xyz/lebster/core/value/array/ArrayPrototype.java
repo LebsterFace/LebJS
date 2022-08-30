@@ -155,8 +155,33 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.find")
-	private static Value<?> find(Interpreter interpreter, Value<?>[] values) {
-		throw new NotImplemented("Array.prototype.find");
+	private static Value<?> find(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.9 Array.prototype.find ( predicate [ , thisArg ] )
+		final Value<?> predicate_ = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
+
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(O, interpreter);
+		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
+		final Executable predicate = Executable.getExecutable(interpreter, predicate_);
+		// 4. Let k be 0.
+		// 5. Repeat, while k < len,
+		for (int k = 0; k < len; k++) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final var Pk = new StringValue(k);
+			// b. Let kValue be ? Get(O, Pk).
+			final Value<?> kValue = O.get(interpreter, Pk);
+			// c. Let testResult be ToBoolean(? Call(predicate, thisArg, « kValue, 𝔽(k), O »)).
+			final boolean testResult = predicate.call(interpreter, thisArg, kValue, new NumberValue(k), O).isTruthy(interpreter);
+			// d. If testResult is true, return kValue.
+			if (testResult) return kValue;
+			// e. Set k to k + 1.
+		}
+
+		// 6. Return undefined.
+		return Undefined.instance;
 	}
 
 	@NonCompliant
@@ -247,12 +272,6 @@ public final class ArrayPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.toLocaleString")
 	private static Value<?> toLocaleString(Interpreter interpreter, Value<?>[] values) {
 		throw new NotImplemented("Array.prototype.toLocaleString");
-	}
-
-	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.toString")
-	private static Value<?> toString(Interpreter interpreter, Value<?>[] values) {
-		throw new NotImplemented("Array.prototype.toString");
 	}
 
 	@NonCompliant

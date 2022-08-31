@@ -3,11 +3,13 @@ package xyz.lebster.core.value.primitive.number;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -16,12 +18,52 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
+@SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-number-prototype-object")
 public final class NumberPrototype extends ObjectValue {
+	private static final double TEN_TO_THE_TWENTY_ONE = 1000000000000000000000.0D;
+
 	public NumberPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
 		this.putMethod(intrinsics, Names.toString, NumberPrototype::toStringMethod);
+		this.putMethod(intrinsics, Names.toFixed, NumberPrototype::toFixed);
 		this.putMethod(intrinsics, Names.valueOf, NumberPrototype::valueOf);
 		this.putMethod(intrinsics, Names.toLocaleString, NumberPrototype::toLocaleString);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tofixed")
+	private static StringValue toFixed(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 21.1.3.3 Number.prototype.toFixed ( fractionDigits )
+		final Value<?> fractionDigits = argument(0, arguments);
+
+		// 1. Let x be ? thisNumberValue(this value).
+		final NumberValue x_ = interpreter.thisValue().toNumberValue(interpreter);
+		// 2. Let f be ? ToIntegerOrInfinity(fractionDigits).
+		final int f = toIntegerOrInfinity(interpreter, fractionDigits);
+		// 3. Assert: If fractionDigits is undefined, then f is 0.
+		if (fractionDigits == Undefined.instance && f != 0) throw new ShouldNotHappen("Assertion failed");
+		// 4. If f is not finite, throw a RangeError exception.
+		// 5. If f < 0 or f > 100, throw a RangeError exception.
+		if (f < 0 || f > 100) throw error(new RangeError(interpreter, "toFixed() digits argument must be between 0 and 100"));
+		// 6. If x is not finite, return Number::toString(x, 10).
+		if (x_.value.isInfinite()) return x_.toStringValue(interpreter);
+		// 7. Set x to ℝ(x).
+		double x = x_.value;
+		// 8. Let s be the empty String.
+		String s = "";
+		// 9. If x < 0, then
+		if (x < 0) {
+			// a. Set s to "-".
+			s = "-";
+			// b. Set x to -x.
+			x = -x;
+		}
+
+		// 10. If x ≥ 10^21, then a. Let m be ! ToString(𝔽(x)).
+		// 11. Else, (String.format used instead)
+		final String m = x >= TEN_TO_THE_TWENTY_ONE ? x_.toStringValue(interpreter).value : String.format("%." + f + "f", x);
+
+		// 12. Return the string-concatenation of s and m.
+		return new StringValue(s + m);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.valueof")

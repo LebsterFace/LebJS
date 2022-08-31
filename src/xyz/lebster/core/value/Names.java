@@ -87,6 +87,7 @@ public final class Names {
 	public static final StringValue splice = new StringValue("splice");
 	public static final StringValue startsWith = new StringValue("startsWith");
 	public static final StringValue substring = new StringValue("substring");
+	public static final StringValue toFixed = new StringValue("toFixed");
 	public static final StringValue toLocaleLowerCase = new StringValue("toLocaleLowerCase");
 	public static final StringValue toLocaleString = new StringValue("toLocaleString");
 	public static final StringValue toLocaleUpperCase = new StringValue("toLocaleUpperCase");

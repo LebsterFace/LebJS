@@ -2,13 +2,13 @@ package xyz.lebster.core.value.object;
 
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
+import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
@@ -47,12 +47,15 @@ public final class ObjectPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tolocalestring")
-	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> toLocaleString(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 20.1.3.5 Object.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
-		final Value<?> reserved1 = argument(0, arguments);
-		final Value<?> reserved2 = argument(1, arguments);
 
-		throw new NotImplemented("Object.prototype.toLocaleString");
+		// 1. Let O be the `this` value.
+		// TODO: 2. Return ? Invoke(O, "toString").
+		final Value<?> V = interpreter.thisValue();
+		final ObjectValue O = V.toObjectValue(interpreter);
+		// 1. If argumentsList is not present, set argumentsList to a new empty List.
+		return Executable.getExecutable(interpreter, O.get(interpreter, Names.toString)).call(interpreter, V);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.isprototypeof")

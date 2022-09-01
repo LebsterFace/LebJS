@@ -314,7 +314,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	@NonCompliant
 	// FIXME: `boolean throw` argument
 	public void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
-		final PropertyDescriptor property = this.getProperty(key);
+		final PropertyDescriptor property = this.getOwnProperty(key);
 		if (property == null) {
 			this.defineOwnProperty(interpreter, key, new DataDescriptor(value, true, false, true));
 			return;

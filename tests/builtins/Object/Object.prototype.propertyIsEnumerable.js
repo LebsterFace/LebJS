@@ -2,16 +2,16 @@
 const o = {};
 
 o.foo = 1;
-expect(true, o.propertyIsEnumerable("foo"));
-expect(false, o.propertyIsEnumerable("bar"));
-expect(false, o.propertyIsEnumerable());
-expect(false, o.propertyIsEnumerable(undefined));
+Test.expect(true, o.propertyIsEnumerable("foo"));
+Test.expect(false, o.propertyIsEnumerable("bar"));
+Test.expect(false, o.propertyIsEnumerable());
+Test.expect(false, o.propertyIsEnumerable(undefined));
 
 o.undefined = 2;
-expect(true, o.propertyIsEnumerable());
-expect(true, o.propertyIsEnumerable(undefined));
+Test.expect(true, o.propertyIsEnumerable());
+Test.expect(true, o.propertyIsEnumerable(undefined));
 
-expect(false, globalThis.propertyIsEnumerable("globalThis"));
+Test.expect(false, globalThis.propertyIsEnumerable("globalThis"));
 
 {
     const object1 = {};

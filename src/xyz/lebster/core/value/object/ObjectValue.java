@@ -316,7 +316,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	public void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
 		final PropertyDescriptor property = this.getOwnProperty(key);
 		if (property == null) {
-			this.defineOwnProperty(interpreter, key, new DataDescriptor(value, true, false, true));
+			this.defineOwnProperty(interpreter, key, new DataDescriptor(value, true, true, true));
 			return;
 		}
 

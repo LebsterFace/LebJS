@@ -64,11 +64,20 @@ public final class ObjectPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.propertyisenumerable")
-	private static BooleanValue propertyIsEnumerable(Interpreter interpreter, Value<?>[] arguments) {
+	private static BooleanValue propertyIsEnumerable(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 20.1.3.4 Object.prototype.propertyIsEnumerable ( V )
 		final Value<?> V = argument(0, arguments);
 
-		throw new NotImplemented("Object.prototype.propertyIsEnumerable");
+		// 1. Let P be ? ToPropertyKey(V).
+		final Key<?> P = V.toPropertyKey(interpreter);
+		// 2. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 3. Let desc be ? O.[[GetOwnProperty]](P).
+		final PropertyDescriptor desc = O.getOwnProperty(P);
+		// 4. If desc is undefined, return false.
+		if (desc == null) return BooleanValue.FALSE;
+		// 5. Return desc.[[Enumerable]].
+		return BooleanValue.of(desc.isEnumerable());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-requireobjectcoercible")

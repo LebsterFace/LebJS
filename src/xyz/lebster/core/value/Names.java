@@ -52,6 +52,7 @@ public final class Names {
 	public static final StringValue isArray = new StringValue("isArray");
 	public static final StringValue isFinite = new StringValue("isFinite");
 	public static final StringValue isNaN = new StringValue("isNaN");
+	public static final StringValue isPrototypeOf = new StringValue("isPrototypeOf");
 	public static final StringValue join = new StringValue("join");
 	public static final StringValue keys = new StringValue("keys");
 	public static final StringValue lastIndexOf = new StringValue("lastIndexOf");
@@ -70,6 +71,7 @@ public final class Names {
 	public static final StringValue parseFloat = new StringValue("parseFloat");
 	public static final StringValue parseInt = new StringValue("parseInt");
 	public static final StringValue pop = new StringValue("pop");
+	public static final StringValue propertyIsEnumerable = new StringValue("propertyIsEnumerable");
 	public static final StringValue prototype = new StringValue("prototype");
 	public static final StringValue push = new StringValue("push");
 	public static final StringValue random = new StringValue("random");

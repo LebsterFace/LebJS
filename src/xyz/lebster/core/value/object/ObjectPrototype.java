@@ -1,6 +1,8 @@
 package xyz.lebster.core.value.object;
 
+import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.HasBuiltinTag;
@@ -16,12 +18,57 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+import static xyz.lebster.core.value.function.NativeFunction.argument;
 
+@SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-object-prototype-object")
 public final class ObjectPrototype extends ObjectValue {
 	public NativeFunction toStringMethod;
 
 	public ObjectPrototype() {
 		super((ObjectValue) null);
+	}
+
+	public void populateMethods(FunctionPrototype fp) {
+		// 20.1.3.2 Object.prototype.hasOwnProperty ( V )
+		putMethod(fp, Names.hasOwnProperty, ObjectPrototype::hasOwnPropertyMethod);
+		// 20.1.3.3 Object.prototype.isPrototypeOf ( V )
+		putMethod(fp, Names.isPrototypeOf, ObjectPrototype::isPrototypeOf);
+		// 20.1.3.4 Object.prototype.propertyIsEnumerable ( V )
+		putMethod(fp, Names.propertyIsEnumerable, ObjectPrototype::propertyIsEnumerable);
+		// 20.1.3.5 Object.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
+		putMethod(fp, Names.toLocaleString, ObjectPrototype::toLocaleString);
+		// 20.1.3.6 Object.prototype.toString ( )
+		toStringMethod = putMethod(fp, Names.toString, ObjectPrototype::toStringMethod);
+		// 20.1.3.7 Object.prototype.valueOf ( )
+		putMethod(fp, Names.valueOf, ObjectPrototype::valueOf);
+
+		// Non-standard
+		putMethod(fp, Names.hasProperty, ObjectPrototype::hasPropertyMethod);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tolocalestring")
+	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] arguments) {
+		// 20.1.3.5 Object.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
+		final Value<?> reserved1 = argument(0, arguments);
+		final Value<?> reserved2 = argument(1, arguments);
+
+		throw new NotImplemented("Object.prototype.toLocaleString");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.isprototypeof")
+	private static BooleanValue isPrototypeOf(Interpreter interpreter, Value<?>[] arguments) {
+		// 20.1.3.3 Object.prototype.isPrototypeOf ( V )
+		final Value<?> V = argument(0, arguments);
+
+		throw new NotImplemented("Object.prototype.isPrototypeOf");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.propertyisenumerable")
+	private static BooleanValue propertyIsEnumerable(Interpreter interpreter, Value<?>[] arguments) {
+		// 20.1.3.4 Object.prototype.propertyIsEnumerable ( V )
+		final Value<?> V = argument(0, arguments);
+
+		throw new NotImplemented("Object.prototype.propertyIsEnumerable");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-requireobjectcoercible")
@@ -33,7 +80,8 @@ public final class ObjectPrototype extends ObjectValue {
 		}
 	}
 
-	private static Value<?> hasOwnPropertyMethod(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.hasownproperty")
+	private static BooleanValue hasOwnPropertyMethod(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
 		final Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
 		return BooleanValue.of(object.hasOwnProperty(property));
@@ -75,20 +123,14 @@ public final class ObjectPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.valueof")
-	private static Value<?> valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static ObjectValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		return interpreter.thisValue().toObjectValue(interpreter);
 	}
 
-	private static Value<?> hasPropertyMethod(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+	@NonStandard
+	private static BooleanValue hasPropertyMethod(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
 		final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
 		final Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
 		return BooleanValue.of(object.hasProperty(property));
-	}
-
-	public void populateMethods(FunctionPrototype fp) {
-		toStringMethod = this.putMethod(fp, Names.toString, ObjectPrototype::toStringMethod);
-		this.putMethod(fp, Names.valueOf, ObjectPrototype::valueOf);
-		this.putMethod(fp, Names.hasOwnProperty, ObjectPrototype::hasOwnPropertyMethod);
-		this.putMethod(fp, Names.hasProperty, ObjectPrototype::hasPropertyMethod);
 	}
 }

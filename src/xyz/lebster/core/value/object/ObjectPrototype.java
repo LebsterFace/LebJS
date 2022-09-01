@@ -56,11 +56,23 @@ public final class ObjectPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.isprototypeof")
-	private static BooleanValue isPrototypeOf(Interpreter interpreter, Value<?>[] arguments) {
+	private static BooleanValue isPrototypeOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 20.1.3.3 Object.prototype.isPrototypeOf ( V )
-		final Value<?> V = argument(0, arguments);
+		final Value<?> V_ = argument(0, arguments);
 
-		throw new NotImplemented("Object.prototype.isPrototypeOf");
+		// 1. If Type(V) is not Object, return false.
+		if (!(V_ instanceof ObjectValue V)) return BooleanValue.FALSE;
+		// 2. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 3. Repeat,
+		while (true) {
+			// a. Set V to ? V.[[GetPrototypeOf]]().
+			V = V.getPrototype();
+			// b. If V is null, return false.
+			if (V == null) return BooleanValue.FALSE;
+			// c. If SameValue(O, V) is true, return true.
+			if (O.sameValue(V)) return BooleanValue.TRUE;
+		}
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.propertyisenumerable")

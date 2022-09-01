@@ -16,7 +16,7 @@ public class ErrorObject extends ObjectValue implements HasBuiltinTag {
 		super(prototype);
 		this.message = ANSI.stripFormatting(message);
 		put(Names.message, new StringValue(message));
-		put(Names.name, new StringValue(getClass().getSimpleName()));
+		put(Names.name, getClass() == ErrorObject.class ? Names.Error : new StringValue(getClass().getSimpleName()));
 	}
 
 	@Override

@@ -24,8 +24,12 @@ public record ReturnStatement(Expression value) implements Statement {
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		representation.append("return ");
-		value.represent(representation);
+		representation.append("return");
+		if (value != null) {
+			representation.append(' ');
+			value.represent(representation);
+		}
+		representation.append(';');
 		representation.appendLine();
 	}
 }

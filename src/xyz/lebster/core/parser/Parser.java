@@ -477,7 +477,7 @@ public final class Parser {
 			return parseObjectDestructuring();
 		} else if (state.optional(TokenType.LBracket)) {
 			return parseArrayDestructuring();
-		} else if (state.token.matchIdentifierName()) {
+		} else if (state.is(TokenType.Identifier)) {
 			return new IdentifierExpression(state.consume().value);
 		} else {
 			throw state.unexpected();
@@ -518,7 +518,7 @@ public final class Parser {
 		while (!state.is(TokenType.RBrace)) {
 			if (state.optional(TokenType.DotDotDot)) {
 				consumeAllLineTerminators();
-				if (state.token.matchIdentifierName()) {
+				if (state.is(TokenType.Identifier)) {
 					restName = new StringValue(state.consume().value);
 					consumeAllLineTerminators();
 					if (!state.optional(TokenType.Comma)) break;
@@ -529,7 +529,7 @@ public final class Parser {
 				}
 			}
 
-			if (state.token.matchIdentifierName()) {
+			if (state.is(TokenType.Identifier)) {
 				final StringLiteral key = parseAsStringLiteral();
 				consumeAllLineTerminators();
 

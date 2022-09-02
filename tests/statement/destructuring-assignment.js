@@ -63,3 +63,5 @@ let obj = { a: 'a', b: 'b', c: [1, 2, 3] };
 Test.expectError("EvalError", "Invalid left-hand side in assignment", () => {
 	eval("(({ a, b, c }) = obj)")
 })
+
+Test.expectSyntaxError('Unexpected token "else"', "let { else } = { else: 1 }")

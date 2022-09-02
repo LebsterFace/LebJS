@@ -26,7 +26,8 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		boolean hideStackTrace,
 		boolean parseOnly,
 		boolean ignoreNotImplemented,
-		boolean hidePassing
+		boolean hidePassing,
+		boolean disableTestOutputBuffers
 	) {
 	}
 
@@ -39,6 +40,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private boolean parseOnly = false;
 		private boolean ignoreNotImplemented = false;
 		private boolean hidePassing = false;
+		private boolean disableTestOutputBuffers = false;
 
 		private ExecutionOptions toExecutionOptions() {
 			return new ExecutionOptions(
@@ -46,7 +48,8 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				this.hideStackTrace,
 				this.parseOnly,
 				this.ignoreNotImplemented,
-				this.hidePassing
+				this.hidePassing,
+				this.disableTestOutputBuffers
 			);
 		}
 
@@ -57,6 +60,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				case "parse-only" -> parseOnly = true;
 				case "ignore-not-impl" -> ignoreNotImplemented = true;
 				case "hide-passing" -> hidePassing = true;
+				case "no-buffer" -> disableTestOutputBuffers = true;
 
 				case "t", "test" -> setMode(ExecutionMode.Tests);
 				case "g", "gif" -> {

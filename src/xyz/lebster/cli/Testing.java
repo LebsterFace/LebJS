@@ -24,10 +24,17 @@ public final class Testing {
 
 	public Testing(CLArguments arguments) {
 		this.arguments = arguments;
-		passedOutput = new ByteArrayOutputStream();
-		passedStream = new PrintStream(passedOutput);
-		failedOutput = new ByteArrayOutputStream();
-		failedStream = new PrintStream(failedOutput);
+		if (arguments.options().disableTestOutputBuffers()) {
+			passedOutput = null;
+			passedStream = System.out;
+			failedOutput = null;
+			failedStream = System.out;
+		} else {
+			passedOutput = new ByteArrayOutputStream();
+			passedStream = new PrintStream(passedOutput);
+			failedOutput = new ByteArrayOutputStream();
+			failedStream = new PrintStream(failedOutput);
+		}
 	}
 
 	private static void printTestResult(PrintStream stream, String color, String status, String name) {
@@ -96,14 +103,19 @@ public final class Testing {
 		final File testingDirectory = arguments.filePathOrNull() == null ? new File("tests/") : arguments.filePathOrNull().toFile();
 		runTestDirectory(testingDirectory, "");
 
-		passedStream.close();
-		failedStream.close();
+		if (!arguments.options().disableTestOutputBuffers()) {
+			passedStream.close();
+			failedStream.close();
+		}
 
 		try {
 			System.out.printf("%n%s%s\t\tPassing Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_GREEN, ANSI.BLACK, successfulTests, totalTests, ANSI.RESET);
-			if (!arguments.options().hidePassing()) passedOutput.writeTo(System.out);
+			if (!arguments.options().disableTestOutputBuffers() && !arguments.options().hidePassing())
+				passedOutput.writeTo(System.out);
+
 			System.out.printf("%n%s%s\t\tFailing Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_RED, ANSI.BLACK, totalTests - successfulTests, totalTests, ANSI.RESET);
-			failedOutput.writeTo(System.out);
+			if (!arguments.options().disableTestOutputBuffers())
+				failedOutput.writeTo(System.out);
 			if (totalTests != successfulTests)
 				System.out.printf("%n%s\t\t%.2f%% of tests passed%n%s%n", ANSI.MAGENTA, 100.0D * ((double) successfulTests / (double) totalTests), ANSI.RESET);
 		} catch (IOException e) {

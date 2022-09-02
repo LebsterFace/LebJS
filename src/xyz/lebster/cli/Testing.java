@@ -13,12 +13,22 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 public final class Testing {
-	private static final ByteArrayOutputStream passedOutput = new ByteArrayOutputStream();
-	private static final PrintStream passedStream = new PrintStream(passedOutput);
-	private static final ByteArrayOutputStream failedOutput = new ByteArrayOutputStream();
-	private static final PrintStream failedStream = new PrintStream(failedOutput);
-	private static int successfulTests = 0;
-	private static int totalTests = 0;
+	private final ByteArrayOutputStream passedOutput;
+	private final PrintStream passedStream;
+	private final ByteArrayOutputStream failedOutput;
+	private final PrintStream failedStream;
+	private int successfulTests = 0;
+	private int totalTests = 0;
+
+	private final CLArguments arguments;
+
+	public Testing(CLArguments arguments) {
+		this.arguments = arguments;
+		passedOutput = new ByteArrayOutputStream();
+		passedStream = new PrintStream(passedOutput);
+		failedOutput = new ByteArrayOutputStream();
+		failedStream = new PrintStream(failedOutput);
+	}
 
 	private static void printTestResult(PrintStream stream, String color, String status, String name) {
 		stream.printf("%s%s %s %s%s %s%s%n", ANSI.BACKGROUND_BLACK, color, status, ANSI.RESET, ANSI.BRIGHT_BLUE, name, ANSI.RESET);
@@ -29,7 +39,7 @@ public final class Testing {
 			printStream.println(baos);
 	}
 
-	private static void runTestFile(CLArguments arguments, File file, String prefix) {
+	private void runTestFile(File file, String prefix) {
 		if (!file.getName().endsWith(".js") && !file.getName().endsWith(".js.skip")) return;
 
 		final String fileName = prefix + file.getName();
@@ -69,22 +79,22 @@ public final class Testing {
 		System.setOut(stdout);
 	}
 
-	private static void runTestDirectory(CLArguments arguments, File directory, String prefix) {
+	private void runTestDirectory(File directory, String prefix) {
 		final File[] files = directory.listFiles();
 		if (files == null) throw new Error("Test directory not found!");
 
 		for (final File file : files) {
 			if (file.isFile()) {
-				runTestFile(arguments, file, prefix);
+				runTestFile(file, prefix);
 			} else {
-				runTestDirectory(arguments, file, prefix + file.getName() + "/");
+				runTestDirectory(file, prefix + file.getName() + "/");
 			}
 		}
 	}
 
-	public static void test(CLArguments arguments) {
+	public void test() {
 		final File testingDirectory = arguments.filePathOrNull() == null ? new File("tests/") : arguments.filePathOrNull().toFile();
-		runTestDirectory(arguments, testingDirectory, "");
+		runTestDirectory(testingDirectory, "");
 
 		passedStream.close();
 		failedStream.close();

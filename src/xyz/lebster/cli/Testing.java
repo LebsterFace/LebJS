@@ -2,6 +2,8 @@ package xyz.lebster.cli;
 
 import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.exception.CannotParse;
+import xyz.lebster.core.exception.SyntaxError;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,7 +21,7 @@ public final class Testing {
 
 	private final CLArguments arguments;
 
-	public Testing(CLArguments arguments) {
+	public Testing(CLArguments arguments) throws CannotParse, SyntaxError {
 		this.arguments = arguments;
 		if (arguments.options().disableTestOutputBuffers()) {
 			passedOutput = null;
@@ -35,6 +37,8 @@ public final class Testing {
 
 		if (arguments.options().testHarnessName() == null) {
 			harness = new DefaultTestHarness();
+		} else if ("serenity".equals(arguments.options().testHarnessName())) {
+			harness = new SerenityTestHarness(arguments);
 		} else {
 			throw new IllegalStateException("Unknown test harness name: " + arguments.options().testHarnessName());
 		}

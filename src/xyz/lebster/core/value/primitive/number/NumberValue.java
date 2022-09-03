@@ -92,7 +92,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		}
 	}
 
-	@NonStandard
+	@NonCompliant
 	private static String toLocaleString(Double d) {
 		if (d.isNaN()) return "NaN";
 		else if (d == 0.0) return "0";

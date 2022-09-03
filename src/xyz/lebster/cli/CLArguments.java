@@ -14,7 +14,9 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 			if (argument.startsWith("--")) {
 				result.setFlag(argument.substring(2).toLowerCase());
 			} else if (argument.startsWith("-")) {
-				result.setFlags(argument.substring(1).toLowerCase().split(""));
+				for (final String flag : argument.substring(1).toLowerCase().split("")) {
+					result.setFlag(flag);
+				}
 			} else {
 				result.setFilename(argument);
 			}
@@ -35,7 +37,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 	}
 
 	private static final class TemporaryResult {
-		private Iterator<String> arguments;
+		private final Iterator<String> arguments;
 		public TemporaryResult(Iterator<String> arguments) {
 			this.arguments = arguments;
 		}
@@ -63,32 +65,23 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 			);
 		}
 
-		private String resolveFlagAlias(String shortFlag) {
-			return switch (shortFlag) {
-				case "a" -> "ast";
-				case "v" -> "verbose";
-				case "t" -> "test";
-				default -> null;
-			};
-		}
-
 		private void setFlag(String flag) throws CLArgumentException {
 			switch (flag) {
-				case "ast" -> showAST = true;
-				case "verbose" -> hideStackTrace = false;
+				case "a", "ast" -> showAST = true;
+				case "v", "verbose" -> hideStackTrace = false;
 				case "parse-only" -> parseOnly = true;
 				case "ignore-not-impl" -> ignoreNotImplemented = true;
 				case "hide-passing" -> hidePassing = true;
 				case "no-buffer" -> disableTestOutputBuffers = true;
-				case "harness" -> testHarnessPath = getFlagValue("Missing harness filepath");
+				case "h", "harness" -> testHarnessPath = getFlagValue("Missing harness filepath");
 
-				case "test" -> setMode(ExecutionMode.Tests);
+				case "t", "test" -> setMode(ExecutionMode.Tests);
 				case "gif" -> {
 					setMode(ExecutionMode.GIF);
 					showAST = true;
 				}
 
-				default -> throw new CLArgumentException("Unknown flag '--%s'".formatted(flag));
+				default -> throw new CLArgumentException("Unknown flag '%s'".formatted(flag));
 			}
 		}
 
@@ -102,14 +95,6 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				this.mode = newMode;
 			} else {
 				throw new CLArgumentException("Mode was specified twice");
-			}
-		}
-
-		private void setFlags(String[] flags) throws CLArgumentException {
-			for (final String flag : flags) {
-				final String longFlag = resolveFlagAlias(flag);
-				if (longFlag == null) throw new CLArgumentException("Unknown flag alias '-%s'".formatted(flag));
-				setFlag(longFlag);
 			}
 		}
 

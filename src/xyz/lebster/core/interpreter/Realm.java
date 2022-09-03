@@ -12,20 +12,22 @@ public record Realm(Interpreter interpreter) {
 	}
 
 	public static Value<?> executeWith(String sourceText, Interpreter interpreter) throws CannotParse, AbruptCompletion, SyntaxError {
-		return parse(sourceText).execute(interpreter);
+		return parse(sourceText, false).execute(interpreter);
 	}
 
-	public static Program parse(String sourceText) throws SyntaxError, CannotParse {
-		return new Parser(sourceText).parse();
-	}
-
-	public Value<?> execute(String sourceText, boolean dumpAST) throws CannotParse, SyntaxError, AbruptCompletion {
-		final Program program = parse(sourceText);
+	public static Program parse(String sourceText, boolean dumpAST) throws SyntaxError, CannotParse {
+		final Program program = new Parser(sourceText).parse();
 		if (dumpAST) {
 			program.dump(0);
 			System.out.println();
 		}
 
+		return program;
+
+	}
+
+	public Value<?> execute(String sourceText, boolean dumpAST) throws CannotParse, SyntaxError, AbruptCompletion {
+		final Program program = parse(sourceText, dumpAST);
 		return program.execute(interpreter);
 	}
 }

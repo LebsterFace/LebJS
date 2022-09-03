@@ -40,7 +40,7 @@ public final class TestObject extends ObjectValue {
 			throw new ShouldNotHappen("Test.parse not called with a string");
 
 		try {
-			Realm.parse(sourceTextSV.value);
+			Realm.parse(sourceTextSV.value, false);
 		} catch (SyntaxError | CannotParse e) {
 			throw new RuntimeException(e);
 		}

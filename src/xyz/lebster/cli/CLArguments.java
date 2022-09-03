@@ -1,18 +1,20 @@
 package xyz.lebster.cli;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Iterator;
 
 public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOptions options) {
 	public static CLArguments from(String[] args) throws CLArgumentException {
-		final TemporaryResult result = new TemporaryResult();
+		final Iterator<String> iterator = Arrays.asList(args).iterator();
+		final TemporaryResult result = new TemporaryResult(iterator);
 
-		for (final String argument : args) {
-			if (argument.startsWith("-")) {
-				if (argument.startsWith("--")) {
-					result.setFlag(argument.substring(2).toLowerCase());
-				} else {
-					result.setFlags(argument.substring(1).toLowerCase());
-				}
+		while (iterator.hasNext()) {
+			final String argument = iterator.next();
+			if (argument.startsWith("--")) {
+				result.setFlag(argument.substring(2).toLowerCase());
+			} else if (argument.startsWith("-")) {
+				result.setFlags(argument.substring(1).toLowerCase().split(""));
 			} else {
 				result.setFilename(argument);
 			}
@@ -27,11 +29,17 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		boolean parseOnly,
 		boolean ignoreNotImplemented,
 		boolean hidePassing,
-		boolean disableTestOutputBuffers
+		boolean disableTestOutputBuffers,
+		String testHarnessName
 	) {
 	}
 
 	private static final class TemporaryResult {
+		private Iterator<String> arguments;
+		public TemporaryResult(Iterator<String> arguments) {
+			this.arguments = arguments;
+		}
+
 		private String fileNameOrNull = null;
 		private ExecutionMode mode = null;
 
@@ -41,6 +49,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private boolean ignoreNotImplemented = false;
 		private boolean hidePassing = false;
 		private boolean disableTestOutputBuffers = false;
+		private String testHarnessPath;
 
 		private ExecutionOptions toExecutionOptions() {
 			return new ExecutionOptions(
@@ -49,27 +58,43 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				this.parseOnly,
 				this.ignoreNotImplemented,
 				this.hidePassing,
-				this.disableTestOutputBuffers
+				this.disableTestOutputBuffers,
+				this.testHarnessPath
 			);
+		}
+
+		private String resolveFlagAlias(String shortFlag) {
+			return switch (shortFlag) {
+				case "a" -> "ast";
+				case "v" -> "verbose";
+				case "t" -> "test";
+				default -> null;
+			};
 		}
 
 		private void setFlag(String flag) throws CLArgumentException {
 			switch (flag) {
-				case "a", "ast" -> showAST = true;
-				case "s", "show", "stack", "v", "verbose" -> hideStackTrace = false;
+				case "ast" -> showAST = true;
+				case "verbose" -> hideStackTrace = false;
 				case "parse-only" -> parseOnly = true;
 				case "ignore-not-impl" -> ignoreNotImplemented = true;
 				case "hide-passing" -> hidePassing = true;
 				case "no-buffer" -> disableTestOutputBuffers = true;
+				case "harness" -> testHarnessPath = getFlagValue("Missing harness filepath");
 
-				case "t", "test" -> setMode(ExecutionMode.Tests);
-				case "g", "gif" -> {
+				case "test" -> setMode(ExecutionMode.Tests);
+				case "gif" -> {
 					setMode(ExecutionMode.GIF);
 					showAST = true;
 				}
 
-				default -> throw new CLArgumentException("Unknown flag '" + flag + "'");
+				default -> throw new CLArgumentException("Unknown flag '--%s'".formatted(flag));
 			}
+		}
+
+		private String getFlagValue(String missingMessage) throws CLArgumentException {
+			if (!arguments.hasNext()) throw new CLArgumentException(missingMessage);
+			return arguments.next();
 		}
 
 		private void setMode(ExecutionMode newMode) throws CLArgumentException {
@@ -80,9 +105,11 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 			}
 		}
 
-		private void setFlags(String flags) throws CLArgumentException {
-			for (int i = 0; i < flags.length(); i++) {
-				this.setFlag(flags.substring(i, i + 1));
+		private void setFlags(String[] flags) throws CLArgumentException {
+			for (final String flag : flags) {
+				final String longFlag = resolveFlagAlias(flag);
+				if (longFlag == null) throw new CLArgumentException("Unknown flag alias '-%s'".formatted(flag));
+				setFlag(longFlag);
 			}
 		}
 
@@ -101,11 +128,11 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		}
 
 		private CLArguments toCLIArguments() {
-			if (this.mode == null) {
-				this.mode = ExecutionMode.REPL;
-			}
-
-			return new CLArguments(this.fileNameOrNull == null ? null : Path.of(this.fileNameOrNull), this.mode, this.toExecutionOptions());
+			return new CLArguments(
+				fileNameOrNull == null ? null : Path.of(fileNameOrNull),
+				mode == null ? ExecutionMode.REPL : mode,
+				toExecutionOptions()
+			);
 		}
 	}
 }

@@ -16,6 +16,7 @@ public final class Names {
 	public static final StringValue create = new StringValue("create");
 	public static final StringValue declare = new StringValue("declare");
 	public static final StringValue description = new StringValue("description");
+	public static final StringValue details = new StringValue("details");
 	public static final StringValue done = new StringValue("done");
 	public static final StringValue endsWith = new StringValue("endsWith");
 	public static final StringValue entries = new StringValue("entries");
@@ -80,6 +81,7 @@ public final class Names {
 	public static final StringValue reduceRight = new StringValue("reduceRight");
 	public static final StringValue repeat = new StringValue("repeat");
 	public static final StringValue replaceAll = new StringValue("replaceAll");
+	public static final StringValue result = new StringValue("result");
 	public static final StringValue reverse = new StringValue("reverse");
 	public static final StringValue setPrototypeOf = new StringValue("setPrototypeOf");
 	public static final StringValue shift = new StringValue("shift");
@@ -127,6 +129,7 @@ public final class Names {
 	public static final StringValue Infinity = new StringValue("Infinity");
 	public static final StringValue NaN = new StringValue("NaN");
 	public static final StringValue undefined = new StringValue("undefined");
+	public static final StringValue __TestResults__ = new StringValue("__TestResults__");
 
 	// Constructors & Global objects
 	public static final StringValue Array = new StringValue("Array");

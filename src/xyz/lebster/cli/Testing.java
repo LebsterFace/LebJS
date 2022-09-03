@@ -2,10 +2,6 @@ package xyz.lebster.cli;
 
 import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.exception.NotImplemented;
-import xyz.lebster.core.exception.ParserNotImplemented;
-import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.Realm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,6 +13,7 @@ public final class Testing {
 	private final PrintStream passedStream;
 	private final ByteArrayOutputStream failedOutput;
 	private final PrintStream failedStream;
+	private final TestHarness harness;
 	private int successfulTests = 0;
 	private int totalTests = 0;
 
@@ -35,6 +32,12 @@ public final class Testing {
 			failedOutput = new ByteArrayOutputStream();
 			failedStream = new PrintStream(failedOutput);
 		}
+
+		if (arguments.options().testHarnessName() == null) {
+			harness = new DefaultTestHarness();
+		} else {
+			throw new IllegalStateException("Unknown test harness name: " + arguments.options().testHarnessName());
+		}
 	}
 
 	private static void printTestResult(PrintStream stream, String color, String status, String name) {
@@ -52,35 +55,27 @@ public final class Testing {
 		final String fileName = prefix + file.getName();
 		totalTests++;
 
-		if (file.getName().endsWith(".js.skip")) {
-			printTestResult(failedStream, ANSI.YELLOW, "SKIPPED", fileName);
-			return;
-		}
-
 		final ByteArrayOutputStream tempOutput = new ByteArrayOutputStream();
 		final PrintStream tempStream = new PrintStream(tempOutput);
 		final PrintStream stdout = System.out;
 		System.setOut(tempStream);
 
-		try {
-			try {
-				Realm.executeStatic(Main.readFile(file.toPath()), arguments.options().showAST());
-			} catch (AbruptCompletion exception) {
-				if (!arguments.options().parseOnly()) {
-					throw exception;
-				}
-			} catch (NotImplemented | ParserNotImplemented exception) {
-				if (!arguments.options().ignoreNotImplemented()) {
-					throw exception;
-				}
+
+		final TestResult result = harness.run(file, arguments);
+		switch (result.status()) {
+			case SKIPPED -> printTestResult(failedStream, ANSI.YELLOW, "SKIPPED", fileName);
+
+			case PASSED -> {
+				successfulTests++;
+				printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", fileName);
+				printTestOutput(passedStream, tempOutput);
 			}
-			successfulTests++;
-			printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", fileName);
-			printTestOutput(passedStream, tempOutput);
-		} catch (Throwable throwable) {
-			printTestResult(failedStream, ANSI.BRIGHT_RED, "FAILED", fileName);
-			printTestOutput(failedStream, tempOutput);
-			Main.handleError(throwable, failedStream, arguments.options().hideStackTrace());
+
+			case FAILED -> {
+				printTestResult(failedStream, ANSI.BRIGHT_RED, "FAILED", fileName);
+				printTestOutput(failedStream, tempOutput);
+				Main.handleError(result.cause(), failedStream, arguments.options().hideStackTrace());
+			}
 		}
 
 		System.setOut(stdout);

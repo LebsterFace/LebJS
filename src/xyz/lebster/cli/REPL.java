@@ -6,7 +6,6 @@ import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.Program;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Token;
 import xyz.lebster.core.value.Value;
@@ -60,9 +59,7 @@ public final class REPL {
 						System.out.println(lastValue.toDisplayString());
 					}
 				} else if (input.startsWith(".dump ")) {
-					final Program program = Realm.parse(input.substring(".dump ".length()));
-					program.dump(0);
-					System.out.println();
+					Realm.parse(input.substring(".dump ".length()), true);
 				} else {
 					final Value<?> lastValue = realm.execute(input, options.showAST());
 					interpreter.globalObject.set(interpreter, new StringValue("$"), lastValue);

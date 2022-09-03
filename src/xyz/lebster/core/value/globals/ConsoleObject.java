@@ -21,14 +21,14 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 public final class ConsoleObject extends ObjectValue {
 	private static final Scanner scanner = new Scanner(System.in);
 
-	public ConsoleObject(Intrinsics functionPrototype) {
+	public ConsoleObject(Intrinsics intrinsics) {
 		super((ObjectValue) null);
-		this.putMethod(functionPrototype, Names.write, ConsoleObject::write);
-		this.putMethod(functionPrototype, Names.log, (interpreter, data) -> logger(LogLevel.Log, data));
-		this.putMethod(functionPrototype, Names.warn, (interpreter, data) -> logger(LogLevel.Warn, data));
-		this.putMethod(functionPrototype, Names.error, (interpreter, data) -> logger(LogLevel.Error, data));
-		this.putMethod(functionPrototype, Names.info, (interpreter, data) -> logger(LogLevel.Info, data));
-		this.putMethod(functionPrototype, Names.input, ConsoleObject::input);
+		putMethod(intrinsics, Names.write, 0, ConsoleObject::write);
+		putMethod(intrinsics, Names.log, 0, (interpreter, data) -> logger(LogLevel.Log, data));
+		putMethod(intrinsics, Names.warn, 0, (interpreter, data) -> logger(LogLevel.Warn, data));
+		putMethod(intrinsics, Names.error, 0, (interpreter, data) -> logger(LogLevel.Error, data));
+		putMethod(intrinsics, Names.info, 0, (interpreter, data) -> logger(LogLevel.Info, data));
+		putMethod(intrinsics, Names.input, 1, ConsoleObject::input);
 	}
 
 	private static Undefined write(Interpreter interpreter, Value<?>[] data) {
@@ -47,6 +47,7 @@ public final class ConsoleObject extends ObjectValue {
 
 	@NonStandard
 	private static Value<?> input(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		// console.input(prompt: string, type?: string): string | number | boolean
 		System.out.print(argumentString(0, "", interpreter, args));
 		final String inputType = argumentString(1, "", interpreter, args);
 		final String input = scanner.nextLine();

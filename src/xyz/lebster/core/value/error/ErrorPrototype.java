@@ -17,11 +17,13 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 public class ErrorPrototype extends ObjectValue {
 	public ErrorPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
-		putMethod(intrinsics, Names.toString, ErrorPrototype::toStringMethod);
+		putMethod(intrinsics, Names.toString, 0, ErrorPrototype::toStringMethod);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-error.prototype.tostring")
 	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.5.3.4 Error.prototype.toString ( )
+
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
 		if (!(interpreter.thisValue() instanceof final ObjectValue O))

@@ -30,20 +30,20 @@ public final class ObjectPrototype extends ObjectValue {
 
 	public void populateMethods(FunctionPrototype fp) {
 		// 20.1.3.2 Object.prototype.hasOwnProperty ( V )
-		putMethod(fp, Names.hasOwnProperty, ObjectPrototype::hasOwnPropertyMethod);
+		putMethod(fp, Names.hasOwnProperty, 1, ObjectPrototype::hasOwnPropertyMethod);
 		// 20.1.3.3 Object.prototype.isPrototypeOf ( V )
-		putMethod(fp, Names.isPrototypeOf, ObjectPrototype::isPrototypeOf);
+		putMethod(fp, Names.isPrototypeOf, 1, ObjectPrototype::isPrototypeOf);
 		// 20.1.3.4 Object.prototype.propertyIsEnumerable ( V )
-		putMethod(fp, Names.propertyIsEnumerable, ObjectPrototype::propertyIsEnumerable);
+		putMethod(fp, Names.propertyIsEnumerable, 1, ObjectPrototype::propertyIsEnumerable);
 		// 20.1.3.5 Object.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
-		putMethod(fp, Names.toLocaleString, ObjectPrototype::toLocaleString);
+		putMethod(fp, Names.toLocaleString, 0, ObjectPrototype::toLocaleString);
 		// 20.1.3.6 Object.prototype.toString ( )
-		toStringMethod = putMethod(fp, Names.toString, ObjectPrototype::toStringMethod);
+		toStringMethod = putMethod(fp, Names.toString, 0, ObjectPrototype::toStringMethod);
 		// 20.1.3.7 Object.prototype.valueOf ( )
-		putMethod(fp, Names.valueOf, ObjectPrototype::valueOf);
+		putMethod(fp, Names.valueOf, 0, ObjectPrototype::valueOf);
 
 		// Non-standard
-		putMethod(fp, Names.hasProperty, ObjectPrototype::hasPropertyMethod);
+		putMethod(fp, Names.hasProperty, 1, ObjectPrototype::hasPropertyMethod);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tolocalestring")
@@ -106,6 +106,8 @@ public final class ObjectPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.hasownproperty")
 	private static BooleanValue hasOwnPropertyMethod(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		// 20.1.3.2 Object.prototype.hasOwnProperty ( V )
+
 		final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
 		final Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
 		return BooleanValue.of(object.hasOwnProperty(property));
@@ -153,6 +155,8 @@ public final class ObjectPrototype extends ObjectValue {
 
 	@NonStandard
 	private static BooleanValue hasPropertyMethod(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
+		// Object.prototype.hasProperty(property: string | symbol): boolean
+
 		final ObjectValue object = interpreter.thisValue().toObjectValue(interpreter);
 		final Key<?> property = args.length > 0 ? args[0].toPropertyKey(interpreter) : Names.undefined;
 		return BooleanValue.of(object.hasProperty(property));

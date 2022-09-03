@@ -24,8 +24,8 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentInt;
 public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayPrototype> {
 	public ArrayConstructor(Intrinsics intrinsics) {
 		super(intrinsics, Names.Array);
-		this.putMethod(intrinsics, Names.of, ArrayConstructor::of);
-		this.putMethod(intrinsics, Names.isArray, ArrayConstructor::isArray);
+		this.putMethod(intrinsics, Names.of, 2, ArrayConstructor::of);
+		this.putMethod(intrinsics, Names.isArray, 1, ArrayConstructor::isArray);
 	}
 
 	@NonCompliant
@@ -38,7 +38,9 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 	}
 
 	@NonStandard
-	private static Value<?> of(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static ArrayObject of(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// Array.prototype.of(length: number, callbackFn: (index: number) => unknown, thisArg?: unknown): unknown[]
+
 		final int len = argumentInt(0, 0, interpreter, arguments);
 		final Value<?> callbackFn = argument(1, arguments);
 		final Value<?> thisArg = argument(2, arguments);

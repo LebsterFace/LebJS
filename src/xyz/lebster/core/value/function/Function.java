@@ -19,7 +19,7 @@ public final class Function extends Constructor {
 	private final FunctionNode code;
 
 	public Function(Intrinsics intrinsics, Environment environment, FunctionNode code) {
-		super(intrinsics, code.name() == null ? Names.EMPTY : new StringValue(code.name()));
+		super(intrinsics, code.name() == null ? Names.EMPTY : new StringValue(code.name()), code.parameters().expectedArgumentCount());
 		this.environment = environment;
 		this.code = code;
 	}

@@ -126,7 +126,7 @@ public final class MathObject extends ObjectValue {
 		});
 
 		// () -> double
-		this.putMethod(fp, Names.random, (interpreter, args) -> new NumberValue(Math.random()));
+		this.putMethod(fp, Names.random, 0, (interpreter, args) -> new NumberValue(Math.random()));
 
 		// https://tc39.es/ecma262/multipage#sec-math.trunc
 		addWrapper(fp, "trunc", (double n) -> {
@@ -174,20 +174,20 @@ public final class MathObject extends ObjectValue {
 		addWrapper(fp, "acosh", (double x) -> Math.log(x + Math.sqrt(x * x - 1)));
 		addWrapper(fp, "atanh", (double x) -> Math.log((1 + x) / (1 - x)) / 2);
 
-		notImplemented(fp, "imul");
-		notImplemented(fp, "clz32");
-		notImplemented(fp, "fround");
+		notImplemented(fp, "imul", 2);
+		notImplemented(fp, "clz32", 1);
+		notImplemented(fp, "fround", 1);
 	}
 
-	private void notImplemented(FunctionPrototype fp, String methodName) {
-		this.putMethod(fp, new StringValue(methodName), (interpreter, args) -> {
+	private void notImplemented(FunctionPrototype fp, String methodName, int expectedArgumentCount) {
+		this.putMethod(fp, new StringValue(methodName), expectedArgumentCount, (interpreter, args) -> {
 			throw new NotImplemented(methodName);
 		});
 	}
 
 	// https://tc39.es/ecma262/multipage#sec-math.hypot + sec-math.min + sec-math.max
 	private void addWrapper(FunctionPrototype fp, String methodName, DoubleRestArgs restArgs) {
-		this.putMethod(fp, new StringValue(methodName), (interpreter, args) -> {
+		this.putMethod(fp, new StringValue(methodName), 0, (interpreter, args) -> {
 			final double[] coerced = new double[args.length];
 			for (int i = 0; i < args.length; i++) {
 				coerced[i] = args[i].toNumberValue(interpreter).value;
@@ -198,16 +198,16 @@ public final class MathObject extends ObjectValue {
 	}
 
 	private void addWrapper(FunctionPrototype fp, String methodName, DoubleUnaryOperator unaryOperator) {
-		this.putMethod(fp, new StringValue(methodName), (interpreter, args) -> {
-			final var number = argumentDouble(0, interpreter, args);
+		this.putMethod(fp, new StringValue(methodName), 1, (interpreter, args) -> {
+			final double number = argumentDouble(0, interpreter, args);
 			return new NumberValue(unaryOperator.applyAsDouble(number));
 		});
 	}
 
 	private void addWrapper(FunctionPrototype fp, String methodName, DoubleBinaryOperator binaryOperator) {
-		this.putMethod(fp, new StringValue(methodName), (interpreter, args) -> {
-			final var a = argumentDouble(0, interpreter, args);
-			final var b = argumentDouble(1, interpreter, args);
+		this.putMethod(fp, new StringValue(methodName), 2, (interpreter, args) -> {
+			final double a = argumentDouble(0, interpreter, args);
+			final double b = argumentDouble(1, interpreter, args);
 			return new NumberValue(binaryOperator.applyAsDouble(a, b));
 		});
 	}

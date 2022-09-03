@@ -146,7 +146,7 @@ public record ClassExpression(
 			String name
 		) {
 			// FIXME: Pass in proper prototype here
-			super(intrinsics, name == null ? Names.EMPTY : new StringValue(name));
+			super(intrinsics, name == null ? Names.EMPTY : new StringValue(name), code.parameters.expectedArgumentCount());
 			this.environment = environment;
 			this.code = code;
 			this.isDerived = isDerived;
@@ -203,7 +203,7 @@ public record ClassExpression(
 		private final Function wrappedFunction;
 
 		public ClassMethod(Intrinsics intrinsics, Environment environment, ClassExpression.ClassMethodNode code) {
-			super(intrinsics, new StringValue(code.name));
+			super(intrinsics, new StringValue(code.name), code.parameters.expectedArgumentCount());
 			this.wrappedFunction = new Function(intrinsics, environment, code);
 		}
 

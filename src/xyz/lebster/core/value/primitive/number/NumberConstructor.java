@@ -17,23 +17,25 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 public final class NumberConstructor extends PrimitiveConstructor {
 	public NumberConstructor(Intrinsics functionPrototype) {
 		super(functionPrototype, Names.Number);
-		this.putMethod(functionPrototype, Names.range, NumberConstructor::range);
+		this.putMethod(functionPrototype, Names.range, 3, NumberConstructor::range);
 	}
 
-	private static NumberRange range(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		if (args.length == 0) throw error(new TypeError(interpreter, "No end value was provided"));
+	@NonStandard
+	private static NumberRange range(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// Number.range(first: number, second: number, third: number): NumberRange
+		if (arguments.length == 0) throw error(new TypeError(interpreter, "No end value was provided"));
 
-		final double first = args[0].toNumberValue(interpreter).value;
+		final double first = arguments[0].toNumberValue(interpreter).value;
 		if (Double.isNaN(first))
 			throw error(new TypeError(interpreter, "NaN passed as first argument of Number.range"));
-		if (args.length == 1) return new NumberRange(interpreter.intrinsics, first);
+		if (arguments.length == 1) return new NumberRange(interpreter.intrinsics, first);
 
-		final double second = args[1].toNumberValue(interpreter).value;
+		final double second = arguments[1].toNumberValue(interpreter).value;
 		if (Double.isNaN(second))
 			throw error(new TypeError(interpreter, "NaN passed as second argument of Number.range"));
-		if (args.length == 2) return new NumberRange(interpreter.intrinsics, first, second);
+		if (arguments.length == 2) return new NumberRange(interpreter.intrinsics, first, second);
 
-		final double third = args[2].toNumberValue(interpreter).value;
+		final double third = arguments[2].toNumberValue(interpreter).value;
 		if (Double.isNaN(third))
 			throw error(new TypeError(interpreter, "NaN passed as third argument of Number.range"));
 		return new NumberRange(interpreter.intrinsics, first, second, third);

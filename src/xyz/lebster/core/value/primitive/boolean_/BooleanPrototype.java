@@ -16,8 +16,26 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 public final class BooleanPrototype extends ObjectValue {
 	public BooleanPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
-		this.putMethod(intrinsics, Names.toString, BooleanPrototype::toStringMethod);
-		this.putMethod(intrinsics, Names.valueOf, BooleanPrototype::valueOf);
+		this.putMethod(intrinsics, Names.toString, 1, BooleanPrototype::toStringMethod);
+		this.putMethod(intrinsics, Names.valueOf, 1, BooleanPrototype::valueOf);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean.prototype.valueof")
+	private static BooleanValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.3.3.3 Boolean.prototype.valueOf ( )
+
+		// 1. Return ? thisBooleanValue(this value).
+		return thisBooleanValue(interpreter, "valueOf");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean.prototype.tostring")
+	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.3.3.2 Boolean.prototype.toString ( )
+
+		// 1. Let b be ? thisBooleanValue(this value).
+		final BooleanValue b = thisBooleanValue(interpreter, "toString");
+		// 2. If b is true, return "true"; else return "false".
+		return b.stringValue;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#thisbooleanvalue")
@@ -38,23 +56,5 @@ public final class BooleanPrototype extends ObjectValue {
 		// 3. Throw a TypeError exception.
 		final String message = "Boolean.prototype.%s requires that 'this' be a Boolean".formatted(methodName);
 		throw error(new TypeError(interpreter, message));
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean.prototype.valueof")
-	private static BooleanValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 20.3.3.3 Boolean.prototype.valueOf ( )
-
-		// 1. Return ? thisBooleanValue(this value).
-		return thisBooleanValue(interpreter, "valueOf");
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean.prototype.tostring")
-	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 20.3.3.2 Boolean.prototype.toString ( )
-
-		// 1. Let b be ? thisBooleanValue(this value).
-		final BooleanValue b = thisBooleanValue(interpreter, "toString");
-		// 2. If b is true, return "true"; else return "false".
-		return b.stringValue;
 	}
 }

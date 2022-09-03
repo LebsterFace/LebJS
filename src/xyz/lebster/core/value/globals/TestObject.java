@@ -1,6 +1,7 @@
 package xyz.lebster.core.value.globals;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.ShouldNotHappen;
@@ -21,16 +22,17 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
+@NonStandard
 public final class TestObject extends ObjectValue {
 	public TestObject(Intrinsics functionPrototype) {
 		super((ObjectValue) null);
 
-		this.putMethod(functionPrototype, Names.expect, TestObject::expect);
-		this.putMethod(functionPrototype, Names.equals, TestObject::equalsMethod);
-		this.putMethod(functionPrototype, Names.fail, TestObject::fail);
-		this.putMethod(functionPrototype, Names.expectError, TestObject::expectError);
-		this.putMethod(functionPrototype, Names.expectSyntaxError, TestObject::expectSyntaxError);
-		this.putMethod(functionPrototype, Names.parse, TestObject::parse);
+		this.putMethod(functionPrototype, Names.expect, 2, TestObject::expect);
+		this.putMethod(functionPrototype, Names.equals, 2, TestObject::equalsMethod);
+		this.putMethod(functionPrototype, Names.fail, 0, TestObject::fail);
+		this.putMethod(functionPrototype, Names.expectError, 3, TestObject::expectError);
+		this.putMethod(functionPrototype, Names.expectSyntaxError, 2, TestObject::expectSyntaxError);
+		this.putMethod(functionPrototype, Names.parse, 1, TestObject::parse);
 	}
 
 	private static Undefined parse(Interpreter interpreter, Value<?>[] arguments) {
@@ -49,13 +51,13 @@ public final class TestObject extends ObjectValue {
 	}
 
 	private static Undefined expectError(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// Test.expectError(name: string, messageStarter: string, callback: () => unknown): void
 		final StringValue name = argument(0, arguments).toStringValue(interpreter);
 		final StringValue messageStarter = argument(1, arguments).toStringValue(interpreter);
 		final Value<?> potentialCallback = argument(2, arguments);
-		if (!(potentialCallback instanceof final Executable callback)) {
-			throw new ShouldNotHappen("Test.expectError called without callback");
-		}
 
+		if (!(potentialCallback instanceof final Executable callback))
+			throw new ShouldNotHappen("Test.expectError called without callback");
 		try {
 			callback.call(interpreter, new Value[0]);
 		} catch (AbruptCompletion completion) {
@@ -98,6 +100,7 @@ public final class TestObject extends ObjectValue {
 	}
 
 	private static Undefined equalsMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// Test.equals(a: unknown, b: unknown): void
 		final Value<?> a = argument(0, arguments);
 		final Value<?> b = argument(1, arguments);
 
@@ -121,6 +124,8 @@ public final class TestObject extends ObjectValue {
 	}
 
 	private static Undefined expect(Interpreter interpreter, Value<?>... arguments) {
+		// Test.expect(a: unknown, b: unknown): void
+
 		final Value<?> a = argument(0, arguments);
 		final Value<?> b = argument(1, arguments);
 		return expect(a, b);
@@ -149,6 +154,7 @@ public final class TestObject extends ObjectValue {
 	}
 
 	private static Undefined fail(Interpreter interpreter, Value<?>[] values) {
+		// Test.fail(): void
 		throw new ShouldNotHappen("Test.fail()");
 	}
 }

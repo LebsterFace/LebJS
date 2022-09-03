@@ -32,40 +32,41 @@ public final class StringPrototype extends ObjectValue {
 	public StringPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
 
-		this.putMethod(intrinsics, Names.reverse, StringPrototype::reverse);
+		putMethod(intrinsics, Names.slice, 2, StringPrototype::slice);
+		putMethod(intrinsics, Names.charAt, 1, StringPrototype::charAt);
+		putMethod(intrinsics, Names.trim, 0, StringPrototype::trim);
+		putMethod(intrinsics, Names.trimStart, 0, StringPrototype::trimStart);
+		putMethod(intrinsics, Names.trimEnd, 0, StringPrototype::trimEnd);
+		putMethod(intrinsics, Names.toUpperCase, 0, StringPrototype::toUpperCase);
+		putMethod(intrinsics, Names.toLowerCase, 0, StringPrototype::toLowerCase);
+		putMethod(intrinsics, Names.valueOf, 0, StringPrototype::valueOf);
+		putMethod(intrinsics, Names.toString, 0, StringPrototype::toStringMethod);
+		putMethod(intrinsics, SymbolValue.iterator, 0, StringIterator::new);
+		putMethod(intrinsics, Names.charCodeAt, 1, StringPrototype::charCodeAt);
+		putMethod(intrinsics, Names.codePointAt, 1, StringPrototype::codePointAt);
+		putMethod(intrinsics, Names.concat, 0, StringPrototype::concat);
+		putMethod(intrinsics, Names.endsWith, 1, StringPrototype::endsWith);
+		putMethod(intrinsics, Names.includes, 1, StringPrototype::includes);
+		putMethod(intrinsics, Names.indexOf, 1, StringPrototype::indexOf);
+		putMethod(intrinsics, Names.lastIndexOf, 1, StringPrototype::lastIndexOf);
+		putMethod(intrinsics, Names.localeCompare, 1, StringPrototype::localeCompare);
+		putMethod(intrinsics, Names.match, 1, StringPrototype::match);
+		putMethod(intrinsics, Names.matchAll, 1, StringPrototype::matchAll);
+		putMethod(intrinsics, Names.normalize, 0, StringPrototype::normalize);
+		putMethod(intrinsics, Names.padEnd, 1, StringPrototype::padEnd);
+		putMethod(intrinsics, Names.padStart, 1, StringPrototype::padStart);
+		putMethod(intrinsics, Names.repeat, 1, StringPrototype::repeat);
+		putMethod(intrinsics, Names.replace, 2, StringPrototype::replace);
+		putMethod(intrinsics, Names.replaceAll, 2, StringPrototype::replaceAll);
+		putMethod(intrinsics, Names.search, 1, StringPrototype::search);
+		putMethod(intrinsics, Names.split, 2, StringPrototype::split);
+		putMethod(intrinsics, Names.startsWith, 1, StringPrototype::startsWith);
+		putMethod(intrinsics, Names.substring, 2, StringPrototype::substring);
+		putMethod(intrinsics, Names.toLocaleLowerCase, 0, StringPrototype::toLocaleLowerCase);
+		putMethod(intrinsics, Names.toLocaleUpperCase, 0, StringPrototype::toLocaleUpperCase);
 
-		this.putMethod(intrinsics, Names.slice, StringPrototype::slice);
-		this.putMethod(intrinsics, Names.charAt, StringPrototype::charAt);
-		this.putMethod(intrinsics, Names.trim, StringPrototype::trim);
-		this.putMethod(intrinsics, Names.trimStart, StringPrototype::trimStart);
-		this.putMethod(intrinsics, Names.trimEnd, StringPrototype::trimEnd);
-		this.putMethod(intrinsics, Names.toUpperCase, StringPrototype::toUpperCase);
-		this.putMethod(intrinsics, Names.toLowerCase, StringPrototype::toLowerCase);
-		this.putMethod(intrinsics, Names.valueOf, StringPrototype::valueOf);
-		this.putMethod(intrinsics, Names.toString, StringPrototype::toStringMethod);
-		this.putMethod(intrinsics, SymbolValue.iterator, StringIterator::new);
-		this.putMethod(intrinsics, Names.charCodeAt, StringPrototype::charCodeAt);
-		this.putMethod(intrinsics, Names.codePointAt, StringPrototype::codePointAt);
-		this.putMethod(intrinsics, Names.concat, StringPrototype::concat);
-		this.putMethod(intrinsics, Names.endsWith, StringPrototype::endsWith);
-		this.putMethod(intrinsics, Names.includes, StringPrototype::includes);
-		this.putMethod(intrinsics, Names.indexOf, StringPrototype::indexOf);
-		this.putMethod(intrinsics, Names.lastIndexOf, StringPrototype::lastIndexOf);
-		this.putMethod(intrinsics, Names.localeCompare, StringPrototype::localeCompare);
-		this.putMethod(intrinsics, Names.match, StringPrototype::match);
-		this.putMethod(intrinsics, Names.matchAll, StringPrototype::matchAll);
-		this.putMethod(intrinsics, Names.normalize, StringPrototype::normalize);
-		this.putMethod(intrinsics, Names.padEnd, StringPrototype::padEnd);
-		this.putMethod(intrinsics, Names.padStart, StringPrototype::padStart);
-		this.putMethod(intrinsics, Names.repeat, StringPrototype::repeat);
-		this.putMethod(intrinsics, Names.replace, StringPrototype::replace);
-		this.putMethod(intrinsics, Names.replaceAll, StringPrototype::replaceAll);
-		this.putMethod(intrinsics, Names.search, StringPrototype::search);
-		this.putMethod(intrinsics, Names.split, StringPrototype::split);
-		this.putMethod(intrinsics, Names.startsWith, StringPrototype::startsWith);
-		this.putMethod(intrinsics, Names.substring, StringPrototype::substring);
-		this.putMethod(intrinsics, Names.toLocaleLowerCase, StringPrototype::toLocaleLowerCase);
-		this.putMethod(intrinsics, Names.toLocaleUpperCase, StringPrototype::toLocaleUpperCase);
+		// Non-standard
+		putMethod(intrinsics, Names.reverse, 0, StringPrototype::reverse);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charcodeat")
@@ -252,41 +253,70 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.localecompare")
 	private static Value<?> localeCompare(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.11 String.prototype.localeCompare ( that [ , reserved1 [ , reserved2 ] ] )
+		final Value<?> that = argument(0, arguments);
+		final Value<?> reserved1 = argument(1, arguments);
+		final Value<?> reserved2 = argument(2, arguments);
+
 		throw new NotImplemented("String.prototype.localeCompare");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.match")
 	private static Value<?> match(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.12 String.prototype.match ( regexp )
+		final Value<?> regexp = argument(0, arguments);
+
 		throw new NotImplemented("String.prototype.match");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.matchall")
 	private static Value<?> matchAll(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.13 String.prototype.matchAll ( regexp )
+		final Value<?> regexp = argument(0, arguments);
+
 		throw new NotImplemented("String.prototype.matchAll");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.normalize")
-	private static Value<?> normalize(Interpreter interpreter, Value<?>[] arguments) {
+	private static StringValue normalize(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.14 String.prototype.normalize ( [ form ] )
+		final Value<?> form = argument(0, arguments);
+
 		throw new NotImplemented("String.prototype.normalize");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.padend")
-	private static Value<?> padEnd(Interpreter interpreter, Value<?>[] arguments) {
+	private static StringValue padEnd(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.15 String.prototype.padEnd ( maxLength [ , fillString ] )
+		final Value<?> maxLength = argument(0, arguments);
+		final Value<?> fillString = argument(1, arguments);
+
 		throw new NotImplemented("String.prototype.padEnd");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.padstart")
-	private static Value<?> padStart(Interpreter interpreter, Value<?>[] arguments) {
+	private static StringValue padStart(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.16 String.prototype.padStart ( maxLength [ , fillString ] )
+		final Value<?> maxLength = argument(0, arguments);
+		final Value<?> fillString = argument(1, arguments);
+
 		throw new NotImplemented("String.prototype.padStart");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.repeat")
-	private static Value<?> repeat(Interpreter interpreter, Value<?>[] arguments) {
+	private static StringValue repeat(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.17 String.prototype.repeat ( count )
+		final Value<?> count = argument(0, arguments);
+
 		throw new NotImplemented("String.prototype.repeat");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.replace")
 	private static Value<?> replace(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.18 String.prototype.replace ( searchValue, replaceValue )
+		final Value<?> searchValue = argument(0, arguments);
+		final Value<?> replaceValue = argument(1, arguments);
+
 		throw new NotImplemented("String.prototype.replace");
 	}
 
@@ -309,17 +339,24 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.search")
 	private static Value<?> search(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.20 String.prototype.search ( regexp )
+		final Value<?> regexp = argument(0, arguments);
+
 		throw new NotImplemented("String.prototype.search");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.split")
 	private static Value<?> split(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.22 String.prototype.split ( separator, limit )
+		final Value<?> separator = argument(0, arguments);
+		final Value<?> limit = argument(1, arguments);
+
 		throw new NotImplemented("String.prototype.split");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.startswith")
 	@NonCompliant
-	private static Value<?> startsWith(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static BooleanValue startsWith(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 22.1.3.23 String.prototype.startsWith ( searchString [ , position ] )
 		final Value<?> searchString = argument(0, arguments);
 		final Value<?> position = argument(1, arguments);
@@ -378,17 +415,23 @@ public final class StringPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tolocalelowercase")
-	private static Value<?> toLocaleLowerCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		return StringPrototype.toLowerCase(interpreter, arguments);
+	private static Value<?> toLocaleLowerCase(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.25 String.prototype.toLocaleLowerCase ( [ reserved1 [ , reserved2 ] ] )
+
+		throw new NotImplemented("String.prototype.toLocaleLowerCase");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tolocaleuppercase")
-	private static Value<?> toLocaleUpperCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		return StringPrototype.toUpperCase(interpreter, arguments);
+	private static Value<?> toLocaleUpperCase(Interpreter interpreter, Value<?>[] arguments) {
+		// 22.1.3.26 String.prototype.toLocaleUpperCase ( [ reserved1 [ , reserved2 ] ] )
+
+		throw new NotImplemented("String.prototype.toLocaleUpperCase");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tolowercase")
 	private static Value<?> toLowerCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.27 String.prototype.toLowerCase ( )
+
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.toLowerCase");
 		// 2. Let S be ? ToString(O).
@@ -402,6 +445,8 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.touppercase")
 	private static Value<?> toUpperCase(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.29 String.prototype.toUpperCase ( )
+
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.toUpperCase");
 		// 2. Let S be ? ToString(O).
@@ -415,6 +460,8 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.trimend")
 	private static StringValue trimEnd(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.31 String.prototype.trimEnd ( )
+
 		// 1. Let str be ? RequireObjectCoercible(string).
 		final Value<?> str = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.trimEnd");
 		// 2. Let S be ? ToString(str).
@@ -426,6 +473,8 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.trimstart")
 	private static StringValue trimStart(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.32 String.prototype.trimStart ( )
+
 		// 1. Let str be ? RequireObjectCoercible(string).
 		final Value<?> str = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.trimStart");
 		// 2. Let S be ? ToString(str).
@@ -437,6 +486,8 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.trim")
 	private static StringValue trim(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.30 String.prototype.trim ( )
+
 		// 1. Let str be ? RequireObjectCoercible(string).
 		final Value<?> str = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.trim");
 		// 2. Let S be ? ToString(str).
@@ -448,8 +499,9 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charat")
 	private static StringValue charAt(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// String.prototype.charAt ( pos )
+		// 22.1.3.2 String.prototype.charAt ( pos )
 		final Value<?> pos = argument(0, arguments);
+
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.charAt");
 		// 2. Let S be ? ToString(O).
@@ -466,9 +518,10 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.slice")
 	private static StringValue slice(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// String.prototype.slice ( start, end )
+		// 22.1.3.21 String.prototype.slice ( start, end )
 		final Value<?> start = argument(0, arguments);
 		final Value<?> end = argument(1, arguments);
+
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.slice");
 		// 2. Let S be ? ToString(O).
@@ -513,14 +566,26 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.valueof")
 	private static StringValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.33 String.prototype.valueOf ( )
+
 		// 1. Return ? thisStringValue(this value).
 		return thisStringValue(interpreter, interpreter.thisValue());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tostring")
 	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.28 String.prototype.toString ( )
+
 		// 1. Return ? thisStringValue(this value).
 		return thisStringValue(interpreter, interpreter.thisValue());
+	}
+
+	@NonStandard
+	private static StringValue reverse(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// String.prototype.reverse(): string
+
+		final String S = thisStringValue(interpreter, interpreter.thisValue()).value;
+		return new StringValue(new StringBuilder(S).reverse().toString());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#thisstringvalue")
@@ -537,12 +602,6 @@ public final class StringPrototype extends ObjectValue {
 
 		// 3. Throw a TypeError exception.
 		throw error(new TypeError(interpreter, "This method requires that 'this' be a String"));
-	}
-
-	@NonStandard
-	private static StringValue reverse(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final String S = thisStringValue(interpreter, interpreter.thisValue()).value;
-		return new StringValue(new StringBuilder(S).reverse().toString());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype-@@iterator")

@@ -10,7 +10,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 public abstract class BuiltinConstructor<T extends ObjectValue, P extends ObjectValue> extends Constructor {
 	public BuiltinConstructor(Intrinsics intrinsics, StringValue name) {
-		super(intrinsics, name);
+		super(intrinsics, name, 1); // AFAIK, all built-in constructors have .length = 1
 	}
 
 	@Override

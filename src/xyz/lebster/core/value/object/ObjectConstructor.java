@@ -10,7 +10,6 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.type.TypeError;
-import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -26,14 +25,14 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	public ObjectConstructor(Intrinsics intrinsics) {
 		super(intrinsics, Names.Object);
 
-		this.putMethod(intrinsics, Names.setPrototypeOf, ObjectConstructor::setPrototypeOf);
-		this.putMethod(intrinsics, Names.getPrototypeOf, ObjectConstructor::getPrototypeOf);
-		this.putMethod(intrinsics, Names.create, ObjectConstructor::create);
-		this.putMethod(intrinsics, Names.keys, ObjectConstructor::keys);
-		this.putMethod(intrinsics, Names.values, ObjectConstructor::values);
-		this.putMethod(intrinsics, Names.entries, ObjectConstructor::entries);
-		this.putMethod(intrinsics, Names.fromEntries, ObjectConstructor::fromEntries);
-		this.putMethod(intrinsics, Names.is, ObjectConstructor::is);
+		this.putMethod(intrinsics, Names.setPrototypeOf, 2, ObjectConstructor::setPrototypeOf);
+		this.putMethod(intrinsics, Names.getPrototypeOf, 1, ObjectConstructor::getPrototypeOf);
+		this.putMethod(intrinsics, Names.create, 2, ObjectConstructor::create);
+		this.putMethod(intrinsics, Names.keys, 1, ObjectConstructor::keys);
+		this.putMethod(intrinsics, Names.values, 1, ObjectConstructor::values);
+		this.putMethod(intrinsics, Names.entries, 1, ObjectConstructor::entriesMethod);
+		this.putMethod(intrinsics, Names.fromEntries, 1, ObjectConstructor::fromEntries);
+		this.putMethod(intrinsics, Names.is, 2, ObjectConstructor::is);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.is")
@@ -50,8 +49,10 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.fromentries")
 	@NonCompliant
 	private static ObjectValue fromEntries(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final Value<?> arg = NativeFunction.argument(0, arguments);
-		if (!(arg instanceof ArrayObject arrayObject))
+		// 20.1.2.7 Object.fromEntries ( iterable )
+		final Value<?> iterable = argument(0, arguments);
+
+		if (!(iterable instanceof ArrayObject arrayObject))
 			throw error(new TypeError(interpreter, "Object.fromEntries call with non-array"));
 
 		final ObjectValue result = new ObjectValue(interpreter.intrinsics);
@@ -70,8 +71,11 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.keys")
-	private static ArrayObject keys(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final ObjectValue obj = argument(0, args).toObjectValue(interpreter);
+	private static ArrayObject keys(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.1.2.18 Object.keys ( O )
+		final Value<?> O = argument(0, arguments);
+
+		final ObjectValue obj = O.toObjectValue(interpreter);
 		final ArrayList<StringValue> properties = new ArrayList<>();
 		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : obj.entries()) {
 			if (entry.getValue().isEnumerable() && entry.getKey() instanceof final StringValue key) {
@@ -83,8 +87,11 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.values")
-	private static ArrayObject values(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final ObjectValue obj = argument(0, args).toObjectValue(interpreter);
+	private static ArrayObject values(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.1.2.23 Object.values ( O )
+		final Value<?> O = argument(0, arguments);
+
+		final ObjectValue obj = O.toObjectValue(interpreter);
 		final ArrayList<Value<?>> properties = new ArrayList<>();
 		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : obj.entries()) {
 			if (entry.getValue().isEnumerable() && entry.getKey() instanceof StringValue) {
@@ -96,8 +103,11 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.entries")
-	private static ArrayObject entries(Interpreter interpreter, Value<?>[] args) throws AbruptCompletion {
-		final ObjectValue obj = argument(0, args).toObjectValue(interpreter);
+	private static ArrayObject entriesMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.1.2.5 Object.entries ( O )
+		final Value<?> O = argument(0, arguments);
+
+		final ObjectValue obj = O.toObjectValue(interpreter);
 		final ArrayList<ArrayObject> properties = new ArrayList<>();
 		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : obj.entries()) {
 			if (entry.getValue().isEnumerable() && entry.getKey() instanceof StringValue) {
@@ -156,6 +166,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	private static Value<?> getPrototypeOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 20.1.2.12 Object.getPrototypeOf ( O )
 		final Value<?> O = argument(0, arguments);
+
 		// 1. Let obj be ? ToObject(O).
 		// 2. Return ? obj.[[GetPrototypeOf]]().
 		final ObjectValue prototype = O.toObjectValue(interpreter).getPrototype();
@@ -163,9 +174,11 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	}
 
 	@Override
-	public Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-value")
+	public ObjectValue call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 20.1.1.1 Object ( [ value ] )
 		final Value<?> value = argument(0, arguments);
+
 		// 2. If value is undefined or null, return OrdinaryObjectCreate(%Object.prototype%).
 		if (value.isNullish()) return new ObjectValue(interpreter.intrinsics);
 		// 3. Return ! ToObject(value).

@@ -35,43 +35,42 @@ public final class ArrayPrototype extends ObjectValue {
 
 	public ArrayPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
-		putMethod(intrinsics, Names.at, ArrayPrototype::at);
-		putMethod(intrinsics, Names.concat, ArrayPrototype::concat);
-		putMethod(intrinsics, Names.copyWithin, ArrayPrototype::copyWithin);
-		putMethod(intrinsics, Names.entries, ArrayPrototype::entries);
-		putMethod(intrinsics, Names.every, ArrayPrototype::every);
-		putMethod(intrinsics, Names.fill, ArrayPrototype::fill);
-		putMethod(intrinsics, Names.filter, ArrayPrototype::filter);
-		putMethod(intrinsics, Names.find, ArrayPrototype::find);
-		putMethod(intrinsics, Names.findIndex, ArrayPrototype::findIndex);
-		putMethod(intrinsics, Names.findLast, ArrayPrototype::findLast);
-		putMethod(intrinsics, Names.findLastIndex, ArrayPrototype::findLastIndex);
-		putMethod(intrinsics, Names.flat, ArrayPrototype::flat);
-		putMethod(intrinsics, Names.flatMap, ArrayPrototype::flatMap);
-		putMethod(intrinsics, Names.forEach, ArrayPrototype::forEach);
-		putMethod(intrinsics, Names.group, ArrayPrototype::group);
-		putMethod(intrinsics, Names.groupToMap, ArrayPrototype::groupToMap);
-		putMethod(intrinsics, Names.includes, ArrayPrototype::includes);
-		putMethod(intrinsics, Names.indexOf, ArrayPrototype::indexOf);
-		putMethod(intrinsics, Names.join, ArrayPrototype::join);
-		putMethod(intrinsics, Names.keys, ArrayPrototype::keys);
-		putMethod(intrinsics, Names.lastIndexOf, ArrayPrototype::lastIndexOf);
-		putMethod(intrinsics, Names.map, ArrayPrototype::map);
-		putMethod(intrinsics, Names.pop, ArrayPrototype::pop);
-		putMethod(intrinsics, Names.push, ArrayPrototype::push);
-		putMethod(intrinsics, Names.reduce, ArrayPrototype::reduce);
-		putMethod(intrinsics, Names.reduceRight, ArrayPrototype::reduceRight);
-		putMethod(intrinsics, Names.reverse, ArrayPrototype::reverse);
-		putMethod(intrinsics, Names.shift, ArrayPrototype::shift);
-		putMethod(intrinsics, Names.slice, ArrayPrototype::slice);
-		putMethod(intrinsics, Names.some, ArrayPrototype::some);
-		putMethod(intrinsics, Names.sort, ArrayPrototype::sort);
-		putMethod(intrinsics, Names.splice, ArrayPrototype::splice);
-		putMethod(intrinsics, Names.toLocaleString, ArrayPrototype::toLocaleString);
-		putMethod(intrinsics, Names.toString, ArrayPrototype::toStringMethod);
-		putMethod(intrinsics, Names.unshift, ArrayPrototype::unshift);
-
-		final NativeFunction values = putMethod(intrinsics, Names.values, ArrayPrototype::values);
+		putMethod(intrinsics, Names.at, 1, ArrayPrototype::at);
+		putMethod(intrinsics, Names.concat, 1, ArrayPrototype::concat);
+		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
+		putMethod(intrinsics, Names.entries, 0, ArrayPrototype::entriesMethod);
+		putMethod(intrinsics, Names.every, 1, ArrayPrototype::every);
+		putMethod(intrinsics, Names.fill, 1, ArrayPrototype::fill);
+		putMethod(intrinsics, Names.filter, 1, ArrayPrototype::filter);
+		putMethod(intrinsics, Names.find, 1, ArrayPrototype::find);
+		putMethod(intrinsics, Names.findIndex, 1, ArrayPrototype::findIndex);
+		putMethod(intrinsics, Names.findLast, 1, ArrayPrototype::findLast);
+		putMethod(intrinsics, Names.findLastIndex, 1, ArrayPrototype::findLastIndex);
+		putMethod(intrinsics, Names.flat, 0, ArrayPrototype::flat);
+		putMethod(intrinsics, Names.flatMap, 1, ArrayPrototype::flatMap);
+		putMethod(intrinsics, Names.forEach, 1, ArrayPrototype::forEach);
+		putMethod(intrinsics, Names.group, 1, ArrayPrototype::group);
+		putMethod(intrinsics, Names.groupToMap, 1, ArrayPrototype::groupToMap);
+		putMethod(intrinsics, Names.includes, 1, ArrayPrototype::includes);
+		putMethod(intrinsics, Names.indexOf, 1, ArrayPrototype::indexOf);
+		putMethod(intrinsics, Names.join, 1, ArrayPrototype::join);
+		putMethod(intrinsics, Names.keys, 0, ArrayPrototype::keys);
+		putMethod(intrinsics, Names.lastIndexOf, 1, ArrayPrototype::lastIndexOf);
+		putMethod(intrinsics, Names.map, 1, ArrayPrototype::map);
+		putMethod(intrinsics, Names.pop, 0, ArrayPrototype::pop);
+		putMethod(intrinsics, Names.push, 1, ArrayPrototype::push);
+		putMethod(intrinsics, Names.reduce, 1, ArrayPrototype::reduce);
+		putMethod(intrinsics, Names.reduceRight, 1, ArrayPrototype::reduceRight);
+		putMethod(intrinsics, Names.reverse, 0, ArrayPrototype::reverse);
+		putMethod(intrinsics, Names.shift, 0, ArrayPrototype::shift);
+		putMethod(intrinsics, Names.slice, 2, ArrayPrototype::slice);
+		putMethod(intrinsics, Names.some, 1, ArrayPrototype::some);
+		putMethod(intrinsics, Names.sort, 1, ArrayPrototype::sort);
+		putMethod(intrinsics, Names.splice, 2, ArrayPrototype::splice);
+		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
+		putMethod(intrinsics, Names.toString, 0, ArrayPrototype::toStringMethod);
+		putMethod(intrinsics, Names.unshift, 0, ArrayPrototype::unshift);
+		final NativeFunction values = putMethod(intrinsics, Names.values, 0, ArrayPrototype::values);
 		put(SymbolValue.iterator, values);
 	}
 
@@ -97,25 +96,32 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.concat")
-	private static Value<?> concat(Interpreter interpreter, Value<?>[] values) {
+	private static Value<?> concat(Interpreter interpreter, Value<?>[] items) {
+		// 23.1.3.2 Array.prototype.concat ( ...items )
 		throw new NotImplemented("Array.prototype.concat");
 	}
 
 	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.copyWithin")
-	private static Value<?> copyWithin(Interpreter interpreter, Value<?>[] values) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.copywithin")
+	private static Value<?> copyWithin(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.4 Array.prototype.copyWithin ( target, start [ , end ] )
+		final Value<?> target = argument(0, arguments);
+		final Value<?> start = argument(1, arguments);
+		final Value<?> end = argument(2, arguments);
+
 		throw new NotImplemented("Array.prototype.copyWithin");
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.entries")
-	private static Value<?> entries(Interpreter interpreter, Value<?>[] values) {
+	private static Value<?> entriesMethod(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.5 Array.prototype.entries ( )
 		throw new NotImplemented("Array.prototype.entries");
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.every")
-	private static Value<?> every(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static BooleanValue every(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.6 Array.prototype.every ( callbackfn [ , thisArg ] )
 		final Value<?> potential_callbackfn = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
@@ -150,7 +156,12 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.fill")
-	private static Value<?> fill(Interpreter interpreter, Value<?>[] values) {
+	private static Value<?> fill(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.7 Array.prototype.fill ( value [ , start [ , end ] ] )
+		final Value<?> value = argument(0, arguments);
+		final Value<?> start = argument(1, arguments);
+		final Value<?> end = argument(2, arguments);
+
 		throw new NotImplemented("Array.prototype.fill");
 	}
 
@@ -186,104 +197,161 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findIndex")
-	private static Value<?> findIndex(Interpreter interpreter, Value<?>[] values) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findindex")
+	private static NumberValue findIndex(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.10 Array.prototype.findIndex ( predicate [ , thisArg ] )
+		final Value<?> predicate = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
+
 		throw new NotImplemented("Array.prototype.findIndex");
 	}
 
 	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findLast")
-	private static Value<?> findLast(Interpreter interpreter, Value<?>[] values) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findlast")
+	private static Value<?> findLast(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.11 Array.prototype.findLast ( predicate [ , thisArg ] )
+		final Value<?> predicate = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
+
 		throw new NotImplemented("Array.prototype.findLast");
 	}
 
 	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findLastIndex")
-	private static Value<?> findLastIndex(Interpreter interpreter, Value<?>[] values) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findlastindex")
+	private static Value<?> findLastIndex(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.12 Array.prototype.findLastIndex ( predicate [ , thisArg ] )
+		final Value<?> predicate = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
+
 		throw new NotImplemented("Array.prototype.findLastIndex");
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.flat")
-	private static Value<?> flat(Interpreter interpreter, Value<?>[] values) {
+	private static Value<?> flat(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.13 Array.prototype.flat ( [ depth ] )
+		final Value<?> depth = argument(0, arguments);
+
 		throw new NotImplemented("Array.prototype.flat");
 	}
 
 	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.flatMap")
-	private static Value<?> flatMap(Interpreter interpreter, Value<?>[] values) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.flatmap")
+	private static Value<?> flatMap(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.14 Array.prototype.flatMap ( mapperFunction [ , thisArg ] )
+		final Value<?> mapperFunction = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
+
 		throw new NotImplemented("Array.prototype.flatMap");
 	}
 
 	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.groupToMap")
-	private static Value<?> groupToMap(Interpreter interpreter, Value<?>[] values) {
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-array.prototype.grouptomap")
+	private static Value<?> groupToMap(Interpreter interpreter, Value<?>[] arguments) {
+		// 2.2 Array.prototype.groupToMap ( callbackfn [ , thisArg ] )
+		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
+
 		throw new NotImplemented("Array.prototype.groupToMap");
 	}
 
 	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.indexOf")
-	private static Value<?> indexOf(Interpreter interpreter, Value<?>[] values) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.indexof")
+	private static NumberValue indexOf(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.17 Array.prototype.indexOf ( searchElement [ , fromIndex ] )
+		final Value<?> searchElement = argument(0, arguments);
+		final Value<?> fromIndex = argument(1, arguments);
+
 		throw new NotImplemented("Array.prototype.indexOf");
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.keys")
-	private static Value<?> keys(Interpreter interpreter, Value<?>[] values) {
+	private static Value<?> keys(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.19 Array.prototype.keys ( )
+
 		throw new NotImplemented("Array.prototype.keys");
 	}
 
 	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.lastIndexOf")
-	private static Value<?> lastIndexOf(Interpreter interpreter, Value<?>[] values) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.lastindexof")
+	private static NumberValue lastIndexOf(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.20 Array.prototype.lastIndexOf ( searchElement [ , fromIndex ] )
+		final Value<?> searchElement = argument(0, arguments);
+		final Value<?> fromIndex = argument(1, arguments);
+
 		throw new NotImplemented("Array.prototype.lastIndexOf");
 	}
 
 	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reduceRight")
-	private static Value<?> reduceRight(Interpreter interpreter, Value<?>[] values) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reduceright")
+	private static Value<?> reduceRight(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.25 Array.prototype.reduceRight ( callbackfn [ , initialValue ] )
+		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> initialValue = argument(1, arguments);
+
 		throw new NotImplemented("Array.prototype.reduceRight");
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.shift")
-	private static Value<?> shift(Interpreter interpreter, Value<?>[] values) {
+	private static Value<?> shift(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.27 Array.prototype.shift ( )
+
 		throw new NotImplemented("Array.prototype.shift");
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.some")
-	private static Value<?> some(Interpreter interpreter, Value<?>[] values) {
+	private static BooleanValue some(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.29 Array.prototype.some ( callbackfn [ , thisArg ] )
+		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> thisArg = argument(1, arguments);
+
 		throw new NotImplemented("Array.prototype.some");
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.sort")
-	private static Value<?> sort(Interpreter interpreter, Value<?>[] values) {
+	private static Value<?> sort(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.30 Array.prototype.sort ( comparefn )
+		final Value<?> comparefn = argument(0, arguments);
+
 		throw new NotImplemented("Array.prototype.sort");
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.splice")
-	private static Value<?> splice(Interpreter interpreter, Value<?>[] values) {
+	private static Value<?> splice(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.31 Array.prototype.splice ( start, deleteCount, ...items )
+		final Value<?> start = argument(0, arguments);
+		final Value<?> deleteCount = argument(1, arguments);
+		// TODO: Rest argument helper
+
 		throw new NotImplemented("Array.prototype.splice");
 	}
 
 	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.toLocaleString")
-	private static Value<?> toLocaleString(Interpreter interpreter, Value<?>[] values) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tolocalestring")
+	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.32 Array.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
 		throw new NotImplemented("Array.prototype.toLocaleString");
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.unshift")
-	private static Value<?> unshift(Interpreter interpreter, Value<?>[] values) {
+	private static Value<?> unshift(Interpreter interpreter, Value<?>[] items) {
+		// 23.1.3.34 Array.prototype.unshift ( ...items )
+
 		throw new NotImplemented("Array.prototype.unshift");
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.values")
-	private static Value<?> values(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
+	private static Value<?> values(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.35 Array.prototype.values ( )
+
 		return new ArrayIterator(interpreter);
 	}
 
@@ -542,6 +610,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.foreach")
 	private static Undefined forEach(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.15 Array.prototype.forEach ( callbackfn [ , thisArg ] )
 		final Value<?> callbackfn = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
 
@@ -646,6 +715,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.map")
 	private static ArrayObject map(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.21 Array.prototype.map ( callbackfn [ , thisArg ] )
 		final Value<?> callbackfn = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
 

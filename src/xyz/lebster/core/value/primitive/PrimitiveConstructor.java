@@ -9,7 +9,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 @NonStandard
 public abstract class PrimitiveConstructor extends Executable {
 	public PrimitiveConstructor(Intrinsics intrinsics, StringValue name) {
-		super(intrinsics, name);
+		super(intrinsics, name, 1); // Primitive constructors have .length = 1
 	}
 
 	@Override

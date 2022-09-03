@@ -16,8 +16,9 @@ public abstract class Generator extends ObjectValue {
 	public Generator(Intrinsics intrinsics) {
 		super(intrinsics);
 
-		putMethod(intrinsics, SymbolValue.iterator, (interpreter, arguments) -> this);
-		putMethod(intrinsics, Names.next, (interpreter, arguments) -> {
+		putMethod(intrinsics, SymbolValue.iterator, 0, (interpreter, arguments) -> this);
+		putMethod(intrinsics, Names.next, 1, (interpreter, arguments) -> {
+			// 27.5.1.2 Generator.prototype.next ( value )
 			final IteratorResult result = this.nextMethod(interpreter, arguments);
 
 			final ObjectValue object = new ObjectValue(interpreter.intrinsics);

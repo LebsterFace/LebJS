@@ -17,6 +17,7 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.HashSet;
@@ -26,14 +27,15 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	public StringValue name;
 
-	Executable(FunctionPrototype functionPrototype, StringValue name) {
+	Executable(FunctionPrototype functionPrototype, StringValue name, int expectedArgumentCount) {
 		super(functionPrototype);
 		this.name = name;
 		this.put(Names.name, name);
+		this.put(Names.length, new NumberValue(expectedArgumentCount));
 	}
 
-	public Executable(Intrinsics intrinsics, StringValue name) {
-		this(intrinsics.functionPrototype, name);
+	public Executable(Intrinsics intrinsics, StringValue name, int expectedArgumentCount) {
+		this(intrinsics.functionPrototype, name, expectedArgumentCount);
 	}
 
 	public static Executable getExecutable(Interpreter interpreter, Value<?> value) throws AbruptCompletion {

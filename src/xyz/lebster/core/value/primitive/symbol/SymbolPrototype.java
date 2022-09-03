@@ -34,20 +34,24 @@ public final class SymbolPrototype extends ObjectValue {
 	public SymbolPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
 		this.value.put(Names.description, SymbolPrototype.DESCRIPTION);
-		putMethod(intrinsics, Names.toString, SymbolPrototype::toStringMethod);
-		putMethod(intrinsics, Names.valueOf, SymbolPrototype::valueOf);
-		putMethod(intrinsics, SymbolValue.toPrimitive, SymbolPrototype::toPrimitiveMethod);
+		putMethod(intrinsics, Names.toString, 0, SymbolPrototype::toStringMethod);
+		putMethod(intrinsics, Names.valueOf, 0, SymbolPrototype::valueOf);
+		putMethod(intrinsics, SymbolValue.toPrimitive, 1, SymbolPrototype::toPrimitiveMethod);
 		put(SymbolValue.toStringTag, Names.Symbol, false, false, true);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype.valueof")
 	private static SymbolValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.4.3.4 Symbol.prototype.valueOf ( )
+
 		// 1. Return ? thisSymbolValue(this value).
 		return thisSymbolValue(interpreter, interpreter.thisValue(), "Symbol.prototype.valueOf");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype-@@toprimitive")
 	private static SymbolValue toPrimitiveMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.4.3.5 Symbol.prototype [ @@toPrimitive ] ( hint )
+
 		// 1. Return ? thisSymbolValue(this value).
 		return thisSymbolValue(interpreter, interpreter.thisValue(), "Symbol.prototype [ @@toPrimitive ]");
 	}

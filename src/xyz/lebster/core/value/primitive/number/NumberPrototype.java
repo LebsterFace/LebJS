@@ -24,10 +24,10 @@ public final class NumberPrototype extends ObjectValue {
 
 	public NumberPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
-		this.putMethod(intrinsics, Names.toString, NumberPrototype::toStringMethod);
-		this.putMethod(intrinsics, Names.toFixed, NumberPrototype::toFixed);
-		this.putMethod(intrinsics, Names.valueOf, NumberPrototype::valueOf);
-		this.putMethod(intrinsics, Names.toLocaleString, NumberPrototype::toLocaleString);
+		this.putMethod(intrinsics, Names.toString, 0, NumberPrototype::toStringMethod);
+		this.putMethod(intrinsics, Names.toFixed, 1, NumberPrototype::toFixed);
+		this.putMethod(intrinsics, Names.valueOf, 0, NumberPrototype::valueOf);
+		this.putMethod(intrinsics, Names.toLocaleString, 0, NumberPrototype::toLocaleString);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tofixed")
@@ -68,6 +68,8 @@ public final class NumberPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.valueof")
 	private static NumberValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 21.1.3.7 Number.prototype.valueOf ( )
+
 		// 1. Return ? thisNumberValue(this value).
 		return thisNumberValue(interpreter, interpreter.thisValue());
 	}
@@ -115,6 +117,8 @@ public final class NumberPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tolocalestring")
 	@NonCompliant
 	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
+		// 21.1.3.4 Number.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
+
 		final NumberValue x = thisNumberValue(interpreter, interpreter.thisValue());
 		return new StringValue(x.toLocaleString());
 	}
@@ -122,7 +126,9 @@ public final class NumberPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tostring")
 	@NonCompliant
 	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 21.1.3.6 Number.prototype.toString ( [ radix ] )
 		final Value<?> radix = argument(0, arguments);
+
 		// 1. Let x be ? thisNumberValue(this value).
 		final NumberValue x = thisNumberValue(interpreter, interpreter.thisValue());
 		// 2. If radix is undefined, let radixMV be 10.

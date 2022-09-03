@@ -30,11 +30,11 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.undefined, Undefined.instance, false, false, true);
 
 		// 19.2 Function Properties of the Global Object
-		putMethod(intrinsics, Names.eval, GlobalObject::eval);
-		putMethod(intrinsics, Names.isFinite, GlobalObject::isFinite);
-		putMethod(intrinsics, Names.isNaN, GlobalObject::isNaN);
-		putMethod(intrinsics, Names.parseFloat, GlobalObject::parseFloat);
-		putMethod(intrinsics, Names.parseInt, GlobalObject::parseInt);
+		putMethod(intrinsics, Names.eval, 1, GlobalObject::eval);
+		putMethod(intrinsics, Names.isFinite, 1, GlobalObject::isFinite);
+		putMethod(intrinsics, Names.isNaN, 1, GlobalObject::isNaN);
+		putMethod(intrinsics, Names.parseFloat, 1, GlobalObject::parseFloat);
+		putMethod(intrinsics, Names.parseInt, 2, GlobalObject::parseInt);
 
 		// 19.3 Constructor Properties of the Global Object
 		// 19.3.1 AggregateError
@@ -133,11 +133,14 @@ public final class GlobalObject extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parseint-string-radix")
 	private static NumberValue parseInt(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		if (arguments.length == 0) return NumberValue.NaN;
+		// 19.2.5 parseInt ( string, radix )
+		final Value<?> string = argument(0, arguments);
 		final Value<?> radix = argument(1, arguments);
 
+		if (arguments.length == 0) return NumberValue.NaN;
+
 		// 1. Let inputString be ? ToString(string).
-		final String inputString = arguments[0].toStringValue(interpreter).value;
+		final String inputString = string.toStringValue(interpreter).value;
 		// 2. Let S be ! TrimString(inputString, start).
 		final StringBuilder S = new StringBuilder(inputString.stripLeading());
 		// 3. Let sign be 1.
@@ -207,32 +210,39 @@ public final class GlobalObject extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parsefloat-string")
 	private static NumberValue parseFloat(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 19.2.4 parseFloat ( string )
+		final Value<?> string = argument(0, arguments);
 		if (arguments.length == 0) return NumberValue.NaN;
 
 		// 1. Let inputString be ? ToString(string).
-		final StringValue string = arguments[0].toStringValue(interpreter);
+		final StringValue inputString = string.toStringValue(interpreter);
 		// 2. Let trimmedString be ! TrimString(inputString, start).
-		final String trimmedString = string.value.stripLeading();
+		final String trimmedString = inputString.value.stripLeading();
 		// FIXME: Follow spec
 		return new NumberValue(Double.parseDouble(trimmedString));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isfinite-number")
 	private static BooleanValue isFinite(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 19.2.2 isFinite ( number )
+		final Value<?> number = argument(0, arguments);
 		if (arguments.length == 0) return BooleanValue.FALSE;
 
 		// 1. Let num be ? ToNumber(number).
-		final double num = arguments[0].toNumberValue(interpreter).value;
+		final double num = number.toNumberValue(interpreter).value;
 		// 2. If num is NaN, +∞𝔽, or -∞𝔽, return false.
 		// 3. Otherwise, return true.
 		return BooleanValue.of(!(Double.isNaN(num) || Double.isInfinite(num)));
 	}
 
 	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-eval-x")
 	private static Value<?> eval(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 19.2.1 eval ( x )
+		final Value<?> x = argument(0, arguments);
 		if (arguments.length == 0) return Undefined.instance;
-		final String sourceText = arguments[0].toStringValue(interpreter).value;
 
+		final String sourceText = x.toStringValue(interpreter).value;
 		final ExecutionContext context = interpreter.pushNewEnvironment();
 		try {
 			return Realm.executeWith(sourceText, interpreter);
@@ -244,9 +254,14 @@ public final class GlobalObject extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isnan-number")
-	// This method behaves the same as the specification, but does not follow it directly
 	private static BooleanValue isNaN(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		if (arguments.length == 0) return BooleanValue.FALSE;
-		return BooleanValue.of(arguments[0].toNumberValue(interpreter).value.isNaN());
+		// 19.2.3 isNaN ( number )
+		final Value<?> number = argument(0, arguments);
+
+		// 1. Let num be ? ToNumber(number).
+		final NumberValue num = number.toNumberValue(interpreter);
+		// 2. If num is NaN, return true.
+		// 3. Otherwise, return false.
+		return BooleanValue.of(num.value.isNaN());
 	}
 }

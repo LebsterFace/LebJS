@@ -412,14 +412,18 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		this.value.put(key, new DataDescriptor(value, true, false, true));
 	}
 
-	protected NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, NativeCode code) {
-		final var function = new NativeFunction(functionPrototype, key.toFunctionName(), code);
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createbuiltinfunction")
+	@NonCompliant
+	protected NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, int expectedArgumentCount, NativeCode code) {
+		final var function = new NativeFunction(functionPrototype, key.toFunctionName(), code, expectedArgumentCount);
 		this.put(key, function);
 		return function;
 	}
 
-	public NativeFunction putMethod(Intrinsics intrinsics, Key<?> key, NativeCode code) {
-		return this.putMethod(intrinsics.functionPrototype, key, code);
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createbuiltinfunction")
+	@NonCompliant
+	public NativeFunction putMethod(Intrinsics intrinsics, Key<?> key, int expectedArgumentCount, NativeCode code) {
+		return this.putMethod(intrinsics.functionPrototype, key, expectedArgumentCount, code);
 	}
 
 	public Iterable<Map.Entry<Key<?>, PropertyDescriptor>> entries() {

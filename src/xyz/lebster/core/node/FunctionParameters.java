@@ -1,6 +1,7 @@
 package xyz.lebster.core.node;
 
 import xyz.lebster.core.DumpBuilder;
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -76,12 +77,23 @@ public final class FunctionParameters implements Dumpable, Iterable<FunctionPara
 		}
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-static-semantics-expectedargumentcount")
+	public int expectedArgumentCount() {
+		int count = 0;
+		for (final var parameter : formalParameters) {
+			if (parameter.defaultExpression != null) break;
+			count++;
+		}
+
+		return count;
+	}
+
 	@Override
 	public Iterator<Parameter> iterator() {
 		return formalParameters.iterator();
 	}
 
-	public record Parameter(AssignmentTarget target, Expression defaultExpression) implements Dumpable {
+	record Parameter(AssignmentTarget target, Expression defaultExpression) implements Dumpable {
 		@Override
 		public void dump(int indent) {
 			DumpBuilder.begin(indent)

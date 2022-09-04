@@ -196,14 +196,35 @@ public final class ArrayPrototype extends ObjectValue {
 		return Undefined.instance;
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findindex")
-	private static NumberValue findIndex(Interpreter interpreter, Value<?>[] arguments) {
+	private static NumberValue findIndex(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.10 Array.prototype.findIndex ( predicate [ , thisArg ] )
-		final Value<?> predicate = argument(0, arguments);
+		final Value<?> predicate_ = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
 
-		throw new NotImplemented("Array.prototype.findIndex");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(O, interpreter);
+		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
+		final Executable predicate = Executable.getExecutable(interpreter, predicate_);
+		// 4. Let k be 0.
+		// 5. Repeat, while k < len,
+		for (int k = 0; k < len; k++) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final var Pk = new StringValue(k);
+			// b. Let kValue be ? Get(O, Pk).
+			final Value<?> kValue = O.get(interpreter, Pk);
+			// c. Let testResult be ToBoolean(? Call(predicate, thisArg, « kValue, 𝔽(k), O »)).
+			final NumberValue index = new NumberValue(k);
+			final boolean testResult = predicate.call(interpreter, thisArg, kValue, index, O).isTruthy(interpreter);
+			// d. If testResult is true, return 𝔽(k).
+			if (testResult) return index;
+			// e. Set k to k + 1.
+		}
+
+		// 6. Return -1𝔽.
+		return new NumberValue(-1);
 	}
 
 	@NonCompliant

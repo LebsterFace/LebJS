@@ -11,6 +11,7 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Null;
+import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -31,8 +32,26 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		this.putMethod(intrinsics, Names.keys, 1, ObjectConstructor::keys);
 		this.putMethod(intrinsics, Names.values, 1, ObjectConstructor::values);
 		this.putMethod(intrinsics, Names.entries, 1, ObjectConstructor::entriesMethod);
+		this.putMethod(intrinsics, Names.getOwnPropertyDescriptor, 2, ObjectConstructor::getOwnPropertyDescriptor);
 		this.putMethod(intrinsics, Names.fromEntries, 1, ObjectConstructor::fromEntries);
 		this.putMethod(intrinsics, Names.is, 2, ObjectConstructor::is);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getownpropertydescriptor")
+	private static Value<?> getOwnPropertyDescriptor(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.1.2.8 Object.getOwnPropertyDescriptor ( O, P )
+		final Value<?> O = argument(0, arguments);
+		final Value<?> P = argument(1, arguments);
+
+		// 1. Let obj be ? ToObject(O).
+		final ObjectValue obj = O.toObjectValue(interpreter);
+		// 2. Let key be ? ToPropertyKey(P).
+		final Key<?> key = P.toPropertyKey(interpreter);
+		// 3. Let desc be ? obj.[[GetOwnProperty]](key).
+		final PropertyDescriptor desc = obj.getOwnProperty(key);
+		if (desc == null) return Undefined.instance;
+		// 4. Return FromPropertyDescriptor(desc).
+		return desc.fromPropertyDescriptor(interpreter);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.is")
@@ -44,7 +63,6 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// 1. Return SameValue(value1, value2).
 		return BooleanValue.of(value1.sameValue(value2));
 	}
-
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.fromentries")
 	@NonCompliant

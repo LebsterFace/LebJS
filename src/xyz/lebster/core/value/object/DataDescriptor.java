@@ -1,10 +1,13 @@
 package xyz.lebster.core.value.object;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 
 import java.util.HashSet;
 
@@ -103,5 +106,16 @@ public final class DataDescriptor implements PropertyDescriptor {
 	public void display(StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
 		parents.add(parent);
 		DataDescriptor.display(this.value, representation, parent, parents, singleLine);
+	}
+
+	@Override
+	public ObjectValue fromPropertyDescriptor(Interpreter interpreter) throws AbruptCompletion {
+		final var obj = new ObjectValue(interpreter.intrinsics);
+		// TODO: Make CreateDataPropertyOrThrow
+		obj.set(interpreter, Names.value, value);
+		obj.set(interpreter, Names.writable, BooleanValue.of(isWritable()));
+		obj.set(interpreter, Names.enumerable, BooleanValue.of(isEnumerable()));
+		obj.set(interpreter, Names.configurable, BooleanValue.of(isConfigurable()));
+		return obj;
 	}
 }

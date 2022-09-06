@@ -11,6 +11,7 @@ public final class Names {
 	public static final StringValue charCodeAt = new StringValue("charCodeAt");
 	public static final StringValue codePointAt = new StringValue("codePointAt");
 	public static final StringValue concat = new StringValue("concat");
+	public static final StringValue configurable = new StringValue("configurable");
 	public static final StringValue constructor = new StringValue("constructor");
 	public static final StringValue copyWithin = new StringValue("copyWithin");
 	public static final StringValue create = new StringValue("create");
@@ -20,6 +21,7 @@ public final class Names {
 	public static final StringValue done = new StringValue("done");
 	public static final StringValue endsWith = new StringValue("endsWith");
 	public static final StringValue entries = new StringValue("entries");
+	public static final StringValue enumerable = new StringValue("enumerable");
 	public static final StringValue equals = new StringValue("equals");
 	public static final StringValue error = new StringValue("error");
 	public static final StringValue eval = new StringValue("eval");
@@ -39,6 +41,8 @@ public final class Names {
 	public static final StringValue flatMap = new StringValue("flatMap");
 	public static final StringValue forEach = new StringValue("forEach");
 	public static final StringValue fromEntries = new StringValue("fromEntries");
+	public static final StringValue get = new StringValue("get");
+	public static final StringValue getOwnPropertyDescriptor = new StringValue("getOwnPropertyDescriptor");
 	public static final StringValue getPrototypeOf = new StringValue("getPrototypeOf");
 	public static final StringValue globalThis = new StringValue("globalThis");
 	public static final StringValue group = new StringValue("group");
@@ -83,6 +87,7 @@ public final class Names {
 	public static final StringValue replaceAll = new StringValue("replaceAll");
 	public static final StringValue result = new StringValue("result");
 	public static final StringValue reverse = new StringValue("reverse");
+	public static final StringValue set = new StringValue("set");
 	public static final StringValue setPrototypeOf = new StringValue("setPrototypeOf");
 	public static final StringValue shift = new StringValue("shift");
 	public static final StringValue slice = new StringValue("slice");
@@ -106,6 +111,7 @@ public final class Names {
 	public static final StringValue valueOf = new StringValue("valueOf");
 	public static final StringValue values = new StringValue("values");
 	public static final StringValue warn = new StringValue("warn");
+	public static final StringValue writable = new StringValue("writable");
 	public static final StringValue write = new StringValue("write");
 
 	// Values

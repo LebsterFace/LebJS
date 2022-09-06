@@ -4,8 +4,10 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 
 import java.util.HashSet;
 
@@ -66,5 +68,17 @@ public final class AccessorDescriptor implements PropertyDescriptor {
 		representation.append(ANSI.CYAN);
 		representation.append("[Getter/Setter]");
 		representation.append(ANSI.RESET);
+	}
+
+	@Override
+	public final ObjectValue fromPropertyDescriptor(Interpreter interpreter) throws AbruptCompletion {
+		final var obj = new ObjectValue(interpreter.intrinsics);
+		// TODO: Make CreateDataPropertyOrThrow
+		obj.set(interpreter, Names.get, getter);
+		obj.set(interpreter, Names.set, setter);
+		obj.set(interpreter, Names.writable, BooleanValue.of(isWritable()));
+		obj.set(interpreter, Names.enumerable, BooleanValue.of(isEnumerable()));
+		obj.set(interpreter, Names.configurable, BooleanValue.of(isConfigurable()));
+		return obj;
 	}
 }

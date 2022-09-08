@@ -43,6 +43,7 @@ public final class Names {
 	public static final StringValue fromEntries = new StringValue("fromEntries");
 	public static final StringValue get = new StringValue("get");
 	public static final StringValue getOwnPropertyDescriptor = new StringValue("getOwnPropertyDescriptor");
+	public static final StringValue getOwnPropertyDescriptors = new StringValue("getOwnPropertyDescriptors");
 	public static final StringValue getPrototypeOf = new StringValue("getPrototypeOf");
 	public static final StringValue globalThis = new StringValue("globalThis");
 	public static final StringValue group = new StringValue("group");

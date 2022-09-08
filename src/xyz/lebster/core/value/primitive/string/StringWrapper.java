@@ -17,7 +17,7 @@ import java.util.PrimitiveIterator;
 public final class StringWrapper extends PrimitiveWrapper<StringValue, StringPrototype> implements HasBuiltinTag {
 	public StringWrapper(Intrinsics intrinsics, StringValue data) {
 		super(intrinsics.stringPrototype, data);
-		this.put(Names.length, new NumberValue(data.value.length()));
+		this.put(Names.length, new NumberValue(data.value.length()), false, false, false);
 	}
 
 	@Override

@@ -33,8 +33,34 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		this.putMethod(intrinsics, Names.values, 1, ObjectConstructor::values);
 		this.putMethod(intrinsics, Names.entries, 1, ObjectConstructor::entriesMethod);
 		this.putMethod(intrinsics, Names.getOwnPropertyDescriptor, 2, ObjectConstructor::getOwnPropertyDescriptor);
+		this.putMethod(intrinsics, Names.getOwnPropertyDescriptors, 1, ObjectConstructor::getOwnPropertyDescriptors);
 		this.putMethod(intrinsics, Names.fromEntries, 1, ObjectConstructor::fromEntries);
 		this.putMethod(intrinsics, Names.is, 2, ObjectConstructor::is);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getownpropertydescriptors")
+	private static ObjectValue getOwnPropertyDescriptors(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.1.2.9 Object.getOwnPropertyDescriptors ( O )
+		final Value<?> O = argument(0, arguments);
+
+		// 1. Let obj be ? ToObject(O).
+		final ObjectValue obj = O.toObjectValue(interpreter);
+		// 2. Let ownKeys be ? obj.[[OwnPropertyKeys]]().
+		final Iterable<Key<?>> ownKeys = obj.ownPropertyKeys();
+		// TODO: 3. Let descriptors be OrdinaryObjectCreate(%Object.prototype%).
+		final var descriptors = new ObjectValue(interpreter.intrinsics);
+		// 4. For each element key of ownKeys, do
+		for (final Key<?> key : ownKeys) {
+			// a. Let desc be ? obj.[[GetOwnProperty]](key).
+			final PropertyDescriptor desc = obj.getOwnProperty(key);
+			// b. Let descriptor be FromPropertyDescriptor(desc).
+			final ObjectValue descriptor = desc.fromPropertyDescriptor(interpreter);
+			// TODO: c. If descriptor is not undefined, perform ! CreateDataPropertyOrThrow(descriptors, key, descriptor).
+			// TODO: When does fromPropertyDescriptor return 'undefined'?
+			descriptors.put(key, descriptor);
+		}
+		// 5. Return descriptors.
+		return descriptors;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getownpropertydescriptor")

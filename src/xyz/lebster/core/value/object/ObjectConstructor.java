@@ -16,10 +16,10 @@ import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
+import static xyz.lebster.core.value.object.ObjectValue.EnumerableOwnPropertyNamesKind.*;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
 public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, ObjectPrototype> {
@@ -93,15 +93,12 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// 20.1.2.18 Object.keys ( O )
 		final Value<?> O = argument(0, arguments);
 
+		// 1. Let obj be ? ToObject(O).
 		final ObjectValue obj = O.toObjectValue(interpreter);
-		final ArrayList<StringValue> properties = new ArrayList<>();
-		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : obj.entries()) {
-			if (entry.getValue().isEnumerable() && entry.getKey() instanceof final StringValue key) {
-				properties.add(key);
-			}
-		}
-
-		return new ArrayObject(interpreter, properties.toArray(new StringValue[0]));
+		// 2. Let nameList be ? EnumerableOwnPropertyNames(obj, key).
+		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, KEY);
+		// 3. Return CreateArrayFromList(nameList).
+		return new ArrayObject(interpreter, nameList);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.values")
@@ -109,15 +106,12 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// 20.1.2.23 Object.values ( O )
 		final Value<?> O = argument(0, arguments);
 
+		// 1. Let obj be ? ToObject(O).
 		final ObjectValue obj = O.toObjectValue(interpreter);
-		final ArrayList<Value<?>> properties = new ArrayList<>();
-		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : obj.entries()) {
-			if (entry.getValue().isEnumerable() && entry.getKey() instanceof StringValue) {
-				properties.add(entry.getValue().get(interpreter, obj));
-			}
-		}
-
-		return new ArrayObject(interpreter, properties.toArray(new Value[0]));
+		// 2. Let nameList be ? EnumerableOwnPropertyNames(obj, value).
+		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, VALUE);
+		// 3. Return CreateArrayFromList(nameList).
+		return new ArrayObject(interpreter, nameList);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.entries")
@@ -125,18 +119,12 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// 20.1.2.5 Object.entries ( O )
 		final Value<?> O = argument(0, arguments);
 
+		// 1. Let obj be ? ToObject(O).
 		final ObjectValue obj = O.toObjectValue(interpreter);
-		final ArrayList<ArrayObject> properties = new ArrayList<>();
-		for (final Map.Entry<Key<?>, PropertyDescriptor> entry : obj.entries()) {
-			if (entry.getValue().isEnumerable() && entry.getKey() instanceof StringValue) {
-				properties.add(new ArrayObject(interpreter,
-					entry.getKey(),
-					entry.getValue().get(interpreter, obj)
-				));
-			}
-		}
-
-		return new ArrayObject(interpreter, properties.toArray(new ArrayObject[0]));
+		// 2. Let nameList be ? EnumerableOwnPropertyNames(obj, key+value).
+		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, KEY_VALUE);
+		// 3. Return CreateArrayFromList(nameList).
+		return new ArrayObject(interpreter, nameList);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.create")

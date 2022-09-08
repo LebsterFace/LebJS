@@ -1,7 +1,7 @@
 package xyz.lebster.core.value.primitive.string;
 
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
@@ -11,7 +11,6 @@ import xyz.lebster.core.value.primitive.PrimitiveWrapper;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.PrimitiveIterator;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-objects")
@@ -40,43 +39,29 @@ public final class StringWrapper extends PrimitiveWrapper<StringValue, StringPro
 	}
 
 	@Override
-	public Iterable<Map.Entry<Key<?>, PropertyDescriptor>> entries() {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-exotic-objects-ownpropertykeys")
+	@NonCompliant
+	public Iterable<Key<?>> ownPropertyKeys() {
 		return () -> new Iterator<>() {
-			private final PrimitiveIterator.OfInt primitiveIterator = data.value.chars().iterator();
-			private final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> x = StringWrapper.super.entries().iterator();
-			private int charIndex = 0;
+			private final PrimitiveIterator.OfInt codePoints = data.value.codePoints().iterator();
+			private int codePointIndex = 0;
+			private final Iterator<Key<?>> properties = StringWrapper.super.ownPropertyKeys().iterator();
 
 			@Override
 			public boolean hasNext() {
-				return primitiveIterator.hasNext() || x.hasNext();
+				return codePoints.hasNext() || properties.hasNext();
 			}
 
 			@Override
-			public Map.Entry<Key<?>, PropertyDescriptor> next() {
-				if (primitiveIterator.hasNext()) {
-					final var key = new StringValue(charIndex);
-					final var value = new DataDescriptor(new StringValue((char) (int) primitiveIterator.next()), false, true, false);
-					charIndex++;
-
-					return new Map.Entry<>() {
-						@Override
-						public Key<?> getKey() {
-							return key;
-						}
-
-						@Override
-						public PropertyDescriptor getValue() {
-							return value;
-						}
-
-						@Override
-						public PropertyDescriptor setValue(PropertyDescriptor value) {
-							throw new ShouldNotHappen("Strings are immutable");
-						}
-					};
+			public Key<?> next() {
+				if (codePoints.hasNext()) {
+					codePoints.next();
+					final var key = new StringValue(codePointIndex);
+					codePointIndex++;
+					return key;
+				} else {
+					return properties.next();
 				}
-
-				return x.next();
 			}
 		};
 	}

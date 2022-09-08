@@ -147,7 +147,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
 			final ObjectValue value = name.execute(interpreter).toObjectValue(interpreter);
-			for (final var entry : value.entries()) {
+			for (final var entry : value.value.entrySet()) {
 				if (entry.getValue().isEnumerable()) {
 					result.put(entry.getKey(), value.get(interpreter, entry.getKey()));
 				}

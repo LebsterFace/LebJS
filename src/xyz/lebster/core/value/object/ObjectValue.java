@@ -11,6 +11,7 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.CheckedError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
@@ -426,16 +427,24 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return this.putMethod(intrinsics.functionPrototype, key, expectedArgumentCount, code);
 	}
 
-	public Iterable<Map.Entry<Key<?>, PropertyDescriptor>> entries() {
-		return this.value.entrySet();
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys")
+	public Iterable<Key<?>> ownPropertyKeys() {
+		return ObjectValue.ordinaryOwnPropertyKeys(this);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinaryownpropertykeys")
+	@NonCompliant
+	// TODO: Follow specified order
+	public static Iterable<Key<?>> ordinaryOwnPropertyKeys(ObjectValue objectValue) {
+		return objectValue.value.keySet();
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerate-object-properties")
-	public ArrayList<StringValue> enumerateObjectProperties() {
+	public final ArrayList<StringValue> enumerateObjectProperties() {
 		final ArrayList<StringValue> result = new ArrayList<>();
 		final HashSet<StringValue> visited = new HashSet<>();
-		for (final var entry : entries()) {
-			if (!(entry.getKey() instanceof StringValue key)) continue;
+		for (final var ownPropertyKey : ownPropertyKeys()) {
+			if (!(ownPropertyKey instanceof StringValue key)) continue;
 			final PropertyDescriptor desc = this.getOwnProperty(key);
 			visited.add(key);
 			if (desc.isEnumerable()) result.add(key);
@@ -450,6 +459,47 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		}
 
 		return result;
+	}
+
+	protected enum EnumerableOwnPropertyNamesKind { KEY, VALUE, KEY_VALUE }
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
+	public final ArrayList<Value<?>> enumerableOwnPropertyNames(Interpreter interpreter, EnumerableOwnPropertyNamesKind kind) throws AbruptCompletion {
+		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
+		final Iterable<Key<?>> ownKeys = this.ownPropertyKeys();
+		// 2. Let properties be a new empty List.
+		final var properties = new ArrayList<Value<?>>();
+		// 3. For each element key of ownKeys, do
+		for (final Key<?> key_ : ownKeys) {
+			// a. If key is a String, then
+			if (!(key_ instanceof final StringValue key)) continue;
+
+			// i. Let desc be ? O.[[GetOwnProperty]](key).
+			final PropertyDescriptor desc = this.getOwnProperty(key);
+			// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
+			if (desc != null && desc.isEnumerable()) {
+				// 1. If kind is key, append key to properties.
+				if (kind == EnumerableOwnPropertyNamesKind.KEY) properties.add(key);
+				// 2. Else,
+				else {
+					// a. Let value be ? Get(O, key).
+					final Value<?> value = this.get(interpreter, key);
+					// b. If kind is value, append value to properties.
+					if (kind == EnumerableOwnPropertyNamesKind.VALUE) properties.add(value);
+					// c. Else,
+					else {
+						// i. Assert: kind is key+value.
+						// ii. Let entry be CreateArrayFromList(« key, value »).
+						final var entry = new ArrayObject(interpreter, key, value);
+						// iii. Append entry to properties.
+						properties.add(entry);
+					}
+				}
+			}
+		}
+
+		// 4. Return properties.
+		return properties;
 	}
 
 	@Override

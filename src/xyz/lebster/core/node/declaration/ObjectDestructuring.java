@@ -10,6 +10,7 @@ import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.object.PropertyDescriptor;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.*;
@@ -34,9 +35,9 @@ public record ObjectDestructuring(Map<Expression, AssignmentPattern> pairs, Stri
 
 		if (restName != null) {
 			final ObjectValue restObject = new ObjectValue(interpreter.intrinsics);
-			for (final var entry : objectValue.entries()) {
-				final ObjectValue.Key<?> key = entry.getKey();
-				if (!visitedKeys.contains(key) && entry.getValue().isEnumerable()) {
+			for (final ObjectValue.Key<?> key : objectValue.ownPropertyKeys()) {
+				final PropertyDescriptor value = objectValue.getOwnProperty(key);
+				if (!visitedKeys.contains(key) && value.isEnumerable()) {
 					restObject.put(key, objectValue.get(interpreter, key));
 				}
 			}

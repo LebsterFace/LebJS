@@ -84,15 +84,12 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 	}
 
 	@Override
-	public ArrayList<Map.Entry<Key<?>, PropertyDescriptor>> entries() {
-		final ArrayList<Map.Entry<Key<?>, PropertyDescriptor>> result = new ArrayList<>();
-
-		for (int i = 0; i < arrayValues.size(); i++) {
-			PropertyDescriptor arrayValue = arrayValues.get(i);
-			result.add(Map.entry(new StringValue(i), arrayValue));
-		}
-
-		result.addAll(value.entrySet());
+	// TODO: Follow specified order
+	public Iterable<Key<?>> ownPropertyKeys() {
+		final ArrayList<Key<?>> result = new ArrayList<>();
+		for (int i = 0; i < arrayValues.size(); i++)
+			result.add(new StringValue(i));
+		result.addAll(value.keySet());
 		return result;
 	}
 

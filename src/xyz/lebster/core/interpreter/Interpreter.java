@@ -6,6 +6,7 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.environment.*;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.reference.ReferenceError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -18,14 +19,32 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 public final class Interpreter {
 	public final Intrinsics intrinsics;
 	public final GlobalObject globalObject;
-	private final ArrayDeque<ExecutionContext> executionContextStack = new ArrayDeque<>();
+	private static final int MAX_CALLSTACK_SIZE = 256;
+	private final ArrayDeque<ExecutionContext> executionContextStack;
 	private final Mode mode;
 
 	public Interpreter() {
 		this.intrinsics = new Intrinsics();
 		this.globalObject = new GlobalObject(intrinsics);
-		executionContextStack.addFirst(new ExecutionContext(new GlobalEnvironment(globalObject)));
+		this.executionContextStack = new ArrayDeque<>();
+		this.executionContextStack.addFirst(new ExecutionContext(new GlobalEnvironment(globalObject)));
 		this.mode = Mode.Strict;
+	}
+
+	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {
+		if (executionContextStack.size() >= MAX_CALLSTACK_SIZE) {
+			throw AbruptCompletion.error(new RangeError(this, "Maximum call stack size exceeded"));
+		}
+
+		executionContextStack.addFirst(context);
+	}
+
+	public void exitExecutionContext(ExecutionContext context) {
+		if (executionContextStack.size() == 0 || executionContextStack.getFirst() != context) {
+			throw new ShouldNotHappen("Attempting to exit from an invalid ExecutionContext");
+		}
+
+		executionContextStack.removeFirst();
 	}
 
 	public boolean isStrictMode() {
@@ -45,25 +64,13 @@ public final class Interpreter {
 	@NonStandard
 	// FIXME: Environment records
 	public void declareVariable(VariableDeclaration.Kind kind, StringValue name, Value<?> value) throws AbruptCompletion {
-		final Environment environment = executionContextStack.getFirst().environment();
+		final Environment environment = environment();
 		if (environment.hasBinding(name)) {
 			// FIXME: This should be a Syntax Error at parse-time
 			throw error(new ReferenceError(this, "Identifier '" + name.value + "' has already been declared"));
 		} else {
 			environment.createBinding(this, name, value);
 		}
-	}
-
-	public void enterExecutionContext(ExecutionContext context) {
-		executionContextStack.addFirst(context);
-	}
-
-	public void exitExecutionContext(ExecutionContext context) {
-		if (executionContextStack.size() == 0 || executionContextStack.getFirst() != context) {
-			throw new ShouldNotHappen("Attempting to exit from an invalid ExecutionContext");
-		}
-
-		executionContextStack.removeFirst();
 	}
 
 	public Value<?> thisValue() {
@@ -84,8 +91,7 @@ public final class Interpreter {
 		// 1. Let envRec be GetThisEnvironment().
 		final FunctionEnvironment envRec = getThisEnvironment();
 		// 2. Assert: envRec is a function Environment Record.
-		if (envRec == null)
-			throw new ShouldNotHappen("getSuperConstructor() called when getThisEnvironment() returns null");
+		if (envRec == null) throw new ShouldNotHappen("getSuperConstructor() called when getThisEnvironment() returns null");
 		// 3. Let activeFunction be envRec.[[FunctionObject]].
 		final Executable activeFunction = envRec.functionObject;
 		// 4. Assert: activeFunction is an ECMAScript function object.
@@ -117,18 +123,17 @@ public final class Interpreter {
 		return executionContextStack.getFirst();
 	}
 
-
-	public ExecutionContext pushEnvironment(Environment env) {
+	public ExecutionContext pushEnvironment(Environment env) throws AbruptCompletion {
 		final ExecutionContext context = new ExecutionContext(env);
 		this.enterExecutionContext(context);
 		return context;
 	}
 
-	public ExecutionContext pushFunctionEnvironment(Value<?> thisValue, ObjectValue newTarget, Executable functionObject) {
+	public ExecutionContext pushFunctionEnvironment(Value<?> thisValue, ObjectValue newTarget, Executable functionObject) throws AbruptCompletion {
 		return this.pushEnvironment(new FunctionEnvironment(environment(), thisValue, newTarget, functionObject));
 	}
 
-	public ExecutionContext pushNewEnvironment() {
+	public ExecutionContext pushNewEnvironment() throws AbruptCompletion {
 		return this.pushEnvironment(new DeclarativeEnvironment(environment()));
 	}
 

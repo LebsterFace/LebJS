@@ -25,7 +25,8 @@ public record ForStatement(Statement init, Expression test, Expression update, S
 					else if (completion.type == AbruptCompletion.Type.Break) break;
 					else throw completion;
 				} finally {
-					update.execute(interpreter);
+					if (update != null)
+						update.execute(interpreter);
 				}
 			}
 

@@ -243,7 +243,7 @@ public final class GlobalObject extends ObjectValue {
 		if (arguments.length == 0) return Undefined.instance;
 
 		final String sourceText = x.toStringValue(interpreter).value;
-		final ExecutionContext context = interpreter.pushNewEnvironment();
+		final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 		try {
 			return Realm.executeWith(sourceText, interpreter);
 		} catch (CannotParse | SyntaxError e) {

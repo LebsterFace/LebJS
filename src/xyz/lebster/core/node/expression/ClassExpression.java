@@ -10,6 +10,7 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.Environment;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
+import xyz.lebster.core.interpreter.environment.FunctionEnvironment;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.FunctionParameters;
 import xyz.lebster.core.node.SourceRange;
@@ -158,6 +159,7 @@ public record ClassExpression(
 		}
 
 		@NonCompliant
+		// FIXME
 		public ObjectValue construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
 			// FIXME: Don't do the next 3 lines if derived. Currently they are just ignored if derived
 			final Value<?> prop = this.get(interpreter, Names.prototype);
@@ -165,8 +167,8 @@ public record ClassExpression(
 			final ObjectValue newInstance = new ObjectValue(prototype);
 
 			// Calling when `this` is bound: The LexicalEnvironment of this.code; The bound `this` value
-			final ExecutionContext pushedEnvironment = interpreter.pushEnvironment(environment);
-			final ExecutionContext pushedThisValue = interpreter.pushFunctionEnvironment(isDerived ? null : newInstance, this, this);
+			Value<?> thisValue = isDerived ? null : newInstance;
+			final ExecutionContext pushedThisValue = interpreter.pushContextWithEnvironment(new FunctionEnvironment(environment, thisValue, this, this));
 
 			try {
 				final Value<?> returnValue = code.executeBody(interpreter, arguments);
@@ -183,12 +185,11 @@ public record ClassExpression(
 				return thisFromParentObject;
 			} finally {
 				interpreter.exitExecutionContext(pushedThisValue);
-				interpreter.exitExecutionContext(pushedEnvironment);
 			}
 		}
 
 		@Override
-		public Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+		public Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 			final String message = this.name.value.isEmpty() ?
 				"Class constructors cannot be invoked without 'new'" :
 				"Class constructor %s cannot be invoked without 'new'".formatted(this.name.value);
@@ -213,13 +214,8 @@ public record ClassExpression(
 		}
 
 		@Override
-		public Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
-			return wrappedFunction.call(interpreter, arguments);
-		}
-
-		@Override
-		public Value<?> call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) throws AbruptCompletion {
-			return wrappedFunction.call(interpreter, newThisValue, arguments);
+		public Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+			return wrappedFunction.internalCall(interpreter, arguments);
 		}
 	}
 }

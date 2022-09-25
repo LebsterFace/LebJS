@@ -26,7 +26,9 @@ public record CallExpression(Expression callee, ExpressionList arguments) implem
 			return executable.call(interpreter, reference.base(), executedArguments);
 		} else {
 			final Executable executable = getExecutable(interpreter, callee.execute(interpreter));
-			return executable.call(interpreter, executedArguments);
+			// TODO: OrdinaryCallBindThis
+			final Value<?> thisValue = interpreter.globalObject;
+			return executable.call(interpreter, thisValue, executedArguments);
 		}
 	}
 

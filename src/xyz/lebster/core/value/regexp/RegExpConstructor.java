@@ -17,11 +17,6 @@ public class RegExpConstructor extends BuiltinConstructor<RegExpObject, RegExpPr
 
 	@Override
 	public RegExpObject construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
-		return this.call(interpreter, arguments);
-	}
-
-	@Override
-	public RegExpObject call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final String pattern = argumentString(0, "(?:)", interpreter, arguments);
 		final String flags = argumentString(1, "", interpreter, arguments);
 		return new RegExpObject(interpreter.intrinsics, pattern, flags);

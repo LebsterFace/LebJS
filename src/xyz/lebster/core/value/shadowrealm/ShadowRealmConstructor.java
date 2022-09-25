@@ -22,7 +22,7 @@ public final class ShadowRealmConstructor extends BuiltinConstructor<ShadowRealm
 	}
 
 	@Override
-	public Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	public ShadowRealm internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		throw error(new TypeError(interpreter, "ShadowRealm constructor must be called with `new`"));
 	}
 }

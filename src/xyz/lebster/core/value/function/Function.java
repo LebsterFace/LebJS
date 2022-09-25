@@ -6,7 +6,6 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.environment.Environment;
-import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
@@ -30,25 +29,13 @@ public final class Function extends Constructor {
 	}
 
 	@Override
-	public Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// Closures: The LexicalEnvironment of this.code; The surrounding `this` value
-		final ExecutionContext parentContext = interpreter.pushEnvironment(environment);
-		try {
-			return code.executeBody(interpreter, arguments);
-		} finally {
-			interpreter.exitExecutionContext(parentContext);
-		}
+	public Environment savedEnvironment(Interpreter interpreter) {
+		return environment;
 	}
 
 	@Override
-	public Value<?> call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) throws AbruptCompletion {
-		// Calling when `this` is bound: The LexicalEnvironment of this.code; The bound `this` value
-		final ExecutionContext pushedThisValue = interpreter.pushFunctionEnvironment(newThisValue, null, this);
-		try {
-			return call(interpreter, arguments);
-		} finally {
-			interpreter.exitExecutionContext(pushedThisValue);
-		}
+	public Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+		return code.executeBody(interpreter, arguments);
 	}
 
 	@Override

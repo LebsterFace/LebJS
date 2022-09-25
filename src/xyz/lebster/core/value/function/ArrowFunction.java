@@ -28,7 +28,7 @@ public final class ArrowFunction extends Executable {
 	}
 
 	private Value<?> executeCode(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushNewEnvironment();
+		final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 
 		try {
 			expression.parameters.declareArguments(interpreter, passedArguments);
@@ -48,17 +48,13 @@ public final class ArrowFunction extends Executable {
 	}
 
 	@Override
-	public Value<?> call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+	public Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+		// Arrow functions ignore attempts to bind `this`
 		interpreter.enterExecutionContext(this.context);
 		try {
 			return this.executeCode(interpreter, arguments);
 		} finally {
 			interpreter.exitExecutionContext(this.context);
 		}
-	}
-
-	@Override
-	public Value<?> call(Interpreter interpreter, Value<?> newThisValue, Value<?>... arguments) throws AbruptCompletion {
-		return this.call(interpreter, arguments);
 	}
 }

@@ -20,7 +20,7 @@ public record ForOfStatement(Assignable left, Expression right, Statement body) 
 
 		Value<?> lastValue = Undefined.instance;
 		for (var next = iterator.next(); !next.done(); next = iterator.next()) {
-			final ExecutionContext context = interpreter.pushNewEnvironment();
+			final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 
 			try {
 				left.assign(interpreter, next.value());

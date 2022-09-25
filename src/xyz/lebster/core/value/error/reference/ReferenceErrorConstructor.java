@@ -19,9 +19,4 @@ public final class ReferenceErrorConstructor extends BuiltinConstructor<Referenc
 	public ReferenceError construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
 		return new ReferenceError(interpreter, argumentString(0, "", interpreter, arguments));
 	}
-
-	@Override
-	public ReferenceError call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		return this.construct(interpreter, arguments, this);
-	}
 }

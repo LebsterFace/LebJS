@@ -28,7 +28,7 @@ public interface FunctionNode extends ASTNode {
 	}
 
 	default Value<?> executeBody(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushNewEnvironment();
+		final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 		try {
 			parameters().declareArguments(interpreter, passedArguments);
 			body().executeWithoutNewContext(interpreter);

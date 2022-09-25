@@ -19,9 +19,4 @@ public final class RangeErrorConstructor extends BuiltinConstructor<RangeError, 
 	public RangeError construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
 		return new RangeError(interpreter, argumentString(0, "", interpreter, arguments));
 	}
-
-	@Override
-	public RangeError call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		return this.construct(interpreter, arguments, this);
-	}
 }

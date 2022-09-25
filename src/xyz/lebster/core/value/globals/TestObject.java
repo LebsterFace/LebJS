@@ -59,7 +59,7 @@ public final class TestObject extends ObjectValue {
 		if (!(potentialCallback instanceof final Executable callback))
 			throw new ShouldNotHappen("Test.expectError called without callback");
 		try {
-			callback.call(interpreter, new Value[0]);
+			callback.call(interpreter, interpreter.globalObject);
 		} catch (AbruptCompletion completion) {
 			if (completion.type != AbruptCompletion.Type.Throw) throw completion;
 			if (completion.value.isNullish()) throw new ShouldNotHappen("Thrown value was nullish");
@@ -82,7 +82,7 @@ public final class TestObject extends ObjectValue {
 		final StringValue messageStarter = argument(0, arguments).toStringValue(interpreter);
 		final StringValue sourceText = argument(1, arguments).toStringValue(interpreter);
 
-		final ExecutionContext context = interpreter.pushNewEnvironment();
+		final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 		try {
 			Realm.executeWith(sourceText.value, interpreter);
 		} catch (SyntaxError error) {

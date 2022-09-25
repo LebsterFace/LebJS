@@ -76,8 +76,7 @@ public final class Interpreter {
 	public Value<?> thisValue() {
 		final FunctionEnvironment thisEnvironment = getThisEnvironment();
 		if (thisEnvironment == null) return globalObject;
-		Value<?> thisValue = thisEnvironment.thisValue;
-		return thisValue;
+		return thisEnvironment.thisValue;
 	}
 
 	public ObjectValue getNewTarget() {
@@ -123,18 +122,14 @@ public final class Interpreter {
 		return executionContextStack.getFirst();
 	}
 
-	public ExecutionContext pushEnvironment(Environment env) throws AbruptCompletion {
+	public ExecutionContext pushContextWithEnvironment(Environment env) throws AbruptCompletion {
 		final ExecutionContext context = new ExecutionContext(env);
 		this.enterExecutionContext(context);
 		return context;
 	}
 
-	public ExecutionContext pushFunctionEnvironment(Value<?> thisValue, ObjectValue newTarget, Executable functionObject) throws AbruptCompletion {
-		return this.pushEnvironment(new FunctionEnvironment(environment(), thisValue, newTarget, functionObject));
-	}
-
-	public ExecutionContext pushNewEnvironment() throws AbruptCompletion {
-		return this.pushEnvironment(new DeclarativeEnvironment(environment()));
+	public ExecutionContext pushContextWithNewEnvironment() throws AbruptCompletion {
+		return this.pushContextWithEnvironment(new DeclarativeEnvironment(environment()));
 	}
 
 	public Reference getBinding(StringValue name) {

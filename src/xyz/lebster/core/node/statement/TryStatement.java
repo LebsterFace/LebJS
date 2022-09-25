@@ -29,7 +29,7 @@ public record TryStatement(BlockStatement body, String catchParameter, BlockStat
 			return body.execute(interpreter);
 		} catch (AbruptCompletion completion) {
 			if (completion.type != AbruptCompletion.Type.Throw) throw completion;
-			final ExecutionContext context = interpreter.pushNewEnvironment();
+			final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 			if (catchParameter != null)
 				interpreter.declareVariable(catchParameter, completion.value);
 			try {

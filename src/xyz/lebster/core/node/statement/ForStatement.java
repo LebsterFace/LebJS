@@ -12,7 +12,7 @@ import xyz.lebster.core.value.globals.Undefined;
 public record ForStatement(Statement init, Expression test, Expression update, Statement body) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushNewEnvironment();
+		final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 		try {
 			if (init != null) init.execute(interpreter);
 			final Value<?> result = Undefined.instance;

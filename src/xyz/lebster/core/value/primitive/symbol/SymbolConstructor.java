@@ -31,7 +31,7 @@ public final class SymbolConstructor extends PrimitiveConstructor {
 
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol-description")
-	public SymbolValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+	public SymbolValue internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		// 20.4.1.1 Symbol ( [ description ] )
 		final Value<?> description = arguments.length == 0 ? Undefined.instance : arguments[0];
 		// 1. If NewTarget is not undefined, throw a TypeError exception.

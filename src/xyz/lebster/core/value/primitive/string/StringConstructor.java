@@ -18,7 +18,7 @@ public class StringConstructor extends PrimitiveConstructor {
 	}
 
 	@Override
-	public StringValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+	public StringValue internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		if (arguments.length == 0) return StringValue.EMPTY;
 		else if (arguments[0] instanceof SymbolValue symbolValue) return new StringValue(symbolValue.toDisplayString());
 		else return arguments[0].toStringValue(interpreter);

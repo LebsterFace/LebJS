@@ -24,7 +24,7 @@ public record BlockStatement(List<Statement> children) implements Statement, App
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushNewEnvironment();
+		final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 		try {
 			return this.executeWithoutNewContext(interpreter);
 		} finally {

@@ -20,7 +20,7 @@ public class BooleanConstructor extends PrimitiveConstructor {
 
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean-constructor-boolean-value")
-	public BooleanValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+	public BooleanValue internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		// 20.3.1.1 Boolean ( value )
 		final Value<?> value = argument(0, arguments);
 

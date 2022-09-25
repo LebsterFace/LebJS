@@ -129,13 +129,4 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 			return array;
 		}
 	}
-
-	@Override
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array")
-	public Value<?> call(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
-		// 23.1.1.1 Array ( ...values )
-
-		// 1. If NewTarget is undefined, let newTarget be the active function object; else let newTarget be NewTarget.
-		return construct(interpreter, values, this);
-	}
 }

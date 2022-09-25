@@ -53,7 +53,7 @@ public final class NativeFunction extends Executable {
 	}
 
 	@Override
-	public Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	public Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		try {
 			return code.execute(interpreter, arguments);
 		} catch (AbruptCompletion e) {

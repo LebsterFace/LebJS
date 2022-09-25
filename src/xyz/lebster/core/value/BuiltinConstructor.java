@@ -20,4 +20,9 @@ public abstract class BuiltinConstructor<T extends ObjectValue, P extends Object
 
 	@Override
 	public abstract T construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion;
+
+	@Override
+	public T internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+		return this.construct(interpreter, arguments, this);
+	}
 }

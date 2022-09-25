@@ -42,7 +42,7 @@ public final class NumberConstructor extends PrimitiveConstructor {
 	}
 
 	@Override
-	public NumberValue call(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
+	public NumberValue internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		// 21.1.1.1 Number ( value )
 
 		// 1. If value is present, then

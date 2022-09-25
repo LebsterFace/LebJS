@@ -19,9 +19,4 @@ public final class TypeErrorConstructor extends BuiltinConstructor<TypeError, Ty
 	public TypeError construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
 		return new TypeError(interpreter, argumentString(0, "", interpreter, arguments));
 	}
-
-	@Override
-	public TypeError call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		return this.construct(interpreter, arguments, this);
-	}
 }

@@ -6,7 +6,9 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.interpreter.environment.Environment;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
+import xyz.lebster.core.interpreter.environment.FunctionEnvironment;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.expression.ArrowFunctionExpression;
 import xyz.lebster.core.node.expression.ClassExpression;
@@ -79,16 +81,24 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 
 	public abstract StringValue toStringMethod();
 
-	public Value<?> call(Interpreter interpreter, Value<?> thisValue, Value<?>... args) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushFunctionEnvironment(thisValue, this, this);
+	// Closures: Functions have access to a saved Environment
+	public Environment savedEnvironment(Interpreter interpreter) {
+		// By default, that environment is just the environment the function is called in
+		// (this is for eval() - so that it can access variables outside its sourceText)
+		return interpreter.environment();
+	}
+
+	public final Value<?> call(Interpreter interpreter, Value<?> thisValue, Value<?>... arguments) throws AbruptCompletion {
+		final var env = new FunctionEnvironment(savedEnvironment(interpreter), thisValue, this, this);
+		final ExecutionContext context = interpreter.pushContextWithEnvironment(env);
 		try {
-			return this.call(interpreter, args);
+			return internalCall(interpreter, arguments);
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}
 	}
 
-	public abstract Value<?> call(final Interpreter interpreter, final Value<?>[] arguments) throws AbruptCompletion;
+	public abstract Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion;
 
 	@Override
 	public String typeOf(Interpreter interpreter) {

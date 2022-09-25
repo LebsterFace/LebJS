@@ -26,7 +26,7 @@ public record ForInStatement(Assignable left, Expression right, Statement body) 
 
 		Value<?> lastValue = Undefined.instance;
 		for (final StringValue nextResult : enumerateProperties) {
-			final ExecutionContext context = interpreter.pushNewEnvironment();
+			final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 			try {
 				if (!objectValue.hasOwnEnumerableProperty(nextResult)) continue;
 

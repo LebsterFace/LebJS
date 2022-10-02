@@ -26,7 +26,7 @@ import static xyz.lebster.core.parser.Associativity.Right;
 public final class Parser {
 	private final String sourceText;
 	private ParserState state;
-	private ParserState saved = null;
+	private final ArrayDeque<ParserState> savedStack = new ArrayDeque<>();
 	private boolean hasConsumedSeparator = false;
 
 	public Parser(String sourceText, Token[] tokens) {
@@ -39,13 +39,12 @@ public final class Parser {
 	}
 
 	private void save() {
-		this.saved = state.copy();
+		this.savedStack.add(state.copy());
 	}
 
 	private void load() {
-		if (this.saved == null) throw new IllegalStateException("Attempting to load invalid ParseState");
-		this.state = saved;
-		this.saved = null;
+		if (this.savedStack.isEmpty()) throw new IllegalStateException("Attempting to load invalid ParseState");
+		this.state = savedStack.removeLast();
 	}
 
 	public Program parse() throws SyntaxError, CannotParse {

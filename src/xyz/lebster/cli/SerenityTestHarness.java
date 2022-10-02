@@ -13,6 +13,7 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import static xyz.lebster.cli.TestStatus.FAILED;
 import static xyz.lebster.cli.TestStatus.PASSED;
@@ -20,8 +21,10 @@ import static xyz.lebster.cli.TestStatus.PASSED;
 final class SerenityTestHarness implements TestHarness {
 	private final Program testCommon;
 
-	SerenityTestHarness(CLArguments arguments) throws CannotParse, SyntaxError {
-		this.testCommon = Realm.parse(Main.readFile(arguments.filePathOrNull().resolve("test-common.js")), arguments.options().showAST());
+	SerenityTestHarness(CLArguments arguments) throws CannotParse, SyntaxError, CLArgumentException {
+		final Path path = arguments.filePathOrNull();
+		if (path == null) throw new CLArgumentException("Test path is required for Serenity test harness");
+		this.testCommon = Realm.parse(Main.readFile(path.resolve("test-common.js")), arguments.options().showAST());
 	}
 
 	private ObjectValue getTestResults(Interpreter interpreter) throws AbruptCompletion {

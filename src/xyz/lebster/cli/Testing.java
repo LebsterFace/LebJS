@@ -21,7 +21,7 @@ public final class Testing {
 
 	private final CLArguments arguments;
 
-	public Testing(CLArguments arguments) throws CannotParse, SyntaxError {
+	public Testing(CLArguments arguments) throws CannotParse, SyntaxError, CLArgumentException {
 		this.arguments = arguments;
 		if (arguments.options().disableTestOutputBuffers()) {
 			passedOutput = null;

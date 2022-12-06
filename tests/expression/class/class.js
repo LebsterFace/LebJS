@@ -7,6 +7,10 @@ class Example {
     multiply(x) {
         return this.property * x;
     }
+
+    ['a' + 'dd'](x) {
+        return this.property + x;
+    }
 }
 
 const example = new Example("lorem");
@@ -20,3 +24,4 @@ Test.expect("lorem", example.name);
 Test.expect(123, example.property);
 
 Test.expect(1, example.multiply(1 / 123));
+Test.expect(124, example.add(1));

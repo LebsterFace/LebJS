@@ -338,16 +338,16 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getmethod")
-	public Value<?> getMethod(Interpreter interpreter, SymbolValue P) throws AbruptCompletion {
+	public Executable getMethod(Interpreter interpreter, SymbolValue P) throws AbruptCompletion {
 		final Value<?> func = this.getWellKnownSymbolOrUndefined(interpreter, P);
 		// 2. If func is either undefined or null, return undefined.
 		if (func == Undefined.instance || func == Null.instance)
-			return Undefined.instance;
+			return null;
 		// 3. If IsCallable(func) is false, throw a TypeError exception.
-		if (!(func instanceof Executable))
+		if (!(func instanceof final Executable func_executable))
 			throw error(new TypeError(interpreter, "Not a function!"));
 		// 4. Return func.
-		return func;
+		return func_executable;
 	}
 
 	public final Value<?> get(Interpreter interpreter, Key<?> key) throws AbruptCompletion {

@@ -18,10 +18,7 @@ import xyz.lebster.core.value.object.PropertyDescriptor;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Iterable<PropertyDescriptor> {
 	private final ArrayList<PropertyDescriptor> arrayValues;
@@ -61,7 +58,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		});
 	}
 
-	public ArrayObject(Interpreter interpreter, ArrayList<Value<?>> arrayValues) {
+	public <T extends Value<?>> ArrayObject(Interpreter interpreter, List<T> arrayValues) {
 		this(interpreter, arrayValues.toArray(new Value[0]));
 	}
 

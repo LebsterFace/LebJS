@@ -1009,6 +1009,7 @@ public final class Parser {
 				throw new ParserNotImplemented(position(), "Parsing class generator methods");
 			} else if (state.token.matchClassElementName()) {
 				final SourcePosition elementStart = position();
+				// FIXME: Computed property names
 				final Token name = state.consume();
 				consumeAllLineTerminators();
 

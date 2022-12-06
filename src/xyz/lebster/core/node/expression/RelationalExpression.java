@@ -87,11 +87,11 @@ public record RelationalExpression(Expression left, Expression right, Relational
 		if (!(target instanceof final ObjectValue O_target))
 			throw error(new TypeError(interpreter, "Right-hand side of `instanceof` is not an object"));
 		// 2. Let instOfHandler be ? GetMethod(target, @@hasInstance).
-		final Value<?> instOfHandler = O_target.getMethod(interpreter, SymbolValue.hasInstance);
+		final Executable instOfHandler = O_target.getMethod(interpreter, SymbolValue.hasInstance);
 		// 3. If instOfHandler is not undefined, then
-		if (instOfHandler instanceof final Executable executable)
+		if (instOfHandler != null)
 			// a. Return ! ToBoolean(? Call(instOfHandler, target, « V »)).
-			return executable.call(interpreter, O_target, V).toBooleanValue(interpreter);
+			return instOfHandler.call(interpreter, O_target, V).toBooleanValue(interpreter);
 		// 4. If IsCallable(target) is false, throw a TypeError exception.
 		if (!(O_target instanceof final Executable executable))
 			throw error(new TypeError(interpreter, "Not a function!"));

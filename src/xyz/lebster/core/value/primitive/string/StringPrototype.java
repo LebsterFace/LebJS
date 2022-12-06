@@ -11,6 +11,7 @@ import xyz.lebster.core.value.Generator;
 import xyz.lebster.core.value.IteratorResult;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -18,6 +19,8 @@ import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.PrimitiveIterator;
 import java.util.regex.Pattern;
 
@@ -25,6 +28,7 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.object.ObjectPrototype.requireObjectCoercible;
 import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
+import static xyz.lebster.core.value.primitive.number.NumberValue.UINT32_LIMIT;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-string-prototype-object")
 public final class StringPrototype extends ObjectValue {
@@ -346,12 +350,86 @@ public final class StringPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.split")
-	private static Value<?> split(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> split(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 22.1.3.22 String.prototype.split ( separator, limit )
 		final Value<?> separator = argument(0, arguments);
 		final Value<?> limit = argument(1, arguments);
 
-		throw new NotImplemented("String.prototype.split");
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.split");
+		// 2. If separator is neither undefined nor null, then
+
+		if (!separator.isNullish())  {
+			// a. Let splitter be ? GetMethod(separator, @@split).
+			final var splitter = separator.toObjectValue(interpreter).getMethod(interpreter, SymbolValue.split);
+			// b. If splitter is not undefined, then
+			if (splitter != null)
+				// i. Return ? Call(splitter, separator, « O, limit »).
+				return splitter.call(interpreter, separator, O, limit);
+		}
+
+		// 3. Let S be ? ToString(O).
+		final StringValue S = O.toStringValue(interpreter);
+		// 4. If limit is undefined, let lim be 2^32 - 1; else let lim be ℝ(? ToUint32(limit)).
+		final long lim = limit == Undefined.instance ? UINT32_LIMIT : limit.toNumberValue(interpreter).toUint32();
+		// 5. Let R be ? ToString(separator).
+		final StringValue R = separator.toStringValue(interpreter);
+		// 6. If lim = 0, then
+		if (lim == 0) {
+			// a. Return CreateArrayFromList(« »).
+			return new ArrayObject(interpreter, 0);
+		}
+		// 7. If separator is undefined, then
+		if (separator == Undefined.instance) {
+			// a. Return CreateArrayFromList(« S »).
+			return new ArrayObject(interpreter, S);
+		}
+		// 8. Let separatorLength be the length of R.
+		final int separatorLength = R.value.length();
+		// 9. If separatorLength is 0, then
+		if (separatorLength == 0) {
+			// a. Let head be the substring of S from 0 to lim.
+			final String head = S.value.substring(0, Math.toIntExact(Math.min(lim, S.value.length())));
+			// b. Let codeUnits be a List consisting of the sequence of code units that are the elements of head.
+			final byte[] codeUnits_bytes = head.getBytes(StandardCharsets.UTF_8);
+			final ArrayList<StringValue> codeUnits = new ArrayList<>();
+			for (final byte b : codeUnits_bytes) {
+				codeUnits.add(new StringValue((char) b));
+			}
+
+			// c. Return CreateArrayFromList(codeUnits).
+			return new ArrayObject(interpreter, codeUnits);
+		}
+
+		// 10. If S is the empty String, return CreateArrayFromList(« S »).
+		if (S.value.isEmpty()) return new ArrayObject(interpreter, S);
+
+		// 11. Let substrings be a new empty List.
+		final var substrings = new ArrayList<StringValue>();
+		// 12. Let i be 0.
+		int i = 0;
+		// 13. Let j be StringIndexOf(S, R, 0).
+		int j = S.value.indexOf(R.value);
+		// 14. Repeat, while j is not -1,
+		while (j != -1) {
+			// a. Let T be the substring of S from i to j.
+			final String T = S.value.substring(i, j);
+			// b. Append T to substrings.
+			substrings.add(new StringValue(T));
+			// c. If the number of elements of substrings is lim, return CreateArrayFromList(substrings).
+			if (substrings.size() == lim) return new ArrayObject(interpreter, substrings);
+			// d. Set i to j + separatorLength.
+			i = j + separatorLength;
+			// e. Set j to StringIndexOf(S, R, i).
+			j = S.value.indexOf(R.value, i);
+		}
+
+		// 15. Let T be the substring of S from `i`.
+		final String T = S.value.substring(i);
+		// 16. Append T to substrings.
+		substrings.add(new StringValue(T));
+		// 17. Return CreateArrayFromList(substrings).
+		return new ArrayObject(interpreter, substrings);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.startswith")

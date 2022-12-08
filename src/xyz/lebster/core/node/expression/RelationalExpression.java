@@ -9,13 +9,11 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
-import xyz.lebster.core.value.primitive.number.NumberValue;
-import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+import static xyz.lebster.core.value.Value.isLessThan;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override
@@ -97,77 +95,6 @@ public record RelationalExpression(Expression left, Expression right, Relational
 			throw error(new TypeError(interpreter, "Not a function!"));
 		// 5. Return ? OrdinaryHasInstance(target, V).
 		return executable.ordinaryHasInstance(interpreter, V);
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isstringprefix")
-	private boolean isStringPrefix(String p, String q) {
-		// 1. If ! StringIndexOf(q, p, 0) is 0, return true.
-		// 2. Else, return false.
-		return q.indexOf(p) == 0;
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-islessthan")
-	private BooleanValue isLessThan(Interpreter interpreter, Value<?> x, Value<?> y, boolean leftFirst) throws AbruptCompletion {
-		// 1. If the LeftFirst flag is true, then
-		PrimitiveValue<?> px;
-		PrimitiveValue<?> py;
-
-		if (leftFirst) {
-			// a. Let px be ? ToPrimitive(x, number).
-			px = x.toPrimitive(interpreter, Value.PreferredType.Number);
-			// b. Let py be ? ToPrimitive(y, number).
-			py = y.toPrimitive(interpreter, Value.PreferredType.Number);
-		}
-		// 2. Else,
-		else {
-			// a. NOTE: The order of evaluation needs to be reversed to preserve left to right evaluation.
-			// b. Let py be ? ToPrimitive(y, number).
-			py = y.toPrimitive(interpreter, Value.PreferredType.Number);
-			// c. Let px be ? ToPrimitive(x, number).
-			px = x.toPrimitive(interpreter, Value.PreferredType.Number);
-		}
-
-
-		// 3. If Type(px) is String and Type(py) is String, then
-		if (px instanceof final StringValue string_px && py instanceof final StringValue string_py) {
-
-			// a. If IsStringPrefix(py, px) is true, return false.
-			if (isStringPrefix(string_py.value, string_px.value)) return BooleanValue.FALSE;
-			// b. If IsStringPrefix(px, py) is true, return true.
-			if (isStringPrefix(string_px.value, string_py.value)) return BooleanValue.TRUE;
-
-			// c. Let k be the smallest non-negative integer such that the code unit at index k
-			//    within px is different from the code unit at index k within py.
-			//    (There must be such a k, for neither String is a prefix of the other.)
-			int k = 0;
-			while (k < string_px.value.length()) {
-				if (string_px.value.charAt(k) != string_py.value.charAt(k)) {
-					break;
-				}
-
-				k++;
-			}
-
-			// d. Let m be the integer that is the numeric value of the code unit at index k within px.
-			int m = string_px.value.charAt(k);
-			// e. Let n be the integer that is the numeric value of the code unit at index k within py.
-			int n = string_py.value.charAt(k);
-			// f. If m < n, return true. Otherwise, return false.
-			return BooleanValue.of(m < n);
-		}
-		// 4. Else,
-		else {
-			// FIXME: BigInt for this entire block
-
-			// c. NOTE: Because px and py are primitive values, evaluation order is not important.
-			// d. Let nx be ? ToNumeric(px).
-			final NumberValue nx = px.toPrimitive(interpreter, Value.PreferredType.Number).toNumberValue(interpreter);
-			// e. Let ny be ? ToNumeric(py).
-			final NumberValue ny = py.toPrimitive(interpreter, Value.PreferredType.Number).toNumberValue(interpreter);
-
-			// 1. Return Number::lessThan(nx, ny).
-			return nx.lessThan(ny);
-		}
 	}
 
 	@Override

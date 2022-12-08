@@ -470,7 +470,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 8. If relativeEnd is -∞, let final be 0.
 		if (relativeEnd == Integer.MIN_VALUE) final_ = 0;
 		// 9. Else if relativeEnd < 0, let final be max(len + relativeEnd, 0).
-		if (relativeEnd < 0) final_ = Math.max(len + relativeEnd, 0);
+		else if (relativeEnd < 0) final_ = Math.max(len + relativeEnd, 0);
 			// 10. Else, let final be min(relativeEnd, len).
 		else final_ = Math.min(relativeEnd, len);
 		// 11. Let count be max(final - k, 0).

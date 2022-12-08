@@ -71,7 +71,7 @@ public final class AccessorDescriptor implements PropertyDescriptor {
 	}
 
 	@Override
-	public final ObjectValue fromPropertyDescriptor(Interpreter interpreter) throws AbruptCompletion {
+	public ObjectValue fromPropertyDescriptor(Interpreter interpreter) throws AbruptCompletion {
 		final var obj = new ObjectValue(interpreter.intrinsics);
 		// TODO: Make CreateDataPropertyOrThrow
 		obj.set(interpreter, Names.get, getter);

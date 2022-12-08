@@ -1078,7 +1078,9 @@ public final class Parser {
 			if (state.is(TokenType.TemplateSpan)) {
 				result.spanNode(state.consume().value);
 			} else if (state.optional(TokenType.TemplateExpressionStart)) {
+				consumeAllLineTerminators();
 				final Expression expression = parseExpression();
+				consumeAllLineTerminators();
 				state.require(TokenType.TemplateExpressionEnd);
 				result.expressionNode(expression);
 			} else if (state.is(TokenType.TemplateEnd)) {

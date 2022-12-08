@@ -42,9 +42,12 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 
 	public static Executable getExecutable(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 		if (value instanceof final Executable executable) return executable;
+		throw notCallable(interpreter, value);
+	}
 
+	public static AbruptCompletion notCallable(Interpreter interpreter, Value<?> value) {
 		final String message = ANSI.stripFormatting(value.toDisplayString()) + " is not a function";
-		throw error(new TypeError(interpreter, message));
+		return error(new TypeError(interpreter, message));
 	}
 
 	public static boolean isAnonymousFunctionExpression(Expression expression) {

@@ -506,6 +506,82 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return properties;
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-sortindexedproperties")
+	public final ObjectValue sortIndexedProperties(Interpreter interpreter, long len, NativeCode SortCompare) throws AbruptCompletion {
+		// 23.1.3.30.1 SortIndexedProperties ( obj, len, SortCompare )
+
+		// 1. Let items be a new empty List.
+		final ArrayList<Value<?>> items = new ArrayList<>();
+		// 2. Let k be 0.
+		int k = 0;
+		// 3. Repeat, while k < len,
+		while (k < len) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final var Pk = new StringValue(k);
+			// b. Let kPresent be ? HasProperty(obj, Pk).
+			final var kPresent = this.hasProperty(Pk);
+			// c. If kPresent is true, then
+			if (kPresent) {
+				// i. Let kValue be ? Get(obj, Pk).
+				final var kValue = this.get(interpreter, Pk);
+				// ii. Append kValue to items.
+				items.add(kValue);
+			}
+
+			// d. Set k to k + 1.
+			k += 1;
+		}
+
+		// 4. Let itemCount be the number of elements in items.
+		final int itemCount = items.size();
+		// 5. Sort items using an implementation-defined sequence of calls to SortCompare.
+		// If any such call returns an abrupt completion, stop before performing any further calls to SortCompare and return that Completion Record.
+		try {
+			items.sort((Value<?> a, Value<?> b) -> {
+				Value<?> returnValue;
+				try {
+					returnValue = SortCompare.execute(interpreter, new Value[] { a, b });
+				} catch (AbruptCompletion e) {
+					if (e.type != AbruptCompletion.Type.Return) throw new RuntimeException(e);
+					returnValue = e.value;
+				}
+
+				if (returnValue instanceof final NumberValue numberValue) {
+					return (int) numberValue.value.doubleValue();
+				} else {
+					throw new ShouldNotHappen("SortCompare returned non-number");
+				}
+			});
+		} catch (RuntimeException runtimeException) {
+			if (runtimeException.getCause() instanceof final AbruptCompletion abruptCompletion) {
+				throw abruptCompletion;
+			} else {
+				throw runtimeException;
+			}
+		}
+
+		// 6. Let j be 0.
+		int j = 0;
+		// 7. Repeat, while j < itemCount,
+		while (j < itemCount) {
+			// a. Perform ? Set(obj, ! ToString(𝔽(j)), items[j], true).
+			this.set(interpreter, new StringValue(j), items.get(j)/* FIXME: , true */);
+			// b. Set j to j + 1.
+			j += 1;
+		}
+
+		// 8. Repeat, while j < len,
+		while (j < len) {
+			// a. Perform ? DeletePropertyOrThrow(obj, ! ToString(𝔽(j))).
+			this.deletePropertyOrThrow(interpreter, new StringValue(j));
+			// b. Set j to j + 1.
+			j += 1;
+		}
+
+		// 9. Return obj.
+		return this;
+	}
+
 	@Override
 	public void display(StringRepresentation representation) {
 		final var singleLine = new StringRepresentation();

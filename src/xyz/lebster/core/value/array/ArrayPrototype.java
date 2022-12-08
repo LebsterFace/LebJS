@@ -13,6 +13,7 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.function.NativeCode;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -335,11 +336,58 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.sort")
-	private static Value<?> sort(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> sort(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.30 Array.prototype.sort ( comparefn )
 		final Value<?> comparefn = argument(0, arguments);
 
-		throw new NotImplemented("Array.prototype.sort");
+		// 1. If comparefn is not undefined and IsCallable(comparefn) is false, throw a TypeError exception.
+		if (comparefn != Undefined.instance && !(comparefn instanceof Executable)) {
+			throw Executable.notCallable(interpreter, comparefn);
+		}
+
+		// 2. Let obj be ? ToObject(this value).
+		final ObjectValue obj = interpreter.thisValue().toObjectValue(interpreter);
+		// 3. Let len be ? LengthOfArrayLike(obj).
+		final long len = lengthOfArrayLike(obj, interpreter);
+		// 4. Let SortCompare be a new Abstract Closure with parameters (x, y) that captures comparefn and performs the following steps when called:
+		final NativeCode SortCompare = ($, arguments_) -> {
+			final Value<?> x = argument(0, arguments_);
+			final Value<?> y = argument(1, arguments_);
+
+			// a. If x and y are both undefined, return +0𝔽.
+			if (x == Undefined.instance && y == Undefined.instance) return NumberValue.ZERO;
+			// b. If x is undefined, return 1𝔽.
+			if (x == Undefined.instance) return new NumberValue(1.0D);
+			// c. If y is undefined, return -1𝔽.
+			if (y == Undefined.instance) return new NumberValue(-1.0D);
+			// d. If comparefn is not undefined, then
+			if (comparefn instanceof final Executable executable) {
+				// i. Let v be ? ToNumber(? Call(comparefn, undefined, « x, y »)).
+				final NumberValue v = executable.call($, Undefined.instance, x, y).toNumberValue($);
+				// ii. If v is NaN, return +0𝔽.
+				if (v.value.isNaN()) return NumberValue.ZERO;
+				// iii. Return v.
+				return v;
+			}
+
+			// e. Let xString be ? ToString(x).
+			final StringValue xString = x.toStringValue($);
+			// f. Let yString be ? ToString(y).
+			final StringValue yString = y.toStringValue($);
+			// g. Let xSmaller be ! IsLessThan(xString, yString, true).
+			final boolean xSmaller = isLessThan($, xString, yString, true).value;
+			// h. If xSmaller is true, return -1𝔽.
+			if (xSmaller) return new NumberValue(-1.0D);
+			// i. Let ySmaller be ! IsLessThan(yString, xString, true).
+			final boolean ySmaller = isLessThan($, yString, xString, true).value;
+			// j. If ySmaller is true, return 1𝔽.
+			if (ySmaller) return new NumberValue(1.0D);
+			// k. Return +0𝔽.
+			return NumberValue.ZERO;
+		};
+
+		// 5. Return ? SortIndexedProperties(obj, len, SortCompare).
+		return obj.sortIndexedProperties(interpreter, len, SortCompare);
 	}
 
 	@NonCompliant

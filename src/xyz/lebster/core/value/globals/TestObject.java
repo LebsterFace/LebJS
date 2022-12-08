@@ -19,6 +19,8 @@ import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import java.util.Objects;
+
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
@@ -114,7 +116,27 @@ public final class TestObject extends ObjectValue {
 			for (int i = 0; i < expectedValues.length; i++) {
 				final Value<?> expectedElement = expectedValues[i];
 				final Value<?> receivedElement = receivedValues[i];
-				if (!expectedElement.equals(receivedElement)) assertionFailed(a, b);
+				// NOTE: expectedElement can be `null` if the expected array contains holes
+				if (!Objects.equals(expectedElement, receivedElement)) assertionFailed(a, b);
+			}
+
+			return Undefined.instance;
+		} else if (
+			a.getClass() == ObjectValue.class &&
+			b.getClass() == ObjectValue.class
+		) {
+			final ObjectValue expected = (ObjectValue) a;
+			final ObjectValue received = (ObjectValue) b;
+			if (expected.getPrototype() != received.getPrototype()) assertionFailed(a, b);
+			for (final Key<?> expectedKey : expected.ownPropertyKeys()) {
+				if (!received.hasOwnProperty(expectedKey)) assertionFailed(a, b);
+				final var expectedValue = expected.get(interpreter, expectedKey);
+				final var recievedValue = received.get(interpreter, expectedKey);
+				if (!recievedValue.equals(expectedValue)) assertionFailed(a, b);
+			}
+
+			for (final Key<?> recievedKey : received.ownPropertyKeys()) {
+				if (!expected.hasOwnProperty(recievedKey)) assertionFailed(a, b);
 			}
 
 			return Undefined.instance;

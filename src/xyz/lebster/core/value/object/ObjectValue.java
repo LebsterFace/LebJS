@@ -380,7 +380,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarydelete")
-	private boolean ordinaryDelete(ObjectValue.Key<?> P) {
+	private boolean ordinaryDelete(Key<?> P) {
 		// 10.1.10.1 OrdinaryDelete ( O, P )
 		// 1. Let desc be ? O.[[GetOwnProperty]](P).
 		final PropertyDescriptor desc = this.getOwnProperty(P);
@@ -389,13 +389,17 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		// 3. If desc.[[Configurable]] is true, then
 		if (desc.isConfigurable()) {
 			// a. Remove the own property with name P from O.
-			this.value.remove(P);
+			this.internalDeleteProperty(P);
 			// b. Return true.
 			return true;
 		}
 
 		// 4. Return false.
 		return false;
+	}
+
+	protected void internalDeleteProperty(Key<?> P) {
+		this.value.remove(P);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinary-object-internal-methods-and-internal-slots-delete-p")

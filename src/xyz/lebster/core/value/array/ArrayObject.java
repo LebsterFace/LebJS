@@ -73,6 +73,14 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 	}
 
 	@Override
+	protected void internalDeleteProperty(Key<?> P) {
+		super.internalDeleteProperty(P);
+		final int index = P.toIndex();
+		if (index != -1 && index < arrayValues.size())
+			arrayValues.set(index, null);
+	}
+
+	@Override
 	public PropertyDescriptor getOwnProperty(Key<?> key) {
 		final PropertyDescriptor fromMap = this.value.get(key);
 		if (fromMap != null) return fromMap;

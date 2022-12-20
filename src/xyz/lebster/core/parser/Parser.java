@@ -528,7 +528,8 @@ public final class Parser {
 				}
 			}
 
-			if (state.is(TokenType.Identifier)) {
+			final Token keyToken = state.token;
+			if (keyToken.matchIdentifierName() || keyToken.type == TokenType.NumericLiteral || keyToken.type == TokenType.StringLiteral) {
 				final StringLiteral key = parseAsStringLiteral();
 				consumeAllLineTerminators();
 
@@ -536,6 +537,7 @@ public final class Parser {
 					consumeAllLineTerminators();
 					pairs.put(key, parseInitializer(parseAssignmentTarget()));
 				} else {
+					if (keyToken.type != TokenType.Identifier) throw state.unexpected(keyToken);
 					pairs.put(key, parseInitializer(new IdentifierExpression(key.value())));
 				}
 			} else {

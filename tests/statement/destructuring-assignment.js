@@ -29,6 +29,13 @@
 	Test.parse("({ a: a1, b: b1, ...rest } = obj);")
 }
 
+// With spaces
+{
+    let object = { 'hello world': 123 }
+    let { 'hello world': v } = object
+    Test.expect(123, v);
+}
+
 let obj = { a: 'a', b: 'b', c: [1, 2, 3] };
 {
 	let { a, b, c } = obj;

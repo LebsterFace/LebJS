@@ -29,7 +29,11 @@ public final class ParserState {
 	}
 
 	public SyntaxError unexpected() {
-		return new SyntaxError("Unexpected token " + token, token.position);
+		return unexpected(this.token);
+	}
+	
+	public SyntaxError unexpected(Token unexpectedToken) {
+		return new SyntaxError("Unexpected token " + unexpectedToken, unexpectedToken.position);
 	}
 
 	Token consume() {

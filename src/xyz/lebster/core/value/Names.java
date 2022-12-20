@@ -15,6 +15,7 @@ public final class Names {
 	public static final StringValue constructor = new StringValue("constructor");
 	public static final StringValue copyWithin = new StringValue("copyWithin");
 	public static final StringValue create = new StringValue("create");
+	public static final StringValue cwd = new StringValue("cwd");
 	public static final StringValue declare = new StringValue("declare");
 	public static final StringValue description = new StringValue("description");
 	public static final StringValue details = new StringValue("details");
@@ -82,6 +83,7 @@ public final class Names {
 	public static final StringValue push = new StringValue("push");
 	public static final StringValue random = new StringValue("random");
 	public static final StringValue range = new StringValue("range");
+	public static final StringValue readFile = new StringValue("readFile");
 	public static final StringValue reduce = new StringValue("reduce");
 	public static final StringValue reduceRight = new StringValue("reduceRight");
 	public static final StringValue repeat = new StringValue("repeat");

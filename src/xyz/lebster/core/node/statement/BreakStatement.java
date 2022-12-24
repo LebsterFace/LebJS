@@ -19,7 +19,7 @@ public final class BreakStatement implements Statement {
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpSingle(indent, "BreakStatement");
+		Dumper.dumpString(indent, "BreakStatement");
 	}
 
 	@Override

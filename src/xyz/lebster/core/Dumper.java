@@ -31,7 +31,7 @@ public final class Dumper {
 		System.out.printf("%s%s%s%n", ANSI.CYAN, value, ANSI.RESET);
 	}
 
-	public static void dumpSingle(int indent, String value) {
+	public static void dumpString(int indent, String value) {
 		dumpIndent(indent);
 		System.out.printf("%s%s%s%n", ANSI.BRIGHT_GREEN, value, ANSI.RESET);
 	}

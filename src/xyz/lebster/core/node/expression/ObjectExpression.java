@@ -82,7 +82,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 		public void dump(int indent) {
 			DumpBuilder.begin(indent)
 				.self(this)
-				.singleChild("Key", key.value)
+				.stringChild("Key", key.value)
 				.child("Value", value);
 		}
 

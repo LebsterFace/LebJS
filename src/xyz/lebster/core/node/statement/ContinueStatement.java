@@ -19,7 +19,7 @@ public final class ContinueStatement implements Statement {
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpSingle(indent, "ContinueStatement");
+		Dumper.dumpString(indent, "ContinueStatement");
 	}
 
 	@Override

@@ -81,7 +81,7 @@ public final class ExpressionList {
 				Dumper.dumpIndicator(indent, "Spread");
 				expression.dump(indent + 1);
 			} else if (type == Type.EMPTY) {
-				Dumper.dumpSingle(indent, "Empty");
+				Dumper.dumpString(indent, "Empty");
 			} else {
 				expression.dump(indent);
 			}

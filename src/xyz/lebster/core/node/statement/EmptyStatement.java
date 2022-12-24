@@ -14,7 +14,7 @@ public final class EmptyStatement implements Statement {
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpSingle(indent, "EmptyStatement");
+		Dumper.dumpString(indent, "EmptyStatement");
 	}
 
 	@Override

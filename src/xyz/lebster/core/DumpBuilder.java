@@ -17,10 +17,6 @@ public final class DumpBuilder {
 		return new DumpBuilder(indent);
 	}
 
-	public static void single(int indent, String name) {
-		Dumper.dumpSingle(indent, name);
-	}
-
 	public DumpBuilder self(Dumpable obj) {
 		Dumper.dumpName(rootIndentation, obj.getClass().getSimpleName());
 		return this;
@@ -28,11 +24,6 @@ public final class DumpBuilder {
 
 	public DumpBuilder selfParameterized(Dumpable self, String name) {
 		Dumper.dumpParameterized(rootIndentation, self.getClass().getSimpleName(), name);
-		return this;
-	}
-
-	public DumpBuilder single(String value) {
-		Dumper.dumpSingle(rootIndentation + 1, value);
 		return this;
 	}
 
@@ -50,9 +41,9 @@ public final class DumpBuilder {
 		return this;
 	}
 
-	public DumpBuilder singleChild(String indicator, String value) {
-		Dumper.dumpIndicator(rootIndentation, indicator);
-		Dumper.dumpSingle(rootIndentation + 1, value);
+	public DumpBuilder stringChild(String indicator, String value) {
+		Dumper.dumpIndicator(rootIndentation + 1, indicator);
+		Dumper.dumpString(rootIndentation + 2, value);
 		return this;
 	}
 
@@ -64,7 +55,7 @@ public final class DumpBuilder {
 				iterator.next().dump(rootIndentation + 2);
 			}
 		} else {
-			Dumper.dumpSingle(rootIndentation + 1, "No " + indicator);
+			Dumper.dumpString(rootIndentation + 1, "No " + indicator);
 		}
 
 		return this;
@@ -72,7 +63,7 @@ public final class DumpBuilder {
 
 	public DumpBuilder children(String indicator, Dumpable[] values) {
 		if (values.length == 0) {
-			Dumper.dumpSingle(rootIndentation + 1, "No " + indicator);
+			Dumper.dumpString(rootIndentation + 1, "No " + indicator);
 		} else {
 			Dumper.dumpIndicator(rootIndentation + 1, indicator);
 			for (final Dumpable child : values) {
@@ -85,7 +76,7 @@ public final class DumpBuilder {
 
 	public DumpBuilder optional(String indicator, Dumpable node) {
 		if (node == null) {
-			Dumper.dumpSingle(rootIndentation + 1, "No " + indicator);
+			Dumper.dumpString(rootIndentation + 1, "No " + indicator);
 		} else {
 			Dumper.dumpIndicated(rootIndentation + 1, indicator, node);
 		}
@@ -95,7 +86,7 @@ public final class DumpBuilder {
 
 	public DumpBuilder expressionList(String indicator, ExpressionList expressionList) {
 		if (expressionList == null || expressionList.isEmpty()) {
-			Dumper.dumpSingle(rootIndentation + 1, "No " + indicator);
+			Dumper.dumpString(rootIndentation + 1, "No " + indicator);
 		} else {
 			Dumper.dumpIndicator(rootIndentation + 1, indicator);
 			expressionList.dumpWithoutIndices(rootIndentation + 2);
@@ -136,7 +127,7 @@ public final class DumpBuilder {
 
 	public DumpBuilder optionalValue(String name, Value<?> value) {
 		if (value == null) {
-			Dumper.dumpSingle(rootIndentation + 1, "No " + name);
+			Dumper.dumpString(rootIndentation + 1, "No " + name);
 		} else {
 			final var representation = new StringRepresentation();
 			value.displayForConsoleLog(representation);

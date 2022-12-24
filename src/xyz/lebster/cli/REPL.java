@@ -74,7 +74,7 @@ public final class REPL {
 	}
 
 	private String readLine(int indent) {
-		if (indent == 0) {
+		if (indent == 0 && options.showPrompt()) {
 			System.out.print("> ");
 		} else {
 			for (int i = 0; i < indent; i++)

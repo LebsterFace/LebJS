@@ -36,6 +36,7 @@ lebjs
 - `--ignore-not-impl` - Ignore test failures from unimplemented features
 - `--no-buffer` - Do not buffer test outputs
 - `--hide-passing` - Only output skipped / failing tests (ignored if `--no-buffer` specified)
-- `-h [value]`, `--harness [value]` - Test harness. Valid options: `serenity`
+- `--disable-prompt` - Disable the `> ` prompt in the REPL
+- `--harness [value]` - Test harness. Valid options: `serenity`
 - `-t`, `--test` - Run tests
 - `--gif` - Enable GIF rendering mode (No error handling, no prompt, print delimiter after execution, print AST)

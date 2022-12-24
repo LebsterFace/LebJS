@@ -52,7 +52,8 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		boolean ignoreNotImplemented,
 		boolean hidePassing,
 		boolean disableTestOutputBuffers,
-		String testHarnessName
+		String testHarnessName,
+		boolean showPrompt
 	) {
 	}
 
@@ -72,6 +73,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private boolean hidePassing = false;
 		private boolean disableTestOutputBuffers = false;
 		private String testHarnessPath;
+		private boolean showPrompt = true;
 
 		private ExecutionOptions toExecutionOptions() {
 			return new ExecutionOptions(
@@ -81,7 +83,8 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				this.ignoreNotImplemented,
 				this.hidePassing,
 				this.disableTestOutputBuffers,
-				this.testHarnessPath
+				this.testHarnessPath,
+				this.showPrompt
 			);
 		}
 
@@ -92,6 +95,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				case "parse-only" -> parseOnly = true;
 				case "ignore-not-impl" -> ignoreNotImplemented = true;
 				case "hide-passing" -> hidePassing = true;
+				case "disable-prompt" -> showPrompt = false;
 				case "no-buffer" -> disableTestOutputBuffers = true;
 				case "harness" -> testHarnessPath = getFlagValue("Missing harness filepath");
 
@@ -132,10 +136,15 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				this.mode = ExecutionMode.File;
 		}
 
-		private CLArguments toCLIArguments() {
+		private CLArguments toCLIArguments() throws CLArgumentException {
+			if (mode == null) mode = ExecutionMode.REPL;
+			if (mode != ExecutionMode.REPL && !showPrompt) {
+				throw new CLArgumentException("Cannot disable prompt when not using REPL mode");
+			}
+
 			return new CLArguments(
 				fileNameOrNull == null ? null : Path.of(fileNameOrNull),
-				mode == null ? ExecutionMode.REPL : mode,
+				mode,
 				toExecutionOptions()
 			);
 		}

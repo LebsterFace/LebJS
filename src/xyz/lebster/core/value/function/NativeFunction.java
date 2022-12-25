@@ -9,6 +9,8 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import java.util.Arrays;
+
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-standard-built-in-objects")
 public final class NativeFunction extends Executable {
 	private final NativeCode code;
@@ -30,6 +32,11 @@ public final class NativeFunction extends Executable {
 	public static Value<?> argument(int index, Value<?>[] arguments) {
 		if (arguments.length <= index) return Undefined.instance;
 		return arguments[index];
+	}
+
+	public static Value<?>[] argumentRest(int index, Value<?>[] arguments) {
+		if (arguments.length <= index) return new Value[0];
+		return Arrays.copyOfRange(arguments, index, arguments.length);
 	}
 
 	public static String argumentString(int index, String defaultValue, Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {

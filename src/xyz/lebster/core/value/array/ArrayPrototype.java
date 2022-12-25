@@ -27,8 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
-import static xyz.lebster.core.value.function.NativeFunction.argument;
-import static xyz.lebster.core.value.function.NativeFunction.argumentString;
+import static xyz.lebster.core.value.function.NativeFunction.*;
 
 public final class ArrayPrototype extends ObjectValue {
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
@@ -395,7 +394,8 @@ public final class ArrayPrototype extends ObjectValue {
 		// 23.1.3.31 Array.prototype.splice ( start, deleteCount, ...items )
 		final Value<?> start = argument(0, arguments);
 		final Value<?> deleteCount = argument(1, arguments);
-		// TODO: Rest argument helper
+		final Value<?>[] items = argumentRest(2, arguments);
+
 
 		throw new NotImplemented("Array.prototype.splice");
 	}

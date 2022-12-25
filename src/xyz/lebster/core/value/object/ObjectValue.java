@@ -2,7 +2,6 @@ package xyz.lebster.core.value.object;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
-import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -331,21 +330,15 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		}
 	}
 
-	@NonStandard
-	public Value<?> getWellKnownSymbolOrUndefined(Interpreter interpreter, SymbolValue key) throws AbruptCompletion {
-		final PropertyDescriptor property = this.getProperty(key);
-		return property == null ? Undefined.instance : property.get(interpreter, this);
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getmethod")
-	public Executable getMethod(Interpreter interpreter, SymbolValue P) throws AbruptCompletion {
-		final Value<?> func = this.getWellKnownSymbolOrUndefined(interpreter, P);
+	public Executable getMethod(Interpreter interpreter, Key<?> P) throws AbruptCompletion {
+		// 1. Let func be ? GetV(V, P).
+		final Value<?> func = get(interpreter, P);
 		// 2. If func is either undefined or null, return undefined.
-		if (func == Undefined.instance || func == Null.instance)
-			return null;
+		if (func.isNullish()) return null;
 		// 3. If IsCallable(func) is false, throw a TypeError exception.
 		if (!(func instanceof final Executable func_executable))
-			throw error(new TypeError(interpreter, "Not a function!"));
+			throw error(new TypeError(interpreter, "Property %s is not a function".formatted(P.toDisplayString())));
 		// 4. Return func.
 		return func_executable;
 	}
@@ -419,16 +412,16 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createbuiltinfunction")
 	@NonCompliant
-	protected NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, int expectedArgumentCount, NativeCode code) {
-		final var function = new NativeFunction(functionPrototype, key.toFunctionName(), code, expectedArgumentCount);
+	protected NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, int length, NativeCode code) {
+		final var function = new NativeFunction(functionPrototype, key.toFunctionName(), code, length);
 		this.put(key, function);
 		return function;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createbuiltinfunction")
 	@NonCompliant
-	public NativeFunction putMethod(Intrinsics intrinsics, Key<?> key, int expectedArgumentCount, NativeCode code) {
-		return this.putMethod(intrinsics.functionPrototype, key, expectedArgumentCount, code);
+	public NativeFunction putMethod(Intrinsics intrinsics, Key<?> key, int length, NativeCode code) {
+		return this.putMethod(intrinsics.functionPrototype, key, length, code);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys")

@@ -5,10 +5,10 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.IteratorHelper;
-import xyz.lebster.core.value.IteratorResult;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.object.ObjectValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,23 +19,23 @@ public record ArrayDestructuring(AssignmentTarget restTarget, AssignmentPattern.
 		final var iterator = IteratorHelper.getIterator(interpreter, input);
 
 		final ArrayList<BindingPair> result = new ArrayList<>();
-		IteratorResult next = iterator.next();
+		ObjectValue iterResult = iterator.next(interpreter, null);
 		for (final var child : children) {
 			if (child != null) {
-				final Value<?> v = next.done() ? Undefined.instance : next.value();
-				final Value<?> x = v == Undefined.instance && child.defaultExpression() != null ?
-					child.defaultExpression().execute(interpreter) : v;
+				final Value<?> v = IteratorHelper.iteratorValue(interpreter, iterResult);
+				final Value<?> x = v != Undefined.instance || child.defaultExpression() == null ?
+					v : child.defaultExpression().execute(interpreter);
 				result.addAll(child.assignmentTarget().getBindings(interpreter, x));
 			}
 
-			next = iterator.next();
+			iterResult = iterator.next(interpreter, null);
 		}
 
 		if (restTarget != null) {
 			final ArrayList<Value<?>> restValues = new ArrayList<>();
-			while (!next.done()) {
-				restValues.add(next.value());
-				next = iterator.next();
+			while (!IteratorHelper.iteratorComplete(interpreter, iterResult)) {
+				restValues.add(IteratorHelper.iteratorValue(interpreter, iterResult));
+				iterResult = iterator.next(interpreter, null);
 			}
 
 			final ArrayObject restArray = new ArrayObject(interpreter, restValues);

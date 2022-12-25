@@ -8,7 +8,6 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Generator;
-import xyz.lebster.core.value.IteratorResult;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
@@ -359,7 +358,7 @@ public final class StringPrototype extends ObjectValue {
 		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.split");
 		// 2. If separator is neither undefined nor null, then
 
-		if (!separator.isNullish())  {
+		if (!separator.isNullish()) {
 			// a. Let splitter be ? GetMethod(separator, @@split).
 			final var splitter = separator.toObjectValue(interpreter).getMethod(interpreter, SymbolValue.split);
 			// b. If splitter is not undefined, then
@@ -694,15 +693,16 @@ public final class StringPrototype extends ObjectValue {
 		}
 
 		@Override
-		public IteratorResult nextMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-			if (!primitiveIterator.hasNext()) {
-				return new IteratorResult(Undefined.instance, true);
-			}
+		public ObjectValue next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+			final ObjectValue object = new ObjectValue(interpreter.intrinsics);
+			object.set(interpreter, Names.done, BooleanValue.of(!primitiveIterator.hasNext()));
 
-			return new IteratorResult(
-				new StringValue(new String(new int[] { primitiveIterator.nextInt() }, 0, 1)),
-				false
-			);
+			final var value = primitiveIterator.hasNext() ?
+				new StringValue(new String(new int[]{ primitiveIterator.nextInt() }, 0, 1)) :
+				Undefined.instance;
+
+			object.set(interpreter, Names.value, value);
+			return object;
 		}
 	}
 }

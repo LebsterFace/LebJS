@@ -7,16 +7,23 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.BuiltinConstructor;
+import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.range.RangeError;
+import xyz.lebster.core.value.error.type.TypeError;
+import xyz.lebster.core.value.function.Constructor;
 import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
+import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+import static xyz.lebster.core.value.IteratorHelper.iteratorValue;
+import static xyz.lebster.core.value.array.ArrayPrototype.lengthOfArrayLike;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentInt;
 
@@ -25,7 +32,123 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 	public ArrayConstructor(Intrinsics intrinsics) {
 		super(intrinsics, Names.Array);
 		this.putMethod(intrinsics, Names.of, 2, ArrayConstructor::of);
+		this.putMethod(intrinsics, Names.from, 1, ArrayConstructor::from);
 		this.putMethod(intrinsics, Names.isArray, 1, ArrayConstructor::isArray);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.from")
+	private static ObjectValue from(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.2.1 Array.from ( items [ , mapfn [ , thisArg ] ] )
+		final Value<?> items = argument(0, arguments);
+		final Value<?> potential_mapfn = argument(1, arguments);
+		final Value<?> thisArg = argument(2, arguments);
+
+		// 1. Let C be the `this` value.
+		final Value<?> C = interpreter.thisValue();
+		// 2. If mapfn is undefined, let mapping be false.
+		boolean mapping;
+		Executable mapFn = null;
+		if (potential_mapfn == Undefined.instance) mapping = false;
+			// 3. Else,
+		else {
+			// a. If IsCallable(mapfn) is false, throw a TypeError exception.
+			mapFn = Executable.getExecutable(interpreter, potential_mapfn);
+			// b. Let mapping be true.
+			mapping = true;
+		}
+
+		// 4. Let usingIterator be ? GetMethod(items, @@iterator).
+		final var usingIterator = items.toObjectValue(interpreter).getMethod(interpreter, SymbolValue.iterator);
+		// 5. If usingIterator is not undefined, then
+		if (usingIterator != null) {
+			// a. If IsConstructor(C) is true, then
+			ObjectValue A = C instanceof final Constructor constructor ?
+				// i. Let A be ? Construct(C).
+				constructor.construct(interpreter, new Value[0], constructor) :
+				// b. Else, i. Let A be ! ArrayCreate(0).
+				arrayCreate(interpreter, 0, interpreter.intrinsics.arrayPrototype);
+
+			// c. Let iteratorRecord be ? GetIterator(items, sync, usingIterator).
+			final var iteratorRecord = IteratorHelper.getIterator(interpreter, items);
+			// d. Let k be 0.
+			long k = 0;
+			// e. Repeat,
+			while (true) {
+				// i. If k ≥ 2^53 - 1, then
+				if (k > ArrayPrototype.MAX_LENGTH) {
+					// 1. Let error be ThrowCompletion(a newly created TypeError object).
+					final var error = AbruptCompletion.error(new TypeError(interpreter, "Maximum array size exceeded"));
+					// FIXME: 2. Return ? IteratorClose(iteratorRecord, error).
+					throw error;
+				}
+
+				// ii. Let Pk be ! ToString(𝔽(k)).
+				final var Pk = new StringValue(k);
+				// iii. Let next be ? IteratorStep(iteratorRecord).
+				final ObjectValue next = iteratorRecord.step(interpreter);
+				// iv. If next is false, then
+				if (next == null) {
+					// 1. Perform ? Set(A, "length", 𝔽(k), true).
+					A.set(interpreter, Names.length, new NumberValue(k) /* FIXME: , true */);
+					// 2. Return A.
+					return A;
+				}
+
+				// v. Let nextValue be ? IteratorValue(next).
+				final var nextValue = iteratorValue(interpreter, next);
+				// vi. If mapping is true, then
+				final Value<?> mappedValue = mapping ?
+					// FIXME: 1. Let mappedValue be Completion(Call(mapfn, thisArg, « nextValue, 𝔽(k) »)).
+					// FIXME: 2. IfAbruptCloseIterator(mappedValue, iteratorRecord).
+					mapFn.call(interpreter, thisArg, nextValue, new NumberValue(k)) :
+					// vii. Else, let mappedValue be nextValue.
+					nextValue;
+
+				// FIXME: viii. Let defineStatus be Completion(CreateDataPropertyOrThrow(A, Pk, mappedValue)).
+				// FIXME: ix. IfAbruptCloseIterator(defineStatus, iteratorRecord).
+
+				A.set(interpreter, Pk, mappedValue);
+				// x. Set k to k + 1.
+				k = k + 1;
+			}
+		}
+
+		// 6. NOTE: items is not an Iterable so assume it is an array-like object.
+		// 7. Let arrayLike be ! ToObject(items).
+		final ObjectValue arrayLike = items.toObjectValue(interpreter);
+		// 8. Let len be ? LengthOfArrayLike(arrayLike).
+		final long len = lengthOfArrayLike(arrayLike, interpreter);
+		// 9. If IsConstructor(C) is true, then
+		final ObjectValue A = C instanceof final Constructor constructor ?
+			// a. Let A be ? Construct(C, « 𝔽(len) »).
+			constructor.construct(interpreter, new Value[]{ new NumberValue(len) }, constructor) :
+			// 10. Else, a. Let A be ? ArrayCreate(len).
+			arrayCreate(interpreter, Math.toIntExact(len), interpreter.intrinsics.arrayPrototype);
+
+		// 11. Let k be 0.
+		int k = 0;
+		// 12. Repeat, while k < len,
+		while (k < len) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final StringValue Pk = new StringValue(k);
+			// b. Let kValue be ? Get(arrayLike, Pk).
+			final Value<?> kValue = arrayLike.get(interpreter, Pk);
+			// c. If mapping is true, then
+			final Value<?> mappedValue = mapping ?
+				// i. Let mappedValue be ? Call(mapfn, thisArg, « kValue, 𝔽(k) »).
+				mapFn.call(interpreter, thisArg, kValue, new NumberValue(k)) :
+				// d. Else, let mappedValue be kValue.
+				kValue;
+			// FIXME: e. Perform ? CreateDataPropertyOrThrow(A, Pk, mappedValue).
+			A.set(interpreter, Pk, mappedValue);
+			// f. Set k to k + 1.
+			k = k + 1;
+		}
+
+		// 13. Perform ? Set(A, "length", 𝔽(len), true).
+		A.set(interpreter, Names.length, new NumberValue(len)/* FIXME: , true */);
+		// 14. Return A.
+		return A;
 	}
 
 	@NonCompliant
@@ -39,7 +162,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 
 	@NonStandard
 	private static ArrayObject of(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// Array.prototype.of(length: number, callbackFn: (index: number) => unknown, thisArg?: unknown): unknown[]
+		// Array.of<T>(length: number, callbackFn: (index: number) => T, thisArg?: unknown): T[]
 
 		final int len = argumentInt(0, 0, interpreter, arguments);
 		final Value<?> callbackFn = argument(1, arguments);
@@ -95,7 +218,8 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 				// i. Let intLen be ! ToUint32(len).
 				intLen = new NumberValue(len_number.toUint32());
 				// ii. If SameValueZero(intLen, len) is false, throw a RangeError exception.
-				if (!NumberValue.sameValueZero(intLen, len_number)) throw error(new RangeError(interpreter, "Invalid array length"));
+				if (!NumberValue.sameValueZero(intLen, len_number))
+					throw error(new RangeError(interpreter, "Invalid array length"));
 			} else {
 				// i. Perform ! CreateDataPropertyOrThrow(array, "0", len).
 				array.set(interpreter, new StringValue(0), len);

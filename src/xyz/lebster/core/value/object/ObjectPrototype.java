@@ -137,7 +137,7 @@ public final class ObjectPrototype extends ObjectValue {
 			// 14. Else, let builtinTag be "Object".
 			final String builtinTag = (O instanceof final HasBuiltinTag hbt) ? hbt.getBuiltinTag() : "Object";
 			// 15. Let tag be ? Get(O, @@toStringTag).
-			final Value<?> tag = O.getWellKnownSymbolOrUndefined(interpreter, SymbolValue.toStringTag);
+			final Value<?> tag = O.get(interpreter, SymbolValue.toStringTag);
 			// 16. If Type(tag) is not String, set tag to builtinTag.
 			// 17. Return the string-concatenation of "[object ", tag, and "]".
 			if (tag instanceof final StringValue stringValue) {

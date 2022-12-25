@@ -8,7 +8,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
-import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.object.PropertyDescriptor;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
@@ -23,72 +22,103 @@ public final class IteratorHelper {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
 	@NonCompliant
-	public static ObjectIterator getIterator(Interpreter interpreter, Expression expression) throws AbruptCompletion {
+	public static IteratorRecord getIterator(Interpreter interpreter, Expression expression) throws AbruptCompletion {
 		final ObjectValue objectValue = expression.execute(interpreter).toObjectValue(interpreter);
-		final String obj = ANSI.stripFormatting(expression.toRepresentationString());
-		return getObjectIterator(interpreter, objectValue, obj);
+		final String representation = ANSI.stripFormatting(expression.toRepresentationString());
+		return getObjectIterator(interpreter, objectValue, representation);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
 	@NonCompliant
-	public static ObjectIterator getIterator(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
-		final ObjectValue objectValue = value.toObjectValue(interpreter);
-		final String obj = ANSI.stripFormatting(value.toDisplayString());
-		return getObjectIterator(interpreter, objectValue, obj);
+	public static IteratorRecord getIterator(Interpreter interpreter, Value<?> obj) throws AbruptCompletion {
+		final ObjectValue objectValue = obj.toObjectValue(interpreter);
+		final String display = ANSI.stripFormatting(objectValue.toDisplayString());
+		return getObjectIterator(interpreter, objectValue, display);
 	}
 
-	private static ObjectIterator getObjectIterator(Interpreter interpreter, ObjectValue objectValue, String obj) throws AbruptCompletion {
+	private static IteratorRecord getObjectIterator(Interpreter interpreter, ObjectValue objectValue, String display) throws AbruptCompletion {
 		final PropertyDescriptor iteratorProperty = objectValue.getProperty(SymbolValue.iterator);
 		if (iteratorProperty == null)
-			throw error(new TypeError(interpreter, obj + " is not iterable (does not contain a `Symbol.iterator` property)"));
+			throw error(new TypeError(interpreter, display + " is not iterable (does not contain a `Symbol.iterator` property)"));
 
 		if (!(iteratorProperty.get(interpreter, objectValue) instanceof final Executable iteratorMethod))
-			throw error(new TypeError(interpreter, obj + "[Symbol.iterator] is not a function"));
+			throw error(new TypeError(interpreter, display + "[Symbol.iterator] is not a function"));
 
 		if (!(iteratorMethod.call(interpreter, objectValue) instanceof final ObjectValue iterator))
-			throw error(new TypeError(interpreter, obj + "[Symbol.iterator]() returned a non-object value"));
+			throw error(new TypeError(interpreter, display + "[Symbol.iterator]() returned a non-object value"));
 
 		final PropertyDescriptor nextProperty = iterator.getProperty(Names.next);
 		if (nextProperty == null)
-			throw error(new TypeError(interpreter, obj + "[Symbol.iterator]() returned an object which does not contain a `next` property"));
+			throw error(new TypeError(interpreter, display + "[Symbol.iterator]() returned an object which does not contain a `next` property"));
 
 		if (!(nextProperty.get(interpreter, iterator) instanceof final Executable executable))
-			throw error(new TypeError(interpreter, obj + "[Symbol.iterator]().next is not a function"));
+			throw error(new TypeError(interpreter, display + "[Symbol.iterator]().next is not a function"));
 
-		return new ObjectIterator(interpreter, iterator, executable, obj);
+		return new IteratorRecord(iterator, executable, display);
 	}
 
-	public static final class ObjectIterator {
-		private final Interpreter interpreter;
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iterator-records")
+	public static final class IteratorRecord {
 		private final ObjectValue iteratorObject;
 		private final Executable nextMethod;
 		private final String errorString;
 
-		private ObjectIterator(Interpreter interpreter, ObjectValue iteratorObject, Executable nextMethod, String errorString) {
-			this.interpreter = interpreter;
+		private IteratorRecord(ObjectValue iteratorObject, Executable nextMethod, String display) {
 			this.iteratorObject = iteratorObject;
 			this.nextMethod = nextMethod;
-			this.errorString = errorString;
+			this.errorString = display;
 		}
 
-		public IteratorResult next() throws AbruptCompletion {
-			final Value<?> iteratorResult = nextMethod.call(interpreter, iteratorObject);
-			if (!(iteratorResult instanceof ObjectValue next)) {
-				final String representation = ANSI.stripFormatting(iteratorResult.toDisplayString());
-				throw error(new TypeError(interpreter, this.errorString + "[Symbol.iterator]().next() returned a non-object value (" + representation + ")"));
+		@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratornext")
+		public ObjectValue next(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
+			// 1. If value is not present, then
+			final var result = value == null ?
+				// a. Let result be ? Call(iteratorRecord.[[NextMethod]], iteratorRecord.[[Iterator]]).
+				nextMethod.call(interpreter, iteratorObject) :
+				// 2. Else, a. Let result be ? Call(iteratorRecord.[[NextMethod]], iteratorRecord.[[Iterator]], « value »).
+				nextMethod.call(interpreter, iteratorObject, value);
+
+			// 3. If result is not an Object, throw a TypeError exception.
+			if (!(result instanceof final ObjectValue next)) {
+				final String representation = ANSI.stripFormatting(result.toDisplayString());
+				throw error(new TypeError(interpreter, errorString + "[Symbol.iterator]().next() returned a non-object value (" + representation + ")"));
 			}
 
-			final boolean done = next.get(interpreter, Names.done).isTruthy(interpreter);
-			final Value<?> value = done ? Undefined.instance : next.get(interpreter, Names.value);
-			return new IteratorResult(value, done);
+			// 4. Return result.
+			return next;
 		}
 
-		public void collect(List<Value<?>> result) throws AbruptCompletion {
-			IteratorResult next = this.next();
-			while (!next.done()) {
-				result.add(next.value());
-				next = this.next();
+		@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorstep")
+		public ObjectValue step(Interpreter interpreter) throws AbruptCompletion {
+			// 1. Let result be ? IteratorNext(iteratorRecord).
+			final var result = next(interpreter, null);
+			// 2. Let done be ? IteratorComplete(result).
+			final var done = iteratorComplete(interpreter, result);
+			// 3. If done is true, return false.
+			if (done) return null;
+			// 4. Return result.
+			return result;
+		}
+
+		public void collect(Interpreter interpreter, List<Value<?>> result) throws AbruptCompletion {
+			ObjectValue iterResult = this.next(interpreter, null);
+			while (!iteratorComplete(interpreter, iterResult)) {
+				result.add(iteratorValue(interpreter, iterResult));
+				iterResult = this.next(interpreter, null);
 			}
 		}
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorcomplete")
+	public static boolean iteratorComplete(Interpreter interpreter, ObjectValue iterResult) throws AbruptCompletion {
+		// 1. Return ToBoolean(? Get(iterResult, "done")).
+		return iterResult.get(interpreter, Names.done).isTruthy(interpreter);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorvalue")
+	public static Value<?> iteratorValue(Interpreter interpreter, ObjectValue iterResult) throws AbruptCompletion {
+		// 1. Return ? Get(iterResult, "value").
+		return iterResult.get(interpreter, Names.value);
 	}
 }

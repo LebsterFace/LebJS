@@ -8,7 +8,6 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Generator;
-import xyz.lebster.core.value.IteratorResult;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
@@ -517,7 +516,7 @@ public final class ArrayPrototype extends ObjectValue {
 		long final_;
 		// 8. If relativeEnd is -∞, let final be 0.
 		if (relativeEnd == Integer.MIN_VALUE) final_ = 0;
-		// 9. Else if relativeEnd < 0, let final be max(len + relativeEnd, 0).
+			// 9. Else if relativeEnd < 0, let final be max(len + relativeEnd, 0).
 		else if (relativeEnd < 0) final_ = Math.max(len + relativeEnd, 0);
 			// 10. Else, let final be min(relativeEnd, len).
 		else final_ = Math.min(relativeEnd, len);
@@ -743,7 +742,7 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
-	private static long lengthOfArrayLike(ObjectValue O, Interpreter interpreter) throws AbruptCompletion {
+	static long lengthOfArrayLike(ObjectValue O, Interpreter interpreter) throws AbruptCompletion {
 		final double number = O.get(interpreter, Names.length).toNumberValue(interpreter).value;
 		if (Double.isNaN(number) || number <= 0) {
 			return 0L;
@@ -816,7 +815,8 @@ public final class ArrayPrototype extends ObjectValue {
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable callback = Executable.getExecutable(interpreter, callbackfn);
 		// 4. If len = 0 and initialValue is not present, throw a TypeError exception.
-		if (len == 0 && arguments.length == 1) throw error(new TypeError(interpreter, "Reduce of empty array with no initial value"));
+		if (len == 0 && arguments.length == 1)
+			throw error(new TypeError(interpreter, "Reduce of empty array with no initial value"));
 
 		// 5. Let k be 0.
 		int k = 0;
@@ -958,11 +958,17 @@ public final class ArrayPrototype extends ObjectValue {
 		}
 
 		@Override
-		public IteratorResult nextMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-			return new IteratorResult(
-				index > len ? Undefined.instance : O.get(interpreter, new StringValue(index++)),
-				index > len
-			);
+		public ObjectValue next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+			final ObjectValue object = new ObjectValue(interpreter.intrinsics);
+
+			if (index > len) {
+				object.set(interpreter, Names.value, Undefined.instance);
+			} else {
+				object.set(interpreter, Names.value, O.get(interpreter, new StringValue(index++)));
+			}
+
+			object.set(interpreter, Names.done, BooleanValue.of(index > len));
+			return object;
 		}
 	}
 }

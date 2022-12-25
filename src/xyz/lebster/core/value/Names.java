@@ -41,6 +41,7 @@ public final class Names {
 	public static final StringValue flat = new StringValue("flat");
 	public static final StringValue flatMap = new StringValue("flatMap");
 	public static final StringValue forEach = new StringValue("forEach");
+	public static final StringValue from = new StringValue("from");
 	public static final StringValue fromEntries = new StringValue("fromEntries");
 	public static final StringValue get = new StringValue("get");
 	public static final StringValue getOwnPropertyDescriptor = new StringValue("getOwnPropertyDescriptor");
@@ -89,6 +90,7 @@ public final class Names {
 	public static final StringValue repeat = new StringValue("repeat");
 	public static final StringValue replaceAll = new StringValue("replaceAll");
 	public static final StringValue result = new StringValue("result");
+	public static final StringValue return_ = new StringValue("return");
 	public static final StringValue reverse = new StringValue("reverse");
 	public static final StringValue set = new StringValue("set");
 	public static final StringValue setPrototypeOf = new StringValue("setPrototypeOf");

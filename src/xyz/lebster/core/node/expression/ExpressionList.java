@@ -42,7 +42,7 @@ public final class ExpressionList {
 			switch (node.type) {
 				case SINGLE -> result.add(node.expression.execute(interpreter));
 				case EMPTY -> result.add(null);
-				case SPREAD -> IteratorHelper.getIterator(interpreter, node.expression).collect(result);
+				case SPREAD -> IteratorHelper.getIterator(interpreter, node.expression).collect(interpreter, result);
 			}
 		}
 

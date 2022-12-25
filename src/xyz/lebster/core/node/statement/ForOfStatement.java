@@ -16,24 +16,29 @@ public record ForOfStatement(Assignable left, Expression right, Statement body) 
 	@Override
 	@NonCompliant
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final IteratorHelper.ObjectIterator iterator = IteratorHelper.getIterator(interpreter, right);
+		final IteratorHelper.IteratorRecord iterator = IteratorHelper.getIterator(interpreter, right);
 
 		Value<?> lastValue = Undefined.instance;
-		for (var next = iterator.next(); !next.done(); next = iterator.next()) {
+		var iterResult = iterator.next(interpreter, null);
+		while (!IteratorHelper.iteratorComplete(interpreter, iterResult)) {
 			final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 
 			try {
-				left.assign(interpreter, next.value());
+				left.assign(interpreter, IteratorHelper.iteratorValue(interpreter, iterResult));
 				try {
 					lastValue = body.execute(interpreter);
 				} catch (AbruptCompletion completion) {
-					if (completion.type == AbruptCompletion.Type.Continue) continue;
+					if (completion.type == AbruptCompletion.Type.Continue) {
+						iterResult = iterator.next(interpreter, null);
+						continue;
+					}
 					if (completion.type == AbruptCompletion.Type.Break) break;
 					else throw completion;
 				}
 			} finally {
 				interpreter.exitExecutionContext(context);
 			}
+			iterResult = iterator.next(interpreter, null);
 		}
 
 		return lastValue;

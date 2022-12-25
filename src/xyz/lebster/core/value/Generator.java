@@ -4,9 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-generator-objects")
@@ -17,21 +15,9 @@ public abstract class Generator extends ObjectValue {
 		super(intrinsics);
 
 		putMethod(intrinsics, SymbolValue.iterator, 0, (interpreter, arguments) -> this);
-		putMethod(intrinsics, Names.next, 1, (interpreter, arguments) -> {
-			// 27.5.1.2 Generator.prototype.next ( value )
-			final IteratorResult result = this.nextMethod(interpreter, arguments);
-
-			final ObjectValue object = new ObjectValue(interpreter.intrinsics);
-			object.put(Names.done, BooleanValue.of(result.done()));
-			object.put(Names.value, result.done() ? Undefined.instance : result.value());
-			return object;
-		});
+		putMethod(intrinsics, Names.next, 1, this::next);
 	}
 
-	/**
-	 * If a previous call to the next method of an Iterator has returned an IteratorResult object whose "done" property is true,
-	 * then all subsequent calls to the next method of that object should also return an IteratorResult object whose "done" property is true.
-	 * However, this requirement is not enforced.
-	 */
-	public abstract IteratorResult nextMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion;
+	// 27.5.1.2 Generator.prototype.next ( value )
+	public abstract ObjectValue next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion;
 }

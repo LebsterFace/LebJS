@@ -6,6 +6,7 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
@@ -37,24 +38,16 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		return Double.doubleToRawLongBits(d) == NEGATIVE_ZERO_BITS;
 	}
 
-	public static boolean isNegativeZero(Double d) {
-		return Double.doubleToRawLongBits(d) == NEGATIVE_ZERO_BITS;
-	}
-
-	public static boolean isNegativeZero(NumberValue n) {
-		return isNegativeZero(n.value);
+	public static boolean isNegativeZero(Value<?> v) {
+		return v instanceof final NumberValue n && isNegativeZero(n.value);
 	}
 
 	public static boolean isPositiveZero(double d) {
 		return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS;
 	}
 
-	public static boolean isPositiveZero(Double d) {
-		return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS;
-	}
-
-	public static boolean isPositiveZero(NumberValue n) {
-		return isPositiveZero(n.value);
+	public static boolean isPositiveZero(Value<?> v) {
+		return v instanceof final NumberValue n && isPositiveZero(n.value);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-tostring")

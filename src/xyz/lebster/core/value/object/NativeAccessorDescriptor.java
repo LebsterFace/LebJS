@@ -5,6 +5,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
+import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
@@ -17,20 +18,35 @@ import static xyz.lebster.core.value.function.NativeFunction.argument;
 public abstract class NativeAccessorDescriptor implements PropertyDescriptor {
 	private boolean enumerable;
 	private boolean configurable;
+	private final boolean hasGetter;
+	private final boolean hasSetter;
 
-	public NativeAccessorDescriptor(boolean enumerable, boolean configurable) {
+	public NativeAccessorDescriptor(boolean enumerable, boolean configurable, boolean hasGetter, boolean hasSetter) {
 		this.enumerable = enumerable;
 		this.configurable = configurable;
+		this.hasGetter = hasGetter;
+		this.hasSetter = hasSetter;
 	}
 
-	private NativeFunction getter(Interpreter interpreter) {
+	@Override
+	public Value<?> get(Interpreter interpreter, ObjectValue thisValue) throws AbruptCompletion {
+		return Undefined.instance;
+	}
+
+	@Override
+	public void set(Interpreter interpreter, ObjectValue thisValue, Value<?> newValue) throws AbruptCompletion {
+	}
+
+	private Value<?> getter(Interpreter interpreter) {
+		if (!this.hasGetter) return Undefined.instance;
 		// TODO: Name 'get xyz'
 		// TODO: 'this' value
 		return new NativeFunction(interpreter.intrinsics, StringValue.EMPTY, (i, arguments) ->
 			get(i, null), 0);
 	}
 
-	private NativeFunction setter(Interpreter interpreter) {
+	private Value<?> setter(Interpreter interpreter) {
+		if (!this.hasSetter) return Undefined.instance;
 		// TODO: Name 'set xyz'
 		// TODO: 'this' value
 		return new NativeFunction(interpreter.intrinsics, StringValue.EMPTY, (i, arguments) -> {

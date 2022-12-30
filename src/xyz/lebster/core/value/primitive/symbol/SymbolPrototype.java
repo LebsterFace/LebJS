@@ -16,7 +16,7 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-symbol-prototype-object")
 public final class SymbolPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype.description")
-	private static final NativeAccessorDescriptor DESCRIPTION = new NativeAccessorDescriptor(false, true) {
+	private static final NativeAccessorDescriptor DESCRIPTION = new NativeAccessorDescriptor(false, true, true, false) {
 		@Override
 		public Value<?> get(Interpreter interpreter, ObjectValue thisValue) throws AbruptCompletion {
 			// 1. Let s be the `this` value.
@@ -24,10 +24,6 @@ public final class SymbolPrototype extends ObjectValue {
 			final SymbolValue sym = thisSymbolValue(interpreter, thisValue, "Symbol.prototype.description");
 			// 3. Return sym.[[Description]].
 			return sym.description;
-		}
-
-		@Override
-		public void set(Interpreter interpreter, ObjectValue thisValue, Value<?> newValue) {
 		}
 	};
 

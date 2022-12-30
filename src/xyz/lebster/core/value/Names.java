@@ -4,11 +4,13 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 public final class Names {
 	// Properties and methods
+	public static final StringValue add = new StringValue("add");
 	public static final StringValue at = new StringValue("at");
 	public static final StringValue bind = new StringValue("bind");
 	public static final StringValue call = new StringValue("call");
 	public static final StringValue charAt = new StringValue("charAt");
 	public static final StringValue charCodeAt = new StringValue("charCodeAt");
+	public static final StringValue clear = new StringValue("clear");
 	public static final StringValue codePointAt = new StringValue("codePointAt");
 	public static final StringValue concat = new StringValue("concat");
 	public static final StringValue configurable = new StringValue("configurable");
@@ -17,6 +19,7 @@ public final class Names {
 	public static final StringValue create = new StringValue("create");
 	public static final StringValue cwd = new StringValue("cwd");
 	public static final StringValue declare = new StringValue("declare");
+	public static final StringValue delete = new StringValue("delete");
 	public static final StringValue description = new StringValue("description");
 	public static final StringValue details = new StringValue("details");
 	public static final StringValue done = new StringValue("done");
@@ -50,6 +53,7 @@ public final class Names {
 	public static final StringValue globalThis = new StringValue("globalThis");
 	public static final StringValue group = new StringValue("group");
 	public static final StringValue groupToMap = new StringValue("groupToMap");
+	public static final StringValue has = new StringValue("has");
 	public static final StringValue hasOwnProperty = new StringValue("hasOwnProperty");
 	public static final StringValue hasProperty = new StringValue("hasProperty");
 	public static final StringValue includes = new StringValue("includes");
@@ -95,6 +99,7 @@ public final class Names {
 	public static final StringValue set = new StringValue("set");
 	public static final StringValue setPrototypeOf = new StringValue("setPrototypeOf");
 	public static final StringValue shift = new StringValue("shift");
+	public static final StringValue size = new StringValue("size");
 	public static final StringValue slice = new StringValue("slice");
 	public static final StringValue some = new StringValue("some");
 	public static final StringValue sort = new StringValue("sort");
@@ -153,6 +158,7 @@ public final class Names {
 	public static final StringValue RangeError = new StringValue("RangeError");
 	public static final StringValue ReferenceError = new StringValue("ReferenceError");
 	public static final StringValue RegExp = new StringValue("RegExp");
+	public static final StringValue Set = new StringValue("Set");
 	public static final StringValue ShadowRealm = new StringValue("ShadowRealm");
 	public static final StringValue String = new StringValue("String");
 	public static final StringValue Symbol = new StringValue("Symbol");

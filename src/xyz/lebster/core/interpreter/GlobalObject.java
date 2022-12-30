@@ -98,7 +98,7 @@ public final class GlobalObject extends ObjectValue {
 		// 19.3.26 RegExp
 		put(Names.RegExp, intrinsics.regExpConstructor);
 		// 19.3.27 Set
-		// put(Names.Set, intrinsics.setConstructor);
+		put(Names.Set, intrinsics.setConstructor);
 		// 19.3.28 SharedArrayBuffer
 		// put(Names.SharedArrayBuffer, intrinsics.sharedArrayBufferConstructor);
 		// 19.3.29 String

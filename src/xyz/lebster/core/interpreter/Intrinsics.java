@@ -29,6 +29,8 @@ import xyz.lebster.core.value.primitive.symbol.SymbolConstructor;
 import xyz.lebster.core.value.primitive.symbol.SymbolPrototype;
 import xyz.lebster.core.value.regexp.RegExpConstructor;
 import xyz.lebster.core.value.regexp.RegExpPrototype;
+import xyz.lebster.core.value.set.SetConstructor;
+import xyz.lebster.core.value.set.SetPrototype;
 import xyz.lebster.core.value.shadowrealm.ShadowRealmConstructor;
 import xyz.lebster.core.value.shadowrealm.ShadowRealmPrototype;
 
@@ -45,6 +47,8 @@ public final class Intrinsics {
 	public final ObjectPrototype objectPrototype;
 	public final RegExpConstructor regExpConstructor;
 	public final RegExpPrototype regExpPrototype;
+	public final SetConstructor setConstructor;
+	public final SetPrototype setPrototype;
 	public final ShadowRealmConstructor shadowRealmConstructor;
 	public final ShadowRealmPrototype shadowRealmPrototype;
 	public final StringConstructor stringConstructor;
@@ -79,6 +83,7 @@ public final class Intrinsics {
 		linkPrototypeAndConstructor(rangeErrorConstructor = new RangeErrorConstructor(this), rangeErrorPrototype = new RangeErrorPrototype(this));
 		linkPrototypeAndConstructor(referenceErrorConstructor = new ReferenceErrorConstructor(this), referenceErrorPrototype = new ReferenceErrorPrototype(this));
 		linkPrototypeAndConstructor(regExpConstructor = new RegExpConstructor(this), regExpPrototype = new RegExpPrototype(this));
+		linkPrototypeAndConstructor(setConstructor = new SetConstructor(this), setPrototype = new SetPrototype(this));
 		linkPrototypeAndConstructor(shadowRealmConstructor = new ShadowRealmConstructor(this), shadowRealmPrototype = new ShadowRealmPrototype(this));
 		linkPrototypeAndConstructor(stringConstructor = new StringConstructor(this), stringPrototype = new StringPrototype(this));
 		linkPrototypeAndConstructor(symbolConstructor = new SymbolConstructor(this), symbolPrototype = new SymbolPrototype(this));

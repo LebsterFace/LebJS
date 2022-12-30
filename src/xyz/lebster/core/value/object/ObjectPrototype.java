@@ -133,7 +133,6 @@ public final class ObjectPrototype extends ObjectValue {
 			// 12. Else if O has a [[DateValue]] internal slot, let builtinTag be "Date".
 			// FIXME: Date Objects
 			// 13. Else if O has a [[RegExpMatcher]] internal slot, let builtinTag be "RegExp".
-			// FIXME: RegExp Objects
 			// 14. Else, let builtinTag be "Object".
 			final String builtinTag = (O instanceof final HasBuiltinTag hbt) ? hbt.getBuiltinTag() : "Object";
 			// 15. Let tag be ? Get(O, @@toStringTag).

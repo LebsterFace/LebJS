@@ -1,12 +1,10 @@
 package xyz.lebster.core.value.array;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Displayable;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
@@ -80,12 +78,6 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 	public ArrayObject(Interpreter interpreter, int length) {
 		this(interpreter, new Value<?>[length]);
-	}
-
-	private static void representEmpty(StringRepresentation representation, int emptyCount) {
-		representation.append(ANSI.BRIGHT_BLACK);
-		representation.append(emptyCount == 1 ? "empty" : "empty x " + emptyCount);
-		representation.append(ANSI.RESET);
 	}
 
 	@Override

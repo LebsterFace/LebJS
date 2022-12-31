@@ -94,16 +94,35 @@ final class ObjectNode implements DisplayNode {
 			representation.append('\n');
 		}
 
+		int emptyCount = 0;
 		while (valuesIt.hasNext()) {
+			final var next = valuesIt.next();
+			if (next == null) {
+				emptyCount++;
+				continue;
+			}
+
+			if (emptyCount > 0) {
+				if (!singleLine) representation.appendIndent();
+				displayEmpty(representation, emptyCount);
+				appendDelimiter(representation, singleLine, true);
+				emptyCount = 0;
+			}
+
 			if (!singleLine) representation.appendIndent();
-			valuesIt.next().display(singleLine, representation);
+			next.display(singleLine, representation);
 			appendDelimiter(representation, singleLine, valuesIt.hasNext() || propertiesIt.hasNext());
+		}
+
+		if (emptyCount > 0) {
+			if (!singleLine) representation.appendIndent();
+			displayEmpty(representation, emptyCount);
+			appendDelimiter(representation, singleLine, propertiesIt.hasNext());
 		}
 
 		while (propertiesIt.hasNext()) {
 			final var entry = propertiesIt.next();
 			if (!singleLine) representation.appendIndent();
-			representation.append(ANSI.BRIGHT_BLACK);
 			entry.getKey().displayForObjectKey(representation);
 			representation.append(ANSI.RESET);
 			representation.append(": ");
@@ -117,6 +136,12 @@ final class ObjectNode implements DisplayNode {
 		}
 
 		representation.append(isArray ? ']' : '}');
+	}
+
+	private static void displayEmpty(StringRepresentation representation, int emptyCount) {
+		representation.append(ANSI.BRIGHT_BLACK);
+		representation.append(emptyCount == 1 ? "empty" : "empty x " + emptyCount);
+		representation.append(ANSI.RESET);
 	}
 
 	private static boolean hidePrefix(ObjectValue value) {
@@ -185,6 +210,7 @@ public final class JSONDisplayer {
 	}
 
 	private DisplayNode buildTree(Displayable d) {
+		if (d == null) return null;
 		if (d instanceof final Value<?> value) return buildTree(value);
 		if (d instanceof final PropertyDescriptor descriptor) return buildTree(descriptor);
 		throw new ShouldNotHappen("Attempting to build tree for " + d.getClass().getSimpleName());

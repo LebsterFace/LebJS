@@ -16,14 +16,12 @@ import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.util.Objects;
 
-public abstract class Value<JType> {
+public abstract class Value<JType> implements Displayable {
 	public final JType value;
 
 	public Value(JType value) {
 		this.value = value;
 	}
-
-	public abstract void display(StringRepresentation representation);
 
 	public void displayForConsoleLog(StringRepresentation representation) {
 		this.display(representation);
@@ -226,12 +224,6 @@ public abstract class Value<JType> {
 
 	public final boolean isNullish() {
 		return this == Undefined.instance || this == Null.instance;
-	}
-
-	public final String toDisplayString() {
-		final var representation = new StringRepresentation();
-		this.display(representation);
-		return representation.toString();
 	}
 
 	public enum PreferredType { String, Number }

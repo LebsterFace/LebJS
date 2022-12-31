@@ -354,7 +354,7 @@ public final class Lexer {
 
 	private Token consumeRegexpLiteral() {
 		final StringBuilder builder = new StringBuilder();
-		collect(builder);
+		consume();
 
 		boolean escaped = false;
 		while (hasNext()) {
@@ -365,7 +365,7 @@ public final class Lexer {
 				escaped = true;
 				consume();
 			} else if (codePoint == '/') {
-				collect(builder);
+				consume();
 				break;
 			} else {
 				collect(builder);

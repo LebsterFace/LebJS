@@ -859,7 +859,7 @@ public final class Parser {
 
 	private RegExpLiteral parseRegexpLiteral() throws SyntaxError {
 		final String pattern = state.require(TokenType.RegexpPattern);
-		final String flags = state.require(TokenType.RegexpFlags);
+		final String flags = state.is(TokenType.RegexpFlags) ? state.consume().value : "";
 		return new RegExpLiteral(pattern, flags);
 	}
 

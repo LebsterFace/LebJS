@@ -1,15 +1,12 @@
 package xyz.lebster.core.value.object;
 
-import xyz.lebster.core.ANSI;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
-
-import java.util.HashSet;
 
 public final class DataDescriptor implements PropertyDescriptor {
 	private Value<?> value;
@@ -22,36 +19,6 @@ public final class DataDescriptor implements PropertyDescriptor {
 		this.writable = writable;
 		this.enumerable = enumerable;
 		this.configurable = configurable;
-	}
-
-	public static void display(Value<?> value, StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
-		if (!(value instanceof final ObjectValue object)) {
-			value.display(representation);
-			return;
-		}
-
-		if (parents.contains(object)) {
-			representation.append(ANSI.RED);
-
-			if (
-				object.getClass() == ObjectValue.class ||
-				object.getClass() == ArrayObject.class ||
-				object.getClass() == parent.getClass()
-			) {
-				// TODO: Shortest-path property collapsing
-				//       e.g. obj = { self: <obj>, child: {}, array: [<obj.child>] }
-				//       or '<ref *1>' & '[Circular *1]'
-				representation.append(value == parent ? "[self]" : "[parent]");
-			} else {
-				ObjectValue.representClassName(representation, object.getClass().getSimpleName());
-			}
-
-			representation.append(ANSI.RESET);
-			return;
-		}
-
-		// noinspection unchecked
-		object.displayRecursive(representation, (HashSet<ObjectValue>) parents.clone(), singleLine);
 	}
 
 	@Override
@@ -103,9 +70,8 @@ public final class DataDescriptor implements PropertyDescriptor {
 	}
 
 	@Override
-	public void display(StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
-		parents.add(parent);
-		DataDescriptor.display(this.value, representation, parent, parents, singleLine);
+	public void display(StringRepresentation representation) {
+		throw new ShouldNotHappen("DataDescriptor#display is handled by JSONDisplayer");
 	}
 
 	@Override

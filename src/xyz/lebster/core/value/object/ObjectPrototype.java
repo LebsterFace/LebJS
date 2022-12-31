@@ -124,14 +124,13 @@ public final class ObjectPrototype extends ObjectValue {
 			final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 			// 4. Let isArray be ? IsArray(O).
 			// 5. If isArray is true, let builtinTag be "Array".
-			// 6. Else if O has a [[ParameterMap]] internal slot, let builtinTag be "Arguments".
+			// TODO: 6. Else if O has a [[ParameterMap]] internal slot, let builtinTag be "Arguments".
 			// 7. Else if O has a [[Call]] internal method, let builtinTag be "Function".
 			// 8. Else if O has an [[ErrorData]] internal slot, let builtinTag be "Error".
 			// 9. Else if O has a [[BooleanData]] internal slot, let builtinTag be "Boolean".
 			// 10. Else if O has a [[NumberData]] internal slot, let builtinTag be "Number".
 			// 11. Else if O has a [[StringData]] internal slot, let builtinTag be "String".
-			// 12. Else if O has a [[DateValue]] internal slot, let builtinTag be "Date".
-			// FIXME: Date Objects
+			// TODO: 12. Else if O has a [[DateValue]] internal slot, let builtinTag be "Date".
 			// 13. Else if O has a [[RegExpMatcher]] internal slot, let builtinTag be "RegExp".
 			// 14. Else, let builtinTag be "Object".
 			final String builtinTag = (O instanceof final HasBuiltinTag hbt) ? hbt.getBuiltinTag() : "Object";

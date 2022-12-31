@@ -8,11 +8,11 @@ import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Token;
+import xyz.lebster.core.value.JSONDisplayer;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.util.HashSet;
 import java.util.Scanner;
 
 public final class REPL {
@@ -53,7 +53,7 @@ public final class REPL {
 					final Value<?> lastValue = realm.execute(input.substring(".inspect ".length()), options.showAST());
 					if (lastValue instanceof final ObjectValue LVO) {
 						final var representation = new StringRepresentation();
-						ObjectValue.staticDisplayRecursive(LVO, representation, new HashSet<>(), false);
+						JSONDisplayer.display(representation, LVO, false, true);
 						System.out.println(representation);
 					} else {
 						System.out.println(lastValue.toDisplayString());

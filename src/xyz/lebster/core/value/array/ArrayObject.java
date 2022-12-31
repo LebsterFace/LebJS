@@ -7,6 +7,7 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.value.Displayable;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
@@ -19,7 +20,11 @@ import xyz.lebster.core.value.object.PropertyDescriptor;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
@@ -146,58 +151,13 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 	}
 
 	@Override
-	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		representation.append("[ ");
-
-		parents.add(this);
-		if (!singleLine) {
-			representation.append('\n');
-			representation.indent();
-		}
-
-		this.representValues(representation, parents, singleLine);
-
-		if (!singleLine) {
-			representation.unindent();
-			representation.appendIndent();
-		}
-
-		representation.append(']');
+	public Iterable<Displayable> displayableValues() {
+		return Collections.unmodifiableList(arrayValues);
 	}
 
-	@SuppressWarnings("unchecked")
-	private void representValues(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> propertiesIterator = nonLengthProperties().iterator();
-		final Iterator<PropertyDescriptor> elementsIterator = arrayValues.iterator();
-		int emptyCount = 0;
-		while (elementsIterator.hasNext()) {
-			if (!singleLine) representation.appendIndent();
-			final PropertyDescriptor next = elementsIterator.next();
-			if (next == null) {
-				emptyCount++;
-				continue;
-			}
-
-			if (emptyCount > 0) {
-				representEmpty(representation, emptyCount);
-				representPropertyDelimiter(true, representation, singleLine);
-				emptyCount = 0;
-			}
-
-			next.display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
-			representPropertyDelimiter(elementsIterator.hasNext() || propertiesIterator.hasNext(), representation, singleLine);
-		}
-
-		if (emptyCount > 0) {
-			representEmpty(representation, emptyCount);
-			representPropertyDelimiter(propertiesIterator.hasNext(), representation, singleLine);
-		}
-
-		representProperties(representation, parents, singleLine, propertiesIterator);
-	}
-
-	private ArrayList<Map.Entry<Key<?>, PropertyDescriptor>> nonLengthProperties() {
-		final ArrayList<Map.Entry<Key<?>, PropertyDescriptor>> nonLengthProperties = new ArrayList<>();
+	@Override
+	public Iterable<Entry<Key<?>, PropertyDescriptor>> displayableProperties() {
+		final ArrayList<Entry<Key<?>, PropertyDescriptor>> nonLengthProperties = new ArrayList<>();
 		for (final var entry : value.entrySet()) {
 			if (entry.getKey().equalsKey(Names.length)) continue;
 			nonLengthProperties.add(entry);

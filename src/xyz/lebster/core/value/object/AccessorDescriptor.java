@@ -4,14 +4,14 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.value.Displayable;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 
-import java.util.HashSet;
-
-public final class AccessorDescriptor implements PropertyDescriptor {
+public final class AccessorDescriptor implements PropertyDescriptor, Displayable {
 	private final Executable getter;
 	private final Executable setter;
 	private boolean enumerable;
@@ -55,30 +55,35 @@ public final class AccessorDescriptor implements PropertyDescriptor {
 
 	@Override
 	public Value<?> get(Interpreter interpreter, ObjectValue thisValue) throws AbruptCompletion {
-		return this.getter.call(interpreter, thisValue);
+		if (getter == null) return Undefined.instance;
+		return getter.call(interpreter, thisValue);
 	}
 
 	@Override
 	public void set(Interpreter interpreter, ObjectValue thisValue, Value<?> newValue) throws AbruptCompletion {
-		this.setter.call(interpreter, thisValue, newValue);
-	}
-
-	@Override
-	public void display(StringRepresentation representation, ObjectValue parent, HashSet<ObjectValue> parents, boolean singleLine) {
-		representation.append(ANSI.CYAN);
-		representation.append("[Getter/Setter]");
-		representation.append(ANSI.RESET);
+		if (setter != null) {
+			setter.call(interpreter, thisValue, newValue);
+		}
 	}
 
 	@Override
 	public ObjectValue fromPropertyDescriptor(Interpreter interpreter) throws AbruptCompletion {
 		final var obj = new ObjectValue(interpreter.intrinsics);
 		// TODO: Make CreateDataPropertyOrThrow
-		obj.set(interpreter, Names.get, getter);
-		obj.set(interpreter, Names.set, setter);
+		obj.set(interpreter, Names.get, getter == null ? Undefined.instance : getter);
+		obj.set(interpreter, Names.set, setter == null ? Undefined.instance : setter);
 		obj.set(interpreter, Names.writable, BooleanValue.of(isWritable()));
 		obj.set(interpreter, Names.enumerable, BooleanValue.of(isEnumerable()));
 		obj.set(interpreter, Names.configurable, BooleanValue.of(isConfigurable()));
 		return obj;
+	}
+
+	@Override
+	public void display(StringRepresentation representation) {
+		representation.append(ANSI.CYAN);
+		representation.append("[Getter");
+		if (setter != null) representation.append("/Setter");
+		representation.append(']');
+		representation.append(ANSI.RESET);
 	}
 }

@@ -7,8 +7,6 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.util.HashSet;
-
 public class ErrorObject extends ObjectValue implements HasBuiltinTag {
 	public final String message;
 
@@ -31,8 +29,8 @@ public class ErrorObject extends ObjectValue implements HasBuiltinTag {
 	}
 
 	@Override
-	public final void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		this.display(representation);
+	public boolean displayAsJSON() {
+		return false;
 	}
 
 	@Override

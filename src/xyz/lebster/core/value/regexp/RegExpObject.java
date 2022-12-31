@@ -1,6 +1,8 @@
 package xyz.lebster.core.value.regexp;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Intrinsics;
+import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.object.ObjectValue;
 
@@ -17,5 +19,20 @@ public final class RegExpObject extends ObjectValue implements HasBuiltinTag {
 	@Override
 	public String getBuiltinTag() {
 		return "RegExp";
+	}
+
+	@Override
+	public void display(StringRepresentation representation) {
+		representation.append(ANSI.RED);
+		representation.append('/');
+		representation.append(pattern);
+		representation.append('/');
+		representation.append(flags);
+		representation.append(ANSI.RESET);
+	}
+
+	@Override
+	public boolean displayAsJSON() {
+		return false;
 	}
 }

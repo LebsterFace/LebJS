@@ -3,13 +3,13 @@ package xyz.lebster.core.value.object;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.*;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.CheckedError;
 import xyz.lebster.core.value.error.type.TypeError;
@@ -26,6 +26,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
@@ -42,83 +43,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 	public ObjectValue(Intrinsics intrinsics) {
 		this(intrinsics.objectPrototype);
-	}
-
-	public static void staticDisplayRecursive(ObjectValue objectValue, StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		if (objectValue.prototypeSlot == null) {
-			representation.append(ANSI.CYAN);
-			representation.append('[');
-			representation.append(objectValue.getClass().getSimpleName());
-			representation.append(": ");
-			representation.append(ANSI.BRIGHT_WHITE);
-			representation.append("null");
-			representation.append(ANSI.CYAN);
-			representation.append(" prototype]");
-			representation.append(ANSI.RESET);
-			representation.append(' ');
-		} else if (
-			// Avoid 'Object { }':
-			!(objectValue.prototypeSlot instanceof ObjectPrototype) &&
-			objectValue.prototypeSlot.getProperty(Names.constructor) instanceof final DataDescriptor constructorProperty &&
-			constructorProperty.value() instanceof final ObjectValue constructor &&
-			constructor.getProperty(Names.name) instanceof final DataDescriptor nameProperty &&
-			nameProperty.value() instanceof final StringValue name
-		) {
-			representClassName(representation, name.value);
-			representation.append(' ');
-		} else if (objectValue.getClass() != ObjectValue.class) {
-			representClassName(representation, objectValue.getClass().getSimpleName());
-			representation.append(' ');
-		}
-
-		representation.append('{');
-		if (objectValue.value.isEmpty()) {
-			representation.append('}');
-			return;
-		}
-
-		representation.append(' ');
-		parents.add(objectValue);
-		if (!singleLine) {
-			representation.append('\n');
-			representation.indent();
-		}
-
-		objectValue.representProperties(representation, parents, singleLine, objectValue.value.entrySet().iterator());
-
-		if (!singleLine) {
-			representation.unindent();
-			representation.appendIndent();
-		}
-
-		representation.append('}');
-	}
-
-	public static void representClassName(StringRepresentation representation, String className) {
-		representation.append(ANSI.CYAN);
-		representation.append(className);
-		representation.append(ANSI.RESET);
-	}
-
-	protected static void representPropertyDelimiter(boolean moreElements, StringRepresentation representation, boolean singleLine) {
-		if (moreElements) representation.append(',');
-		if (singleLine) representation.append(' ');
-		else representation.append('\n');
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void representProperties(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine, Iterator<Map.Entry<Key<?>, PropertyDescriptor>> iterator) {
-		while (iterator.hasNext()) {
-			final Map.Entry<Key<?>, PropertyDescriptor> entry = iterator.next();
-			if (!singleLine) representation.appendIndent();
-			representation.append(ANSI.BRIGHT_BLACK);
-			entry.getKey().displayForObjectKey(representation);
-			representation.append(ANSI.RESET);
-			representation.append(": ");
-
-			entry.getValue().display(representation, this, (HashSet<ObjectValue>) parents.clone(), singleLine);
-			representPropertyDelimiter(iterator.hasNext(), representation, singleLine);
-		}
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarygetprototypeof")
@@ -216,9 +140,9 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 		// 3. If hint is string, then Let methodNames be "toString", "valueOf".
 		final StringValue[] methodNames = hint == PreferredType.String ?
-			new StringValue[] { Names.toString, Names.valueOf } :
+			new StringValue[]{ Names.toString, Names.valueOf } :
 			// 4. Else, Let methodNames be "valueOf", "toString".
-			new StringValue[] { Names.valueOf, Names.toString };
+			new StringValue[]{ Names.valueOf, Names.toString };
 
 		// 5. For each element name of methodNames, do
 		for (final StringValue name : methodNames) {
@@ -323,10 +247,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		if (property.isWritable()) {
 			property.set(interpreter, this, value);
 		} else {
-			final var representation = new StringRepresentation();
-			representation.append("Cannot assign to read-only property ");
-			key.display(representation);
-			throw error(new TypeError(interpreter, representation.toString()));
+			throw error(new TypeError(interpreter, "Cannot assign to read-only property " + key.toDisplayString()));
 		}
 	}
 
@@ -458,6 +379,39 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return result;
 	}
 
+	@Override
+	public void display(StringRepresentation representation) {
+		if (displayAsJSON()) {
+			JSONDisplayer.display(representation, this);
+		} else {
+			throw new NotImplemented("display() for " + getClass().getSimpleName());
+		}
+	}
+
+	public boolean displayAsJSON() {
+		return true;
+	}
+
+	public Iterable<Entry<Key<?>, PropertyDescriptor>> displayableProperties() {
+		return value.entrySet();
+	}
+
+	public Iterable<Displayable> displayableValues() {
+		return Collections.emptyList();
+	}
+
+	public void displayPrefix(StringRepresentation representation) {
+		representation.append(ANSI.CYAN);
+		representation.append(getName());
+		representation.append(ANSI.RESET);
+	}
+
+	private String getName() {
+		if (this instanceof final HasBuiltinTag hbt) return hbt.getBuiltinTag();
+		if (this.getClass() == ObjectValue.class) return "Object";
+		return getClass().getSimpleName();
+	}
+
 	protected enum EnumerableOwnPropertyNamesKind { KEY, VALUE, KEY_VALUE }
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
@@ -477,13 +431,13 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			if (desc != null && desc.isEnumerable()) {
 				// 1. If kind is key, append key to properties.
 				if (kind == EnumerableOwnPropertyNamesKind.KEY) properties.add(key);
-				// 2. Else,
+					// 2. Else,
 				else {
 					// a. Let value be ? Get(O, key).
 					final Value<?> value = this.get(interpreter, key);
 					// b. If kind is value, append value to properties.
 					if (kind == EnumerableOwnPropertyNamesKind.VALUE) properties.add(value);
-					// c. Else,
+						// c. Else,
 					else {
 						// i. Assert: kind is key+value.
 						// ii. Let entry be CreateArrayFromList(« key, value »).
@@ -533,7 +487,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			items.sort((Value<?> a, Value<?> b) -> {
 				Value<?> returnValue;
 				try {
-					returnValue = SortCompare.execute(interpreter, new Value[] { a, b });
+					returnValue = SortCompare.execute(interpreter, new Value[]{ a, b });
 				} catch (AbruptCompletion e) {
 					if (e.type != AbruptCompletion.Type.Return) throw new RuntimeException(e);
 					returnValue = e.value;
@@ -573,22 +527,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 		// 9. Return obj.
 		return this;
-	}
-
-	@Override
-	public void display(StringRepresentation representation) {
-		final var singleLine = new StringRepresentation();
-		this.displayRecursive(singleLine, new HashSet<>(), true);
-		if (singleLine.length() < 72) {
-			representation.append(singleLine);
-			return;
-		}
-
-		this.displayRecursive(representation, new HashSet<>(), false);
-	}
-
-	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		ObjectValue.staticDisplayRecursive(this, representation, parents, singleLine);
 	}
 
 	public static abstract class Key<R> extends PrimitiveValue<R> {

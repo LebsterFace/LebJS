@@ -1,19 +1,15 @@
 package xyz.lebster.core.value.set;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.value.Displayable;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.object.DataDescriptor;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.object.PropertyDescriptor;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.Collections;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-set-objects")
 public final class SetObject extends ObjectValue {
@@ -40,46 +36,15 @@ public final class SetObject extends ObjectValue {
 	}
 
 	@Override
-	public void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		representation.append(ANSI.CYAN);
+	public Iterable<Displayable> displayableValues() {
+		return Collections.unmodifiableList(setData);
+	}
+
+	@Override
+	public void displayPrefix(StringRepresentation representation) {
 		representation.append("Set");
-		representation.append(ANSI.RESET);
 		representation.append('(');
 		getSize().display(representation);
-		representation.append(") { ");
-
-		parents.add(this);
-		if (!singleLine) {
-			representation.append('\n');
-			representation.indent();
-		}
-
-		this.representValues(representation, parents, singleLine);
-
-		if (!singleLine) {
-			representation.unindent();
-			representation.appendIndent();
-		}
-
-		representation.append('}');
+		representation.append(')');
 	}
-
-	@SuppressWarnings("unchecked")
-	private void representValues(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		final Iterator<Map.Entry<Key<?>, PropertyDescriptor>> propertiesIterator = value.entrySet().iterator();
-		final Iterator<Value<?>> elementsIterator = setData.iterator();
-		while (elementsIterator.hasNext()) {
-			if (!singleLine) representation.appendIndent();
-			final Value<?> next = elementsIterator.next();
-			if (next == null) continue;
-
-			HashSet<ObjectValue> newParents = (HashSet<ObjectValue>) parents.clone();
-			newParents.add(this);
-			DataDescriptor.display(next, representation, this, newParents, singleLine);
-			representPropertyDelimiter(elementsIterator.hasNext() || propertiesIterator.hasNext(), representation, singleLine);
-		}
-
-		representProperties(representation, parents, singleLine, propertiesIterator);
-	}
-
 }

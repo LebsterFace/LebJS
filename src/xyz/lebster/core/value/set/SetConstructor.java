@@ -10,10 +10,7 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
-import xyz.lebster.core.value.function.NativeFunction;
-import xyz.lebster.core.value.object.AccessorDescriptor;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.util.ArrayList;
 

@@ -22,8 +22,6 @@ import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.util.HashSet;
-
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public abstract class Executable extends ObjectValue implements HasBuiltinTag {
@@ -78,8 +76,8 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	}
 
 	@Override
-	public final void displayRecursive(StringRepresentation representation, HashSet<ObjectValue> parents, boolean singleLine) {
-		this.display(representation);
+	public boolean displayAsJSON() {
+		return false;
 	}
 
 	public abstract StringValue toStringMethod();

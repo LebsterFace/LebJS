@@ -50,7 +50,7 @@ public final class SetObject extends ObjectValue {
 
 		parents.add(this);
 		if (!singleLine) {
-			representation.appendLine();
+			representation.append('\n');
 			representation.indent();
 		}
 

@@ -80,7 +80,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		representation.append(' ');
 		parents.add(objectValue);
 		if (!singleLine) {
-			representation.appendLine();
+			representation.append('\n');
 			representation.indent();
 		}
 
@@ -103,7 +103,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 	protected static void representPropertyDelimiter(boolean moreElements, StringRepresentation representation, boolean singleLine) {
 		if (moreElements) representation.append(',');
 		if (singleLine) representation.append(' ');
-		else representation.appendLine();
+		else representation.append('\n');
 	}
 
 	@SuppressWarnings("unchecked")

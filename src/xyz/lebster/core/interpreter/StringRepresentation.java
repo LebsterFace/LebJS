@@ -7,25 +7,12 @@ public final class StringRepresentation implements CharSequence {
 	private final StringBuilder builder = new StringBuilder();
 	private int currentIndent = 0;
 
-	public void append(String s) {
-		builder.append(s);
-	}
-
 	public void append(Object o) {
 		builder.append(o);
 	}
 
 	public void append(Dumpable dumpable) {
 		dumpable.represent(this);
-	}
-
-	public void appendLine(Object o) {
-		append(o);
-		appendLine();
-	}
-
-	public void appendLine() {
-		builder.append('\n');
 	}
 
 	public void indent() {

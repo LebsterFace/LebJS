@@ -88,14 +88,14 @@ public record ClassExpression(
 		}
 		representation.append('{');
 		representation.indent();
-		representation.appendLine();
+		representation.append('\n');
 		constructor.represent(representation);
 		for (ClassMethodNode method : methods) {
-			representation.appendLine();
+			representation.append('\n');
 			method.represent(representation);
 		}
 		representation.unindent();
-		representation.appendLine();
+		representation.append('\n');
 		representation.append('}');
 	}
 

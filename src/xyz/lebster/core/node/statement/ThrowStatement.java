@@ -26,6 +26,6 @@ public record ThrowStatement(Expression value) implements Statement {
 	public void represent(StringRepresentation representation) {
 		representation.append("throw ");
 		value.represent(representation);
-		representation.appendLine();
+		representation.append('\n');
 	}
 }

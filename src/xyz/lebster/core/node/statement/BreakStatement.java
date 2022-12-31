@@ -24,6 +24,7 @@ public final class BreakStatement implements Statement {
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		representation.appendLine("break;");
+		representation.append("break;");
+		representation.append('\n');
 	}
 }

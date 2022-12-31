@@ -140,7 +140,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 		parents.add(this);
 		if (!singleLine) {
-			representation.appendLine();
+			representation.append('\n');
 			representation.indent();
 		}
 

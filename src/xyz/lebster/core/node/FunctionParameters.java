@@ -48,10 +48,10 @@ public final class FunctionParameters implements Dumpable, Iterable<FunctionPara
 	@Override
 	public void represent(StringRepresentation representation) {
 		if (formalParameters.size() > 0) {
-			representation.append(formalParameters.get(0));
+			formalParameters.get(0).represent(representation);
 			for (int i = 1; i < formalParameters.size(); i++) {
 				representation.append(", ");
-				representation.append(formalParameters.get(i));
+				formalParameters.get(i).represent(representation);
 			}
 		}
 	}

@@ -62,6 +62,7 @@ public record SwitchStatement(Expression discriminant, SwitchCase... cases) impl
 	public void represent(StringRepresentation representation) {
 		representation.append(ANSI.BACKGROUND_BRIGHT_YELLOW);
 		representation.append("[SwitchStatement];");
-		representation.appendLine(ANSI.RESET);
+		representation.append(ANSI.RESET);
+		representation.append('\n');
 	}
 }

@@ -43,6 +43,7 @@ public record DoWhileStatement(Statement body, Expression condition) implements 
 		body.represent(representation);
 		representation.append(" while (");
 		condition.represent(representation);
-		representation.appendLine(");");
+		representation.append(");");
+		representation.append('\n');
 	}
 }

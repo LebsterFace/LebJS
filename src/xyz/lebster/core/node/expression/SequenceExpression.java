@@ -29,8 +29,8 @@ public record SequenceExpression(Expression left, Expression right) implements E
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		representation.append(left);
+		left.represent(representation);
 		representation.append(',');
-		representation.append(right);
+		right.represent(representation);
 	}
 }

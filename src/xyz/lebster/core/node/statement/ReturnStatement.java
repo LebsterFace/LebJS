@@ -30,6 +30,6 @@ public record ReturnStatement(Expression value) implements Statement {
 			value.represent(representation);
 		}
 		representation.append(';');
-		representation.appendLine();
+		representation.append('\n');
 	}
 }

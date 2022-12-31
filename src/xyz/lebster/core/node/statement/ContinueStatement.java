@@ -24,6 +24,7 @@ public final class ContinueStatement implements Statement {
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		representation.appendLine("continue;");
+		representation.append("continue;");
+		representation.append('\n');
 	}
 }

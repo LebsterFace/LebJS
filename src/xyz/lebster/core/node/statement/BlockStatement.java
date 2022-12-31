@@ -42,12 +42,13 @@ public record BlockStatement(List<Statement> children) implements Statement, App
 	@Override
 	public void represent(StringRepresentation representation) {
 		representation.indent();
-		representation.appendLine("{");
+		representation.append("{");
+		representation.append('\n');
 
 		for (ASTNode child : children) {
 			representation.appendIndent();
 			child.represent(representation);
-			representation.appendLine();
+			representation.append('\n');
 		}
 
 		representation.unindent();

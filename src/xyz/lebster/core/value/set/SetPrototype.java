@@ -8,9 +8,11 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
-import xyz.lebster.core.value.object.NativeAccessorDescriptor;
+import xyz.lebster.core.value.function.NativeFunction;
+import xyz.lebster.core.value.object.AccessorDescriptor;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
@@ -33,21 +35,24 @@ public class SetPrototype extends ObjectValue {
 		final var values = putMethod(intrinsics, Names.values, 0, SetPrototype::values);
 		put(SymbolValue.iterator, values, false, false, true);
 		put(SymbolValue.toStringTag, Names.Set, false, false, true);
+		this.value.put(Names.size, new AccessorDescriptor(
+			new NativeFunction(intrinsics, StringValue.EMPTY, SetPrototype::getSize, 0),
+			null,
+			false,
+			true
+		));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-get-set.prototype.size")
+	public static NumberValue getSize(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let S be the `this` value.
+		final Value<?> S = interpreter.thisValue();
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		this.value.put(Names.size, new NativeAccessorDescriptor(false, true, true, false) {
-			@Override
-			public NumberValue get(Interpreter interpreter, ObjectValue thisValue) throws AbruptCompletion {
-				// 1. Let S be the `this` value.
-				final var S = thisValue;
-				// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-				if (S instanceof final SetObject setObject) {
-					return setObject.getSize();
-				} else {
-					throw error(new TypeError(interpreter, "Set.prototype.size requires that 'this' be a Set"));
-				}
-			}
-		});
+		if (!(S instanceof final SetObject setObject)) {
+			throw error(new TypeError(interpreter, "Set.prototype.size requires that 'this' be a Set"));
+		}
+
+		return setObject.getSize();
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.add")

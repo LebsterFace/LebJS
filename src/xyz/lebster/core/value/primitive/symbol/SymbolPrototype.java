@@ -7,7 +7,8 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
-import xyz.lebster.core.value.object.NativeAccessorDescriptor;
+import xyz.lebster.core.value.function.NativeFunction;
+import xyz.lebster.core.value.object.AccessorDescriptor;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -15,25 +16,28 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-symbol-prototype-object")
 public final class SymbolPrototype extends ObjectValue {
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype.description")
-	private static final NativeAccessorDescriptor DESCRIPTION = new NativeAccessorDescriptor(false, true, true, false) {
-		@Override
-		public Value<?> get(Interpreter interpreter, ObjectValue thisValue) throws AbruptCompletion {
-			// 1. Let s be the `this` value.
-			// 2. Let sym be ? thisSymbolValue(s).
-			final SymbolValue sym = thisSymbolValue(interpreter, thisValue, "Symbol.prototype.description");
-			// 3. Return sym.[[Description]].
-			return sym.description;
-		}
-	};
-
 	public SymbolPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
-		this.value.put(Names.description, SymbolPrototype.DESCRIPTION);
 		putMethod(intrinsics, Names.toString, 0, SymbolPrototype::toStringMethod);
 		putMethod(intrinsics, Names.valueOf, 0, SymbolPrototype::valueOf);
 		putMethod(intrinsics, SymbolValue.toPrimitive, 1, SymbolPrototype::toPrimitiveMethod);
 		put(SymbolValue.toStringTag, Names.Symbol, false, false, true);
+		this.value.put(Names.description, new AccessorDescriptor(
+			new NativeFunction(intrinsics, new StringValue("get description"), SymbolPrototype::getDescription, 0),
+			null,
+			false,
+			true
+		));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype.description")
+	private static Value<?> getDescription(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 1. Let s be the `this` value.
+		final Value<?> s = interpreter.thisValue();
+		// 2. Let sym be ? thisSymbolValue(s).
+		final SymbolValue sym = thisSymbolValue(interpreter, s, "Symbol.prototype.description");
+		// 3. Return sym.[[Description]].
+		return sym.description;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype.valueof")

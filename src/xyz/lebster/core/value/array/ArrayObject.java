@@ -10,15 +10,18 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.object.AccessorDescriptor;
 import xyz.lebster.core.value.object.DataDescriptor;
-import xyz.lebster.core.value.object.NativeAccessorDescriptor;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.object.PropertyDescriptor;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.*;
+
+import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Iterable<PropertyDescriptor> {
 	private final ArrayList<PropertyDescriptor> arrayValues;
@@ -35,27 +38,35 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 			}
 		}
 
-		this.value.put(Names.length, new NativeAccessorDescriptor(false, false, true, true) {
-			@Override
-			public Value<?> get(Interpreter interpreter, ObjectValue thisValue) {
-				return new NumberValue(arrayValues.size());
-			}
+		value.put(Names.length, new AccessorDescriptor(
+			new NativeFunction(interpreter.intrinsics, StringValue.EMPTY, this::getLength, 0),
+			new NativeFunction(interpreter.intrinsics, StringValue.EMPTY, this::arraySetLength, 1),
+			false,
+			false
+		));
+	}
 
-			@Override
-			@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-arraysetlength")
-			public void set(Interpreter interpreter, ObjectValue thisValue, Value<?> value1) throws AbruptCompletion {
-				final int newLen = (int) Math.floor(value1.toNumberValue(interpreter).value);
-				if (newLen == arrayValues.size()) return;
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-arraysetlength")
+	public Undefined arraySetLength(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		final var newLength = argument(0, arguments);
 
-				if (newLen > arrayValues.size()) {
-					final int delta = newLen - arrayValues.size();
-					for (int i = 0; i < delta; i++)
-						arrayValues.add(null);
-				} else {
-					arrayValues.subList(newLen, arrayValues.size()).clear();
-				}
-			}
-		});
+		final int newLen = (int) Math.floor(newLength.toNumberValue(interpreter).value);
+		if (newLen == arrayValues.size()) return Undefined.instance;
+
+		if (newLen > arrayValues.size()) {
+			final int delta = newLen - arrayValues.size();
+			for (int i = 0; i < delta; i++)
+				arrayValues.add(null);
+		} else {
+			arrayValues.subList(newLen, arrayValues.size()).clear();
+		}
+
+		return Undefined.instance;
+	}
+
+	private NumberValue getLength(Interpreter interpreter1, Value<?>[] arguments) {
+		return new NumberValue(arrayValues.size());
 	}
 
 	public <T extends Value<?>> ArrayObject(Interpreter interpreter, List<T> arrayValues) {

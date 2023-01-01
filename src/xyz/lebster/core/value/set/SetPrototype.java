@@ -1,5 +1,6 @@
 package xyz.lebster.core.value.set;
 
+import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -11,6 +12,7 @@ import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.object.AccessorDescriptor;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
@@ -19,7 +21,7 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-set-prototype-object")
-public class SetPrototype extends ObjectValue {
+public final class SetPrototype extends ObjectValue {
 	public SetPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
 
@@ -30,7 +32,13 @@ public class SetPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.forEach, 1, SetPrototype::forEach);
 		putMethod(intrinsics, Names.has, 1, SetPrototype::has);
 		putMethod(intrinsics, Names.keys, 0, SetPrototype::keys);
-
+		putMethod(intrinsics, Names.union, 1, SetPrototype::union);
+		putMethod(intrinsics, Names.intersection, 1, SetPrototype::intersection);
+		putMethod(intrinsics, Names.difference, 1, SetPrototype::difference);
+		putMethod(intrinsics, Names.symmetricDifference, 1, SetPrototype::symmetricDifference);
+		putMethod(intrinsics, Names.isSubsetOf, 1, SetPrototype::isSubsetOf);
+		putMethod(intrinsics, Names.isSupersetOf, 1, SetPrototype::isSupersetOf);
+		putMethod(intrinsics, Names.isDisjointFrom, 1, SetPrototype::isDisjointFrom);
 
 		final var values = putMethod(intrinsics, Names.values, 0, SetPrototype::values);
 		put(SymbolValue.iterator, values, false, false, true);
@@ -55,6 +63,11 @@ public class SetPrototype extends ObjectValue {
 		return setObject.getSize();
 	}
 
+	private static SetObject requireSetData(Interpreter interpreter, String methodName) throws AbruptCompletion {
+		if (interpreter.thisValue() instanceof final SetObject S) return S;
+		throw error(new TypeError(interpreter, "Set.prototype%s requires that 'this' be a Set.".formatted(methodName)));
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.add")
 	private static Value<?> add(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 24.2.3.1 Set.prototype.add ( value )
@@ -62,9 +75,7 @@ public class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		if (!(interpreter.thisValue() instanceof final SetObject S)) {
-			throw error(new TypeError(interpreter, "Set.prototype.add requires that 'this' be a Set."));
-		}
+		final SetObject S = requireSetData(interpreter, ".add");
 
 		// 3. Let entries be the List that is S.[[SetData]].
 		final var entries = S.setData;
@@ -135,5 +146,68 @@ public class SetPrototype extends ObjectValue {
 		// 24.2.3.10 Set.prototype.values ( )
 
 		throw new NotImplemented("Set.prototype.values");
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.union")
+	public static SetObject union(Interpreter interpreter, Value<?>[] arguments) {
+		// 1 Set.prototype.union ( other )
+		final Value<?> other = argument(0, arguments);
+
+		throw new NotImplemented("Set.prototype.union");
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.intersection")
+	public static SetObject intersection(Interpreter interpreter, Value<?>[] arguments) {
+		// 2 Set.prototype.intersection ( other )
+		final Value<?> other = argument(0, arguments);
+
+		throw new NotImplemented("Set.prototype.intersection");
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.difference")
+	public static SetObject difference(Interpreter interpreter, Value<?>[] arguments) {
+		// 3 Set.prototype.difference ( other )
+		final Value<?> other = argument(0, arguments);
+
+		throw new NotImplemented("Set.prototype.difference");
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.symmetricdifference")
+	public static SetObject symmetricDifference(Interpreter interpreter, Value<?>[] arguments) {
+		// 4 Set.prototype.symmetricDifference ( other )
+		final Value<?> other = argument(0, arguments);
+
+		throw new NotImplemented("Set.prototype.symmetricDifference");
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.issubsetof")
+	public static BooleanValue isSubsetOf(Interpreter interpreter, Value<?>[] arguments) {
+		// 5 Set.prototype.isSubsetOf ( other )
+		final Value<?> other = argument(0, arguments);
+
+		throw new NotImplemented("Set.prototype.isSubsetOf");
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.issupersetof")
+	public static BooleanValue isSupersetOf(Interpreter interpreter, Value<?>[] arguments) {
+		// 6 Set.prototype.isSupersetOf ( other )
+		final Value<?> other = argument(0, arguments);
+
+		throw new NotImplemented("Set.prototype.isSupersetOf");
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.isdisjointfrom")
+	public static BooleanValue isDisjointFrom(Interpreter interpreter, Value<?>[] arguments) {
+		// 7 Set.prototype.isDisjointFrom ( other )
+		final Value<?> other = argument(0, arguments);
+
+		throw new NotImplemented("Set.prototype.isDisjointFrom");
 	}
 }

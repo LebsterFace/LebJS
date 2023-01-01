@@ -22,6 +22,7 @@ public final class Names {
 	public static final StringValue delete = new StringValue("delete");
 	public static final StringValue description = new StringValue("description");
 	public static final StringValue details = new StringValue("details");
+	public static final StringValue difference = new StringValue("difference");
 	public static final StringValue done = new StringValue("done");
 	public static final StringValue endsWith = new StringValue("endsWith");
 	public static final StringValue entries = new StringValue("entries");
@@ -60,11 +61,15 @@ public final class Names {
 	public static final StringValue indexOf = new StringValue("indexOf");
 	public static final StringValue info = new StringValue("info");
 	public static final StringValue input = new StringValue("input");
+	public static final StringValue intersection = new StringValue("intersection");
 	public static final StringValue is = new StringValue("is");
 	public static final StringValue isArray = new StringValue("isArray");
+	public static final StringValue isDisjointFrom = new StringValue("isDisjointFrom");
 	public static final StringValue isFinite = new StringValue("isFinite");
 	public static final StringValue isNaN = new StringValue("isNaN");
 	public static final StringValue isPrototypeOf = new StringValue("isPrototypeOf");
+	public static final StringValue isSubsetOf = new StringValue("isSubsetOf");
+	public static final StringValue isSupersetOf = new StringValue("isSupersetOf");
 	public static final StringValue join = new StringValue("join");
 	public static final StringValue keys = new StringValue("keys");
 	public static final StringValue lastIndexOf = new StringValue("lastIndexOf");
@@ -106,6 +111,7 @@ public final class Names {
 	public static final StringValue splice = new StringValue("splice");
 	public static final StringValue startsWith = new StringValue("startsWith");
 	public static final StringValue substring = new StringValue("substring");
+	public static final StringValue symmetricDifference = new StringValue("symmetricDifference");
 	public static final StringValue toFixed = new StringValue("toFixed");
 	public static final StringValue toLocaleLowerCase = new StringValue("toLocaleLowerCase");
 	public static final StringValue toLocaleString = new StringValue("toLocaleString");
@@ -116,6 +122,7 @@ public final class Names {
 	public static final StringValue trim = new StringValue("trim");
 	public static final StringValue trimEnd = new StringValue("trimEnd");
 	public static final StringValue trimStart = new StringValue("trimStart");
+	public static final StringValue union = new StringValue("union");
 	public static final StringValue unshift = new StringValue("unshift");
 	public static final StringValue value = new StringValue("value");
 	public static final StringValue valueOf = new StringValue("valueOf");

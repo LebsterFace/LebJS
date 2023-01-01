@@ -1,12 +1,13 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.DumpBuilder;
+import xyz.lebster.core.NonCompliant;
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.SourceRange;
-import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -15,8 +16,8 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-initializer")
 public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> entries) implements Expression {
-
 	public static StaticEntryNode staticEntry(StringValue key, Expression value) {
 		return new StaticEntryNode(key, value);
 	}
@@ -68,13 +69,9 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 
 	private record StaticEntryNode(StringValue key, Expression value) implements ObjectEntryNode {
 		@Override
+		@NonCompliant
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
-			final Value<?> executedValue = value.execute(interpreter);
-			if (Executable.isAnonymousFunctionExpression(value) && executedValue instanceof final Executable function) {
-				function.set(interpreter, Names.name, key);
-				function.updateName(key.toFunctionName());
-			}
-
+			final Value<?> executedValue = Executable.namedEvaluation(interpreter, value, key);
 			result.put(key, executedValue, true, true, true);
 		}
 
@@ -98,13 +95,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
 			final ObjectValue.Key<?> executedKey = this.key.execute(interpreter).toPropertyKey(interpreter);
-			final Value<?> executedValue = value.execute(interpreter);
-
-			if (Executable.isAnonymousFunctionExpression(value) && executedValue instanceof final Executable function) {
-				function.set(interpreter, Names.name, executedKey);
-				function.updateName(executedKey.toFunctionName());
-			}
-
+			final Value<?> executedValue = Executable.namedEvaluation(interpreter, value, executedKey);
 			result.put(executedKey, executedValue, true, true, true);
 		}
 

@@ -7,7 +7,6 @@ import xyz.lebster.core.node.Assignable;
 import xyz.lebster.core.node.Declarable;
 import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.globals.Undefined;
@@ -45,17 +44,11 @@ public sealed interface AssignmentTarget extends Dumpable, Assignable, Declarabl
 	private Value<?> getValue(Interpreter interpreter, Expression expression) throws AbruptCompletion {
 		if (expression == null) return Undefined.instance;
 
-		final Value<?> value = expression.execute(interpreter);
 		if (this instanceof final IdentifierExpression identifierAssignmentTarget) {
 			final StringValue name = identifierAssignmentTarget.name();
-			if (Executable.isAnonymousFunctionExpression(expression)) {
-				if (value instanceof final Executable function) {
-					function.set(interpreter, Names.name, name);
-					function.updateName(name.toFunctionName());
-				}
-			}
+			return Executable.namedEvaluation(interpreter, expression, name);
 		}
 
-		return value;
+		return expression.execute(interpreter);
 	}
 }

@@ -1,6 +1,7 @@
 package xyz.lebster.core.value.function;
 
 import xyz.lebster.core.ANSI;
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -24,14 +25,15 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
+@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function-instances")
 public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	public StringValue name;
 
 	Executable(FunctionPrototype functionPrototype, StringValue name, int expectedArgumentCount) {
 		super(functionPrototype);
 		this.name = name;
-		this.put(Names.name, name);
-		this.put(Names.length, new NumberValue(expectedArgumentCount));
+		this.put(Names.name, name, false, false, true);
+		this.put(Names.length, new NumberValue(expectedArgumentCount), false, false, true);
 	}
 
 	public Executable(Intrinsics intrinsics, StringValue name, int expectedArgumentCount) {
@@ -53,6 +55,20 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		if (expression instanceof final ClassExpression classExpression) return classExpression.className() == null;
 		if (expression instanceof final FunctionNode functionNode) return functionNode.name() == null || functionNode.name().isEmpty();
 		return false;
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-runtime-semantics-namedevaluation")
+	public static Value<?> namedEvaluation(Interpreter interpreter, Expression expression, Key<?> name) throws AbruptCompletion {
+		final Value<?> executedValue = expression.execute(interpreter);
+
+		if (Executable.isAnonymousFunctionExpression(expression) && executedValue instanceof final Executable function) {
+			// TODO: Do this when creating the function, not after.
+			function.getOwnProperty(Names.name).set(interpreter, function, name);
+			function.updateName(name.toFunctionName());
+		}
+
+		return executedValue;
 	}
 
 	public final void updateName(StringValue newName) {

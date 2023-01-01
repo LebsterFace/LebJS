@@ -13,7 +13,7 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public final class ShadowRealmConstructor extends BuiltinConstructor<ShadowRealm, ShadowRealmPrototype> {
 	public ShadowRealmConstructor(Intrinsics intrinsics) {
-		super(intrinsics, Names.ShadowRealm);
+		super(intrinsics, Names.ShadowRealm, 0);
 	}
 
 	@Override

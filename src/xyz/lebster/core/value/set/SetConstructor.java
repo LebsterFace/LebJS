@@ -21,7 +21,7 @@ import static xyz.lebster.core.value.function.NativeFunction.argument;
 public class SetConstructor extends BuiltinConstructor<SetObject, SetPrototype> {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-set-constructor")
 	public SetConstructor(Intrinsics intrinsics) {
-		super(intrinsics, Names.Set);
+		super(intrinsics, Names.Set, 0);
 		// TODO: 24.2.2.2 get Set [ @@species ]
 	}
 

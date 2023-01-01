@@ -24,7 +24,7 @@ import static xyz.lebster.core.value.object.ObjectValue.EnumerableOwnPropertyNam
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
 public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, ObjectPrototype> {
 	public ObjectConstructor(Intrinsics intrinsics) {
-		super(intrinsics, Names.Object);
+		super(intrinsics, Names.Object, 1);
 
 		this.putMethod(intrinsics, Names.setPrototypeOf, 2, ObjectConstructor::setPrototypeOf);
 		this.putMethod(intrinsics, Names.getPrototypeOf, 1, ObjectConstructor::getPrototypeOf);

@@ -12,7 +12,7 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 
 public final class ReferenceErrorConstructor extends BuiltinConstructor<ReferenceError, ReferenceErrorPrototype> {
 	public ReferenceErrorConstructor(Intrinsics intrinsics) {
-		super(intrinsics, Names.ReferenceError);
+		super(intrinsics, Names.ReferenceError, 1);
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 
 public final class RangeErrorConstructor extends BuiltinConstructor<RangeError, RangeErrorPrototype> {
 	public RangeErrorConstructor(Intrinsics intrinsics) {
-		super(intrinsics, Names.RangeError);
+		super(intrinsics, Names.RangeError, 1);
 	}
 
 	@Override

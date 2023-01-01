@@ -30,7 +30,7 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentInt;
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-array-constructor")
 public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayPrototype> {
 	public ArrayConstructor(Intrinsics intrinsics) {
-		super(intrinsics, Names.Array);
+		super(intrinsics, Names.Array, 1);
 		this.putMethod(intrinsics, Names.of, 2, ArrayConstructor::of);
 		this.putMethod(intrinsics, Names.from, 1, ArrayConstructor::from);
 		this.putMethod(intrinsics, Names.isArray, 1, ArrayConstructor::isArray);

@@ -12,7 +12,7 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 
 public final class TypeErrorConstructor extends BuiltinConstructor<TypeError, TypeErrorPrototype> {
 	public TypeErrorConstructor(Intrinsics intrinsics) {
-		super(intrinsics, Names.TypeError);
+		super(intrinsics, Names.TypeError, 1);
 	}
 
 	@Override

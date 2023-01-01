@@ -13,7 +13,7 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 // TODO: NativeError https://tc39.es/ecma262/multipage#sec-nativeerror-constructors
 public final class ErrorConstructor extends BuiltinConstructor<ErrorObject, ErrorPrototype> {
 	public ErrorConstructor(Intrinsics intrinsics) {
-		super(intrinsics, Names.Error);
+		super(intrinsics, Names.Error, 1);
 	}
 
 	@Override

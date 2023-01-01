@@ -12,7 +12,7 @@ import static xyz.lebster.core.value.function.NativeFunction.argumentString;
 
 public class RegExpConstructor extends BuiltinConstructor<RegExpObject, RegExpPrototype> {
 	public RegExpConstructor(Intrinsics intrinsics) {
-		super(intrinsics, Names.RegExp);
+		super(intrinsics, Names.RegExp, 2);
 	}
 
 	@Override

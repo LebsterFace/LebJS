@@ -13,7 +13,7 @@ import xyz.lebster.core.value.object.ObjectValue;
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-constructor")
 public class FunctionConstructor extends BuiltinConstructor<Function, FunctionPrototype> {
 	public FunctionConstructor(Intrinsics intrinsics) {
-		super(intrinsics, Names.Function);
+		super(intrinsics, Names.Function, 1);
 	}
 
 	public Function construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) {

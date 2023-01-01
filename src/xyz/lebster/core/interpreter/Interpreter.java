@@ -17,9 +17,9 @@ import java.util.ArrayDeque;
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public final class Interpreter {
+	private static final int MAX_CALLSTACK_SIZE = 256;
 	public final Intrinsics intrinsics;
 	public final GlobalObject globalObject;
-	private static final int MAX_CALLSTACK_SIZE = 256;
 	private final ArrayDeque<ExecutionContext> executionContextStack;
 	private final Mode mode;
 

@@ -16,10 +16,9 @@ public final class Testing {
 	private final ByteArrayOutputStream failedOutput;
 	private final PrintStream failedStream;
 	private final TestHarness harness;
+	private final CLArguments arguments;
 	private int successfulTests = 0;
 	private int totalTests = 0;
-
-	private final CLArguments arguments;
 
 	public Testing(CLArguments arguments) throws CannotParse, SyntaxError, CLArgumentException {
 		this.arguments = arguments;

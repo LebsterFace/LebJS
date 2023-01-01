@@ -698,7 +698,7 @@ public final class StringPrototype extends ObjectValue {
 			object.set(interpreter, Names.done, BooleanValue.of(!primitiveIterator.hasNext()));
 
 			final var value = primitiveIterator.hasNext() ?
-				new StringValue(new String(new int[]{ primitiveIterator.nextInt() }, 0, 1)) :
+				new StringValue(new String(new int[] { primitiveIterator.nextInt() }, 0, 1)) :
 				Undefined.instance;
 
 			object.set(interpreter, Names.value, value);

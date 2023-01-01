@@ -36,11 +36,11 @@ public final class REPL {
 				if (input.isBlank()) continue;
 				if (input.equals(".help")) {
 					System.out.printf("""
-						%s.help%s                      Display this message
-						%s.clear%s                     Clear the screen
-						%s.inspect%s [expression]%s      Deep print the result of %s[expression]%s
-						%s.dump%s [code]%s               Dump the parsed AST of %s[code]%s
-						""",
+							%s.help%s                      Display this message
+							%s.clear%s                     Clear the screen
+							%s.inspect%s [expression]%s      Deep print the result of %s[expression]%s
+							%s.dump%s [code]%s               Dump the parsed AST of %s[code]%s
+							""",
 						ANSI.CYAN, ANSI.RESET,
 						ANSI.CYAN, ANSI.RESET,
 						ANSI.CYAN, ANSI.BRIGHT_GREEN, ANSI.RESET, ANSI.BRIGHT_GREEN, ANSI.RESET,

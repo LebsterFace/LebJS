@@ -44,8 +44,8 @@ public final class StringWrapper extends PrimitiveWrapper<StringValue, StringPro
 	public Iterable<Key<?>> ownPropertyKeys() {
 		return () -> new Iterator<>() {
 			private final PrimitiveIterator.OfInt codePoints = data.value.codePoints().iterator();
-			private int codePointIndex = 0;
 			private final Iterator<Key<?>> properties = StringWrapper.super.ownPropertyKeys().iterator();
+			private int codePointIndex = 0;
 
 			@Override
 			public boolean hasNext() {

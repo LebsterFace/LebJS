@@ -44,9 +44,9 @@ record ReferenceNode(int id) implements DisplayNode {
 }
 
 final class ObjectNode implements DisplayNode {
-	private final ObjectValue value;
 	final ArrayList<DisplayNode> values;
 	final HashMap<Key<?>, DisplayNode> properties;
+	private final ObjectValue value;
 	int id;
 
 	ObjectNode(ObjectValue value) {
@@ -54,6 +54,24 @@ final class ObjectNode implements DisplayNode {
 		this.values = new ArrayList<>();
 		this.properties = new HashMap<>();
 		this.id = -1;
+	}
+
+	private static void displayEmpty(StringRepresentation representation, int emptyCount) {
+		representation.append(ANSI.BRIGHT_BLACK);
+		representation.append(emptyCount == 1 ? "empty" : "empty x " + emptyCount);
+		representation.append(ANSI.RESET);
+	}
+
+	private static boolean hidePrefix(ObjectValue value) {
+		if (value.getPrototype() == null) return false;
+		return value.getClass() == ObjectValue.class ||
+			   value.getClass() == ArrayObject.class;
+	}
+
+	private static void appendDelimiter(StringRepresentation representation, boolean singleLine, boolean more) {
+		if (more) representation.append(',');
+		if (singleLine) representation.append(' ');
+		else representation.append('\n');
 	}
 
 	@Override
@@ -136,24 +154,6 @@ final class ObjectNode implements DisplayNode {
 		}
 
 		representation.append(isArray ? ']' : '}');
-	}
-
-	private static void displayEmpty(StringRepresentation representation, int emptyCount) {
-		representation.append(ANSI.BRIGHT_BLACK);
-		representation.append(emptyCount == 1 ? "empty" : "empty x " + emptyCount);
-		representation.append(ANSI.RESET);
-	}
-
-	private static boolean hidePrefix(ObjectValue value) {
-		if (value.getPrototype() == null) return false;
-		return value.getClass() == ObjectValue.class ||
-			   value.getClass() == ArrayObject.class;
-	}
-
-	private static void appendDelimiter(StringRepresentation representation, boolean singleLine, boolean more) {
-		if (more) representation.append(',');
-		if (singleLine) representation.append(' ');
-		else representation.append('\n');
 	}
 }
 

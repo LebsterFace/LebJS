@@ -57,6 +57,18 @@ public final class IteratorHelper {
 		return new IteratorRecord(iterator, executable, display);
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorcomplete")
+	public static boolean iteratorComplete(Interpreter interpreter, ObjectValue iterResult) throws AbruptCompletion {
+		// 1. Return ToBoolean(? Get(iterResult, "done")).
+		return iterResult.get(interpreter, Names.done).isTruthy(interpreter);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorvalue")
+	public static Value<?> iteratorValue(Interpreter interpreter, ObjectValue iterResult) throws AbruptCompletion {
+		// 1. Return ? Get(iterResult, "value").
+		return iterResult.get(interpreter, Names.value);
+	}
+
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iterator-records")
 	public static final class IteratorRecord {
@@ -108,17 +120,5 @@ public final class IteratorHelper {
 				iterResult = this.next(interpreter, null);
 			}
 		}
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorcomplete")
-	public static boolean iteratorComplete(Interpreter interpreter, ObjectValue iterResult) throws AbruptCompletion {
-		// 1. Return ToBoolean(? Get(iterResult, "done")).
-		return iterResult.get(interpreter, Names.done).isTruthy(interpreter);
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorvalue")
-	public static Value<?> iteratorValue(Interpreter interpreter, ObjectValue iterResult) throws AbruptCompletion {
-		// 1. Return ? Get(iterResult, "value").
-		return iterResult.get(interpreter, Names.value);
 	}
 }

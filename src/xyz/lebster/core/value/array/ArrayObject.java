@@ -49,6 +49,14 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 		));
 	}
 
+	public <T extends Value<?>> ArrayObject(Interpreter interpreter, List<T> arrayValues) {
+		this(interpreter, arrayValues.toArray(new Value[0]));
+	}
+
+	public ArrayObject(Interpreter interpreter, int length) {
+		this(interpreter, new Value<?>[length]);
+	}
+
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-arraysetlength")
 	public Undefined arraySetLength(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
@@ -70,14 +78,6 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 
 	private NumberValue getLength(Interpreter interpreter1, Value<?>[] arguments) {
 		return new NumberValue(arrayValues.size());
-	}
-
-	public <T extends Value<?>> ArrayObject(Interpreter interpreter, List<T> arrayValues) {
-		this(interpreter, arrayValues.toArray(new Value[0]));
-	}
-
-	public ArrayObject(Interpreter interpreter, int length) {
-		this(interpreter, new Value<?>[length]);
 	}
 
 	@Override

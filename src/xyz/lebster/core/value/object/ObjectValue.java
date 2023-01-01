@@ -45,6 +45,13 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		this(intrinsics.objectPrototype);
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinaryownpropertykeys")
+	@NonCompliant
+	// TODO: Follow specified order
+	public static Iterable<Key<?>> ordinaryOwnPropertyKeys(ObjectValue objectValue) {
+		return objectValue.value.keySet();
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarygetprototypeof")
 	public final ObjectValue getPrototype() {
 		return this.prototypeSlot;
@@ -140,9 +147,9 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 		// 3. If hint is string, then Let methodNames be "toString", "valueOf".
 		final StringValue[] methodNames = hint == PreferredType.String ?
-			new StringValue[]{ Names.toString, Names.valueOf } :
+			new StringValue[] { Names.toString, Names.valueOf } :
 			// 4. Else, Let methodNames be "valueOf", "toString".
-			new StringValue[]{ Names.valueOf, Names.toString };
+			new StringValue[] { Names.valueOf, Names.toString };
 
 		// 5. For each element name of methodNames, do
 		for (final StringValue name : methodNames) {
@@ -350,13 +357,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return ObjectValue.ordinaryOwnPropertyKeys(this);
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinaryownpropertykeys")
-	@NonCompliant
-	// TODO: Follow specified order
-	public static Iterable<Key<?>> ordinaryOwnPropertyKeys(ObjectValue objectValue) {
-		return objectValue.value.keySet();
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerate-object-properties")
 	public final ArrayList<StringValue> enumerateObjectProperties() {
 		final ArrayList<StringValue> result = new ArrayList<>();
@@ -411,8 +411,6 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		if (this.getClass() == ObjectValue.class) return "Object";
 		return getClass().getSimpleName();
 	}
-
-	protected enum EnumerableOwnPropertyNamesKind { KEY, VALUE, KEY_VALUE }
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
 	public final ArrayList<Value<?>> enumerableOwnPropertyNames(Interpreter interpreter, EnumerableOwnPropertyNamesKind kind) throws AbruptCompletion {
@@ -487,7 +485,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			items.sort((Value<?> a, Value<?> b) -> {
 				Value<?> returnValue;
 				try {
-					returnValue = SortCompare.execute(interpreter, new Value[]{ a, b });
+					returnValue = SortCompare.execute(interpreter, new Value[] { a, b });
 				} catch (AbruptCompletion e) {
 					if (e.type != AbruptCompletion.Type.Return) throw new RuntimeException(e);
 					returnValue = e.value;
@@ -528,6 +526,8 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		// 9. Return obj.
 		return this;
 	}
+
+	protected enum EnumerableOwnPropertyNamesKind { KEY, VALUE, KEY_VALUE }
 
 	public static abstract class Key<R> extends PrimitiveValue<R> {
 		public Key(R value) {

@@ -121,7 +121,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 		// 9. If IsConstructor(C) is true, then
 		final ObjectValue A = C instanceof final Constructor constructor ?
 			// a. Let A be ? Construct(C, « 𝔽(len) »).
-			constructor.construct(interpreter, new Value[]{ new NumberValue(len) }, constructor) :
+			constructor.construct(interpreter, new Value[] { new NumberValue(len) }, constructor) :
 			// 10. Else, a. Let A be ? ArrayCreate(len).
 			arrayCreate(interpreter, Math.toIntExact(len), interpreter.intrinsics.arrayPrototype);
 

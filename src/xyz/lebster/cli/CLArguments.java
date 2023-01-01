@@ -59,13 +59,8 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 
 	private static final class TemporaryResult {
 		private final Iterator<String> arguments;
-		public TemporaryResult(Iterator<String> arguments) {
-			this.arguments = arguments;
-		}
-
 		private String fileNameOrNull = null;
 		private ExecutionMode mode = null;
-
 		private boolean showAST = false;
 		private boolean hideStackTrace = true;
 		private boolean parseOnly = false;
@@ -74,6 +69,9 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private boolean disableTestOutputBuffers = false;
 		private String testHarnessPath;
 		private boolean showPrompt = true;
+		public TemporaryResult(Iterator<String> arguments) {
+			this.arguments = arguments;
+		}
 
 		private ExecutionOptions toExecutionOptions() {
 			return new ExecutionOptions(

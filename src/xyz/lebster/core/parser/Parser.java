@@ -25,8 +25,8 @@ import static xyz.lebster.core.parser.Associativity.Right;
 
 public final class Parser {
 	private final String sourceText;
-	private ParserState state;
 	private final ArrayDeque<ParserState> savedStack = new ArrayDeque<>();
+	private ParserState state;
 	private boolean hasConsumedSeparator = false;
 
 	public Parser(String sourceText, Token[] tokens) {
@@ -734,19 +734,14 @@ public final class Parser {
 		return switch (token.type) {
 			case Plus, Minus, Star, Slash, Percent, Exponent, Pipe, Ampersand, Caret, LeftShift, RightShift, UnsignedRightShift ->
 				new BinaryExpression(left, parseExpression(minPrecedence, assoc), token.getBinaryOp());
-
 			case StrictEqual, LooseEqual, StrictNotEqual, NotEqual ->
 				new EqualityExpression(left, parseExpression(minPrecedence, assoc), token.getEqualityOp());
-
 			case LogicalOr, LogicalAnd, NullishCoalescing ->
 				new LogicalExpression(left, parseExpression(minPrecedence, assoc), token.getLogicOp());
-
 			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf ->
 				new RelationalExpression(left, parseExpression(minPrecedence, assoc), token.getRelationalOp());
-
 			case MinusMinus, PlusPlus ->
 				new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), token.getUpdateOp());
-
 			case Equals, LogicalAndEquals, LogicalOrEquals, NullishCoalescingEquals, MultiplyEquals,
 				DivideEquals, PercentEquals, PlusEquals, MinusEquals, LeftShiftEquals, RightShiftEquals,
 				UnsignedRightShiftEquals, AmpersandEquals, CaretEquals, PipeEquals, ExponentEquals ->

@@ -150,6 +150,31 @@ public final class Lexer {
 		}
 	}
 
+	public static Token[] tokenize(String sourceText) throws SyntaxError {
+		final var instance = new Lexer(sourceText);
+		final ArrayList<Token> tokens = new ArrayList<>();
+		while (instance.hasNext()) {
+			final Token next = instance.next();
+			if (next == null) {
+				break;
+			} else {
+				instance.lastTokenType = next.type;
+				if (!instance.templateLiteralStates.isEmpty() && instance.templateLiteralStates.getFirst().inExpression) {
+					if (next.type == TokenType.LBrace) {
+						instance.templateLiteralStates.getFirst().bracketCount++;
+					} else if (next.type == TokenType.RBrace) {
+						instance.templateLiteralStates.getFirst().bracketCount--;
+					}
+				}
+
+				tokens.add(next);
+			}
+		}
+
+		tokens.add(new Token(TokenType.EOF, null));
+		return tokens.toArray(new Token[0]);
+	}
+
 	private boolean isFinished() {
 		return index >= codePoints.length;
 	}
@@ -606,31 +631,6 @@ public final class Lexer {
 		}
 
 		throw new SyntaxError("Cannot tokenize character %s".formatted(quoteCodePoint(codePoint)), position());
-	}
-
-	public static Token[] tokenize(String sourceText) throws SyntaxError {
-		final var instance = new Lexer(sourceText);
-		final ArrayList<Token> tokens = new ArrayList<>();
-		while (instance.hasNext()) {
-			final Token next = instance.next();
-			if (next == null) {
-				break;
-			} else {
-				instance.lastTokenType = next.type;
-				if (!instance.templateLiteralStates.isEmpty() && instance.templateLiteralStates.getFirst().inExpression) {
-					if (next.type == TokenType.LBrace) {
-						instance.templateLiteralStates.getFirst().bracketCount++;
-					} else if (next.type == TokenType.RBrace) {
-						instance.templateLiteralStates.getFirst().bracketCount--;
-					}
-				}
-
-				tokens.add(next);
-			}
-		}
-
-		tokens.add(new Token(TokenType.EOF, null));
-		return tokens.toArray(new Token[0]);
 	}
 
 	private SourcePosition position() {

@@ -31,7 +31,7 @@ public final class ParserState {
 	public SyntaxError unexpected() {
 		return unexpected(this.token);
 	}
-	
+
 	public SyntaxError unexpected(Token unexpectedToken) {
 		return new SyntaxError("Unexpected token " + unexpectedToken, unexpectedToken.position);
 	}

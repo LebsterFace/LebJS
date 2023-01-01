@@ -127,11 +127,23 @@ public final class SetPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.has")
-	private static Value<?> has(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> has(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 24.2.3.7 Set.prototype.has ( value )
 		final Value<?> value = argument(0, arguments);
 
-		throw new NotImplemented("Set.prototype.has");
+		// 1. Let S be the `this` value.
+		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
+		final SetObject S = requireSetData(interpreter, ".has");
+		// 3. Let entries be the List that is S.[[SetData]].
+		final var entries = S.setData;
+		// 4. For each element e of entries, do
+		for (final Value<?> e : entries) {
+			// a. If e is not empty and SameValueZero(e, value) is true, return true.
+			if (e != null && e.sameValueZero(value)) return BooleanValue.TRUE;
+		}
+
+		// 5. Return false.
+		return BooleanValue.FALSE;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.keys")

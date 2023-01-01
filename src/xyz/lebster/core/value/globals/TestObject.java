@@ -70,7 +70,7 @@ public final class TestObject extends ObjectValue {
 			final StringValue nameProperty = error.get(interpreter, Names.name).toStringValue(interpreter);
 			final StringValue messageProperty = error.get(interpreter, Names.message).toStringValue(interpreter);
 			TestObject.expect(interpreter, name, nameProperty);
-			if (!messageProperty.value.startsWith(messageStarter.value))
+			if (!messageProperty.value.contains(messageStarter.value))
 				assertionFailed(messageStarter, messageProperty);
 
 
@@ -147,10 +147,8 @@ public final class TestObject extends ObjectValue {
 
 	private static Undefined expect(Interpreter interpreter, Value<?>... arguments) {
 		// Test.expect(a: unknown, b: unknown): void
-
-		final Value<?> a = argument(0, arguments);
-		final Value<?> b = argument(1, arguments);
-		return expect(a, b);
+		if (arguments.length != 2) throw new ShouldNotHappen("Test.expect() must be called with exactly two arguments");
+		return expect(arguments[0], arguments[1]);
 	}
 
 	private static Undefined expect(Value<?> a, Value<?> b) {

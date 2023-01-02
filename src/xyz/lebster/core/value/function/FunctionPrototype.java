@@ -3,44 +3,78 @@ package xyz.lebster.core.value.function;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
-
-import java.util.Arrays;
+import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
+import static xyz.lebster.core.value.function.NativeFunction.argumentRest;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-function.prototype")
 @NonStandard
 public final class FunctionPrototype extends ObjectValue {
 	public FunctionPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
-		// TODO: .bind, .apply, .constructor, [ @@hasInstance ]
-		putMethod(this, Names.call, 1, FunctionPrototype::callMethod);
+		// NOTE: `this` is used instead of `intrinsics` because Function.prototype has not been initialised yet
+		putMethod(this, Names.apply, 2, FunctionPrototype::apply);
+		putMethod(this, Names.bind, 1, FunctionPrototype::bind);
+		putMethod(this, Names.call, 1, FunctionPrototype::call);
 		putMethod(this, Names.toString, 0, FunctionPrototype::toStringMethod);
+		putMethod(this, SymbolValue.hasInstance, 1, FunctionPrototype::hasInstance, false, false, false);
+	}
+
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function.prototype.apply")
+	private static Value<?> apply(Interpreter interpreter, Value<?>[] arguments) {
+		// 20.2.3.1 Function.prototype.apply ( thisArg, argArray )
+		final Value<?> thisArg = argument(0, arguments);
+		final Value<?> argArray = argument(1, arguments);
+
+		throw new NotImplemented("Function.prototype.apply()");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function.prototype.bind")
+	private static Value<?> bind(Interpreter interpreter, Value<?>[] arguments) {
+		// 20.2.3.2 Function.prototype.bind ( thisArg, ...args )
+		final Value<?> thisArg = argument(0, arguments);
+		final Value<?>[] args = argumentRest(1, arguments);
+
+		throw new NotImplemented("Function.prototype.bind()");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function.prototype.call")
+	private static Value<?> call(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.2.3.3 Function.prototype.call ( thisArg, ...args )
+		final Value<?> thisArg = argument(0, arguments);
+		final Value<?>[] args = argumentRest(1, arguments);
+
+		final Executable func = Executable.getExecutable(interpreter, interpreter.thisValue());
+		return func.call(interpreter, thisArg, args);
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function.prototype.tostring")
-	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
+	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 20.2.3.5 Function.prototype.toString ( )
 
 		return Executable.getExecutable(interpreter, interpreter.thisValue()).toStringMethod();
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function.prototype.call")
-	@NonCompliant
-	private static Value<?> callMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 20.2.3.3 Function.prototype.call ( thisArg, ...args )
-		final Value<?> thisArg = argument(0, arguments);
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function.prototype-@@hasinstance")
+	private static BooleanValue hasInstance(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.2.3.6 Function.prototype [ @@hasInstance ] ( V )
+		final Value<?> V = argument(0, arguments);
 
-		final Executable func = Executable.getExecutable(interpreter, interpreter.thisValue());
-		final Value<?>[] args = Arrays.copyOfRange(arguments, 1, arguments.length);
-		return func.call(interpreter, thisArg, args);
+		// 1. Let F be the `this` value.
+		final Value<?> F = interpreter.thisValue();
+		// 2. Return ? OrdinaryHasInstance(F, V).
+		return Executable.ordinaryHasInstance(interpreter, F, V);
 	}
 }

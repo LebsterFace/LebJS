@@ -26,15 +26,15 @@ import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @NonStandard
 public final class TestObject extends ObjectValue {
-	public TestObject(Intrinsics functionPrototype) {
-		super((ObjectValue) null);
+	public TestObject(Intrinsics intrinsics) {
+		super(Null.instance);
 
-		this.putMethod(functionPrototype, Names.expect, 2, TestObject::expect);
-		this.putMethod(functionPrototype, Names.equals, 2, TestObject::equalsMethod);
-		this.putMethod(functionPrototype, Names.fail, 0, TestObject::fail);
-		this.putMethod(functionPrototype, Names.expectError, 3, TestObject::expectError);
-		this.putMethod(functionPrototype, Names.expectSyntaxError, 2, TestObject::expectSyntaxError);
-		this.putMethod(functionPrototype, Names.parse, 1, TestObject::parse);
+		putMethod(intrinsics, Names.expect, 2, TestObject::expect);
+		putMethod(intrinsics, Names.equals, 2, TestObject::equalsMethod);
+		putMethod(intrinsics, Names.fail, 0, TestObject::fail);
+		putMethod(intrinsics, Names.expectError, 3, TestObject::expectError);
+		putMethod(intrinsics, Names.expectSyntaxError, 2, TestObject::expectSyntaxError);
+		putMethod(intrinsics, Names.parse, 1, TestObject::parse);
 	}
 
 	private static Undefined parse(Interpreter interpreter, Value<?>[] arguments) {

@@ -16,8 +16,8 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 public final class BooleanPrototype extends ObjectValue {
 	public BooleanPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
-		this.putMethod(intrinsics, Names.toString, 1, BooleanPrototype::toStringMethod);
-		this.putMethod(intrinsics, Names.valueOf, 1, BooleanPrototype::valueOf);
+		putMethod(intrinsics, Names.toString, 1, BooleanPrototype::toStringMethod);
+		putMethod(intrinsics, Names.valueOf, 1, BooleanPrototype::valueOf);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-boolean.prototype.valueof")

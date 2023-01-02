@@ -17,7 +17,7 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 public final class NumberConstructor extends PrimitiveConstructor {
 	public NumberConstructor(Intrinsics functionPrototype) {
 		super(functionPrototype, Names.Number);
-		this.putMethod(functionPrototype, Names.range, 3, NumberConstructor::range);
+		putMethod(functionPrototype, Names.range, 3, NumberConstructor::range);
 	}
 
 	@NonStandard

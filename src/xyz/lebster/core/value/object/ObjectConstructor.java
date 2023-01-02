@@ -26,16 +26,16 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	public ObjectConstructor(Intrinsics intrinsics) {
 		super(intrinsics, Names.Object, 1);
 
-		this.putMethod(intrinsics, Names.setPrototypeOf, 2, ObjectConstructor::setPrototypeOf);
-		this.putMethod(intrinsics, Names.getPrototypeOf, 1, ObjectConstructor::getPrototypeOf);
-		this.putMethod(intrinsics, Names.create, 2, ObjectConstructor::create);
-		this.putMethod(intrinsics, Names.keys, 1, ObjectConstructor::keys);
-		this.putMethod(intrinsics, Names.values, 1, ObjectConstructor::values);
-		this.putMethod(intrinsics, Names.entries, 1, ObjectConstructor::entriesMethod);
-		this.putMethod(intrinsics, Names.getOwnPropertyDescriptor, 2, ObjectConstructor::getOwnPropertyDescriptor);
-		this.putMethod(intrinsics, Names.getOwnPropertyDescriptors, 1, ObjectConstructor::getOwnPropertyDescriptors);
-		this.putMethod(intrinsics, Names.fromEntries, 1, ObjectConstructor::fromEntries);
-		this.putMethod(intrinsics, Names.is, 2, ObjectConstructor::is);
+		putMethod(intrinsics, Names.setPrototypeOf, 2, ObjectConstructor::setPrototypeOf);
+		putMethod(intrinsics, Names.getPrototypeOf, 1, ObjectConstructor::getPrototypeOf);
+		putMethod(intrinsics, Names.create, 2, ObjectConstructor::create);
+		putMethod(intrinsics, Names.keys, 1, ObjectConstructor::keys);
+		putMethod(intrinsics, Names.values, 1, ObjectConstructor::values);
+		putMethod(intrinsics, Names.entries, 1, ObjectConstructor::entriesMethod);
+		putMethod(intrinsics, Names.getOwnPropertyDescriptor, 2, ObjectConstructor::getOwnPropertyDescriptor);
+		putMethod(intrinsics, Names.getOwnPropertyDescriptors, 1, ObjectConstructor::getOwnPropertyDescriptors);
+		putMethod(intrinsics, Names.fromEntries, 1, ObjectConstructor::fromEntries);
+		putMethod(intrinsics, Names.is, 2, ObjectConstructor::is);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getownpropertydescriptors")
@@ -160,7 +160,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		final Value<?> O = argument(0, arguments);
 
 		if (O == Null.instance) {
-			return new ObjectValue((ObjectValue) null);
+			return new ObjectValue(Null.instance);
 		} else if (O instanceof final ObjectValue prototype) {
 			return new ObjectValue(prototype);
 		} else {

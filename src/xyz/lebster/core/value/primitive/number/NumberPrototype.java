@@ -24,10 +24,10 @@ public final class NumberPrototype extends ObjectValue {
 
 	public NumberPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
-		this.putMethod(intrinsics, Names.toString, 0, NumberPrototype::toStringMethod);
-		this.putMethod(intrinsics, Names.toFixed, 1, NumberPrototype::toFixed);
-		this.putMethod(intrinsics, Names.valueOf, 0, NumberPrototype::valueOf);
-		this.putMethod(intrinsics, Names.toLocaleString, 0, NumberPrototype::toLocaleString);
+		putMethod(intrinsics, Names.toString, 0, NumberPrototype::toStringMethod);
+		putMethod(intrinsics, Names.toFixed, 1, NumberPrototype::toFixed);
+		putMethod(intrinsics, Names.valueOf, 0, NumberPrototype::valueOf);
+		putMethod(intrinsics, Names.toLocaleString, 0, NumberPrototype::toLocaleString);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tofixed")

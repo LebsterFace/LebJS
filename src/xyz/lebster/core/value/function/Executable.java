@@ -123,8 +123,9 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinaryhasinstance")
-	public BooleanValue ordinaryHasInstance(Interpreter interpreter, Value<?> O) throws AbruptCompletion {
+	public static BooleanValue ordinaryHasInstance(Interpreter interpreter, Value<?> C_, Value<?> O) throws AbruptCompletion {
 		// 1. If IsCallable(C) is false, return false.
+		if (!(C_ instanceof final Executable C)) return BooleanValue.FALSE;
 
 		// FIXME: BoundTargetFunction
 		// 2. If C has a [[BoundTargetFunction]] internal slot, then
@@ -135,7 +136,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		if (!(O instanceof ObjectValue object)) return BooleanValue.FALSE;
 
 		// 4. Let P be ? Get(C, "prototype").
-		final Value<?> P = this.get(interpreter, Names.prototype);
+		final Value<?> P = C.get(interpreter, Names.prototype);
 		// 5. If Type(P) is not Object, throw a TypeError exception.
 		if (!(P instanceof ObjectValue)) throw error(new TypeError(interpreter, "Not an object!"));
 

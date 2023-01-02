@@ -5,6 +5,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 public final class Names {
 	// Properties and methods
 	public static final StringValue add = new StringValue("add");
+	public static final StringValue apply = new StringValue("apply");
 	public static final StringValue at = new StringValue("at");
 	public static final StringValue bind = new StringValue("bind");
 	public static final StringValue call = new StringValue("call");

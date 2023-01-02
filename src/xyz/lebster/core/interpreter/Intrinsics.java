@@ -74,7 +74,7 @@ public final class Intrinsics {
 		objectPrototype = new ObjectPrototype();
 		functionPrototype = new FunctionPrototype(this);
 		linkPrototypeAndConstructor(functionConstructor = new FunctionConstructor(this), functionPrototype);
-		objectPrototype.populateMethods(functionPrototype);
+		objectPrototype.populateMethods(this);
 		linkPrototypeAndConstructor(objectConstructor = new ObjectConstructor(this), objectPrototype);
 
 		linkPrototypeAndConstructor(arrayConstructor = new ArrayConstructor(this), arrayPrototype = new ArrayPrototype(this));

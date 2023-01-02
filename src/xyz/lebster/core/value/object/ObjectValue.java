@@ -41,6 +41,10 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		this.prototypeSlot = prototype;
 	}
 
+	public ObjectValue(Null noPrototype) {
+		this((ObjectValue) null);
+	}
+
 	public ObjectValue(Intrinsics intrinsics) {
 		this(intrinsics.objectPrototype);
 	}
@@ -338,18 +342,20 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		this.value.put(key, new DataDescriptor(value, true, false, true));
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createbuiltinfunction")
 	@NonCompliant
-	protected NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, int length, NativeCode code) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createbuiltinfunction")
+	protected NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, int length, NativeCode code, boolean writable, boolean enumerable, boolean configurable) {
 		final var function = new NativeFunction(functionPrototype, key.toFunctionName(), code, length);
-		this.put(key, function);
+		this.put(key, function, writable, enumerable, configurable);
 		return function;
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createbuiltinfunction")
-	@NonCompliant
+	protected NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, int length, NativeCode code) {
+		return putMethod(functionPrototype, key, length, code, true, false, true);
+	}
+
 	public NativeFunction putMethod(Intrinsics intrinsics, Key<?> key, int length, NativeCode code) {
-		return this.putMethod(intrinsics.functionPrototype, key, length, code);
+		return putMethod(intrinsics.functionPrototype, key, length, code, true, false, true);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys")

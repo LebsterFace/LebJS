@@ -22,7 +22,7 @@ public final class ConsoleObject extends ObjectValue {
 	private static final Scanner scanner = new Scanner(System.in);
 
 	public ConsoleObject(Intrinsics intrinsics) {
-		super((ObjectValue) null);
+		super(Null.instance);
 		putMethod(intrinsics, Names.write, 0, ConsoleObject::write);
 		putMethod(intrinsics, Names.log, 0, (interpreter, data) -> logger(LogLevel.Log, data));
 		putMethod(intrinsics, Names.warn, 0, (interpreter, data) -> logger(LogLevel.Warn, data));

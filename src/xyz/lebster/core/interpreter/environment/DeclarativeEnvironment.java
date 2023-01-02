@@ -3,6 +3,7 @@ package xyz.lebster.core.interpreter.environment;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -11,7 +12,7 @@ public class DeclarativeEnvironment implements Environment {
 	private final Environment parent;
 
 	public DeclarativeEnvironment(Environment parent) {
-		this.variables = new ObjectValue((ObjectValue) null);
+		this.variables = new ObjectValue(Null.instance);
 		this.parent = parent;
 	}
 

@@ -19,8 +19,8 @@ public final class ShadowRealmPrototype extends ObjectValue {
 	public ShadowRealmPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
 
-		this.putMethod(intrinsics, Names.evaluate, 1, ShadowRealmPrototype::evaluate);
-		this.putMethod(intrinsics, Names.declare, 2, ShadowRealmPrototype::declare);
+		putMethod(intrinsics, Names.evaluate, 1, ShadowRealmPrototype::evaluate);
+		putMethod(intrinsics, Names.declare, 2, ShadowRealmPrototype::declare);
 	}
 
 	@NonStandard

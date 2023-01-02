@@ -4,7 +4,6 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -21,8 +20,6 @@ import static xyz.lebster.core.value.primitive.number.NumberValue.isPositiveZero
 public final class MathObject extends ObjectValue {
 	public MathObject(Intrinsics intrinsics) {
 		super(intrinsics);
-		final FunctionPrototype fp = intrinsics.functionPrototype;
-
 		put(SymbolValue.toStringTag, Names.Math);
 
 		// 21.3.1 Value Properties of the Math Object
@@ -44,35 +41,35 @@ public final class MathObject extends ObjectValue {
 		put(Names.SQRT2, new NumberValue(1.4142135623730951D), false, false, false);
 
 		// (double) -> double
-		addWrapper(fp, "abs", (DoubleUnaryOperator) Math::abs);
-		addWrapper(fp, "acos", Math::acos);
-		addWrapper(fp, "asin", Math::asin);
-		addWrapper(fp, "atan", Math::atan);
-		addWrapper(fp, "ceil", Math::ceil);
-		addWrapper(fp, "cbrt", Math::cbrt);
-		addWrapper(fp, "expm1", Math::expm1);
-		addWrapper(fp, "cos", Math::cos);
-		addWrapper(fp, "cosh", Math::cosh);
-		addWrapper(fp, "exp", Math::exp);
-		addWrapper(fp, "floor", Math::floor);
-		addWrapper(fp, "log", Math::log);
-		addWrapper(fp, "log1p", Math::log1p);
-		addWrapper(fp, "log10", Math::log10);
-		addWrapper(fp, "round", (DoubleUnaryOperator) Math::round);
-		addWrapper(fp, "sin", Math::sin);
-		addWrapper(fp, "sinh", Math::sinh);
-		addWrapper(fp, "sqrt", Math::sqrt);
-		addWrapper(fp, "tan", Math::tan);
-		addWrapper(fp, "tanh", Math::tanh);
-		addWrapper(fp, "sign", (DoubleUnaryOperator) Math::signum);
+		addWrapper(intrinsics, "abs", (DoubleUnaryOperator) Math::abs);
+		addWrapper(intrinsics, "acos", Math::acos);
+		addWrapper(intrinsics, "asin", Math::asin);
+		addWrapper(intrinsics, "atan", Math::atan);
+		addWrapper(intrinsics, "ceil", Math::ceil);
+		addWrapper(intrinsics, "cbrt", Math::cbrt);
+		addWrapper(intrinsics, "expm1", Math::expm1);
+		addWrapper(intrinsics, "cos", Math::cos);
+		addWrapper(intrinsics, "cosh", Math::cosh);
+		addWrapper(intrinsics, "exp", Math::exp);
+		addWrapper(intrinsics, "floor", Math::floor);
+		addWrapper(intrinsics, "log", Math::log);
+		addWrapper(intrinsics, "log1p", Math::log1p);
+		addWrapper(intrinsics, "log10", Math::log10);
+		addWrapper(intrinsics, "round", (DoubleUnaryOperator) Math::round);
+		addWrapper(intrinsics, "sin", Math::sin);
+		addWrapper(intrinsics, "sinh", Math::sinh);
+		addWrapper(intrinsics, "sqrt", Math::sqrt);
+		addWrapper(intrinsics, "tan", Math::tan);
+		addWrapper(intrinsics, "tanh", Math::tanh);
+		addWrapper(intrinsics, "sign", (DoubleUnaryOperator) Math::signum);
 
 		// (double, double) -> double
-		addWrapper(fp, "atan2", Math::atan2);
-		addWrapper(fp, "pow", Math::pow);
+		addWrapper(intrinsics, "atan2", Math::atan2);
+		addWrapper(intrinsics, "pow", Math::pow);
 
 		// This method conforms to the same interface as the specification, but doesn't
 		// follow it exactly. It should behave the same for any given input, however.
-		addWrapper(fp, "hypot", (double[] coerced) -> {
+		addWrapper(intrinsics, "hypot", (double[] coerced) -> {
 			double sum = 0;
 			for (final double number : coerced) {
 				if (Double.isInfinite(number)) return Double.POSITIVE_INFINITY;
@@ -87,7 +84,7 @@ public final class MathObject extends ObjectValue {
 		});
 
 		// https://tc39.es/ecma262/multipage#sec-math.max
-		addWrapper(fp, "max", (double[] coerced) -> {
+		addWrapper(intrinsics, "max", (double[] coerced) -> {
 			//  3. Let highest be -∞𝔽.
 			double highest = Double.NEGATIVE_INFINITY;
 			//  4. For each element number of coerced, do
@@ -107,7 +104,7 @@ public final class MathObject extends ObjectValue {
 		});
 
 		// https://tc39.es/ecma262/multipage#sec-math.min
-		addWrapper(fp, "min", (double[] coerced) -> {
+		addWrapper(intrinsics, "min", (double[] coerced) -> {
 			//  3. Let lowest be +∞𝔽.
 			double lowest = Double.POSITIVE_INFINITY;
 			//  4. For each element number of coerced, do
@@ -126,10 +123,10 @@ public final class MathObject extends ObjectValue {
 		});
 
 		// () -> double
-		this.putMethod(fp, Names.random, 0, (interpreter, args) -> new NumberValue(Math.random()));
+		putMethod(intrinsics, Names.random, 0, (interpreter, args) -> new NumberValue(Math.random()));
 
 		// https://tc39.es/ecma262/multipage#sec-math.trunc
-		addWrapper(fp, "trunc", (double n) -> {
+		addWrapper(intrinsics, "trunc", (double n) -> {
 			// 2. If n is NaN, n is +0𝔽, n is -0𝔽, n is +∞𝔽, or n is -∞𝔽, return n.
 			if (Double.isNaN(n) || n == 0 || Double.isInfinite(n)) {
 				return n;
@@ -151,7 +148,7 @@ public final class MathObject extends ObjectValue {
 		});
 
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/asinh#polyfill
-		addWrapper(fp, "asinh", (double x) -> {
+		addWrapper(intrinsics, "asinh", (double x) -> {
 			double absX = Math.abs(x), w;
 
 			if (absX < 3.725290298461914e-9) // |x| < 2^-28
@@ -170,24 +167,24 @@ public final class MathObject extends ObjectValue {
 			return x > 0 ? w : -w;
 		});
 
-		addWrapper(fp, "log2", (double x) -> Math.log(x) / 0.6931471805599453D);
-		addWrapper(fp, "acosh", (double x) -> Math.log(x + Math.sqrt(x * x - 1)));
-		addWrapper(fp, "atanh", (double x) -> Math.log((1 + x) / (1 - x)) / 2);
+		addWrapper(intrinsics, "log2", (double x) -> Math.log(x) / 0.6931471805599453D);
+		addWrapper(intrinsics, "acosh", (double x) -> Math.log(x + Math.sqrt(x * x - 1)));
+		addWrapper(intrinsics, "atanh", (double x) -> Math.log((1 + x) / (1 - x)) / 2);
 
-		notImplemented(fp, "imul", 2);
-		notImplemented(fp, "clz32", 1);
-		notImplemented(fp, "fround", 1);
+		notImplemented(intrinsics, "imul", 2);
+		notImplemented(intrinsics, "clz32", 1);
+		notImplemented(intrinsics, "fround", 1);
 	}
 
-	private void notImplemented(FunctionPrototype fp, String methodName, int expectedArgumentCount) {
-		this.putMethod(fp, new StringValue(methodName), expectedArgumentCount, (interpreter, args) -> {
+	private void notImplemented(Intrinsics intrinsics, String methodName, int expectedArgumentCount) {
+		putMethod(intrinsics, new StringValue(methodName), expectedArgumentCount, (interpreter, args) -> {
 			throw new NotImplemented(methodName);
 		});
 	}
 
 	// https://tc39.es/ecma262/multipage#sec-math.hypot + sec-math.min + sec-math.max
-	private void addWrapper(FunctionPrototype fp, String methodName, DoubleRestArgs restArgs) {
-		this.putMethod(fp, new StringValue(methodName), 0, (interpreter, args) -> {
+	private void addWrapper(Intrinsics intrinsics, String methodName, DoubleRestArgs restArgs) {
+		putMethod(intrinsics, new StringValue(methodName), 0, (interpreter, args) -> {
 			final double[] coerced = new double[args.length];
 			for (int i = 0; i < args.length; i++) {
 				coerced[i] = args[i].toNumberValue(interpreter).value;
@@ -197,15 +194,15 @@ public final class MathObject extends ObjectValue {
 		});
 	}
 
-	private void addWrapper(FunctionPrototype fp, String methodName, DoubleUnaryOperator unaryOperator) {
-		this.putMethod(fp, new StringValue(methodName), 1, (interpreter, args) -> {
+	private void addWrapper(Intrinsics intrinsics, String methodName, DoubleUnaryOperator unaryOperator) {
+		putMethod(intrinsics, new StringValue(methodName), 1, (interpreter, args) -> {
 			final double number = argumentDouble(0, interpreter, args);
 			return new NumberValue(unaryOperator.applyAsDouble(number));
 		});
 	}
 
-	private void addWrapper(FunctionPrototype fp, String methodName, DoubleBinaryOperator binaryOperator) {
-		this.putMethod(fp, new StringValue(methodName), 2, (interpreter, args) -> {
+	private void addWrapper(Intrinsics intrinsics, String methodName, DoubleBinaryOperator binaryOperator) {
+		putMethod(intrinsics, new StringValue(methodName), 2, (interpreter, args) -> {
 			final double a = argumentDouble(0, interpreter, args);
 			final double b = argumentDouble(1, interpreter, args);
 			return new NumberValue(binaryOperator.applyAsDouble(a, b));

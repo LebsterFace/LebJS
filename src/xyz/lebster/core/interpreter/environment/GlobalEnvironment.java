@@ -4,12 +4,13 @@ import xyz.lebster.core.interpreter.GlobalObject;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 public record GlobalEnvironment(ObjectValue variables, GlobalObject globalObject) implements Environment {
 	public GlobalEnvironment(GlobalObject globalObject) {
-		this(new ObjectValue((ObjectValue) null), globalObject);
+		this(new ObjectValue(Null.instance), globalObject);
 	}
 
 	@Override

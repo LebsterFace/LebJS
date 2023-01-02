@@ -80,21 +80,20 @@ public record RelationalExpression(Expression left, Expression right, Relational
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-instanceofoperator")
-	private BooleanValue instanceofOperator(Interpreter interpreter, Value<?> V, Value<?> target) throws AbruptCompletion {
+	private BooleanValue instanceofOperator(Interpreter interpreter, Value<?> V, Value<?> target_) throws AbruptCompletion {
 		// 1. If Type(target) is not Object, throw a TypeError exception.
-		if (!(target instanceof final ObjectValue O_target))
+		if (!(target_ instanceof final ObjectValue target))
 			throw error(new TypeError(interpreter, "Right-hand side of `instanceof` is not an object"));
 		// 2. Let instOfHandler be ? GetMethod(target, @@hasInstance).
-		final Executable instOfHandler = O_target.getMethod(interpreter, SymbolValue.hasInstance);
+		final Executable instOfHandler = target.getMethod(interpreter, SymbolValue.hasInstance);
 		// 3. If instOfHandler is not undefined, then
 		if (instOfHandler != null)
 			// a. Return ! ToBoolean(? Call(instOfHandler, target, « V »)).
-			return instOfHandler.call(interpreter, O_target, V).toBooleanValue(interpreter);
+			return instOfHandler.call(interpreter, target, V).toBooleanValue(interpreter);
 		// 4. If IsCallable(target) is false, throw a TypeError exception.
-		if (!(O_target instanceof final Executable executable))
-			throw error(new TypeError(interpreter, "Not a function!"));
+		final Executable targetFn = Executable.getExecutable(interpreter, target);
 		// 5. Return ? OrdinaryHasInstance(target, V).
-		return executable.ordinaryHasInstance(interpreter, V);
+		return Executable.ordinaryHasInstance(interpreter, targetFn, V);
 	}
 
 	@Override

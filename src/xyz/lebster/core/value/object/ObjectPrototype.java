@@ -4,12 +4,12 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
-import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
@@ -25,7 +25,7 @@ public final class ObjectPrototype extends ObjectValue {
 	public NativeFunction toStringMethod;
 
 	public ObjectPrototype() {
-		super((ObjectValue) null);
+		super(Null.instance);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.tolocalestring")
@@ -142,21 +142,21 @@ public final class ObjectPrototype extends ObjectValue {
 		return BooleanValue.of(object.hasProperty(property));
 	}
 
-	public void populateMethods(FunctionPrototype fp) {
+	public void populateMethods(Intrinsics intrinsics) {
 		// 20.1.3.2 Object.prototype.hasOwnProperty ( V )
-		putMethod(fp, Names.hasOwnProperty, 1, ObjectPrototype::hasOwnPropertyMethod);
+		putMethod(intrinsics, Names.hasOwnProperty, 1, ObjectPrototype::hasOwnPropertyMethod);
 		// 20.1.3.3 Object.prototype.isPrototypeOf ( V )
-		putMethod(fp, Names.isPrototypeOf, 1, ObjectPrototype::isPrototypeOf);
+		putMethod(intrinsics, Names.isPrototypeOf, 1, ObjectPrototype::isPrototypeOf);
 		// 20.1.3.4 Object.prototype.propertyIsEnumerable ( V )
-		putMethod(fp, Names.propertyIsEnumerable, 1, ObjectPrototype::propertyIsEnumerable);
+		putMethod(intrinsics, Names.propertyIsEnumerable, 1, ObjectPrototype::propertyIsEnumerable);
 		// 20.1.3.5 Object.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
-		putMethod(fp, Names.toLocaleString, 0, ObjectPrototype::toLocaleString);
+		putMethod(intrinsics, Names.toLocaleString, 0, ObjectPrototype::toLocaleString);
 		// 20.1.3.6 Object.prototype.toString ( )
-		toStringMethod = putMethod(fp, Names.toString, 0, ObjectPrototype::toStringMethod);
+		toStringMethod = putMethod(intrinsics, Names.toString, 0, ObjectPrototype::toStringMethod);
 		// 20.1.3.7 Object.prototype.valueOf ( )
-		putMethod(fp, Names.valueOf, 0, ObjectPrototype::valueOf);
+		putMethod(intrinsics, Names.valueOf, 0, ObjectPrototype::valueOf);
 
 		// Non-standard
-		putMethod(fp, Names.hasProperty, 1, ObjectPrototype::hasPropertyMethod);
+		putMethod(intrinsics, Names.hasProperty, 1, ObjectPrototype::hasPropertyMethod);
 	}
 }

@@ -14,6 +14,7 @@ import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.NativeCode;
 import xyz.lebster.core.value.function.NativeFunction;
+import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
@@ -455,7 +456,7 @@ public final class ArrayPrototype extends ObjectValue {
 		}
 
 		// 7. Let obj be OrdinaryObjectCreate(null).
-		final var obj = new ObjectValue((ObjectValue) null);
+		final var obj = new ObjectValue(Null.instance);
 		// 8. For each Record { [[Key]], [[Elements]] } g of groups, do
 		for (final ArrayGroup g : groups) {
 			// a. Let elements be CreateArrayFromList(g.[[Elements]]).

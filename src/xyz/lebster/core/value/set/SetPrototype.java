@@ -111,11 +111,29 @@ public final class SetPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.delete")
-	private static Value<?> delete(Interpreter interpreter, Value<?>[] arguments) {
+	private static BooleanValue delete(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 24.2.3.4 Set.prototype.delete ( value )
 		final Value<?> value = argument(0, arguments);
 
-		throw new NotImplemented("Set.prototype.delete");
+		// 1. Let S be the `this` value.
+		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
+		final SetObject S = requireSetData(interpreter, "delete()");
+		// 3. Let entries be the List that is S.[[SetData]].
+		final ArrayList<Value<?>> entries = S.setData;
+		// 4. For each element e of entries, do
+		for (int i = 0; i < entries.size(); i++) {
+			final Value<?> e = entries.get(i);
+			// a. If e is not empty and SameValueZero(e, value) is true, then
+			if (e != null && e.sameValueZero(value)) {
+				// i. Replace the element of entries whose value is e with an element whose value is empty.
+				entries.set(i, null);
+				// ii. Return true.
+				return BooleanValue.TRUE;
+			}
+		}
+
+		// 5. Return false.
+		return BooleanValue.FALSE;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.entries")

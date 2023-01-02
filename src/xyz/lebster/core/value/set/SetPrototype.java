@@ -236,7 +236,7 @@ public final class SetPrototype extends ObjectValue {
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other);
 		// 4. Let keysIter be ? GetKeysIterator(otherRec).
-		final IteratorRecord keysIter = getKeysIter(interpreter, otherRec);
+		final IteratorRecord keysIter = getKeysIterator(interpreter, otherRec);
 		// 5. Let resultSetData be a copy of O.[[SetData]].
 		final ArrayList<Value<?>> resultSetData = new ArrayList<>(O.setData);
 		// 6. Let next be true.
@@ -278,7 +278,7 @@ public final class SetPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-getkeysiterator")
-	private static IteratorRecord getKeysIter(Interpreter interpreter, SetRecord setRec) throws AbruptCompletion {
+	private static IteratorRecord getKeysIterator(Interpreter interpreter, SetRecord setRec) throws AbruptCompletion {
 		// 1. Let keysIter be ? Call(setRec.[[Keys]], setRec.[[Set]]).
 		final Value<?> keysIter_ = setRec.keys.call(interpreter, setRec.set());
 		// 2. If keysIter is not an Object, throw a TypeError exception.
@@ -361,7 +361,7 @@ public final class SetPrototype extends ObjectValue {
 		// 7. Else,
 		else {
 			// a. Let keysIter be ? GetKeysIterator(otherRec).
-			final IteratorRecord keysIter = getKeysIter(interpreter, otherRec);
+			final IteratorRecord keysIter = getKeysIterator(interpreter, otherRec);
 			// b. Let next be true.
 			// c. Repeat, while next is not false,
 			ObjectValue next;
@@ -405,11 +405,65 @@ public final class SetPrototype extends ObjectValue {
 
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.difference")
-	public static SetObject difference(Interpreter interpreter, Value<?>[] arguments) {
+	public static SetObject difference(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 3 Set.prototype.difference ( other )
 		final Value<?> other = argument(0, arguments);
 
-		throw new NotImplemented("Set.prototype.difference");
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "difference()");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final SetRecord otherRec = getSetRecord(interpreter, other);
+		// 4. Let resultSetData be a copy of O.[[SetData]].
+		final ArrayList<Value<?>> resultSetData = new ArrayList<>(O.setData);
+		// 5. Let thisSize be the number of elements in O.[[SetData]].
+		final int thisSize = O.setData.size();
+		// 6. If thisSize ≤ otherRec.[[Size]], then
+		if (thisSize <= otherRec.size()) {
+			// a. For each element e of resultSetData, do
+			for (int i = resultSetData.size() - 1; i >= 0; i--) {
+				final Value<?> e = resultSetData.get(i);
+				// i. If e is not empty, then
+				if (e != null) {
+					// 1. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[Set]], « e »)).
+					final boolean inOther = otherRec.has().call(interpreter, otherRec.set(), e).isTruthy(interpreter);
+					// 2. If inOther is true, then
+					if (inOther) {
+						// a. Remove e from resultSetData.
+						resultSetData.remove(i);
+					}
+				}
+			}
+		}
+		// 7. Else,
+		else {
+			// a. Let keysIter be ? GetKeysIterator(otherRec).
+			final IteratorRecord keysIter = getKeysIterator(interpreter, otherRec);
+			// b. Let next be true.
+			ObjectValue next;
+			// c. Repeat, while next is not false,
+			do {
+				// i. Set next to ? IteratorStep(keysIter).
+				next = keysIter.step(interpreter);
+				// ii. If next is not false, then
+				if (next != null) {
+					// 1. Let nextValue be ? IteratorValue(next).
+					Value<?> nextValue = iteratorValue(interpreter, next);
+					// 2. If nextValue is -0𝔽, set nextValue to +0𝔽.
+					if (NumberValue.isNegativeZero(nextValue)) nextValue = NumberValue.ZERO;
+					// 3. If SetDataHas(resultSetData, nextValue) is true, then
+					if (setDataHas(resultSetData, nextValue)) {
+						// a. Remove nextValue from resultSetData.
+						resultSetData.remove(nextValue);
+					}
+				}
+			} while (next != null);
+		}
+
+		// 8. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
+		// 9. Set result.[[SetData]] to resultSetData.
+		// 10. Return result.
+		return new SetObject(interpreter.intrinsics, resultSetData);
 	}
 
 	@Proposal

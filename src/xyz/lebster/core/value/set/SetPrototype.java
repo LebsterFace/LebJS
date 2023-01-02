@@ -495,11 +495,52 @@ public final class SetPrototype extends ObjectValue {
 
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.isdisjointfrom")
-	public static BooleanValue isDisjointFrom(Interpreter interpreter, Value<?>[] arguments) {
+	public static BooleanValue isDisjointFrom(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 7 Set.prototype.isDisjointFrom ( other )
 		final Value<?> other = argument(0, arguments);
 
-		throw new NotImplemented("Set.prototype.isDisjointFrom");
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "isDisjointFrom()");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final SetRecord otherRec = getSetRecord(interpreter, other);
+		// 4. Let thisSize be the number of elements in O.[[SetData]].
+		final int thisSize = O.setData.size();
+		// 5. If thisSize ≤ otherRec.[[Size]], then
+		if (thisSize <= otherRec.size()) {
+			// a. For each element e of O.[[SetData]], do
+			for (final Value<?> e : O.setData) {
+				// i. If e is not empty, then
+				if (e != null) {
+					// 1. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[Set]], « e »)).
+					final boolean inOther = otherRec.has().call(interpreter, otherRec.set(), e).isTruthy(interpreter);
+					// 2. If inOther is true, return false.
+					if (inOther) return BooleanValue.FALSE;
+				}
+			}
+		}
+		// 6. Else,
+		else {
+			// a. Let keysIter be ? GetKeysIterator(otherRec).
+			final IteratorRecord keysIter = getKeysIterator(interpreter, otherRec);
+			// b. Let next be true.
+			ObjectValue next;
+			// c. Repeat, while next is not false,
+			do {
+				// i. Set next to ? IteratorStep(keysIter).
+				next = keysIter.step(interpreter);
+				// ii. If next is not false, then
+				if (next != null) {
+					// 1. Let nextValue be ? IteratorValue(next).
+					final Value<?> nextValue = iteratorValue(interpreter, next);
+					// 2. If SetDataHas(O.[[SetData]], nextValue) is true, return false.
+					if (setDataHas(O.setData, nextValue)) return BooleanValue.FALSE;
+				}
+			} while (next != null);
+		}
+
+		// 7. Return true.
+		return BooleanValue.TRUE;
 	}
 
 	private enum SetIteratorKind { KeyValue, Value }

@@ -171,7 +171,7 @@ public final class SetPrototype extends ObjectValue {
 		// 7. Repeat, while index < numEntries,
 		while (index < numEntries) {
 			// a. Let e be entries[index].
-			final var e = entries.get(index);
+			final Value<?> e = entries.get(index);
 			// b. Set index to index + 1.
 			index = index + 1;
 			// c. If e is not empty, then
@@ -197,7 +197,7 @@ public final class SetPrototype extends ObjectValue {
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
 		final SetObject S = requireSetData(interpreter, "has()");
 		// 3. Let entries be the List that is S.[[SetData]].
-		final var entries = S.setData;
+		final ArrayList<Value<?>> entries = S.setData;
 		// 4. For each element e of entries, do
 		for (final Value<?> e : entries) {
 			// a. If e is not empty and SameValueZero(e, value) is true, return true.
@@ -236,7 +236,7 @@ public final class SetPrototype extends ObjectValue {
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other);
 		// 4. Let keysIter be ? GetKeysIterator(otherRec).
-		final IteratorRecord keysIter = getKeysIterator(interpreter, otherRec);
+		final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
 		// 5. Let resultSetData be a copy of O.[[SetData]].
 		final ArrayList<Value<?>> resultSetData = new ArrayList<>(O.setData);
 		// 6. Let next be true.
@@ -277,24 +277,23 @@ public final class SetPrototype extends ObjectValue {
 		return false;
 	}
 
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-getkeysiterator")
-	private static IteratorRecord getKeysIterator(Interpreter interpreter, SetRecord setRec) throws AbruptCompletion {
-		// 1. Let keysIter be ? Call(setRec.[[Keys]], setRec.[[Set]]).
-		final Value<?> keysIter_ = setRec.keys.call(interpreter, setRec.set());
-		// 2. If keysIter is not an Object, throw a TypeError exception.
-		if (!(keysIter_ instanceof final ObjectValue keysIter))
-			throw error(new TypeError(interpreter, "SetRec.keys() did not return an object"));
-		// 3. Let nextMethod be ? Get(keysIter, "next").
-		final Value<?> nextMethod_ = keysIter.get(interpreter, Names.next);
-		// 4. If IsCallable(nextMethod) is false, throw a TypeError exception.
-		final Executable nextMethod = Executable.getExecutable(interpreter, nextMethod_);
-		// 5. Return a new Iterator Record { [[Iterator]]: keysIter, [[NextMethod]]: nextMethod, [[Done]]: false }.
-		return new IteratorRecord(keysIter, nextMethod, ANSI.stripFormatting(keysIter.toDisplayString()), "keys");
-	}
-
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set-records")
 	private record SetRecord(ObjectValue set, int size, Executable has, Executable keys) {
+		@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-getkeysiterator")
+		private IteratorRecord getKeysIterator(Interpreter interpreter) throws AbruptCompletion {
+			// 1. Let keysIter be ? Call(setRec.[[Keys]], setRec.[[Set]]).
+			final Value<?> keysIter_ = this.keys.call(interpreter, set());
+			// 2. If keysIter is not an Object, throw a TypeError exception.
+			if (!(keysIter_ instanceof final ObjectValue keysIter))
+				throw error(new TypeError(interpreter, "SetRec.keys() did not return an object"));
+			// 3. Let nextMethod be ? Get(keysIter, "next").
+			final Value<?> nextMethod_ = keysIter.get(interpreter, Names.next);
+			// 4. If IsCallable(nextMethod) is false, throw a TypeError exception.
+			final Executable nextMethod = Executable.getExecutable(interpreter, nextMethod_);
+			// 5. Return a new Iterator Record { [[Iterator]]: keysIter, [[NextMethod]]: nextMethod, [[Done]]: false }.
+			return new IteratorRecord(keysIter, nextMethod, ANSI.stripFormatting(keysIter.toDisplayString()), "keys");
+		}
 	}
 
 	@Proposal
@@ -361,7 +360,7 @@ public final class SetPrototype extends ObjectValue {
 		// 7. Else,
 		else {
 			// a. Let keysIter be ? GetKeysIterator(otherRec).
-			final IteratorRecord keysIter = getKeysIterator(interpreter, otherRec);
+			final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
 			// b. Let next be true.
 			// c. Repeat, while next is not false,
 			ObjectValue next;
@@ -438,7 +437,7 @@ public final class SetPrototype extends ObjectValue {
 		// 7. Else,
 		else {
 			// a. Let keysIter be ? GetKeysIterator(otherRec).
-			final IteratorRecord keysIter = getKeysIterator(interpreter, otherRec);
+			final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
 			// b. Let next be true.
 			ObjectValue next;
 			// c. Repeat, while next is not false,
@@ -504,11 +503,38 @@ public final class SetPrototype extends ObjectValue {
 
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.issupersetof")
-	public static BooleanValue isSupersetOf(Interpreter interpreter, Value<?>[] arguments) {
+	public static BooleanValue isSupersetOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 6 Set.prototype.isSupersetOf ( other )
 		final Value<?> other = argument(0, arguments);
 
-		throw new NotImplemented("Set.prototype.isSupersetOf");
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "isSupersetOf()");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final SetRecord otherRec = getSetRecord(interpreter, other);
+		// 4. Let thisSize be the number of elements in O.[[SetData]].
+		final int thisSize = O.setData.size();
+		// 5. If thisSize < otherRec.[[Size]], return false.
+		if (thisSize < otherRec.size()) return BooleanValue.FALSE;
+		// 6. Let keysIter be ? GetKeysIterator(otherRec).
+		final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
+		// 7. Let next be true.
+		ObjectValue next;
+		// 8. Repeat, while next is not false,
+		do {
+			// a. Set next to ? IteratorStep(keysIter).
+			next = keysIter.step(interpreter);
+			// b. If next is not false, then
+			if (next != null) {
+				// i. Let nextValue be ? IteratorValue(next).
+				final Value<?> nextValue = iteratorValue(interpreter, next);
+				// ii. If SetDataHas(O.[[SetData]], nextValue) is false, return false.
+				if (!setDataHas(O.setData, nextValue)) return BooleanValue.FALSE;
+			}
+		} while (next != null);
+
+		// 9. Return true.
+		return BooleanValue.TRUE;
 	}
 
 	@Proposal
@@ -540,7 +566,7 @@ public final class SetPrototype extends ObjectValue {
 		// 6. Else,
 		else {
 			// a. Let keysIter be ? GetKeysIterator(otherRec).
-			final IteratorRecord keysIter = getKeysIterator(interpreter, otherRec);
+			final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
 			// b. Let next be true.
 			ObjectValue next;
 			// c. Repeat, while next is not false,

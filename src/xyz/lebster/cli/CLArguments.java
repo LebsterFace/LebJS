@@ -15,19 +15,20 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 			final String argument = iterator.next();
 			if (argument.equalsIgnoreCase("--help") ||
 				argument.equalsIgnoreCase("-h") ||
-				argument.equalsIgnoreCase("/?")) {
+				argument.equals("/?") || argument.equals("-?")
+			) {
 				// Special case for help:
 				System.out.printf("%sLebJS Usage: %slebjs %s[parameters] %s[path]%s%n", ANSI.RED, ANSI.RESET, ANSI.CYAN, ANSI.GREEN, ANSI.RESET);
-				System.out.printf("%s-a%s, %s--ast%s                        Show AST%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
-				System.out.printf("%s-v%s, %s--verbose%s                    Don't hide stack traces%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
-				System.out.printf("%s--parse-only%s                     Ignore test failures from parsing%n", ANSI.CYAN, ANSI.RESET);
-				System.out.printf("%s--ignore-not-impl%s                Ignore test failures from unimplemented features%n", ANSI.CYAN, ANSI.RESET);
-				System.out.printf("%s--no-buffer%s                      Do not buffer test outputs%n", ANSI.CYAN, ANSI.RESET);
-				System.out.printf("%s--hide-passing%s                   Only output skipped / failing tests (ignored if %s--no-buffer%s specified)%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
-				System.out.printf("%s--disable-prompt%s                 Disable the %s'> '%s prompt in the REPL%n", ANSI.CYAN, ANSI.RESET, ANSI.BRIGHT_GREEN, ANSI.RESET);
-				System.out.printf("%s--harness %s[value]%s    Test harness. Valid options: %sserenity%s%n", ANSI.CYAN, ANSI.MAGENTA, ANSI.RESET, ANSI.MAGENTA, ANSI.RESET);
-				System.out.printf("%s-t%s, %s--test%s                       Run tests%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
-				System.out.printf("%s--gif%s                            Enable GIF rendering mode (No error handling, no prompt, print delimiter after execution, print AST)%n", ANSI.CYAN, ANSI.RESET);
+				System.out.printf("%s-a%s, %s--ast%s             Show AST%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
+				System.out.printf("%s-v%s, %s--verbose%s         Don't hide stack traces%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
+				System.out.printf("%s--parse-only%s          Ignore test failures from parsing%n", ANSI.CYAN, ANSI.RESET);
+				System.out.printf("%s--ignore-not-impl%s     Ignore test failures from unimplemented features%n", ANSI.CYAN, ANSI.RESET);
+				System.out.printf("%s--no-buffer%s           Do not buffer test outputs%n", ANSI.CYAN, ANSI.RESET);
+				System.out.printf("%s--hide-passing%s        Only output skipped / failing tests (ignored if %s--no-buffer%s specified)%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
+				System.out.printf("%s--disable-prompt%s      Disable the %s'> '%s prompt in the REPL%n", ANSI.CYAN, ANSI.RESET, ANSI.BRIGHT_GREEN, ANSI.RESET);
+				System.out.printf("%s--harness %s[value]%s     Test harness. Valid options: %sserenity%s%n", ANSI.CYAN, ANSI.MAGENTA, ANSI.RESET, ANSI.MAGENTA, ANSI.RESET);
+				System.out.printf("%s-t%s, %s--test%s            Run tests%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
+				System.out.printf("%s--gif%s                 Enable GIF rendering mode (No error handling, no prompt, print delimiter after execution, print AST)%n", ANSI.CYAN, ANSI.RESET);
 				System.exit(0);
 			}
 

@@ -23,6 +23,9 @@ import static xyz.lebster.core.value.primitive.number.NumberValue.isPositiveZero
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-math-object")
 public final class MathObject extends ObjectValue {
+	private static final double RAD_PER_DEG = 180 / Math.PI;
+	private static final double DEG_PER_RAD = Math.PI / 180;
+
 	public MathObject(Intrinsics intrinsics) {
 		super(intrinsics);
 		put(SymbolValue.toStringTag, Names.Math);
@@ -36,11 +39,10 @@ public final class MathObject extends ObjectValue {
 		addConstant(Names.PI, Math.PI); // π, the ratio of the circumference of a circle to its diameter
 		addConstant(Names.SQRT1_2, Math.sqrt(0.5)); // the square root of ½
 		addConstant(Names.SQRT2, Math.sqrt(2)); // the square root of 2
+		addConstant(Names.RAD_PER_DEG, RAD_PER_DEG);
+		addConstant(Names.DEG_PER_RAD, DEG_PER_RAD);
 
 		// 21.3.2 Function Properties of the Math Object
-
-		// (double) -> boolean
-		putMethod(intrinsics, Names.signbit, 1, MathObject::signbit);
 
 		// (double) -> double
 		addWrapper(intrinsics, Names.abs, (DoubleUnaryOperator) Math::abs);
@@ -71,8 +73,8 @@ public final class MathObject extends ObjectValue {
 
 		// (...double[]) -> double
 		addWrapper(intrinsics, Names.hypot, MathObject::hypot);
-		addWrapper(intrinsics, Names.max, MathObject::max);
-		addWrapper(intrinsics, Names.min, MathObject::min);
+		addWrapper(intrinsics, Names.max, (DoubleRestArgs) MathObject::max);
+		addWrapper(intrinsics, Names.min, (DoubleRestArgs) MathObject::min);
 
 		// () -> double
 		putMethod(intrinsics, Names.random, 0, MathObject::random);
@@ -81,6 +83,13 @@ public final class MathObject extends ObjectValue {
 		addWrapper(intrinsics, Names.log2, MathObject::log2);
 		addWrapper(intrinsics, Names.acosh, MathObject::acosh);
 		addWrapper(intrinsics, Names.atanh, MathObject::atanh);
+
+		// Proposed methods
+		putMethod(intrinsics, Names.signbit, 1, MathObject::signbit);
+		putMethod(intrinsics, Names.clamp, 3, MathObject::clamp);
+		putMethod(intrinsics, Names.scale, 5, MathObject::scale);
+		putMethod(intrinsics, Names.radians, 1, MathObject::radians);
+		putMethod(intrinsics, Names.degrees, 1, MathObject::degrees);
 
 		// Not implemented
 		notImplemented(intrinsics, "imul", 2);
@@ -126,6 +135,73 @@ public final class MathObject extends ObjectValue {
 	}
 
 	@Proposal
+	@SpecificationURL("https://rwaldron.github.io/proposal-math-extensions/#sec-math.degrees")
+	private static NumberValue degrees(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 5 Math.degrees ( radians )
+		final double radians = argumentDouble(0, interpreter, arguments);
+
+		// 1. If radians is one of NaN, +∞, -∞, return radians.
+		if (Double.isNaN(radians) || Double.isInfinite(radians)) return new NumberValue(radians);
+		// 2. Let degrees be (radians × Math.RAD_PER_DEG).
+		final double degrees = radians * RAD_PER_DEG;
+		// 3. Return degrees.
+		return new NumberValue(degrees);
+	}
+
+	@Proposal
+	@SpecificationURL("https://rwaldron.github.io/proposal-math-extensions/#sec-math.radians")
+	private static NumberValue radians(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 4. Math.radians ( degrees )
+		final double degrees = argumentDouble(0, interpreter, arguments);
+
+		// 1. If degrees is one of NaN, +∞, -∞, return degrees.
+		if (Double.isNaN(degrees) || Double.isInfinite(degrees)) return new NumberValue(degrees);
+		// 2. Let radians be (degrees × Math.DEG_PER_RAD).
+		final double radians = degrees * DEG_PER_RAD;
+		// 3. Return radians.
+		return new NumberValue(radians);
+	}
+
+	@Proposal
+	@SpecificationURL("https://rwaldron.github.io/proposal-math-extensions/#sec-math.scale")
+	private static NumberValue scale(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 3 Math.scale ( x, inLow, inHigh, outLow, outHigh )
+		final double x = argumentDouble(0, interpreter, arguments);
+		final double inLow = argumentDouble(1, interpreter, arguments);
+		final double inHigh = argumentDouble(2, interpreter, arguments);
+		final double outLow = argumentDouble(3, interpreter, arguments);
+		final double outHigh = argumentDouble(4, interpreter, arguments);
+
+		// 1. If any argument is NaN, return NaN.
+		if (Double.isNaN(x) || Double.isNaN(inLow) || Double.isNaN(inHigh) || Double.isNaN(outLow) || Double.isNaN(outHigh))
+			return NumberValue.NaN;
+
+		// 2. If x is one of +∞, -∞, return x.
+		if (Double.isInfinite(x)) return new NumberValue(x);
+		// 3. Return (x − inLow) × (outHigh − outLow) ÷ (inHigh − inLow) + outLow.
+		return new NumberValue((x - inLow) * (outHigh - outLow) / (inHigh - inLow) + outLow);
+	}
+
+	@Proposal
+	@SpecificationURL("https://rwaldron.github.io/proposal-math-extensions/#sec-math.clamp")
+	private static NumberValue clamp(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 2 Math.clamp ( x, lower, upper )
+
+		final double x = argumentDouble(0, interpreter, arguments);
+		final double lower = argumentDouble(1, interpreter, arguments);
+		final double upper = argumentDouble(2, interpreter, arguments);
+
+		// 1. If any argument is NaN, return NaN.
+		if (Double.isNaN(x) || Double.isNaN(lower) || Double.isNaN(upper)) return NumberValue.NaN;
+		// 2. Let max be %Math_max%(x, lower).
+		final double max = max(x, lower);
+		// 3. Let min be %Math_min%(max, upper).
+		final double min = min(max, upper);
+		// 4. Return min.
+		return new NumberValue(min);
+	}
+
+	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-Math.signbit/Math.signbit.html#spec")
 	private static BooleanValue signbit(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final double n = argumentDouble(0, interpreter, arguments);
@@ -162,7 +238,7 @@ public final class MathObject extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-math.min")
-	private static double min(double[] coerced) {
+	private static double min(double... coerced) {
 		//  3. Let lowest be +∞𝔽.
 		double lowest = Double.POSITIVE_INFINITY;
 		//  4. For each element number of coerced, do
@@ -181,7 +257,7 @@ public final class MathObject extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-math.max")
-	private static double max(double[] coerced) {
+	private static double max(double... coerced) {
 		//  3. Let highest be -∞𝔽.
 		double highest = Double.NEGATIVE_INFINITY;
 		//  4. For each element number of coerced, do

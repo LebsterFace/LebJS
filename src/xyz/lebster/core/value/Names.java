@@ -5,6 +5,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 public final class Names {
 	public static final StringValue Array = new StringValue("Array");
 	public static final StringValue Boolean = new StringValue("Boolean");
+	public static final StringValue DEG_PER_RAD = new StringValue("DEG_PER_RAD");
 	public static final StringValue E = new StringValue("E");
 	public static final StringValue Error = new StringValue("Error");
 	public static final StringValue Function = new StringValue("Function");
@@ -18,6 +19,7 @@ public final class Names {
 	public static final StringValue Number = new StringValue("Number");
 	public static final StringValue Object = new StringValue("Object");
 	public static final StringValue PI = new StringValue("PI");
+	public static final StringValue RAD_PER_DEG = new StringValue("RAD_PER_DEG");
 	public static final StringValue RangeError = new StringValue("RangeError");
 	public static final StringValue ReferenceError = new StringValue("ReferenceError");
 	public static final StringValue RegExp = new StringValue("RegExp");
@@ -220,6 +222,10 @@ public final class Names {
 	public static final StringValue warn = new StringValue("warn");
 	public static final StringValue writable = new StringValue("writable");
 	public static final StringValue write = new StringValue("write");
+	public static final StringValue clamp = new StringValue("clamp");
+	public static final StringValue scale = new StringValue("scale");
+	public static final StringValue radians = new StringValue("radians");
+	public static final StringValue degrees = new StringValue("degrees");
 
 	public static final StringValue EMPTY = new StringValue("");
 }

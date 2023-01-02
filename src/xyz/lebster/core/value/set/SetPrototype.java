@@ -467,11 +467,50 @@ public final class SetPrototype extends ObjectValue {
 
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.symmetricdifference")
-	public static SetObject symmetricDifference(Interpreter interpreter, Value<?>[] arguments) {
+	public static SetObject symmetricDifference(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 4 Set.prototype.symmetricDifference ( other )
 		final Value<?> other = argument(0, arguments);
 
-		throw new NotImplemented("Set.prototype.symmetricDifference");
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "symmetricDifference()");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final SetRecord otherRec = getSetRecord(interpreter, other);
+		// 4. Let keysIter be ? GetKeysIterator(otherRec).
+		final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
+		// 5. Let resultSetData be a copy of O.[[SetData]].
+		final ArrayList<Value<?>> resultSetData = new ArrayList<>(O.setData);
+		// 6. Let next be true.
+		ObjectValue next;
+		// 7. Repeat, while next is not false,
+		do {
+			// a. Set next to ? IteratorStep(keysIter).
+			next = keysIter.step(interpreter);
+			// b. If next is not false, then
+			if (next != null) {
+				// i. Let nextValue be ? IteratorValue(next).
+				Value<?> nextValue = iteratorValue(interpreter, next);
+				// ii. If nextValue is -0𝔽, set nextValue to +0𝔽.
+				if (NumberValue.isNegativeZero(nextValue)) nextValue = NumberValue.ZERO;
+				// iii. Let inResult be SetDataHas(resultSetData, nextValue).
+				final boolean inResult = setDataHas(resultSetData, nextValue);
+				// iv. If SetDataHas(O.[[SetData]], nextValue) is true, then
+				if (setDataHas(O.setData, nextValue)) {
+					// 1. If inResult is true, remove nextValue from resultSetData.
+					if (inResult) resultSetData.remove(nextValue);
+				}
+				// v. Else,
+				else {
+					// 1. If inResult is false, append nextValue to resultSetData.
+					if (!inResult) resultSetData.add(nextValue);
+				}
+			}
+		} while (next != null);
+
+		// 8. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
+		// 9. Set result.[[SetData]] to resultSetData.
+		// 10. Return result.
+		return new SetObject(interpreter.intrinsics, resultSetData);
 	}
 
 	@Proposal

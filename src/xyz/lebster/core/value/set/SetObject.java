@@ -9,7 +9,6 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-set-objects")
 public final class SetObject extends ObjectValue {
@@ -37,7 +36,14 @@ public final class SetObject extends ObjectValue {
 
 	@Override
 	public Iterable<Displayable> displayableValues() {
-		return Collections.unmodifiableList(setData);
+		final ArrayList<Displayable> result = new ArrayList<>(setData.size());
+		for (final Value<?> e : setData) {
+			if (e != null) {
+				result.add(e);
+			}
+		}
+
+		return result;
 	}
 
 	@Override

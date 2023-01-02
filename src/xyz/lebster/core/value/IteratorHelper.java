@@ -54,7 +54,7 @@ public final class IteratorHelper {
 		if (!(nextProperty.get(interpreter, iterator) instanceof final Executable executable))
 			throw error(new TypeError(interpreter, display + "[Symbol.iterator]().next is not a function"));
 
-		return new IteratorRecord(iterator, executable, display);
+		return new IteratorRecord(iterator, executable, display, "[Symbol.iterator]");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorcomplete")
@@ -75,11 +75,13 @@ public final class IteratorHelper {
 		private final ObjectValue iteratorObject;
 		private final Executable nextMethod;
 		private final String errorString;
+		private final String methodName;
 
-		private IteratorRecord(ObjectValue iteratorObject, Executable nextMethod, String display) {
+		public IteratorRecord(ObjectValue iteratorObject, Executable nextMethod, String display, String methodName) {
 			this.iteratorObject = iteratorObject;
 			this.nextMethod = nextMethod;
 			this.errorString = display;
+			this.methodName = methodName;
 		}
 
 		@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratornext")
@@ -94,7 +96,8 @@ public final class IteratorHelper {
 			// 3. If result is not an Object, throw a TypeError exception.
 			if (!(result instanceof final ObjectValue next)) {
 				final String representation = ANSI.stripFormatting(result.toDisplayString());
-				throw error(new TypeError(interpreter, errorString + "[Symbol.iterator]().next() returned a non-object value (" + representation + ")"));
+				throw error(new TypeError(interpreter,
+					"%s%s().next() returned a non-object value (%s)".formatted(errorString, methodName, representation)));
 			}
 
 			// 4. Return result.

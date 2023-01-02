@@ -1,13 +1,18 @@
 package xyz.lebster.core.value.set;
 
+import xyz.lebster.core.ANSI;
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
+import xyz.lebster.core.value.Generator;
+import xyz.lebster.core.value.IteratorHelper.IteratorRecord;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.NativeFunction;
@@ -23,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+import static xyz.lebster.core.value.IteratorHelper.iteratorValue;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
+import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-set-prototype-object")
 public final class SetPrototype extends ObjectValue {
@@ -201,11 +208,20 @@ public final class SetPrototype extends ObjectValue {
 		return BooleanValue.FALSE;
 	}
 
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createsetiterator")
+	private static Generator createSetIterator(Interpreter interpreter, SetObject set, SetIteratorKind kind) throws AbruptCompletion {
+		return new SetIterator(interpreter, set, kind);
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.values")
-	private static Value<?> values(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> values(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 24.2.3.10 Set.prototype.values ( )
 
-		throw new NotImplemented("Set.prototype.values");
+		// 1. Let S be the `this` value.
+		final SetObject S = requireSetData(interpreter, "values()");
+		// 2. Return ? CreateSetIterator(S, value).
+		return createSetIterator(interpreter, S, SetIteratorKind.Value);
 	}
 
 	@Proposal
@@ -269,5 +285,42 @@ public final class SetPrototype extends ObjectValue {
 		final Value<?> other = argument(0, arguments);
 
 		throw new NotImplemented("Set.prototype.isDisjointFrom");
+	}
+
+	private enum SetIteratorKind { KeyValue, Value }
+
+	private static class SetIterator extends Generator {
+		private final SetIteratorKind kind;
+		private int index;
+		private final ArrayList<Value<?>> entries;
+
+		private SetIterator(Interpreter interpreter, SetObject set, SetIteratorKind kind) {
+			super(interpreter.intrinsics);
+			this.index = 0;
+			this.entries = set.setData;
+			this.kind = kind;
+		}
+
+		@Override
+		public ObjectValue next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+			final ObjectValue result = new ObjectValue(interpreter.intrinsics);
+
+			while (true) {
+				if (index >= entries.size()) {
+					result.put(Names.done, BooleanValue.TRUE);
+					result.put(Names.value, Undefined.instance);
+					return result;
+				}
+
+				final Value<?> e = entries.get(index);
+				index = index + 1;
+				if (e == null) continue;
+
+				final Value<?> value = kind == SetIteratorKind.KeyValue ? new ArrayObject(interpreter, e, e) : e;
+				result.put(Names.value, value);
+				result.put(Names.done, BooleanValue.FALSE);
+				return result;
+			}
+		}
 	}
 }

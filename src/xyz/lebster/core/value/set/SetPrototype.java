@@ -226,11 +226,105 @@ public final class SetPrototype extends ObjectValue {
 
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.union")
-	public static SetObject union(Interpreter interpreter, Value<?>[] arguments) {
+	public static SetObject union(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1 Set.prototype.union ( other )
 		final Value<?> other = argument(0, arguments);
 
-		throw new NotImplemented("Set.prototype.union");
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "union()");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final SetRecord otherRec = getSetRecord(interpreter, other);
+		// 4. Let keysIter be ? GetKeysIterator(otherRec).
+		final IteratorRecord keysIter = getKeysIter(interpreter, otherRec);
+		// 5. Let resultSetData be a copy of O.[[SetData]].
+		final ArrayList<Value<?>> resultSetData = new ArrayList<>(O.setData);
+		// 6. Let next be true.
+		// 7. Repeat, while next is not false,
+		ObjectValue next;
+		do {
+			// a. Set next to ? IteratorStep(keysIter).
+			next = keysIter.step(interpreter);
+			// b. If next is not false, then
+			if (next != null) {
+				// i. Let nextValue be ? IteratorValue(next).
+				Value<?> nextValue = iteratorValue(interpreter, next);
+				// ii. If nextValue is -0𝔽, set nextValue to +0𝔽.
+				if (NumberValue.isNegativeZero(nextValue)) nextValue = NumberValue.ZERO;
+				// iii. If SetDataHas(resultSetData, nextValue) is false, then
+				if (!setDataHas(resultSetData, nextValue)) {
+					// 1. Append nextValue to resultSetData.
+					resultSetData.add(nextValue);
+				}
+			}
+		} while (next != null);
+
+		// 8. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
+		// 9. Set result.[[SetData]] to resultSetData.
+		// 10. Return result.
+		return new SetObject(interpreter.intrinsics, resultSetData);
+	}
+
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-setdatahas")
+	private static boolean setDataHas(ArrayList<Value<?>> resultSetData, Value<?> value) {
+		// 1. For each element e of resultSetData, do
+		for (final Value<?> e : resultSetData) {
+			// a. If e is not empty and SameValueZero(e, value) is true, return true.
+			if (e != null && e.sameValueZero(value)) return true;
+		}
+
+		// 2. Return false.
+		return false;
+	}
+
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-getkeysiterator")
+	private static IteratorRecord getKeysIter(Interpreter interpreter, SetRecord setRec) throws AbruptCompletion {
+		// 1. Let keysIter be ? Call(setRec.[[Keys]], setRec.[[Set]]).
+		final Value<?> keysIter_ = setRec.keys.call(interpreter, setRec.set());
+		// 2. If keysIter is not an Object, throw a TypeError exception.
+		if (!(keysIter_ instanceof final ObjectValue keysIter))
+			throw error(new TypeError(interpreter, "SetRec.keys() did not return an object"));
+		// 3. Let nextMethod be ? Get(keysIter, "next").
+		final Value<?> nextMethod_ = keysIter.get(interpreter, Names.next);
+		// 4. If IsCallable(nextMethod) is false, throw a TypeError exception.
+		final Executable nextMethod = Executable.getExecutable(interpreter, nextMethod_);
+		// 5. Return a new Iterator Record { [[Iterator]]: keysIter, [[NextMethod]]: nextMethod, [[Done]]: false }.
+		return new IteratorRecord(keysIter, nextMethod, ANSI.stripFormatting(keysIter.toDisplayString()), "keys");
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set-records")
+	private record SetRecord(ObjectValue set, int size, Executable has, Executable keys) {
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-getsetrecord")
+	private static SetRecord getSetRecord(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
+		// 1. If obj is not an Object, throw a TypeError exception.
+		if (!(value instanceof final ObjectValue obj)) {
+			throw error(new TypeError(interpreter, "Not an object"));
+		}
+
+		// 2. Let rawSize be ? Get(obj, "size").
+		final Value<?> rawSize = obj.get(interpreter, Names.size);
+		// 3. Let numSize be ? ToNumber(rawSize).
+		final NumberValue numSize = rawSize.toNumberValue(interpreter);
+		// 4. NOTE: If rawSize is undefined, then numSize will be NaN.
+		// 5. If numSize is NaN, throw a TypeError exception.
+		if (numSize.value.isNaN())
+			throw error(new TypeError(interpreter, "Size must not be NaN"));
+		// 6. Let intSize be ! ToIntegerOrInfinity(numSize).
+		final int intSize = toIntegerOrInfinity(interpreter, numSize);
+		// 7. Let has be ? Get(obj, "has").
+		final Value<?> has_ = obj.get(interpreter, Names.has);
+		// 8. If IsCallable(has) is false, throw a TypeError exception.
+		final Executable has = Executable.getExecutable(interpreter, has_);
+		// 9. Let keys be ? Get(obj, "keys").
+		final Value<?> keys_ = obj.get(interpreter, Names.keys);
+		// 10. If IsCallable(keys) is false, throw a TypeError exception.
+		final Executable keys = Executable.getExecutable(interpreter, keys_);
+		// 11. Return a new Set Record { [[Set]]: obj, [[Size]]: intSize, [[Has]]: has, [[Keys]]: keys }.
+		return new SetRecord(obj, intSize, has, keys);
 	}
 
 	@Proposal

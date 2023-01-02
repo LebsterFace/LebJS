@@ -329,11 +329,78 @@ public final class SetPrototype extends ObjectValue {
 
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.intersection")
-	public static SetObject intersection(Interpreter interpreter, Value<?>[] arguments) {
+	public static SetObject intersection(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 2 Set.prototype.intersection ( other )
 		final Value<?> other = argument(0, arguments);
 
-		throw new NotImplemented("Set.prototype.intersection");
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "intersection()");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final SetRecord otherRec = getSetRecord(interpreter, other);
+		// 4. Let resultSetData be a new empty List.
+		final ArrayList<Value<?>> resultSetData = new ArrayList<>();
+		// 5. Let thisSize be the number of elements in O.[[SetData]].
+		final int thisSize = O.setData.size();
+		// 6. If thisSize ≤ otherRec.[[Size]], then
+		if (thisSize <= otherRec.size()) {
+			// a. For each element e of O.[[SetData]], do
+			for (final Value<?> e : O.setData) {
+				// i. If e is not empty, then
+				if (e != null) {
+					// 1. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[Set]], « e »)).
+					final boolean inOther = otherRec.has().call(interpreter, otherRec.set, e).isTruthy(interpreter);
+					// 2. If inOther is true, then
+					if (inOther) {
+						// a. Append e to resultSetData.
+						resultSetData.add(e);
+					}
+				}
+			}
+		}
+		// 7. Else,
+		else {
+			// a. Let keysIter be ? GetKeysIterator(otherRec).
+			final IteratorRecord keysIter = getKeysIter(interpreter, otherRec);
+			// b. Let next be true.
+			// c. Repeat, while next is not false,
+			ObjectValue next;
+			do {
+				// i. Set next to ? IteratorStep(keysIter).
+				next = keysIter.step(interpreter);
+				// ii. If next is not false, then
+				if (next != null) {
+					// 1. Let nextValue be ? IteratorValue(next).
+					Value<?> nextValue = iteratorValue(interpreter, next);
+					// 2. If nextValue is -0𝔽, set nextValue to +0𝔽.
+					if (NumberValue.isNegativeZero(nextValue)) nextValue = NumberValue.ZERO;
+					// 3. NOTE: Because other is an arbitrary object, it is possible for its "keys" iterator to produce the same value more than once.
+					// 4. Let alreadyInResult be SetDataHas(resultSetData, nextValue).
+					final boolean alreadyInResult = setDataHas(resultSetData, nextValue);
+					// 5. Let inThis be SetDataHas(O.[[SetData]], nextValue).
+					final boolean inThis = setDataHas(O.setData, nextValue);
+					// 6. If alreadyInResult is false and inThis is true, then
+					if (!alreadyInResult && inThis) {
+						// a. Append nextValue to resultSetData.
+						resultSetData.add(nextValue);
+					}
+				}
+			} while (next != null);
+			// d. NOTE: It is possible for resultSetData not to be a subset of O.[[SetData]] at this point because
+			// arbitrary code may have been executed by the iterator, including code which modifies O.[[SetData]].
+			// e. Sort the elements of resultSetData so that
+			resultSetData.sort((Value<?> a, Value<?> b) -> {
+				// all elements which are also in O.[[SetData]] are ordered as they are in O.[[SetData]],
+				if (O.setData.contains(a)) return -1;
+				// and any additional elements are moved to the end of the list in the same order as they were before sorting resultSetData.
+				return 1;
+			});
+		}
+
+		// 8. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
+		// 9. Set result.[[SetData]] to resultSetData.
+		// 10. Return result.
+		return new SetObject(interpreter.intrinsics, resultSetData);
 	}
 
 	@Proposal

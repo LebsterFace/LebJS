@@ -117,7 +117,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 		// 7. Let arrayLike be ! ToObject(items).
 		final ObjectValue arrayLike = items.toObjectValue(interpreter);
 		// 8. Let len be ? LengthOfArrayLike(arrayLike).
-		final long len = lengthOfArrayLike(arrayLike, interpreter);
+		final long len = lengthOfArrayLike(interpreter, arrayLike);
 		// 9. If IsConstructor(C) is true, then
 		final ObjectValue A = C instanceof final Constructor constructor ?
 			// a. Let A be ? Construct(C, « 𝔽(len) »).

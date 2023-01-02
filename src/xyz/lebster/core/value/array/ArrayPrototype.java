@@ -69,7 +69,7 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.splice, 2, ArrayPrototype::splice);
 		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
 		putMethod(intrinsics, Names.toString, 0, ArrayPrototype::toStringMethod);
-		putMethod(intrinsics, Names.unshift, 0, ArrayPrototype::unshift);
+		putMethod(intrinsics, Names.unshift, 1, ArrayPrototype::unshift);
 		final NativeFunction values = putMethod(intrinsics, Names.values, 0, ArrayPrototype::values);
 		put(SymbolValue.iterator, values);
 	}
@@ -82,7 +82,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. Let relativeIndex be ? ToIntegerOrInfinity(index).
 		final int relativeIndex = NumberPrototype.toIntegerOrInfinity(interpreter, index);
 		// 4. If relativeIndex ≥ 0, then a. Let k be relativeIndex. 5. Else, a. Let k be len + relativeIndex.
@@ -129,7 +129,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable callbackfn = Executable.getExecutable(interpreter, potential_callbackfn);
 
@@ -175,7 +175,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
 		final Executable predicate = Executable.getExecutable(interpreter, predicate_);
 		// 4. Let k be 0.
@@ -205,7 +205,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
 		final Executable predicate = Executable.getExecutable(interpreter, predicate_);
 		// 4. Let k be 0.
@@ -347,7 +347,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let obj be ? ToObject(this value).
 		final ObjectValue obj = interpreter.thisValue().toObjectValue(interpreter);
 		// 3. Let len be ? LengthOfArrayLike(obj).
-		final long len = lengthOfArrayLike(obj, interpreter);
+		final long len = lengthOfArrayLike(interpreter, obj);
 		// 4. Let SortCompare be a new Abstract Closure with parameters (x, y) that captures comparefn and performs the following steps when called:
 		final NativeCode SortCompare = ($, arguments_) -> {
 			final Value<?> x = argument(0, arguments_);
@@ -408,12 +408,64 @@ public final class ArrayPrototype extends ObjectValue {
 		throw new NotImplemented("Array.prototype.toLocaleString");
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.unshift")
-	private static Value<?> unshift(Interpreter interpreter, Value<?>[] items) {
+	private static NumberValue unshift(Interpreter interpreter, Value<?>[] items) throws AbruptCompletion {
 		// 23.1.3.34 Array.prototype.unshift ( ...items )
 
-		throw new NotImplemented("Array.prototype.unshift");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(interpreter, O);
+		// 3. Let argCount be the number of elements in items.
+		final int argCount = items.length;
+		// 4. If argCount > 0, then
+		if (argCount > 0) {
+			// a. If len + argCount > 2^53 - 1, throw a TypeError exception.
+			if (len + argCount > MAX_LENGTH)
+				throw error(new TypeError(interpreter, "Invalid array length"));
+			// b. Let k be len.
+			long k = len;
+			// c. Repeat, while k > 0,
+			while (k > 0) {
+				// i. Let `from` be ! ToString(𝔽(k - 1)).
+				final StringValue from = new StringValue(k - 1);
+				// ii. Let `to` be ! ToString(𝔽(k + argCount - 1)).
+				final StringValue to = new StringValue(k + argCount - 1);
+				// iii. Let fromPresent be ? HasProperty(O, from).
+				final boolean fromPresent = O.hasProperty(from);
+				// iv. If fromPresent is true, then
+				if (fromPresent) {
+					// 1. Let fromValue be ? Get(O, from).
+					final Value<?> fromValue = O.get(interpreter, from);
+					// 2. Perform ? Set(O, to, fromValue, true).
+					O.set(interpreter, to, fromValue/* FIXME: , true */);
+				}
+				// v. Else,
+				else {
+					// 1. Assert: fromPresent is false.
+					// 2. Perform ? DeletePropertyOrThrow(O, to).
+					O.deletePropertyOrThrow(interpreter, to);
+				}
+
+				// vi. Set k to k - 1.
+				k = k - 1;
+			}
+
+			// d. Let j be +0𝔽.
+			int j = 0;
+			// e. For each element E of items, do
+			for (final Value<?> E : items) {
+				// i. Perform ? Set(O, ! ToString(j), E, true).
+				O.set(interpreter, new StringValue(j), E/* FIXME: , true */);
+				// ii. Set j to j + 1𝔽.
+				j = j + 1;
+			}
+		}
+
+		// 5. Perform ? Set(O, "length", 𝔽(len + argCount), true).
+		O.set(interpreter, Names.length, new NumberValue(len + argCount)/* FIXME: , true */);
+		// 6. Return 𝔽(len + argCount).
+		return new NumberValue(len + argCount);
 	}
 
 	@NonCompliant
@@ -434,7 +486,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
 		// 4. Let k be 0.
@@ -502,7 +554,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. Let relativeStart be ? ToIntegerOrInfinity(start).
 		final int relativeStart = NumberPrototype.toIntegerOrInfinity(interpreter, start);
 		long k;
@@ -560,7 +612,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If len is 0, return false.
 		if (len == 0) return BooleanValue.FALSE;
 		// 4. Let n be ? ToIntegerOrInfinity(fromIndex).
@@ -604,7 +656,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If len = 0, then
 		if (len == 0) {
 			// a. Perform ? Set(O, "length", +0𝔽, true).
@@ -639,7 +691,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
 		// 4. Let A be ? ArraySpeciesCreate(O, 0).
@@ -686,7 +738,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
 		// 4. Let k be 0.
@@ -743,7 +795,7 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
-	static long lengthOfArrayLike(ObjectValue O, Interpreter interpreter) throws AbruptCompletion {
+	static long lengthOfArrayLike(Interpreter interpreter, ObjectValue O) throws AbruptCompletion {
 		final double number = O.get(interpreter, Names.length).toNumberValue(interpreter).value;
 		if (Double.isNaN(number) || number <= 0) {
 			return 0L;
@@ -758,7 +810,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		long len = lengthOfArrayLike(O, interpreter);
+		long len = lengthOfArrayLike(interpreter, O);
 		// 3. Let argCount be the number of elements in items.
 		final int argCount = items.length;
 		// 4. If len + argCount > 2^53 - 1, throw a TypeError exception.
@@ -789,7 +841,7 @@ public final class ArrayPrototype extends ObjectValue {
 		final Value<?> thisArg = argument(1, arguments);
 
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
 
 		final Value<?>[] values = new Value<?>[(int) len];
@@ -812,7 +864,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable callback = Executable.getExecutable(interpreter, callbackfn);
 		// 4. If len = 0 and initialValue is not present, throw a TypeError exception.
@@ -879,7 +931,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(O, interpreter);
+		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. Let middle be floor(len / 2).
 		final long middle = Math.floorDiv(len, 2);
 		// 4. Let lower be 0.
@@ -954,7 +1006,7 @@ public final class ArrayPrototype extends ObjectValue {
 		public ArrayIterator(Interpreter interpreter) throws AbruptCompletion {
 			super(interpreter.intrinsics);
 			this.O = interpreter.thisValue().toObjectValue(interpreter);
-			this.len = lengthOfArrayLike(O, interpreter);
+			this.len = lengthOfArrayLike(interpreter, O);
 			this.index = 0;
 		}
 

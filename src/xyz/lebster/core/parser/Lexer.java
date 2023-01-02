@@ -179,11 +179,11 @@ public final class Lexer {
 		return index >= codePoints.length;
 	}
 
-	private boolean isDigit(int c) {
+	private static boolean isDigit(int c) {
 		return c >= '0' && c <= '9';
 	}
 
-	private boolean isDigit(int ch, int radix) {
+	private static boolean isDigit(int ch, int radix) {
 		if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX) {
 			return false;
 		}
@@ -199,7 +199,7 @@ public final class Lexer {
 		}
 	}
 
-	private boolean isAlphabetical(int c) {
+	private static boolean isAlphabetical(int c) {
 		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 	}
 
@@ -258,7 +258,7 @@ public final class Lexer {
 		return anyOf(codePoints.codePoints().toArray());
 	}
 
-	private boolean isIdentifierStart() {
+	public static boolean isIdentifierStart(int codePoint) {
 		if (codePoint == '\\') {
 			return false;
 		} else if (isAlphabetical(codePoint) || codePoint == '_' || codePoint == '$') {
@@ -273,7 +273,7 @@ public final class Lexer {
 		}
 	}
 
-	private boolean isIdentifierMiddle() {
+	public static boolean isIdentifierMiddle(int codePoint) {
 		if (codePoint == '\\') {
 			return false;
 		} else if (isAlphabetical(codePoint) || isDigit(codePoint) || codePoint == '_' || codePoint == '$') {
@@ -351,7 +351,7 @@ public final class Lexer {
 		if (isLineTerminator()) {
 			while (isLineTerminator() && hasNext()) consume();
 			return new Token(TokenType.LineTerminator, position());
-		} else if (isIdentifierStart()) {
+		} else if (isIdentifierStart(codePoint)) {
 			return tokenizeKeywordOrIdentifier();
 		} else if (isDigit(codePoint)) {
 			return tokenizeNumericLiteral();
@@ -613,7 +613,7 @@ public final class Lexer {
 
 	private Token tokenizeKeywordOrIdentifier() {
 		final var builder = new StringBuilder();
-		while (isIdentifierMiddle()) collect(builder);
+		while (isIdentifierMiddle(codePoint)) collect(builder);
 		final String value = builder.toString();
 		final TokenType type = keywords.getOrDefault(value, TokenType.Identifier);
 		return new Token(type, value, position());

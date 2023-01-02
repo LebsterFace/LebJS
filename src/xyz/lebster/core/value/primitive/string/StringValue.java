@@ -5,9 +5,12 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
+
+import java.util.PrimitiveIterator;
 
 public final class StringValue extends ObjectValue.Key<String> {
 	public static final StringValue EMPTY = new StringValue("");
@@ -68,11 +71,26 @@ public final class StringValue extends ObjectValue.Key<String> {
 
 	@Override
 	public void displayForObjectKey(StringRepresentation representation) {
-		if (this.value.contains(" ")) {
-			this.display(representation);
-		} else {
+		if (this.isValidIdentifier()) {
 			representation.append(value);
+		} else {
+			this.display(representation);
 		}
+	}
+
+	private boolean isValidIdentifier() {
+		final PrimitiveIterator.OfInt iterator = value.codePoints().iterator();
+		if (!(iterator.hasNext() && Lexer.isIdentifierStart(iterator.next()))) {
+			return false;
+		}
+
+		while (iterator.hasNext()) {
+			if (!Lexer.isIdentifierMiddle(iterator.next())) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Override

@@ -477,11 +477,29 @@ public final class SetPrototype extends ObjectValue {
 
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.issubsetof")
-	public static BooleanValue isSubsetOf(Interpreter interpreter, Value<?>[] arguments) {
+	public static BooleanValue isSubsetOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 5 Set.prototype.isSubsetOf ( other )
 		final Value<?> other = argument(0, arguments);
 
-		throw new NotImplemented("Set.prototype.isSubsetOf");
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "isSubsetOf()");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final SetRecord otherRec = getSetRecord(interpreter, other);
+		// 4. Let thisSize be the number of elements in O.[[SetData]].
+		final int thisSize = O.setData.size();
+		// 5. If thisSize > otherRec.[[Size]], return false.
+		if (thisSize > otherRec.size()) return BooleanValue.FALSE;
+		// 6. For each element e of O.[[SetData]], do
+		for (final Value<?> e : O.setData) {
+			// a. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[Set]], « e »)).
+			final boolean inOther = otherRec.has().call(interpreter, otherRec.set(), e).isTruthy(interpreter);
+			// b. If inOther is false, return false.
+			if (!inOther) return BooleanValue.FALSE;
+		}
+
+		// 7. Return true.
+		return BooleanValue.TRUE;
 	}
 
 	@Proposal

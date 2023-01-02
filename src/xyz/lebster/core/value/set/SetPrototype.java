@@ -9,6 +9,7 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
+import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.AccessorDescriptor;
@@ -144,12 +145,40 @@ public final class SetPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.foreach")
-	private static Value<?> forEach(Interpreter interpreter, Value<?>[] arguments) {
+	private static Undefined forEach(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 24.2.3.6 Set.prototype.forEach ( callbackfn [ , thisArg ] )
-		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> callbackfn_ = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
 
-		throw new NotImplemented("Set.prototype.forEach");
+		// 1. Let S be the `this` value.
+		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
+		final SetObject S = requireSetData(interpreter, "forEach()");
+		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
+		final Executable callbackfn = Executable.getExecutable(interpreter, callbackfn_);
+		// 4. Let entries be the List that is S.[[SetData]].
+		final ArrayList<Value<?>> entries = S.setData;
+		// 5. Let numEntries be the number of elements of entries.
+		int numEntries = entries.size();
+		// 6. Let index be 0.
+		int index = 0;
+		// 7. Repeat, while index < numEntries,
+		while (index < numEntries) {
+			// a. Let e be entries[index].
+			final var e = entries.get(index);
+			// b. Set index to index + 1.
+			index = index + 1;
+			// c. If e is not empty, then
+			if (e != null) {
+				// i. Perform ? Call(callbackfn, thisArg, « e, e, S »).
+				callbackfn.call(interpreter, thisArg, e, e, S);
+				// ii. NOTE: The number of elements in entries may have increased during execution of callbackfn.
+				// iii. Set numEntries to the number of elements of entries.
+				numEntries = entries.size();
+			}
+		}
+
+		// 8. Return undefined.
+		return Undefined.instance;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.has")

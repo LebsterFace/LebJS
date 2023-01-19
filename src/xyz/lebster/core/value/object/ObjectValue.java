@@ -258,7 +258,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		if (property.isWritable()) {
 			property.set(interpreter, this, value);
 		} else {
-			throw error(new TypeError(interpreter, "Cannot assign to read-only property " + key.toDisplayString()));
+			throw error(new TypeError(interpreter, "Cannot assign to read-only property " + ANSI.stripFormatting(key.toDisplayString())));
 		}
 	}
 

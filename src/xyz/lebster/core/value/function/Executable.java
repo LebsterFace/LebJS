@@ -14,6 +14,7 @@ import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.expression.ArrowFunctionExpression;
 import xyz.lebster.core.node.expression.ClassExpression;
 import xyz.lebster.core.node.expression.Expression;
+import xyz.lebster.core.node.expression.ParenthesizedExpression;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
@@ -50,8 +51,9 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		return error(new TypeError(interpreter, message));
 	}
 
-	// TODO: Test if this works in all cases
 	public static boolean isAnonymousFunctionExpression(Expression expression) {
+		if (expression instanceof final ParenthesizedExpression parenthesizedExpression)
+			return isAnonymousFunctionExpression(parenthesizedExpression.expression());
 		if (expression instanceof ArrowFunctionExpression) return true;
 		if (expression instanceof final ClassExpression classExpression) return classExpression.className() == null;
 		if (expression instanceof final FunctionNode functionNode) return functionNode.name() == null;

@@ -14,9 +14,6 @@ public record StringLiteral(StringValue value) implements Literal<StringValue> {
 
 	@Override
 	public void represent(StringRepresentation representation) {
-		final char quoteType = this.value.value.contains("'") ? '"' : '\'';
-		representation.append(quoteType);
-		representation.append(this.value.value);
-		representation.append(quoteType);
+		value.display(representation);
 	}
 }

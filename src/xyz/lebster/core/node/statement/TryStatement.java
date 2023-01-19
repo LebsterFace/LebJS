@@ -7,20 +7,25 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.util.Objects;
-
-public record TryStatement(BlockStatement body, String catchParameter, BlockStatement catchBody, BlockStatement finallyBody) implements Statement {
+public record TryStatement(BlockStatement body, StringValue catchParameter, BlockStatement catchBody, BlockStatement finallyBody) implements Statement {
 	@Override
 	public void dump(int indent) {
-		final var builder = DumpBuilder.begin(indent)
+		DumpBuilder.begin(indent)
 			.self(this)
 			.child("Body", body);
 
-		Dumper.dumpIndicator(indent + 1, "Catch");
-		Dumper.dumpParameterized(indent + 2, "CatchClause", Objects.requireNonNullElse(catchParameter, "No Parameter"));
-		catchBody.dump(indent + 3);
-		builder.child("Finally", finallyBody);
+		if (catchBody != null) {
+			Dumper.dumpIndicator(indent + 1, "Catch");
+			Dumper.dumpValue(indent + 2, "Parameter", catchParameter == null ? "No Parameter" : catchParameter.value);
+			catchBody.dump(indent + 2);
+		}
+
+		if (finallyBody != null) {
+			Dumper.dumpIndicator(indent + 1, "Finally");
+			finallyBody.dump(indent + 2);
+		}
 	}
 
 	@Override

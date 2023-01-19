@@ -50,10 +50,11 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		return error(new TypeError(interpreter, message));
 	}
 
+	// TODO: Test if this works in all cases
 	public static boolean isAnonymousFunctionExpression(Expression expression) {
 		if (expression instanceof ArrowFunctionExpression) return true;
 		if (expression instanceof final ClassExpression classExpression) return classExpression.className() == null;
-		if (expression instanceof final FunctionNode functionNode) return functionNode.name() == null || functionNode.name().isEmpty();
+		if (expression instanceof final FunctionNode functionNode) return functionNode.name() == null;
 		return false;
 	}
 

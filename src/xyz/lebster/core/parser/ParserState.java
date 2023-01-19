@@ -1,6 +1,7 @@
 package xyz.lebster.core.parser;
 
 import xyz.lebster.core.exception.SyntaxError;
+import xyz.lebster.core.node.expression.literal.StringLiteral;
 
 public final class ParserState {
 	public final Token[] tokens;
@@ -58,10 +59,6 @@ public final class ParserState {
 		return token.type == type ? consume() : null;
 	}
 
-	boolean match(TokenType type, String value) {
-		return token.type == type && token.value.equals(value);
-	}
-
 	boolean optional(TokenType type) {
 		if (token.type == type) {
 			consume();
@@ -69,6 +66,21 @@ public final class ParserState {
 		}
 
 		return false;
+	}
+
+	boolean optional(TokenType type, String value) {
+		if (token.type == type && token.value.equals(value)) {
+			consume();
+			return true;
+		}
+
+		return false;
+	}
+
+	StringLiteral optionalStringLiteral(TokenType type) {
+		final Token token = accept(type);
+		if (token == null) return null;
+		return token.asStringLiteral();
 	}
 
 	boolean optional(TokenType... types) {
@@ -91,6 +103,10 @@ public final class ParserState {
 
 	boolean is(TokenType type) {
 		return token.type == type;
+	}
+
+	boolean is(TokenType type, String value) {
+		return token.type == type && token.value.equals(value);
 	}
 
 	void consumeAll(TokenType t) {

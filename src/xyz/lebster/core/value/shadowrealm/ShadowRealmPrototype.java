@@ -10,6 +10,7 @@ import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
@@ -50,7 +51,7 @@ public final class ShadowRealmPrototype extends ObjectValue {
 		if (arguments.length < 1)
 			throw error(new TypeError(interpreter, "Missing variable name"));
 
-		final String name = arguments[0].toStringValue(interpreter).value;
+		final StringValue name = arguments[0].toStringValue(interpreter);
 		final Value<?> value = argument(1, arguments);
 
 		shadowRealm.declare(name, value);

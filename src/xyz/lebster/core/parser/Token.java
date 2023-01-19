@@ -11,6 +11,8 @@ import xyz.lebster.core.node.expression.EqualityExpression.EqualityOp;
 import xyz.lebster.core.node.expression.LogicalExpression.LogicOp;
 import xyz.lebster.core.node.expression.RelationalExpression.RelationalOp;
 import xyz.lebster.core.node.expression.UpdateExpression.UpdateOp;
+import xyz.lebster.core.node.expression.literal.StringLiteral;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.Set;
 
@@ -357,5 +359,9 @@ public final class Token {
 			case ExponentEquals -> ExponentAssign;
 			default -> throw new CannotParse(this, "AssignmentOp");
 		};
+	}
+
+	StringLiteral asStringLiteral() {
+		return new StringLiteral(new StringValue(value));
 	}
 }

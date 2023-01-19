@@ -14,13 +14,13 @@ import xyz.lebster.core.interpreter.environment.FunctionEnvironment;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.FunctionParameters;
 import xyz.lebster.core.node.SourceRange;
+import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Constructor;
 import xyz.lebster.core.value.function.Executable;
-import xyz.lebster.core.value.function.Function;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -65,7 +65,7 @@ public record ClassExpression(
 		constructorFunction.setPrototype(constructorParent);
 
 		for (final ClassMethodNode method : methods) {
-			prototypeProperty.put(new StringValue(method.name), method.execute(interpreter));
+			prototypeProperty.put(method.name.execute(interpreter).toPropertyKey(interpreter), method.execute(interpreter));
 		}
 
 		return constructorFunction;
@@ -99,38 +99,42 @@ public record ClassExpression(
 		representation.append('}');
 	}
 
-	private interface ClassFunctionNode extends FunctionNode {
+	public record ClassMethodNode(Expression name, boolean computedName, FunctionParameters parameters, BlockStatement body, SourceRange range) implements FunctionNode {
 		@Override
-		default void represent(StringRepresentation representation) {
-			representation.append(name());
-			representation.append(toCallString());
+		public ClassMethod execute(Interpreter interpreter) throws AbruptCompletion {
+			return new ClassMethod(interpreter, name.execute(interpreter).toStringValue(interpreter), this);
+		}
+
+		@Override
+		public void represent(StringRepresentation representation) {
+			representCall(representation);
 			representation.append(' ');
 			body().represent(representation);
 		}
 	}
 
-
-	public record ClassMethodNode(String className, String name, FunctionParameters parameters, BlockStatement body, SourceRange range) implements ClassFunctionNode {
-		@Override
-		public ClassMethod execute(Interpreter interpreter) {
-			return new ClassMethod(interpreter.intrinsics, interpreter.environment(), this);
-		}
-	}
-
-	public record ClassConstructorNode(String className, FunctionParameters parameters, BlockStatement body, boolean isDerived, SourceRange range) implements ClassFunctionNode {
+	public record ClassConstructorNode(String className, FunctionParameters parameters, BlockStatement body, boolean isDerived, SourceRange range) implements FunctionNode {
 		@Override
 		public ClassConstructor execute(Interpreter interpreter) {
 			return new ClassConstructor(interpreter.intrinsics, interpreter.environment(), this, isDerived, className);
 		}
 
 		@Override
-		public String name() {
-			return "constructor";
+		public void represent(StringRepresentation representation) {
+			representCall(representation);
+			representation.append(' ');
+			body.represent(representation);
+		}
+
+		private static final StringLiteral name = new StringLiteral(Names.constructor);
+		@Override
+		public Expression name() {
+			return name;
 		}
 	}
 
-	public record ClassFieldNode(String name, Expression initializer, SourceRange range) {
-
+	// FIXME: Currently unused
+	public record ClassFieldNode(Expression name, Expression initializer, SourceRange range) {
 	}
 
 	// A wrapper of core.value.function.Function, without the call method - class constructors cannot be called without 'new'
@@ -195,27 +199,24 @@ public record ClassExpression(
 				"Class constructor %s cannot be invoked without 'new'".formatted(this.name.value);
 			throw error(new TypeError(interpreter, message));
 		}
-
-		// call(Interpreter interpreter, Value<?> newThisValue, Value<?>... parameters) is handled by Executable
 	}
 
-	// A wrapper of core.value.function.Function, without the construct method - class methods cannot be constructed
 	private static final class ClassMethod extends Executable {
-		private final Function wrappedFunction;
+		private final ClassMethodNode code;
 
-		public ClassMethod(Intrinsics intrinsics, Environment environment, ClassExpression.ClassMethodNode code) {
-			super(intrinsics, new StringValue(code.name), code.parameters.expectedArgumentCount());
-			this.wrappedFunction = new Function(intrinsics, environment, code);
+		public ClassMethod(Interpreter interpreter, StringValue name, ClassExpression.ClassMethodNode code) {
+			super(interpreter.intrinsics, name, code.parameters.expectedArgumentCount());
+			this.code = code;
 		}
 
 		@Override
 		public StringValue toStringMethod() {
-			return wrappedFunction.toStringMethod();
+			return new StringValue(code.toRepresentationString());
 		}
 
 		@Override
 		public Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
-			return wrappedFunction.internalCall(interpreter, arguments);
+			return code.executeBody(interpreter, arguments);
 		}
 	}
 }

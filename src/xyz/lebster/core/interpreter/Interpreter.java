@@ -57,8 +57,8 @@ public final class Interpreter {
 
 	@NonStandard
 	// FIXME: Environment records
-	public void declareVariable(String name, Value<?> value) throws AbruptCompletion {
-		this.declareVariable(VariableDeclaration.Kind.Let, new StringValue(name), value);
+	public void declareVariable(StringValue name, Value<?> value) throws AbruptCompletion {
+		this.declareVariable(VariableDeclaration.Kind.Let, name, value);
 	}
 
 	@NonStandard

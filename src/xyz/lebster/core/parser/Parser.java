@@ -302,7 +302,7 @@ public final class Parser {
 			if (state.token.matchVariableDeclaration()) {
 				// TODO: for_loop_variable_declaration
 				final VariableDeclaration declaration = parseVariableDeclaration(/* true */);
-				if (state.match(TokenType.Identifier, "of")) {
+				if (state.is(TokenType.Identifier, "of")) {
 					// for ( LetOrConst ForBinding of AssignmentExpression ) Statement
 					if (declaration.declarations().length != 1) throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.", position());
 					if (declaration.declarations()[0].init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
@@ -319,7 +319,7 @@ public final class Parser {
 				}
 			} else if (state.token.matchPrimaryExpression()) {
 				final Expression expression = parseExpression(0, Associativity.Right, Collections.singleton(TokenType.In));
-				if (state.match(TokenType.Identifier, "of")) {
+				if (state.is(TokenType.Identifier, "of")) {
 					return parseForOfStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
 				} else if (state.is(TokenType.In)) {
 					return parseForInStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
@@ -373,12 +373,12 @@ public final class Parser {
 		final BlockStatement body = parseBlockStatement();
 		consumeAllLineTerminators();
 
-		String catchParameter = null;
+		StringValue catchParameter = null;
 		BlockStatement catchBody = null;
 		final boolean hasCatch = state.optional(TokenType.Catch);
 		if (hasCatch) {
 			if (state.optional(TokenType.LParen)) {
-				catchParameter = state.require(TokenType.Identifier);
+				catchParameter = new StringValue(state.require(TokenType.Identifier));
 				state.require(TokenType.RParen);
 			}
 
@@ -530,7 +530,7 @@ public final class Parser {
 
 			final Token keyToken = state.token;
 			if (keyToken.matchIdentifierName() || keyToken.type == TokenType.NumericLiteral || keyToken.type == TokenType.StringLiteral) {
-				final StringLiteral key = parseAsStringLiteral();
+				final StringLiteral key = state.consume().asStringLiteral();
 				consumeAllLineTerminators();
 
 				if (state.optional(TokenType.Colon)) {
@@ -599,13 +599,13 @@ public final class Parser {
 
 	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
-		if (state.is(TokenType.Star)) throw new ParserNotImplemented(position(), "Generator function declarations");
+		if (state.is(TokenType.Star))
+			throw new ParserNotImplemented(position(), "Generator function declarations");
 		consumeAllLineTerminators();
-		if (!state.is(TokenType.Identifier)) {
+		if (!state.is(TokenType.Identifier))
 			throw new SyntaxError("Function declarations require a function name", position());
-		}
 
-		final String name = state.consume().value;
+		final StringLiteral name = state.consume().asStringLiteral();
 		consumeAllLineTerminators();
 		final FunctionParameters parameters = parseFunctionParameters(true);
 		consumeAllLineTerminators();
@@ -615,8 +615,7 @@ public final class Parser {
 	private FunctionExpression parseFunctionExpression() throws SyntaxError, CannotParse {
 		state.require(TokenType.Function);
 		if (state.is(TokenType.Star)) throw new ParserNotImplemented(position(), "Generator function expressions");
-		final Token potentialName = state.accept(TokenType.Identifier);
-		final String name = potentialName == null ? null : potentialName.value;
+		final StringLiteral name = state.optionalStringLiteral(TokenType.Identifier);
 		final FunctionParameters parameters = parseFunctionParameters(true);
 		return new FunctionExpression(parseFunctionBody(), name, parameters);
 	}
@@ -766,7 +765,7 @@ public final class Parser {
 
 	private MemberExpression parseNonComputedMemberExpression(Expression left) throws SyntaxError {
 		if (!state.token.matchIdentifierName()) throw state.expected("IdentifierName");
-		return new MemberExpression(left, parseAsStringLiteral(), false);
+		return new MemberExpression(left, state.consume().asStringLiteral(), false);
 	}
 
 	private Assignable ensureAssignable(Expression left_expr, AssignmentOp op) throws SyntaxError, CannotParse {
@@ -815,7 +814,7 @@ public final class Parser {
 			case Identifier -> parseIdentifierExpressionOrArrowFunctionExpression();
 
 			case RegexpPattern -> parseRegexpLiteral();
-			case StringLiteral -> parseAsStringLiteral();
+			case StringLiteral -> state.consume().asStringLiteral();
 			case NumericLiteral -> parseNumericLiteral(false);
 			case Period -> {
 				state.consume();
@@ -881,10 +880,6 @@ public final class Parser {
 		return new ParenthesizedExpression(expression, range(start));
 	}
 
-	private StringLiteral parseAsStringLiteral() {
-		return new StringLiteral(new StringValue(state.consume().value));
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-new-operator")
 	private NewExpression parseNewExpression() throws SyntaxError, CannotParse {
 		final Token newOperator = state.consume();
@@ -936,7 +931,7 @@ public final class Parser {
 				continue;
 			}
 
-			// TODO: Remove duplication with parseClassElementName
+			// TODO: Remove duplication with parseClassBody
 			boolean isIdentifier = state.token.matchIdentifierName();
 			if (isIdentifier || state.is(TokenType.NumericLiteral, TokenType.StringLiteral)) {
 				final String propertyName = state.consume().value;
@@ -996,58 +991,66 @@ public final class Parser {
 
 		while (!state.is(TokenType.RBrace)) {
 			consumeAllSeparators();
-			final boolean isStatic = state.optional(TokenType.Static);
-			if (isStatic) throw new ParserNotImplemented(position(), "Parsing class `static` methods / fields");
-
-			if (state.optional(TokenType.LBrace)) {
-				// TODO: Class static blocks
-				throw new ParserNotImplemented(position(), "Parsing class `static` blocks");
-			} else if (state.optional(TokenType.Star)) {
+			if (state.optional(TokenType.Static))
+				throw new ParserNotImplemented(position(), "Parsing class `static` initialization blocks / methods / fields");
+			if (state.optional(TokenType.Star))
 				throw new ParserNotImplemented(position(), "Parsing class generator methods");
-			} else if (state.token.matchClassElementName()) {
-				final SourcePosition elementStart = position();
-				// FIXME: Computed property names
-				final Token name = state.consume();
-				consumeAllLineTerminators();
 
-				// FieldDefinition
-				if (state.optional(TokenType.Equals)) {
-					consumeAllLineTerminators();
-					final Expression initializer = parseSpecAssignmentExpression();
-					consumeAllLineTerminators();
-					fields.add(new ClassFieldNode(name.value, initializer, range(elementStart)));
-				} else {
-					if (name.type == TokenType.Async) {
-						throw new ParserNotImplemented(position(), "Parsing class async methods");
-					} else if (name.value.equals("get") || name.value.equals("set")) {
-						// FIXME: Methods named get / set
-						throw new ParserNotImplemented(position(), "Parsing class getter / setters");
-					}
+			if (!state.token.matchClassElementName()) {
+				if (state.is(TokenType.Hashtag))
+					throw new ParserNotImplemented(position(), "Parsing private class fields");
 
-					final boolean isConstructor = name.value.equals("constructor");
-					if (isConstructor && constructor != null) throw new SyntaxError("A class may only have one constructor", elementStart);
-
-					if (state.is(TokenType.Equals, TokenType.Semicolon)) {
-						throw new ParserNotImplemented(position(), "Parsing class fields");
-					}
-
-					final FunctionParameters parameters = parseFunctionParameters(true);
-					consumeAllLineTerminators();
-					final BlockStatement body = parseFunctionBody();
-
-					if (isConstructor) {
-						constructor = new ClassConstructorNode(className, parameters, body, isDerived, range(elementStart));
-					} else {
-						methods.add(new ClassMethodNode(className, name.value, parameters, body, range(elementStart)));
-					}
-				}
-
-				consumeAllSeparators();
-			} else if (state.is(TokenType.Hashtag)) {
-				throw new ParserNotImplemented(position(), "Parsing private class fields");
-			} else {
 				throw state.unexpected();
 			}
+
+			final SourcePosition elementStart = position();
+			if (state.optional(TokenType.Async))
+				throw new ParserNotImplemented(position(), "Parsing class async methods");
+
+			// FIXME: Methods named get / set
+			if (state.optional(TokenType.Identifier, "get") || state.optional(TokenType.Identifier, "set"))
+				throw new ParserNotImplemented(position(), "Parsing class getter / setters");
+
+			// TODO: Remove duplication with parseObjectExpression
+			final Expression name;
+			final boolean computedName = !state.token.matchIdentifierName() && !state.is(TokenType.NumericLiteral, TokenType.StringLiteral);
+			final boolean isConstructor = state.is(TokenType.Identifier, "constructor");
+			if (computedName) {
+				state.require(TokenType.LBracket);
+				consumeAllLineTerminators();
+				name = parseExpression();
+				state.require(TokenType.RBracket);
+			} else {
+				name = state.consume().asStringLiteral();
+			}
+
+			consumeAllLineTerminators();
+
+			// FieldDefinition
+			if (state.optional(TokenType.Equals)) {
+				consumeAllLineTerminators();
+				final Expression initializer = parseSpecAssignmentExpression();
+				consumeAllLineTerminators();
+				fields.add(new ClassFieldNode(name, initializer, range(elementStart)));
+
+				consumeAllSeparators();
+				continue;
+			}
+
+			if (isConstructor && constructor != null)
+				throw new SyntaxError("A class may only have one constructor", elementStart);
+
+			final FunctionParameters parameters = parseFunctionParameters(true);
+			consumeAllLineTerminators();
+			final BlockStatement body = parseFunctionBody();
+
+			if (isConstructor) {
+				constructor = new ClassConstructorNode(className, parameters, body, isDerived, range(elementStart));
+			} else {
+				methods.add(new ClassMethodNode(name, computedName, parameters, body, range(elementStart)));
+			}
+
+			consumeAllSeparators();
 		}
 
 		state.require(TokenType.RBrace);

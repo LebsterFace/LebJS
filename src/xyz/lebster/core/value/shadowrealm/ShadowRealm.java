@@ -9,6 +9,7 @@ import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.EvalError;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
@@ -27,7 +28,7 @@ public final class ShadowRealm extends ObjectValue {
 		}
 	}
 
-	public void declare(String name, Value<?> value) throws AbruptCompletion {
+	public void declare(StringValue name, Value<?> value) throws AbruptCompletion {
 		this.realm.interpreter().declareVariable(name, value);
 	}
 }

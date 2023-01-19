@@ -53,11 +53,15 @@ public record ObjectDestructuring(Map<Expression, AssignmentPattern> pairs, Stri
 		DumpBuilder.begin(indent)
 			.self(this)
 			.optionalValue("Rest Name", restName);
-		Dumper.dumpIndicator(indent + 1, "Children");
-		for (final var entry : pairs.entrySet()) {
-			DumpBuilder.begin(indent + 2)
-				.child("Key", entry.getKey())
-				.child("Value", entry.getValue());
+		if (pairs.isEmpty()) {
+			Dumper.dumpString(indent + 1, "No Children");
+		} else {
+			Dumper.dumpIndicator(indent + 1, "Children");
+			for (final var entry : pairs.entrySet()) {
+				DumpBuilder.begin(indent + 2)
+					.child("Key", entry.getKey())
+					.child("Value", entry.getValue());
+			}
 		}
 	}
 

@@ -15,13 +15,10 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
-import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.object.AccessorDescriptor;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
-import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.util.ArrayList;
@@ -56,12 +53,7 @@ public final class SetPrototype extends ObjectValue {
 		put(Names.keys, values); // https://tc39.es/ecma262/multipage#sec-set.prototype.keys
 
 		put(SymbolValue.toStringTag, Names.Set, false, false, true);
-		this.value.put(Names.size, new AccessorDescriptor(
-			new NativeFunction(intrinsics, StringValue.EMPTY, SetPrototype::getSize, 0),
-			null,
-			false,
-			true
-		));
+		putAccessor(intrinsics, Names.size, SetPrototype::getSize, null, false, true);
 	}
 
 	private static SetObject requireSetData(Interpreter interpreter, String methodName) throws AbruptCompletion {

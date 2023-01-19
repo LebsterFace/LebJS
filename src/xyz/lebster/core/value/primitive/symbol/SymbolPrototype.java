@@ -7,8 +7,6 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
-import xyz.lebster.core.value.function.NativeFunction;
-import xyz.lebster.core.value.object.AccessorDescriptor;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -22,12 +20,7 @@ public final class SymbolPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.valueOf, 0, SymbolPrototype::valueOf);
 		putMethod(intrinsics, SymbolValue.toPrimitive, 1, SymbolPrototype::toPrimitiveMethod);
 		put(SymbolValue.toStringTag, Names.Symbol, false, false, true);
-		this.value.put(Names.description, new AccessorDescriptor(
-			new NativeFunction(intrinsics, new StringValue("get description"), SymbolPrototype::getDescription, 0),
-			null,
-			false,
-			true
-		));
+		putAccessor(intrinsics, Names.description, SymbolPrototype::getDescription, null, false, true);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype.description")

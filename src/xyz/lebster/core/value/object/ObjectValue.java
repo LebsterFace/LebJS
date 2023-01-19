@@ -358,6 +358,13 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		return putMethod(intrinsics.functionPrototype, key, length, code, true, false, true);
 	}
 
+	public void putAccessor(Intrinsics intrinsics, Key<?> key, NativeCode getter, NativeCode setter, boolean enumerable, boolean configurable) {
+		final NativeFunction getterFn = getter == null ? null : new NativeFunction(intrinsics, new StringValue("get " + key.toFunctionName()), getter, 0);
+		final NativeFunction setterFn = setter == null ? null : new NativeFunction(intrinsics, new StringValue("set " + key.toFunctionName()), setter, 1);
+
+		value.put(key, new AccessorDescriptor(getterFn, setterFn, enumerable, configurable));
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys")
 	public Iterable<Key<?>> ownPropertyKeys() {
 		return ObjectValue.ordinaryOwnPropertyKeys(this);

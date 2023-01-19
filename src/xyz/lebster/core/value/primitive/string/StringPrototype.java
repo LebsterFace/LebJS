@@ -1,5 +1,6 @@
 package xyz.lebster.core.value.primitive.string;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
@@ -11,6 +12,7 @@ import xyz.lebster.core.value.Generator;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
+import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -307,11 +309,23 @@ public final class StringPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.repeat")
-	private static StringValue repeat(Interpreter interpreter, Value<?>[] arguments) {
+	private static StringValue repeat(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 22.1.3.17 String.prototype.repeat ( count )
 		final Value<?> count = argument(0, arguments);
 
-		throw new NotImplemented("String.prototype.repeat");
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.repeat");
+		// 2. Let S be ? ToString(O).
+		final StringValue S = O.toStringValue(interpreter);
+		// 3. Let n be ? ToIntegerOrInfinity(count).
+		final int n = toIntegerOrInfinity(interpreter, count);
+		// 4. If n < 0 or n is +∞, throw a RangeError exception.
+		if (n < 0 || n == Integer.MAX_VALUE)
+			throw error(new RangeError(interpreter, "Invalid count value: " + ANSI.stripFormatting(count.toDisplayString())));
+		// 5. If n is 0, return the empty String.
+		if (n == 0) return StringValue.EMPTY;
+		// 6. Return the String value that is made from n copies of S appended together.
+		return new StringValue(S.value.repeat(n));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.replace")

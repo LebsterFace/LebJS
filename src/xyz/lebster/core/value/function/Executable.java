@@ -51,9 +51,10 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		return error(new TypeError(interpreter, message));
 	}
 
-	public static boolean isAnonymousFunctionExpression(Expression expression) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isanonymousfunctiondefinition")
+	public static boolean isAnonymousFunctionDefinition(Expression expression) {
 		if (expression instanceof final ParenthesizedExpression parenthesizedExpression)
-			return isAnonymousFunctionExpression(parenthesizedExpression.expression());
+			return isAnonymousFunctionDefinition(parenthesizedExpression.expression());
 		if (expression instanceof ArrowFunctionExpression) return true;
 		if (expression instanceof final ClassExpression classExpression) return classExpression.className() == null;
 		if (expression instanceof final FunctionNode functionNode) return functionNode.name() == null;
@@ -65,7 +66,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	public static Value<?> namedEvaluation(Interpreter interpreter, Expression expression, Key<?> name) throws AbruptCompletion {
 		final Value<?> executedValue = expression.execute(interpreter);
 
-		if (Executable.isAnonymousFunctionExpression(expression) && executedValue instanceof final Executable function) {
+		if (Executable.isAnonymousFunctionDefinition(expression) && executedValue instanceof final Executable function) {
 			// TODO: Do this when creating the function, not after.
 			function.getOwnProperty(Names.name).set(interpreter, function, name);
 			function.updateName(name.toFunctionName());

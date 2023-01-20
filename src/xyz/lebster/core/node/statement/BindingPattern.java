@@ -19,7 +19,7 @@ public record BindingPattern(VariableDeclaration.Kind kind, AssignmentTarget ass
 		DumpBuilder.begin(indent)
 			.self(this)
 			.enum_("Kind", kind)
-			.child("Identifier", assignmentTarget);
+			.child("Target", assignmentTarget);
 	}
 
 	@Override

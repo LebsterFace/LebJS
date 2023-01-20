@@ -38,7 +38,7 @@ Test.expect(0, {
     Test.expect(0, +[])
     Test.expect(1, +[1])
     Test.expect(NaN, +[1, 2])
-    // FIXME: Test.expect(NaN, +new Set([1]))
+    Test.expect(NaN, +new Set([1]))
     // FIXME: Test.expectError("TypeError", "Cannot convert a BigInt value to a number", () => +BigInt(1))
     Test.expect(NaN, +undefined)
     Test.expect(0, +null)

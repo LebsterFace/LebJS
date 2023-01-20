@@ -14,10 +14,9 @@ a = [];
 Test.expect(a.pop(), undefined);
 Test.equals(a, []);
 
-// FIXME: array with empty slot
-//a = [,];
-//Test.expect(a.pop(), undefined);
-//Test.equals(a, []);
+a = [,];
+Test.expect(a.pop(), undefined);
+Test.equals(a, []);
 
 // array with prototype indexed value
 Array.prototype[1] = 1;

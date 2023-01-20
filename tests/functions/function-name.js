@@ -70,12 +70,39 @@
         Test.expect("", f4.name);
     };
 
+    let f1 = (function() {});
+    Test.expect("f1", f1.name);
+
     // direct assignment does name new function expression
     {
-        let f1 = (function() {});
-        Test.expect("f1", f1.name);
         let f2 = false;
         f2 ||= function () {};
         Test.expect("f2", f2.name);
+
+        f2 = true;
+        f2 ||= function () {};
+        Test.expect(true, f2);
+    };
+    {
+        let f2 = false;
+        f2 &&= function () {};
+        Test.expect(false, f2);
+
+        f2 = true;
+        f2 &&= function () {};
+        Test.expect("f2", f2.name);
+    };
+    {
+        let f2 = null;
+        f2 ??= function () {};
+        Test.expect("f2", f2.name);
+
+        f2 = undefined;
+        f2 ??= function () {};
+        Test.expect("f2", f2.name);
+
+        f2 = 123;
+        f2 ??= function () {};
+        Test.expect(123, f2);
     };
 };

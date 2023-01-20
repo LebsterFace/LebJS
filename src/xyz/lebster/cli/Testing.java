@@ -34,12 +34,12 @@ public final class Testing {
 			failedStream = new PrintStream(failedOutput);
 		}
 
-		if (arguments.options().testHarnessName() == null) {
+		if (arguments.options().harness() == null) {
 			harness = new DefaultTestHarness();
-		} else if ("serenity".equals(arguments.options().testHarnessName())) {
+		} else if ("serenity".equals(arguments.options().harness())) {
 			harness = new SerenityTestHarness(arguments);
 		} else {
-			throw new IllegalStateException("Unknown test harness name: " + arguments.options().testHarnessName());
+			throw new IllegalStateException("Unknown test harness name: " + arguments.options().harness());
 		}
 	}
 

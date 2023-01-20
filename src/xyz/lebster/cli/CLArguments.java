@@ -53,7 +53,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		boolean ignoreNotImplemented,
 		boolean hidePassing,
 		boolean disableTestOutputBuffers,
-		String testHarnessName,
+		String harness,
 		boolean showPrompt
 	) {
 	}
@@ -68,7 +68,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private boolean ignoreNotImplemented = false;
 		private boolean hidePassing = false;
 		private boolean disableTestOutputBuffers = false;
-		private String testHarnessPath;
+		private String harness;
 		private boolean showPrompt = true;
 		public TemporaryResult(Iterator<String> arguments) {
 			this.arguments = arguments;
@@ -82,7 +82,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				this.ignoreNotImplemented,
 				this.hidePassing,
 				this.disableTestOutputBuffers,
-				this.testHarnessPath,
+				this.harness,
 				this.showPrompt
 			);
 		}
@@ -96,7 +96,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				case "hide-passing" -> hidePassing = true;
 				case "disable-prompt" -> showPrompt = false;
 				case "no-buffer" -> disableTestOutputBuffers = true;
-				case "harness" -> testHarnessPath = getFlagValue("Missing harness filepath");
+				case "harness" -> harness = getFlagValue("Missing harness filepath");
 
 				case "t", "test" -> setMode(ExecutionMode.Tests);
 				case "gif" -> {
@@ -139,6 +139,14 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 			if (mode == null) mode = ExecutionMode.REPL;
 			if (mode != ExecutionMode.REPL && !showPrompt) {
 				throw new CLArgumentException("Cannot disable prompt when not using REPL mode");
+			}
+
+			if (mode != ExecutionMode.Tests) {
+				if (disableTestOutputBuffers) throw new CLArgumentException("Cannot disable test output buffers unless mode is Tests");
+				if (parseOnly) throw new CLArgumentException("Cannot ignore test failures from runtime errors unless mode is Tests");
+				if (ignoreNotImplemented) throw new CLArgumentException("Cannot ignore test failures from unimplemented features unless mode is Tests");
+				if (hidePassing) throw new CLArgumentException("Cannot hide passing tests unless mode is Tests");
+				if (harness != null) throw new CLArgumentException("Cannot specify test harness unless mode is Tests");
 			}
 
 			return new CLArguments(

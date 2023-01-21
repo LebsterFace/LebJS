@@ -257,6 +257,7 @@ public final class StringPrototype extends ObjectValue {
 		return new NumberValue(S.lastIndexOf(searchStr, pos));
 	}
 
+	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.localecompare")
 	private static Value<?> localeCompare(Interpreter interpreter, Value<?>[] arguments) {
 		// 22.1.3.11 String.prototype.localeCompare ( that [ , reserved1 [ , reserved2 ] ] )
@@ -267,6 +268,7 @@ public final class StringPrototype extends ObjectValue {
 		throw new NotImplemented("String.prototype.localeCompare");
 	}
 
+	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.match")
 	private static Value<?> match(Interpreter interpreter, Value<?>[] arguments) {
 		// 22.1.3.12 String.prototype.match ( regexp )
@@ -275,6 +277,7 @@ public final class StringPrototype extends ObjectValue {
 		throw new NotImplemented("String.prototype.match");
 	}
 
+	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.matchall")
 	private static Value<?> matchAll(Interpreter interpreter, Value<?>[] arguments) {
 		// 22.1.3.13 String.prototype.matchAll ( regexp )
@@ -283,6 +286,7 @@ public final class StringPrototype extends ObjectValue {
 		throw new NotImplemented("String.prototype.matchAll");
 	}
 
+	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.normalize")
 	private static StringValue normalize(Interpreter interpreter, Value<?>[] arguments) {
 		// 22.1.3.14 String.prototype.normalize ( [ form ] )

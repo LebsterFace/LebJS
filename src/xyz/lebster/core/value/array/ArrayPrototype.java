@@ -323,14 +323,40 @@ public final class ArrayPrototype extends ObjectValue {
 		throw new NotImplemented("Array.prototype.shift");
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.some")
-	private static BooleanValue some(Interpreter interpreter, Value<?>[] arguments) {
+	private static BooleanValue some(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.29 Array.prototype.some ( callbackfn [ , thisArg ] )
-		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> callbackfn_ = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
 
-		throw new NotImplemented("Array.prototype.some");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(interpreter, O);
+		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
+		final Executable callbackFn = Executable.getExecutable(interpreter, callbackfn_);
+		// 4. Let k be 0.
+		// 5. Repeat, while k < len,
+		for (int k = 0; k < len; k++) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final StringValue Pk = new StringValue(k);
+			// b. Let kPresent be ? HasProperty(O, Pk).
+			final boolean kPresent = O.hasProperty(Pk);
+			// c. If kPresent is true, then
+			if (kPresent) {
+				// i. Let kValue be ? Get(O, Pk).
+				final Value<?> kValue = O.get(interpreter, Pk);
+				// ii. Let testResult be ToBoolean(? Call(callbackfn, thisArg, « kValue, 𝔽(k), O »)).
+				final boolean testResult = callbackFn.call(interpreter, thisArg, kValue, new NumberValue(k), O).isTruthy(interpreter);
+				// iii. If testResult is true, return true.
+				if (testResult) return BooleanValue.TRUE;
+			}
+
+			// d. Set k to k + 1.
+		}
+
+		// 6. Return false.
+		return BooleanValue.FALSE;
 	}
 
 	@NonCompliant

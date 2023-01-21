@@ -9,6 +9,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
@@ -112,6 +113,16 @@ public final class NumberPrototype extends ObjectValue {
 			throw new NotImplemented("ToIntegerOrInfinity returning values over 2^31-1");
 
 		return (int) integer;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tolength")
+	public static int toLength(Interpreter interpreter, Value<?> argument) throws AbruptCompletion {
+		// 1. Let len be ? ToIntegerOrInfinity(argument).
+		final int len = toIntegerOrInfinity(interpreter, argument);
+		// 2. If len ≤ 0, return +0𝔽.
+		if (len <= 0) return 0;
+		// 3. Return 𝔽(min(len, 2^53 - 1)).
+		return Math.toIntExact(Math.min(len, ArrayPrototype.MAX_LENGTH));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tolocalestring")

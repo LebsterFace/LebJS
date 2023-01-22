@@ -114,6 +114,8 @@ public record ClassExpression(
 	}
 
 	public record ClassConstructorNode(String className, FunctionParameters parameters, BlockStatement body, boolean isDerived, SourceRange range) implements FunctionNode {
+		private static final StringLiteral name = new StringLiteral(Names.constructor);
+
 		@Override
 		public ClassConstructor execute(Interpreter interpreter) {
 			return new ClassConstructor(interpreter.intrinsics, interpreter.environment(), this, isDerived, className);
@@ -126,7 +128,6 @@ public record ClassExpression(
 			body.represent(representation);
 		}
 
-		private static final StringLiteral name = new StringLiteral(Names.constructor);
 		@Override
 		public Expression name() {
 			return name;

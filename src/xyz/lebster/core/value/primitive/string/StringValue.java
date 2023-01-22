@@ -80,17 +80,19 @@ public final class StringValue extends ObjectValue.Key<String> {
 
 	private boolean isValidIdentifier() {
 		final PrimitiveIterator.OfInt iterator = value.codePoints().iterator();
-		if (!(iterator.hasNext() && Lexer.isIdentifierStart(iterator.next()))) {
-			return false;
-		}
+		if (iterator.hasNext() && Lexer.isIdentifierStart(iterator.next())) {
+			while (iterator.hasNext()) {
+				if (Lexer.isIdentifierMiddle(iterator.next())) {
+					continue;
+				}
 
-		while (iterator.hasNext()) {
-			if (!Lexer.isIdentifierMiddle(iterator.next())) {
 				return false;
 			}
-		}
 
-		return true;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override

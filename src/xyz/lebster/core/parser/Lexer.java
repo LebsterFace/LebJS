@@ -175,10 +175,6 @@ public final class Lexer {
 		return tokens.toArray(new Token[0]);
 	}
 
-	private boolean isFinished() {
-		return index >= codePoints.length;
-	}
-
 	private static boolean isDigit(int c) {
 		return c >= '0' && c <= '9';
 	}
@@ -201,6 +197,40 @@ public final class Lexer {
 
 	private static boolean isAlphabetical(int c) {
 		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+	}
+
+	public static boolean isIdentifierStart(int codePoint) {
+		if (codePoint == '\\') {
+			return false;
+		} else if (isAlphabetical(codePoint) || codePoint == '_' || codePoint == '$') {
+			return true;
+		} else if (codePoint < 0x80) {
+			// Optimization: the first codepoint with the ID_Start property after A-Za-z is outside the
+			// ASCII range (0x00AA), so we can skip isUnicodeIdentifierStart() for any ASCII characters.
+			// (Thanks Serenity!)
+			return false;
+		} else {
+			return Character.isUnicodeIdentifierStart(codePoint);
+		}
+	}
+
+	public static boolean isIdentifierMiddle(int codePoint) {
+		if (codePoint == '\\') {
+			return false;
+		} else if (isAlphabetical(codePoint) || isDigit(codePoint) || codePoint == '_' || codePoint == '$') {
+			return true;
+		} else if (codePoint < 0x80) {
+			// Optimization: the first codepoint with the ID_Continue property after A-Za-z0-9_ is outside the
+			// ASCII range (0x00AA), so we can skip isUnicodeIdentifierPart() for any ASCII characters.
+			// (Thanks Serenity!)
+			return false;
+		} else {
+			return Character.isUnicodeIdentifierPart(codePoint);
+		}
+	}
+
+	private boolean isFinished() {
+		return index >= codePoints.length;
 	}
 
 	private boolean isLineTerminator() {
@@ -256,36 +286,6 @@ public final class Lexer {
 
 	private boolean anyOf(String codePoints) {
 		return anyOf(codePoints.codePoints().toArray());
-	}
-
-	public static boolean isIdentifierStart(int codePoint) {
-		if (codePoint == '\\') {
-			return false;
-		} else if (isAlphabetical(codePoint) || codePoint == '_' || codePoint == '$') {
-			return true;
-		} else if (codePoint < 0x80) {
-			// Optimization: the first codepoint with the ID_Start property after A-Za-z is outside the
-			// ASCII range (0x00AA), so we can skip isUnicodeIdentifierStart() for any ASCII characters.
-			// (Thanks Serenity!)
-			return false;
-		} else {
-			return Character.isUnicodeIdentifierStart(codePoint);
-		}
-	}
-
-	public static boolean isIdentifierMiddle(int codePoint) {
-		if (codePoint == '\\') {
-			return false;
-		} else if (isAlphabetical(codePoint) || isDigit(codePoint) || codePoint == '_' || codePoint == '$') {
-			return true;
-		} else if (codePoint < 0x80) {
-			// Optimization: the first codepoint with the ID_Continue property after A-Za-z0-9_ is outside the
-			// ASCII range (0x00AA), so we can skip isUnicodeIdentifierPart() for any ASCII characters.
-			// (Thanks Serenity!)
-			return false;
-		} else {
-			return Character.isUnicodeIdentifierPart(codePoint);
-		}
 	}
 
 	private boolean slashMeansDivision() {

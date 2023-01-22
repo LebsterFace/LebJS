@@ -270,25 +270,6 @@ public final class SetPrototype extends ObjectValue {
 	}
 
 	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set-records")
-	private record SetRecord(ObjectValue set, int size, Executable has, Executable keys) {
-		@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-getkeysiterator")
-		private IteratorRecord getKeysIterator(Interpreter interpreter) throws AbruptCompletion {
-			// 1. Let keysIter be ? Call(setRec.[[Keys]], setRec.[[Set]]).
-			final Value<?> keysIter_ = this.keys.call(interpreter, set());
-			// 2. If keysIter is not an Object, throw a TypeError exception.
-			if (!(keysIter_ instanceof final ObjectValue keysIter))
-				throw error(new TypeError(interpreter, "SetRec.keys() did not return an object"));
-			// 3. Let nextMethod be ? Get(keysIter, "next").
-			final Value<?> nextMethod_ = keysIter.get(interpreter, Names.next);
-			// 4. If IsCallable(nextMethod) is false, throw a TypeError exception.
-			final Executable nextMethod = Executable.getExecutable(interpreter, nextMethod_);
-			// 5. Return a new Iterator Record { [[Iterator]]: keysIter, [[NextMethod]]: nextMethod, [[Done]]: false }.
-			return new IteratorRecord(keysIter, nextMethod, ANSI.stripFormatting(keysIter.toDisplayString()), "keys");
-		}
-	}
-
-	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-getsetrecord")
 	private static SetRecord getSetRecord(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 		// 1. If obj is not an Object, throw a TypeError exception.
@@ -620,10 +601,29 @@ public final class SetPrototype extends ObjectValue {
 
 	private enum SetIteratorKind { KeyValue, Value }
 
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set-records")
+	private record SetRecord(ObjectValue set, int size, Executable has, Executable keys) {
+		@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-getkeysiterator")
+		private IteratorRecord getKeysIterator(Interpreter interpreter) throws AbruptCompletion {
+			// 1. Let keysIter be ? Call(setRec.[[Keys]], setRec.[[Set]]).
+			final Value<?> keysIter_ = this.keys.call(interpreter, set());
+			// 2. If keysIter is not an Object, throw a TypeError exception.
+			if (!(keysIter_ instanceof final ObjectValue keysIter))
+				throw error(new TypeError(interpreter, "SetRec.keys() did not return an object"));
+			// 3. Let nextMethod be ? Get(keysIter, "next").
+			final Value<?> nextMethod_ = keysIter.get(interpreter, Names.next);
+			// 4. If IsCallable(nextMethod) is false, throw a TypeError exception.
+			final Executable nextMethod = Executable.getExecutable(interpreter, nextMethod_);
+			// 5. Return a new Iterator Record { [[Iterator]]: keysIter, [[NextMethod]]: nextMethod, [[Done]]: false }.
+			return new IteratorRecord(keysIter, nextMethod, ANSI.stripFormatting(keysIter.toDisplayString()), "keys");
+		}
+	}
+
 	private static class SetIterator extends Generator {
 		private final SetIteratorKind kind;
-		private int index;
 		private final ArrayList<Value<?>> entries;
+		private int index;
 
 		private SetIterator(Interpreter interpreter, SetObject set, SetIteratorKind kind) {
 			super(interpreter.intrinsics);

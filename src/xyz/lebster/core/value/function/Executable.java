@@ -75,6 +75,35 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		return executedValue;
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinaryhasinstance")
+	public static BooleanValue ordinaryHasInstance(Interpreter interpreter, Value<?> C_, Value<?> O) throws AbruptCompletion {
+		// 1. If IsCallable(C) is false, return false.
+		if (!(C_ instanceof final Executable C)) return BooleanValue.FALSE;
+
+		// FIXME: BoundTargetFunction
+		// 2. If C has a [[BoundTargetFunction]] internal slot, then
+		// a. Let BC be C.[[BoundTargetFunction]].
+		// b. Return ? InstanceofOperator(O, BC).
+
+		// 3. If Type(O) is not Object, return false.
+		if (!(O instanceof ObjectValue object)) return BooleanValue.FALSE;
+
+		// 4. Let P be ? Get(C, "prototype").
+		final Value<?> P = C.get(interpreter, Names.prototype);
+		// 5. If Type(P) is not Object, throw a TypeError exception.
+		if (!(P instanceof ObjectValue)) throw error(new TypeError(interpreter, "Not an object!"));
+
+		// 6. Repeat,
+		while (true) {
+			// a. Set O to ? O.[[GetPrototypeOf]]().
+			object = object.getPrototype();
+			// b. If O is null, return false.
+			if (object == null) return BooleanValue.FALSE;
+			// c. If SameValue(P, O) is true, return true.
+			if (P.sameValue(object)) return BooleanValue.TRUE;
+		}
+	}
+
 	public final void updateName(StringValue newName) {
 		this.name = newName;
 	}
@@ -124,34 +153,5 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	@Override
 	public String typeOf(Interpreter interpreter) {
 		return "function";
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinaryhasinstance")
-	public static BooleanValue ordinaryHasInstance(Interpreter interpreter, Value<?> C_, Value<?> O) throws AbruptCompletion {
-		// 1. If IsCallable(C) is false, return false.
-		if (!(C_ instanceof final Executable C)) return BooleanValue.FALSE;
-
-		// FIXME: BoundTargetFunction
-		// 2. If C has a [[BoundTargetFunction]] internal slot, then
-		// a. Let BC be C.[[BoundTargetFunction]].
-		// b. Return ? InstanceofOperator(O, BC).
-
-		// 3. If Type(O) is not Object, return false.
-		if (!(O instanceof ObjectValue object)) return BooleanValue.FALSE;
-
-		// 4. Let P be ? Get(C, "prototype").
-		final Value<?> P = C.get(interpreter, Names.prototype);
-		// 5. If Type(P) is not Object, throw a TypeError exception.
-		if (!(P instanceof ObjectValue)) throw error(new TypeError(interpreter, "Not an object!"));
-
-		// 6. Repeat,
-		while (true) {
-			// a. Set O to ? O.[[GetPrototypeOf]]().
-			object = object.getPrototype();
-			// b. If O is null, return false.
-			if (object == null) return BooleanValue.FALSE;
-			// c. If SameValue(P, O) is true, return true.
-			if (P.sameValue(object)) return BooleanValue.TRUE;
-		}
 	}
 }

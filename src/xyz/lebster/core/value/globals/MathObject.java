@@ -97,43 +97,6 @@ public final class MathObject extends ObjectValue {
 		notImplemented(intrinsics, "fround", 1);
 	}
 
-	private void notImplemented(Intrinsics intrinsics, String methodName, int expectedArgumentCount) {
-		putMethod(intrinsics, new StringValue(methodName), expectedArgumentCount, (interpreter, args) -> {
-			throw new NotImplemented(methodName);
-		});
-	}
-
-	private void addConstant(StringValue name, double value) {
-		put(name, new NumberValue(value), false, false, false);
-	}
-
-	// For https://tc39.es/ecma262/multipage#sec-math.hypot + sec-math.min + sec-math.max
-	private void addWrapper(Intrinsics intrinsics, StringValue methodName, DoubleRestArgs restArgs) {
-		putMethod(intrinsics, methodName, 0, (interpreter, args) -> {
-			final double[] coerced = new double[args.length];
-			for (int i = 0; i < args.length; i++) {
-				coerced[i] = args[i].toNumberValue(interpreter).value;
-			}
-
-			return new NumberValue(restArgs.applyAsDouble(coerced));
-		});
-	}
-
-	private void addWrapper(Intrinsics intrinsics, StringValue methodName, DoubleUnaryOperator unaryOperator) {
-		putMethod(intrinsics, methodName, 1, (interpreter, args) -> {
-			final double number = argumentDouble(0, interpreter, args);
-			return new NumberValue(unaryOperator.applyAsDouble(number));
-		});
-	}
-
-	private void addWrapper(Intrinsics intrinsics, StringValue methodName, DoubleBinaryOperator binaryOperator) {
-		putMethod(intrinsics, methodName, 2, (interpreter, args) -> {
-			final double a = argumentDouble(0, interpreter, args);
-			final double b = argumentDouble(1, interpreter, args);
-			return new NumberValue(binaryOperator.applyAsDouble(a, b));
-		});
-	}
-
 	@Proposal
 	@SpecificationURL("https://rwaldron.github.io/proposal-math-extensions/#sec-math.degrees")
 	private static NumberValue degrees(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
@@ -313,6 +276,43 @@ public final class MathObject extends ObjectValue {
 
 		// Return the square root of the sum of squares of the elements of coerced.
 		return Math.sqrt(sum);
+	}
+
+	private void notImplemented(Intrinsics intrinsics, String methodName, int expectedArgumentCount) {
+		putMethod(intrinsics, new StringValue(methodName), expectedArgumentCount, (interpreter, args) -> {
+			throw new NotImplemented(methodName);
+		});
+	}
+
+	private void addConstant(StringValue name, double value) {
+		put(name, new NumberValue(value), false, false, false);
+	}
+
+	// For https://tc39.es/ecma262/multipage#sec-math.hypot + sec-math.min + sec-math.max
+	private void addWrapper(Intrinsics intrinsics, StringValue methodName, DoubleRestArgs restArgs) {
+		putMethod(intrinsics, methodName, 0, (interpreter, args) -> {
+			final double[] coerced = new double[args.length];
+			for (int i = 0; i < args.length; i++) {
+				coerced[i] = args[i].toNumberValue(interpreter).value;
+			}
+
+			return new NumberValue(restArgs.applyAsDouble(coerced));
+		});
+	}
+
+	private void addWrapper(Intrinsics intrinsics, StringValue methodName, DoubleUnaryOperator unaryOperator) {
+		putMethod(intrinsics, methodName, 1, (interpreter, args) -> {
+			final double number = argumentDouble(0, interpreter, args);
+			return new NumberValue(unaryOperator.applyAsDouble(number));
+		});
+	}
+
+	private void addWrapper(Intrinsics intrinsics, StringValue methodName, DoubleBinaryOperator binaryOperator) {
+		putMethod(intrinsics, methodName, 2, (interpreter, args) -> {
+			final double a = argumentDouble(0, interpreter, args);
+			final double b = argumentDouble(1, interpreter, args);
+			return new NumberValue(binaryOperator.applyAsDouble(a, b));
+		});
 	}
 
 	@FunctionalInterface

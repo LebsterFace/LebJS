@@ -70,6 +70,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private boolean disableTestOutputBuffers = false;
 		private String harness;
 		private boolean showPrompt = true;
+
 		public TemporaryResult(Iterator<String> arguments) {
 			this.arguments = arguments;
 		}

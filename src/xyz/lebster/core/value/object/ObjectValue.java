@@ -19,6 +19,7 @@ import xyz.lebster.core.value.function.NativeCode;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.object.ObjectValue.Key;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
@@ -30,15 +31,14 @@ import java.util.Map.Entry;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
-public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescriptor>> {
+public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	private static int LAST_UNUSED_IDENTIFIER = 0;
 	private final int UNIQUE_ID = ObjectValue.LAST_UNUSED_IDENTIFIER++;
-
-	private ObjectValue prototypeSlot;
+	private ObjectValue prototype;
 
 	public ObjectValue(ObjectValue prototype) {
 		super(new HashMap<>());
-		this.prototypeSlot = prototype;
+		this.prototype = prototype;
 	}
 
 	public ObjectValue(Null noPrototype) {
@@ -58,13 +58,13 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarygetprototypeof")
 	public final ObjectValue getPrototype() {
-		return this.prototypeSlot;
+		return this.prototype;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinarysetprototypeof")
 	public final boolean setPrototype(Value<?> V_or_null) {
 		if (V_or_null == Null.instance) {
-			this.prototypeSlot = null;
+			this.prototype = null;
 			return true;
 		}
 
@@ -72,7 +72,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 			throw new ShouldNotHappen("ObjectValue#getPrototypeOf called with non-object parameter");
 
 		// 1. Let current be O.[[Prototype]].
-		final ObjectValue current = this.prototypeSlot;
+		final ObjectValue current = this.prototype;
 		// 2. If SameValue(V, current) is true, return true.
 		if (V.sameValue(current)) return true;
 
@@ -104,7 +104,7 @@ public class ObjectValue extends Value<Map<ObjectValue.Key<?>, PropertyDescripto
 		}
 
 		// 8. Set O.[[Prototype]] to V.
-		this.prototypeSlot = V;
+		this.prototype = V;
 		// 9. Return true.
 		return true;
 	}

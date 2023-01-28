@@ -13,12 +13,14 @@ import xyz.lebster.core.value.function.Function;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import static xyz.lebster.core.node.declaration.VariableDeclaration.Kind.Let;
+
 public record FunctionDeclaration(BlockStatement body, StringLiteral name, FunctionParameters parameters) implements FunctionNode, Declaration {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final StringValue executedName = name == null ? Names.EMPTY : name.execute(interpreter);
 		final Function function = new Function(interpreter.intrinsics, executedName, interpreter.environment(), this);
-		interpreter.declareVariable(executedName, function);
+		interpreter.declareVariable(Let, executedName, function);
 		return Undefined.instance;
 	}
 

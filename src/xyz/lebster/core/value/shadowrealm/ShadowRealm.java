@@ -12,6 +12,7 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+import static xyz.lebster.core.node.declaration.VariableDeclaration.Kind.Let;
 
 public final class ShadowRealm extends ObjectValue {
 	private final Realm realm = new Realm(new Interpreter());
@@ -29,6 +30,6 @@ public final class ShadowRealm extends ObjectValue {
 	}
 
 	public void declare(StringValue name, Value<?> value) throws AbruptCompletion {
-		this.realm.interpreter().declareVariable(name, value);
+		realm.interpreter().declareVariable(Let, name, value);
 	}
 }

@@ -194,6 +194,15 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		return new NumberValue(-value);
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-bitwiseNOT")
+	public NumberValue bitwiseNOT() {
+		// 1. Let oldValue be ! ToInt32(x).
+		final int oldValue = toInt32();
+		// 2. Return the result of applying bitwise complement to oldValue.
+		// The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
+		return new NumberValue(~oldValue);
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toint32")
 	public int toInt32() {
 		// 1. Let number be ? ToNumber(argument).

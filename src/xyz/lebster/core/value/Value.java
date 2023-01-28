@@ -1,5 +1,6 @@
 package xyz.lebster.core.value;
 
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -78,9 +79,9 @@ public abstract class Value<JType> implements Displayable {
 
 			// c. NOTE: Because px and py are primitive values, evaluation order is not important.
 			// d. Let nx be ? ToNumeric(px).
-			final NumberValue nx = px.toPrimitive(interpreter, Value.PreferredType.Number).toNumberValue(interpreter);
+			final NumberValue nx = px.toNumeric(interpreter);
 			// e. Let ny be ? ToNumeric(py).
-			final NumberValue ny = py.toPrimitive(interpreter, Value.PreferredType.Number).toNumberValue(interpreter);
+			final NumberValue ny = py.toNumeric(interpreter);
 
 			// 1. Return Number::lessThan(nx, ny).
 			return nx.lessThan(ny);
@@ -122,6 +123,16 @@ public abstract class Value<JType> implements Displayable {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toobject")
 	public abstract ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion;
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tonumeric")
+	@NonCompliant
+	public NumberValue toNumeric(Interpreter interpreter) throws AbruptCompletion {
+		// 1. Let primValue be ? ToPrimitive(value, number).
+		final PrimitiveValue<?> primValue = toPrimitive(interpreter, PreferredType.Number);
+		// TODO: 2. If primValue is a BigInt, return primValue.
+		// 3. Return ? ToNumber(primValue).
+		return primValue.toNumberValue(interpreter);
+	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevaluezero")
 	public boolean sameValueZero(Value<?> y) {

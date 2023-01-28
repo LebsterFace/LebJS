@@ -11,6 +11,7 @@ import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.primitive.PrimitiveConstructor;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-number-constructor")
 @NonStandard
@@ -44,15 +45,24 @@ public final class NumberConstructor extends PrimitiveConstructor {
 	@Override
 	public NumberValue internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 		// 21.1.1.1 Number ( value )
+		final Value<?> value = argument(0, arguments);
 
 		// 1. If value is present, then
-		//     FIXME: a. Let prim be ? ToNumeric(value).
-		//     FIXME: b. If Type(prim) is BigInt, let n be 𝔽(ℝ(prim)).
-		//     c. Otherwise, let n be prim.
+		NumberValue n;
+		if (arguments.length > 0) {
+			// a. Let prim be ? ToNumeric(value).
+			final NumberValue prim = value.toNumeric(interpreter);
+			// TODO: b. If prim is a BigInt, let n be 𝔽(ℝ(prim)).
+			// c. Otherwise, let n be prim.
+			n = prim;
+		}
 		// 2. Else,
-		//     a. Let n be +0𝔽.
+		else {
+			// a. Let n be +0𝔽.
+			n = NumberValue.ZERO;
+		}
 
 		// 3. If NewTarget is undefined, return n.
-		return arguments.length > 0 ? arguments[0].toNumberValue(interpreter) : NumberValue.ZERO;
+		return n;
 	}
 }

@@ -2,6 +2,7 @@ package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -12,8 +13,10 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+@SpecificationURL("https://tc39.es/ecma262/multipage#sec-unary-operators")
 public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op) implements Expression {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
@@ -21,39 +24,54 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 			case UnaryPlus -> expression.execute(interpreter).toNumberValue(interpreter);
 			case UnaryMinus -> expression.execute(interpreter).toNumberValue(interpreter).unaryMinus();
 			case LogicalNot -> expression.execute(interpreter).toBooleanValue(interpreter).not();
-			case Typeof -> {
-				// https://tc39.es/ecma262/multipage#sec-typeof-operator-runtime-semantics-evaluation
-				if (expression instanceof final LeftHandSideExpression lhs) {
-					final Reference reference = lhs.toReference(interpreter);
-					if (reference.isResolvable()) {
-						yield new StringValue(reference.getValue(interpreter).typeOf(interpreter));
-					} else {
-						yield Names.undefined;
-					}
-				} else {
-					yield new StringValue(expression.execute(interpreter).typeOf(interpreter));
-				}
-			}
+			case Typeof -> typeofOperator(interpreter);
+			case Void -> voidOperator(interpreter);
+			case Delete -> deleteOperator(interpreter);
+			case BitwiseNot -> bitwiseNotOperator(interpreter);
 
-			// https://tc39.es/ecma262/multipage#sec-void-operator-runtime-semantics-evaluation
-			case Void -> {
-				// UnaryExpression : void UnaryExpression
-				// 1. Let expr be the result of evaluating UnaryExpression.
-				// 2. Perform ? GetValue(expr).
-				expression.execute(interpreter);
-				// 3. Return undefined.
-				yield Undefined.instance;
-			}
-
-			case Delete -> deleteOperator(interpreter, expression);
-
-			case BitwiseNot -> throw new NotImplemented("The `~` operator");
 			case Await -> throw new NotImplemented("The `await` operator");
 		};
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-bitwise-not-operator")
+	private Value<?> bitwiseNotOperator(Interpreter interpreter) throws AbruptCompletion {
+		//  1. Let expr be ? Evaluation of UnaryExpression.
+		final Value<?> expr = expression.execute(interpreter);
+		//  2. Let oldValue be ? ToNumeric(? GetValue(expr)).
+		final NumberValue oldValue = expr.toNumeric(interpreter);
+		//  3. If oldValue is a Number, then return Number::bitwiseNOT(oldValue).
+		return oldValue.bitwiseNOT();
+		//  TODO: 4. Else, Assert: oldValue is a BigInt.
+		//  b. Return BigInt::bitwiseNOT(oldValue).
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-typeof-operator")
+	private StringValue typeofOperator(Interpreter interpreter) throws AbruptCompletion {
+		if (expression instanceof final LeftHandSideExpression lhs) {
+			final Reference reference = lhs.toReference(interpreter);
+			if (reference.isResolvable()) {
+				return new StringValue(reference.getValue(interpreter).typeOf(interpreter));
+			} else {
+				return Names.undefined;
+			}
+		} else {
+			return new StringValue(expression.execute(interpreter).typeOf(interpreter));
+		}
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-void-operator")
+	private Undefined voidOperator(Interpreter interpreter) throws AbruptCompletion {
+		// UnaryExpression : void UnaryExpression
+		// 1. Let expr be the result of evaluating UnaryExpression.
+		// 2. Perform ? GetValue(expr).
+		expression.execute(interpreter);
+		// 3. Return undefined.
+		return Undefined.instance;
+	}
+
 	@NonCompliant
-	private BooleanValue deleteOperator(Interpreter interpreter, Expression expression) throws AbruptCompletion {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-delete-operator")
+	private BooleanValue deleteOperator(Interpreter interpreter) throws AbruptCompletion {
 		if (!(expression instanceof final MemberExpression memberExpression)) {
 			return BooleanValue.TRUE;
 		}

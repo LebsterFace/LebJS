@@ -1,47 +1,39 @@
-{
-    // callback must be a function
-    Test.expectError("TypeError", "undefined is not a function", () => [].find(undefined));
-}
+Test.expect(1, Array.prototype.find.length);
 
-{
-    // basic functionality
-    const array = ["hello", "world", 1, 2, false];
-    Test.expect("hello", array.find(value => value === "hello"));
-    Test.expect("world", array.find((value, index, arr) => index === 1));
-    // Test.expect(1, array.find(value => value == "1"));
-    Test.expect(1, array.find(value => value === 1));
-    Test.expect(1, array.find(value => typeof value !== "string"));
-    Test.expect(false, array.find(value => typeof value === "boolean"));
-    Test.expect(2, array.find(value => value > 1));
-    Test.expect(2, array.find(value => value > 1 && value < 3));
-    Test.expect(undefined, array.find(value => value > 100));
-    Test.expect(undefined, [].find(value => value === 1));
-}
+//callback must be a function
+Test.expectError("TypeError", "undefined is not a function", () => [].find(undefined));
 
-{
-    // never calls callback with empty array
-    var callbackCalled = 0;
-    Test.expect(undefined, [].find(() => {
-        callbackCalled++;
-    }));
-    Test.expect(0, callbackCalled);
-}
+// basic functionality
+const array = ["hello", "world", 1, 2, false];
+Test.expect("hello", array.find(value => value === "hello"));
+Test.expect("world", array.find((value, index, arr) => index === 1));
+// TODO: Loose equality: Test.expect(1, array.find(value => value == "1"));
+Test.expect(1, array.find(value => value === 1));
+Test.expect(1, array.find(value => typeof value !== "string"));
+Test.expect(false, array.find(value => typeof value === "boolean"));
+Test.expect(2, array.find(value => value > 1));
+Test.expect(2, array.find(value => value > 1 && value < 3));
+Test.expect(undefined, array.find(value => value > 100));
+Test.expect(undefined, [].find(value => value === 1));
 
-{
-    // calls callback once for every item
-    var callbackCalled = 0;
-    Test.expect(undefined, [1, 2, 3].find(() => {
-        callbackCalled++;
-    }));
-    Test.expect(3, callbackCalled);
-}
+// never calls callback with empty array
+let c = 0;
+Test.expect(undefined, [].find(() => { c++; }));
+Test.expect(0, c);
 
-{
-    // empty slots are treated as undefined
-    var callbackCalled = 0;
-    Test.expect(undefined, [1, , , "foo", , undefined, , , ].find(value => {
-        callbackCalled++;
-        return value === undefined;
-    }));
-    Test.expect(2, callbackCalled);
-}
+// calls callback once for every item
+Test.expect(undefined, [1, 2, 3].find(() => { c++; }));
+Test.expect(3, c);
+
+// empty slots are treated as undefined
+c = 0;
+const holes = [1, , , "foo", , undefined, , ,];
+Test.expect(undefined, holes.find(value => { c++; return value === undefined; }));
+Test.expect(2, c);
+
+/* TODO: is unscopable
+    Test.expect(true, Array.prototype[Symbol.unscopables].find);
+    const array = [];
+    with (array) {
+        Test.expectError("ReferenceError", "'find' is not defined", () => { find; });
+    } */

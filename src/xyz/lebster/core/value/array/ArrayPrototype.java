@@ -169,7 +169,7 @@ public final class ArrayPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.find")
 	private static Value<?> find(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.9 Array.prototype.find ( predicate [ , thisArg ] )
-		final Value<?> predicate_ = argument(0, arguments);
+		final Value<?> maybePredicate = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
 
 		// 1. Let O be ? ToObject(this value).
@@ -177,7 +177,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let len be ? LengthOfArrayLike(O).
 		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
-		final Executable predicate = Executable.getExecutable(interpreter, predicate_);
+		final Executable predicate = Executable.getExecutable(interpreter, maybePredicate);
 		// 4. Let k be 0.
 		// 5. Repeat, while k < len,
 		for (int k = 0; k < len; k++) {
@@ -199,7 +199,7 @@ public final class ArrayPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findindex")
 	private static NumberValue findIndex(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.10 Array.prototype.findIndex ( predicate [ , thisArg ] )
-		final Value<?> predicate_ = argument(0, arguments);
+		final Value<?> maybePredicate = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
 
 		// 1. Let O be ? ToObject(this value).
@@ -207,7 +207,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let len be ? LengthOfArrayLike(O).
 		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
-		final Executable predicate = Executable.getExecutable(interpreter, predicate_);
+		final Executable predicate = Executable.getExecutable(interpreter, maybePredicate);
 		// 4. Let k be 0.
 		// 5. Repeat, while k < len,
 		for (int k = 0; k < len; k++) {
@@ -229,22 +229,65 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findlast")
-	private static Value<?> findLast(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> findLast(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.11 Array.prototype.findLast ( predicate [ , thisArg ] )
-		final Value<?> predicate = argument(0, arguments);
+		final Value<?> maybePredicate = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
 
-		throw new NotImplemented("Array.prototype.findLast");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
+		final Executable predicate = Executable.getExecutable(interpreter, maybePredicate);
+		// 4. Let k be len - 1.
+		// 5. Repeat, while k ≥ 0,
+		for (long k = len - 1; k >= 0; k--) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final StringValue Pk = new StringValue(k);
+			// b. Let kValue be ? Get(O, Pk).
+			final Value<?> kValue = O.get(interpreter, Pk);
+			// c. Let testResult be ToBoolean(? Call(predicate, thisArg, « kValue, 𝔽(k), O »)).
+			final boolean testResult = predicate.call(interpreter, thisArg, kValue, new NumberValue(k), O).isTruthy(interpreter);
+			// d. If testResult is true, return kValue.
+			if (testResult) return kValue;
+			// e. Set k to k - 1.
+		}
+
+		// 6. Return undefined.
+		return Undefined.instance;
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findlastindex")
-	private static Value<?> findLastIndex(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> findLastIndex(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.12 Array.prototype.findLastIndex ( predicate [ , thisArg ] )
-		final Value<?> predicate = argument(0, arguments);
+		final Value<?> maybePredicate = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
 
-		throw new NotImplemented("Array.prototype.findLastIndex");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
+		final Executable predicate = Executable.getExecutable(interpreter, maybePredicate);
+		// 4. Let k be len - 1.
+		// 5. Repeat, while k ≥ 0,
+		for (long k = len - 1; k >= 0; k--) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final StringValue Pk = new StringValue(k);
+			// b. Let kValue be ? Get(O, Pk).
+			final Value<?> kValue = O.get(interpreter, Pk);
+			// c. Let testResult be ToBoolean(? Call(predicate, thisArg, « kValue, 𝔽(k), O »)).
+			final NumberValue kNum = new NumberValue(k);
+			final boolean testResult = predicate.call(interpreter, thisArg, kValue, kNum, O).isTruthy(interpreter);
+			// d. If testResult is true, return 𝔽(k).
+			if (testResult) return kNum;
+			// e. Set k to k - 1.
+		}
+
+		// 6. Return -1𝔽.
+		return new NumberValue(-1);
 	}
 
 	@NonCompliant
@@ -821,13 +864,19 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
-	static long lengthOfArrayLike(Interpreter interpreter, ObjectValue O) throws AbruptCompletion {
-		final double number = O.get(interpreter, Names.length).toNumberValue(interpreter).value;
-		if (Double.isNaN(number) || number <= 0) {
-			return 0L;
-		} else {
-			return Long.min((long) number, MAX_LENGTH);
-		}
+	static int lengthOfArrayLike(Interpreter interpreter, ObjectValue O) throws AbruptCompletion {
+		// 1. Return ℝ(? ToLength(? Get(obj, "length"))).
+		return toLength(interpreter, O.get(interpreter, Names.length));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tolength")
+	private static int toLength(Interpreter interpreter, Value<?> argument) throws AbruptCompletion {
+		// 1. Let len be ? ToIntegerOrInfinity(argument).
+		final int len = NumberPrototype.toIntegerOrInfinity(interpreter, argument);
+		// 2. If len ≤ 0, return +0𝔽.
+		if (len <= 0) return 0;
+		// 3. Return 𝔽(min(len, 2^53 - 1)).
+		return Math.toIntExact(Math.min(len, MAX_LENGTH));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.push")

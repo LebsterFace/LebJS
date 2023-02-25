@@ -139,14 +139,12 @@ public final class Lexer {
 	private int index = -1;
 	private TokenType lastTokenType;
 
-	private Lexer(String sourceText) {
+	private Lexer(String sourceText) throws SyntaxError {
 		this.codePoints = sourceText.codePoints().toArray();
 		this.sourceText = sourceText;
 		consume();
 		if (accept("#!")) {
-			while (!isLineTerminator()) {
-				consume();
-			}
+			consumeSingleLineComment();
 		}
 	}
 
@@ -229,15 +227,23 @@ public final class Lexer {
 		}
 	}
 
-	private boolean isFinished() {
-		return index >= codePoints.length;
-	}
-
 	private boolean isLineTerminator() {
-		return peek("\r\n") || codePoint == '\n';
+		return codePoint == '\n' ||
+			   codePoint == '\r' ||
+			   codePoint == '\u2028' ||
+			   codePoint == '\u2029';
 	}
 
-	private int consume() {
+	private boolean isLineTerminatorSequence() {
+		return codePoint == '\n' ||
+			   codePoint == '\u2028' ||
+			   codePoint == '\u2029' ||
+			   peek("\r\n") ||
+			   codePoint == '\r';
+	}
+
+	private int consume() throws SyntaxError {
+		if (!hasNext()) throw new SyntaxError("Unexpected end of input", position());
 		final int old = codePoint;
 		consume(1);
 		return old;
@@ -245,14 +251,14 @@ public final class Lexer {
 
 	private void consume(int count) {
 		index += count;
-		codePoint = isFinished() ? -1 : codePoints[index];
+		codePoint = !hasNext() ? -1 : codePoints[index];
 	}
 
-	private void collect(StringBuilder builder) {
+	private void collect(StringBuilder builder) throws SyntaxError {
 		builder.appendCodePoint(consume());
 	}
 
-	private void consumeWhitespace() {
+	private void consumeWhitespace() throws SyntaxError {
 		while (codePoint == '\t'      // Tab
 			   || codePoint == '\013' // Vertical tab
 			   || codePoint == '\014' // Form feed
@@ -286,6 +292,12 @@ public final class Lexer {
 
 	private boolean anyOf(String codePoints) {
 		return anyOf(codePoints.codePoints().toArray());
+	}
+
+	private boolean consumeAnyOf(String codePoints) throws SyntaxError {
+		final boolean result = anyOf(codePoints.codePoints().toArray());
+		if (result) consume();
+		return result;
 	}
 
 	private boolean slashMeansDivision() {
@@ -329,38 +341,56 @@ public final class Lexer {
 
 		if (accept("`")) {
 			return tokenizeTemplateLiteralStart(inTemplateLiteral);
-		} else if (inTemplateLiteral) {
-			if (currentTemplateLiteralIsEnding()) {
-				return tokenizeTemplateLiteralEnd();
-			}
-
-			if (!templateLiteralStates.getFirst().inExpression) {
-				if (isFinished()) throw new SyntaxError("Unterminated template literal", position());
-
-				if (accept("${")) {
-					templateLiteralStates.getFirst().inExpression = true;
-					return new Token(TokenType.TemplateExpressionStart, position());
-				}
-
-				return tokenizeTemplateLiteralSpan();
-			}
 		}
 
-		if (isFinished()) return null;
+		if (inTemplateLiteral && currentTemplateLiteralIsEnding()) {
+			return tokenizeTemplateLiteralEnd();
+		}
+
+		if (inTemplateLiteral && !templateLiteralStates.getFirst().inExpression) {
+			if (!hasNext()) {
+				throw new SyntaxError("Unterminated template literal", position());
+			}
+
+			if (accept("${")) {
+				templateLiteralStates.getFirst().inExpression = true;
+				return new Token(TokenType.TemplateExpressionStart, position());
+			}
+
+			return tokenizeTemplateLiteralSpan();
+		}
+
+		if (!hasNext()) {
+			return null;
+		}
 
 		if (isLineTerminator()) {
-			while (isLineTerminator() && hasNext()) consume();
+			consumeLineTerminators();
 			return new Token(TokenType.LineTerminator, position());
-		} else if (isIdentifierStart(codePoint)) {
+		}
+
+		if (isIdentifierStart(codePoint)) {
 			return tokenizeKeywordOrIdentifier();
-		} else if (isDigit(codePoint)) {
+		}
+
+		if (isDigit(codePoint)) {
 			return tokenizeNumericLiteral();
-		} else if (codePoint == '"' || codePoint == '\'') {
+		}
+
+		if (codePoint == '"' || codePoint == '\'') {
 			return tokenizeStringLiteral();
-		} else if (codePoint == '/' && !slashMeansDivision()) {
+		}
+
+		if (codePoint == '/' && !slashMeansDivision()) {
 			return consumeRegexpLiteral();
-		} else {
-			return tokenizeSymbol();
+		}
+
+		return tokenizeSymbol();
+	}
+
+	private void consumeLineTerminators() throws SyntaxError {
+		while (isLineTerminator()) {
+			consume();
 		}
 	}
 
@@ -377,18 +407,28 @@ public final class Lexer {
 		}
 	}
 
-	private Token consumeRegexpLiteral() {
+	private Token consumeRegexpLiteral() throws SyntaxError {
 		final StringBuilder builder = new StringBuilder();
 		consume();
 
+		boolean inCharacterClass = false;
 		boolean escaped = false;
 		while (hasNext()) {
 			if (escaped) {
 				escaped = false;
 				collect(builder);
+			} else if (inCharacterClass) {
+				if (codePoint == ']') {
+					inCharacterClass = false;
+				}
+
+				collect(builder);
+			} else if (codePoint == '[') {
+				inCharacterClass = true;
+				collect(builder);
 			} else if (codePoint == '\\') {
 				escaped = true;
-				consume();
+				collect(builder);
 			} else if (codePoint == '/') {
 				consume();
 				break;
@@ -404,14 +444,23 @@ public final class Lexer {
 		return index < codePoints.length;
 	}
 
-	private void consumeComment() {
+	private void consumeComment() throws SyntaxError {
 		if (accept("//")) {
-			while (!isLineTerminator() && hasNext()) consume();
-		} else if (accept("/*")) {
+			consumeSingleLineComment();
+			return;
+		}
+
+		if (accept("/*")) {
 			while (hasNext()) {
 				if (accept("*/")) break;
 				consume();
 			}
+		}
+	}
+
+	private void consumeSingleLineComment() throws SyntaxError {
+		while (!isLineTerminator() && hasNext()) {
+			consume();
 		}
 	}
 
@@ -422,7 +471,7 @@ public final class Lexer {
 			if (escaped) {
 				escaped = false;
 				if (isLineTerminator()) {
-					while (isLineTerminator() && hasNext()) consume();
+					consumeLineTerminators();
 				} else {
 					builder.appendCodePoint(readEscapedCharacter());
 				}
@@ -436,7 +485,7 @@ public final class Lexer {
 			}
 		}
 
-		if (isFinished() && !templateLiteralStates.isEmpty()) {
+		if (!hasNext() && !templateLiteralStates.isEmpty()) {
 			throw new SyntaxError("Unterminated template literal", position());
 		}
 
@@ -469,23 +518,52 @@ public final class Lexer {
 
 		boolean escaped = false;
 		while (true) {
-			if (isFinished()) throw new SyntaxError("Unterminated string literal", position());
+			if (!hasNext()) throw new SyntaxError("Unterminated string literal", position());
 
 			if (escaped) {
 				escaped = false;
-				builder.appendCodePoint(readEscapedCharacter());
-			} else if (codePoint == '\\') {
+				if (isLineTerminatorSequence()) {
+					// Line continuation
+					consumeLineContinuation();
+				} else {
+					builder.appendCodePoint(readEscapedCharacter());
+				}
+
+				continue;
+			}
+
+			// All code points may appear literally in a string literal except for
+			// the closing quote code points
+			if (codePoint == stringType) break;
+
+			// U+005C (REVERSE SOLIDUS)
+			if (codePoint == '\\') {
 				escaped = true;
 				consume();
-			} else if (codePoint == stringType) {
-				break;
-			} else {
-				collect(builder);
+				continue;
 			}
+
+			// U+000D (CARRIAGE RETURN)
+			// and U+000A (LINE FEED)
+			if (codePoint == '\r' || codePoint == '\n') {
+				throw new SyntaxError("Unterminated string literal", position());
+			}
+
+			collect(builder);
 		}
 
 		consume();
 		return new Token(TokenType.StringLiteral, builder.toString(), position());
+	}
+
+	private void consumeLineContinuation() throws SyntaxError {
+		if (!consumeAnyOf("\n\u2028\u2029") && !accept("\r\n")) {
+			if (codePoint == '\r') {
+				consume();
+			} else {
+				throw new SyntaxError("Expecting to see LineTerminatorSequence after escape", position());
+			}
+		}
 	}
 
 	private int readEscapedCharacter() throws SyntaxError {
@@ -611,7 +689,7 @@ public final class Lexer {
 		return new Token(type, new BigInteger(integerString, radix).toString(), position());
 	}
 
-	private Token tokenizeKeywordOrIdentifier() {
+	private Token tokenizeKeywordOrIdentifier() throws SyntaxError {
 		final var builder = new StringBuilder();
 		while (isIdentifierMiddle(codePoint)) collect(builder);
 		final String value = builder.toString();

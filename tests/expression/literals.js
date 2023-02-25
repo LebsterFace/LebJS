@@ -1,4 +1,7 @@
 Test.expect("abc", "abc");
+Test.expect("abc\
+def\
+", "abcdef");
 Test.expect(10, 10);
 Test.expect(1.2345, 1.2345);
 Test.expect(true, true);

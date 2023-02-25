@@ -167,7 +167,10 @@ public final class Parser {
 
 			default -> {
 				if (state.token.matchPrimaryExpression()) {
-					yield new ExpressionStatement(parseExpression());
+					final Expression expression = parseExpression();
+					if (state.is(TokenType.Colon))
+						throw new ParserNotImplemented(position(), "Parsing labels");
+					yield new ExpressionStatement(expression);
 				} else {
 					throw new CannotParse(state.token, "Statement");
 				}

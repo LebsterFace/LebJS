@@ -18,7 +18,7 @@ public record BindingPattern(VariableDeclaration.Kind kind, AssignmentTarget ass
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
 			.self(this)
-			.enum_("Kind", kind)
+			.enumChild("Kind", kind)
 			.child("Target", assignmentTarget);
 	}
 

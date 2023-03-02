@@ -75,7 +75,7 @@ public record ClassExpression(
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
 			.self(this)
-			.optional("Constructor", constructor)
+			.optionalChild("Constructor", constructor)
 			.children("Methods", methods);
 	}
 

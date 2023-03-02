@@ -15,7 +15,7 @@ public record IfStatement(Expression condition, Statement consequence, Statement
 			.self(this)
 			.child("Condition", condition)
 			.child("Consequence", consequence)
-			.optionalHidden("Else", elseStatement);
+			.hiddenChild("Else", elseStatement);
 	}
 
 	@Override

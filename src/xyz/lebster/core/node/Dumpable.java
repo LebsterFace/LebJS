@@ -1,15 +1,5 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.core.interpreter.StringRepresentation;
-
-public interface Dumpable {
+public interface Dumpable extends Representable {
 	void dump(int indent);
-
-	void represent(StringRepresentation representation);
-
-	default String toRepresentationString() {
-		final StringRepresentation representation = new StringRepresentation();
-		this.represent(representation);
-		return representation.toString();
-	}
 }

@@ -5,13 +5,14 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Value;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public final class ExpressionList {
+public final class ExpressionList implements Dumpable {
 	private final ArrayList<ExpressionNode> backingList;
 	private final boolean canHaveEmpty;
 
@@ -49,25 +50,36 @@ public final class ExpressionList {
 		return result;
 	}
 
-	public void dumpWithIndices(int indent) {
-		for (int i = 0; i < backingList.size(); i++) {
-			Dumper.dumpIndicator(indent, String.valueOf(i));
-			backingList.get(i).dump(indent + 1);
-		}
-	}
-
-	public void dumpWithoutIndices(int indent) {
+	@Override
+	public void dump(int indent) {
 		for (final ExpressionNode node : backingList) {
-			node.dump(indent + 1);
+			switch (node.type) {
+				case SPREAD -> {
+					Dumper.dumpIndicator(indent + 1, "Spread");
+					node.expression.dump(indent + 2);
+				}
+				case SINGLE -> node.expression.dump(indent + 1);
+				case EMPTY -> Dumper.dumpString(indent + 1, "Empty");
+			}
 		}
 	}
 
+	@Override
 	public void represent(StringRepresentation representation) {
 		final Iterator<ExpressionNode> iterator = backingList.iterator();
 		while (iterator.hasNext()) {
 			final ExpressionNode element = iterator.next();
-			element.represent(representation);
-			if (iterator.hasNext()) representation.append(", ");
+			switch (element.type) {
+				case SPREAD -> {
+					representation.append("...");
+					element.expression.represent(representation);
+				}
+				case SINGLE -> element.expression.represent(representation);
+				case EMPTY -> representation.append(' ');
+			}
+
+			if (iterator.hasNext())
+				representation.append(", ");
 		}
 	}
 
@@ -76,27 +88,6 @@ public final class ExpressionList {
 	}
 
 	private record ExpressionNode(Expression expression, Type type) {
-		public void dump(int indent) {
-			if (type == Type.SPREAD) {
-				Dumper.dumpIndicator(indent, "Spread");
-				expression.dump(indent + 1);
-			} else if (type == Type.EMPTY) {
-				Dumper.dumpString(indent, "Empty");
-			} else {
-				expression.dump(indent);
-			}
-		}
-
-		public void represent(StringRepresentation representation) {
-			if (type == Type.EMPTY) {
-				representation.append(' ');
-				return;
-			}
-
-			if (type == Type.SPREAD) representation.append("...");
-			expression.represent(representation);
-		}
-
 		private enum Type { SINGLE, EMPTY, SPREAD }
 	}
 }

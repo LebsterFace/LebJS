@@ -78,9 +78,8 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 		@Override
 		public void dump(int indent) {
 			DumpBuilder.begin(indent)
-				.self(this)
-				.stringChild("Key", key.value)
-				.child("Value", value);
+				.selfParameterized(this, key.value)
+				.container(value);
 		}
 
 		@Override
@@ -125,7 +124,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 		@Override
 		public void dump(int indent) {
 			DumpBuilder.begin(indent)
-				.value(this, key.value);
+				.selfValue(this, key.value);
 		}
 
 		@Override

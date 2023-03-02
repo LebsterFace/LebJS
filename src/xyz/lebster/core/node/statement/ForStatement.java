@@ -53,9 +53,9 @@ public record ForStatement(Statement init, Expression test, Expression update, S
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
 			.self(this)
-			.optional("Init", init)
-			.optional("Test", test)
-			.optional("Update", update)
+			.optionalChild("Init", init)
+			.optionalChild("Test", test)
+			.optionalChild("Update", update)
 			.child("Body", body);
 	}
 }

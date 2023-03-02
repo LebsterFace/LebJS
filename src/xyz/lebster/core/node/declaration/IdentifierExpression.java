@@ -30,7 +30,7 @@ public record IdentifierExpression(StringValue name) implements AssignmentTarget
 	@Override
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
-			.value(this, name.value);
+			.selfValue(this, name.value);
 	}
 
 	@Override

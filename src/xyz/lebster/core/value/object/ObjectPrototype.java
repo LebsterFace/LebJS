@@ -130,6 +130,7 @@ public final class ObjectPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype.valueof")
 	private static ObjectValue valueOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 1. Return ? ToObject(this value).
 		return interpreter.thisValue().toObjectValue(interpreter);
 	}
 

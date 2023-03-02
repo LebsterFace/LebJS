@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public final class FunctionParameters implements Dumpable, Iterable<FunctionParameters.Parameter> {
+public final class FunctionParameters implements Iterable<FunctionParameters.Parameter>, Representable {
 	private final List<Parameter> formalParameters = new ArrayList<>();
 	public AssignmentTarget rest;
 
@@ -36,13 +36,6 @@ public final class FunctionParameters implements Dumpable, Iterable<FunctionPara
 
 	public void add(AssignmentTarget target) {
 		this.formalParameters.add(new Parameter(target, null));
-	}
-
-	@Override
-	public void dump(int indent) {
-		for (final var parameter : formalParameters) {
-			parameter.dump(indent + 1);
-		}
 	}
 
 	@Override
@@ -99,7 +92,7 @@ public final class FunctionParameters implements Dumpable, Iterable<FunctionPara
 			DumpBuilder.begin(indent)
 				.self(this)
 				.child("Target", target)
-				.optional("Default Expression", defaultExpression);
+				.optionalChild("Default Expression", defaultExpression);
 		}
 
 		@Override

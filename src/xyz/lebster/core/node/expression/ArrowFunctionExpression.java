@@ -1,10 +1,8 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.DumpBuilder;
-import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.ASTNode;
 import xyz.lebster.core.node.FunctionParameters;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.function.ArrowFunction;
@@ -12,13 +10,13 @@ import xyz.lebster.core.value.function.ArrowFunction;
 public final class ArrowFunctionExpression implements Expression {
 	public final FunctionParameters parameters;
 	public final BlockStatement body;
-	public final Expression implicitReturnExpression;
+	public final Expression implicitReturn;
 	public final boolean hasFullBody;
 
-	public ArrowFunctionExpression(FunctionParameters parameters, BlockStatement body, Expression implicitReturnExpression, boolean hasFullBody) {
+	public ArrowFunctionExpression(FunctionParameters parameters, BlockStatement body, Expression implicitReturn, boolean hasFullBody) {
 		this.parameters = parameters;
 		this.body = body;
-		this.implicitReturnExpression = implicitReturnExpression;
+		this.implicitReturn = implicitReturn;
 		this.hasFullBody = hasFullBody;
 	}
 
@@ -26,8 +24,8 @@ public final class ArrowFunctionExpression implements Expression {
 		this(parameters, body, null, true);
 	}
 
-	public ArrowFunctionExpression(Expression implicitReturnExpression, FunctionParameters parameters) {
-		this(parameters, null, implicitReturnExpression, false);
+	public ArrowFunctionExpression(Expression implicitReturn, FunctionParameters parameters) {
+		this(parameters, null, implicitReturn, false);
 	}
 
 	@Override
@@ -39,18 +37,9 @@ public final class ArrowFunctionExpression implements Expression {
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
 			.self(this)
-			.child("Parameters", parameters);
-
-		if (this.hasFullBody) {
-			assert body != null;
-			for (final ASTNode child : body.children()) {
-				child.dump(indent + 1);
-			}
-		} else {
-			assert this.implicitReturnExpression != null;
-			Dumper.dumpName(indent + 1, "ImplicitReturnStatement");
-			this.implicitReturnExpression.dump(indent + 2);
-		}
+			.children("Parameters", parameters)
+			.optionalChild("Body", body)
+			.hiddenChild("Implicit Return", implicitReturn);
 	}
 
 	@Override
@@ -62,8 +51,8 @@ public final class ArrowFunctionExpression implements Expression {
 			assert body != null;
 			body.represent(representation);
 		} else {
-			assert implicitReturnExpression != null;
-			implicitReturnExpression.represent(representation);
+			assert implicitReturn != null;
+			implicitReturn.represent(representation);
 		}
 	}
 }

@@ -62,7 +62,7 @@ public class TemplateLiteral implements Expression {
 		@Override
 		public void dump(int indent) {
 			DumpBuilder.begin(indent)
-				.value(this, StringEscapeUtils.quote(string, false));
+				.selfValue(this, StringEscapeUtils.quote(string, false));
 		}
 
 		@Override

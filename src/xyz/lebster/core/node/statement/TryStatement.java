@@ -1,7 +1,6 @@
 package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.DumpBuilder;
-import xyz.lebster.core.Dumper;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -14,20 +13,16 @@ import static xyz.lebster.core.node.declaration.VariableDeclaration.Kind.Let;
 public record TryStatement(BlockStatement body, StringValue catchParameter, BlockStatement catchBody, BlockStatement finallyBody) implements Statement {
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.begin(indent)
+		final var builder = DumpBuilder.begin(indent)
 			.self(this)
 			.child("Body", body);
-
-		if (catchBody != null) {
-			Dumper.dumpIndicator(indent + 1, "Catch");
-			Dumper.dumpValue(indent + 2, "Parameter", catchParameter == null ? "No Parameter" : catchParameter.value);
-			catchBody.dump(indent + 2);
-		}
-
-		if (finallyBody != null) {
-			Dumper.dumpIndicator(indent + 1, "Finally");
-			finallyBody.dump(indent + 2);
-		}
+		if (catchBody != null)
+			builder.nestedChild("Catch")
+				.stringChild("Parameter", catchParameter)
+				.child("Body", catchBody);
+		if (finallyBody != null)
+			builder.nestedChild("Finally")
+				.child("Body", finallyBody);
 	}
 
 	@Override

@@ -8,7 +8,7 @@ public record BooleanLiteral(BooleanValue value) implements Literal<BooleanValue
 	@Override
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
-			.value(this, value == BooleanValue.TRUE ? "true" : "false");
+			.selfValue(this, value == BooleanValue.TRUE ? "true" : "false");
 	}
 
 	@Override

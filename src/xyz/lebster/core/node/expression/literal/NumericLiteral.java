@@ -8,7 +8,7 @@ public record NumericLiteral(NumberValue value) implements Literal<NumberValue> 
 	@Override
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
-			.value(this, value.stringValueOf());
+			.selfValue(this, value.stringValueOf());
 	}
 
 	@Override

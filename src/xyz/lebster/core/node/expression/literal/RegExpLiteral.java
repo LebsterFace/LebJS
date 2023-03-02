@@ -9,7 +9,7 @@ import xyz.lebster.core.value.regexp.RegExpObject;
 public record RegExpLiteral(String pattern, String flags) implements Expression {
 	@Override
 	public void dump(int indent) {
-		DumpBuilder.begin(indent).value(this, pattern);
+		DumpBuilder.begin(indent).selfValue(this, pattern);
 	}
 
 	@Override

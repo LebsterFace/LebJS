@@ -1,6 +1,6 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.Dumper;
+import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -19,7 +19,7 @@ public final class BreakStatement implements Statement {
 
 	@Override
 	public void dump(int indent) {
-		Dumper.dumpString(indent, "BreakStatement");
+		DumpBuilder.begin(indent).selfString(this);
 	}
 
 	@Override

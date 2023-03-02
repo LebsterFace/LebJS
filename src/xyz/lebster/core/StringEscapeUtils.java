@@ -27,8 +27,9 @@ public final class StringEscapeUtils {
 					case '\t' -> res.append('\\').append('t');
 					case '\f' -> res.append('\\').append('f');
 					case '\r' -> res.append('\\').append('r');
+					case 0x0B -> res.append('\\').append('v'); // \x0B -> \v
 					default -> {
-						res.append("\\u00");
+						res.append("\\x");
 						if (ch <= 0xf) res.append('0');
 						res.append(hex(ch));
 					}

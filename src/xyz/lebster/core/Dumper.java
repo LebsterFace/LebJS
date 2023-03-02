@@ -1,7 +1,5 @@
 package xyz.lebster.core;
 
-import xyz.lebster.core.node.Dumpable;
-
 @Deprecated
 public final class Dumper {
 	private Dumper() {
@@ -39,16 +37,6 @@ public final class Dumper {
 	public static void dumpEnum(int indent, Enum<?> value) {
 		dumpIndent(indent);
 		System.out.printf("%s%s %s%s%s%n", ANSI.BRIGHT_RED, value.getClass().getSimpleName(), ANSI.BRIGHT_YELLOW, value, ANSI.RESET);
-	}
-
-	public static void dumpEnum(int indent, String indicator, Enum<?> value) {
-		dumpIndicator(indent, indicator);
-		dumpEnum(indent + 1, value);
-	}
-
-	public static void dumpIndicated(int indent, String indicator, Dumpable node) {
-		dumpIndicator(indent, indicator);
-		node.dump(indent + 1);
 	}
 
 	public static void dumpIndicator(int indent, String indicator) {

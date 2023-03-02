@@ -16,7 +16,7 @@ public record VariableDeclarator(AssignmentTarget target, Expression init, Sourc
 		DumpBuilder.begin(indent)
 			.self(this)
 			.child("Target", target)
-			.optional("Initializer", init);
+			.optionalChild("Initializer", init);
 	}
 
 	@Override

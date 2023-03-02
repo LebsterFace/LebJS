@@ -9,7 +9,7 @@ public record StringLiteral(StringValue value) implements Literal<StringValue> {
 	@Override
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
-			.value(this, StringEscapeUtils.quote(value.value, false));
+			.selfValue(this, StringEscapeUtils.quote(value.value, false));
 	}
 
 	@Override

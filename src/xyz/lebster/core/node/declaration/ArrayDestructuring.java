@@ -49,7 +49,7 @@ public record ArrayDestructuring(AssignmentTarget restTarget, AssignmentPattern.
 	public void dump(int indent) {
 		DumpBuilder.begin(indent)
 			.self(this)
-			.optional("Rest Target", restTarget)
+			.optionalChild("Rest Target", restTarget)
 			.children("Elements", children);
 	}
 

@@ -37,7 +37,7 @@ public final class ArrowFunction extends Executable {
 				expression.body.executeWithoutNewContext(interpreter);
 				return Undefined.instance;
 			} else {
-				return expression.implicitReturnExpression.execute(interpreter);
+				return expression.implicitReturn.execute(interpreter);
 			}
 		} catch (AbruptCompletion e) {
 			if (e.type != AbruptCompletion.Type.Return) throw e;

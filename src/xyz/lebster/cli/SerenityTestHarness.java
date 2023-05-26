@@ -15,16 +15,17 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import java.io.File;
 import java.nio.file.Path;
 
-import static xyz.lebster.cli.TestStatus.FAILED;
-import static xyz.lebster.cli.TestStatus.PASSED;
+import static xyz.lebster.cli.TestStatus.*;
 
 final class SerenityTestHarness implements TestHarness {
 	private final Program testCommon;
+	private final Path commonPath;
 
 	SerenityTestHarness(CLArguments arguments) throws CannotParse, SyntaxError, CLArgumentException {
 		final Path path = arguments.filePathOrNull();
 		if (path == null) throw new CLArgumentException("Test path is required for Serenity test harness");
-		this.testCommon = Realm.parse(Main.readFile(path.resolve("test-common.js")), arguments.options().showAST());
+		this.commonPath = path.resolve("test-common.js");
+		this.testCommon = Realm.parse(Main.readFile(commonPath), arguments.options().showAST());
 	}
 
 	private ObjectValue getTestResults(Interpreter interpreter) throws AbruptCompletion {
@@ -38,6 +39,9 @@ final class SerenityTestHarness implements TestHarness {
 
 	@Override
 	public TestResult run(File file, CLArguments arguments) {
+		if (file.toPath().equals(commonPath))
+			return new TestResult(SKIPPED, null);
+
 		try {
 			final Interpreter interpreter = new Interpreter();
 			try {

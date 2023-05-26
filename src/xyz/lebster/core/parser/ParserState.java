@@ -1,7 +1,11 @@
 package xyz.lebster.core.parser;
 
 import xyz.lebster.core.exception.SyntaxError;
+import xyz.lebster.core.node.SourcePosition;
+import xyz.lebster.core.node.expression.ObjectExpression;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
+
+import java.util.HashMap;
 
 public final class ParserState {
 	public final Token[] tokens;
@@ -9,6 +13,7 @@ public final class ParserState {
 	public int index = -1;
 	public boolean inBreakContext = false;
 	public boolean inContinueContext = false;
+	public HashMap<ObjectExpression, SourcePosition> invalidProperties = new HashMap<>();
 
 	public ParserState(Token[] tokens) {
 		this.tokens = tokens;

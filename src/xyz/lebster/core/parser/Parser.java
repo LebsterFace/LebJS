@@ -710,15 +710,26 @@ public final class Parser {
 
 		while (state.token.matchSecondaryExpression(forbidden)) {
 			final int newPrecedence = state.token.precedence();
+			final var newAssoc = state.token.associativity();
+			if (newPrecedence < minPrecedence) break;
+			if (newPrecedence == minPrecedence && assoc == Left) break;
 
-			if (newPrecedence < minPrecedence || newPrecedence == minPrecedence && assoc == Left) break;
-
-			final Associativity newAssoc = state.token.associativity();
 			latestExpr = parseSecondaryExpression(latestExpr, newPrecedence, newAssoc);
+			checkForInvalidProperty(latestExpr);
 			consumeAllLineTerminators();
 		}
 
+		checkForInvalidProperty(latestExpr);
 		return latestExpr;
+	}
+
+	private void checkForInvalidProperty(Expression latestExpr) throws SyntaxError {
+		if (latestExpr instanceof final ObjectExpression objectExpression) {
+			final SourcePosition position = state.invalidProperties.get(objectExpression);
+			if (position != null) {
+				throw new SyntaxError("Invalid shorthand property initializer", position);
+			}
+		}
 	}
 
 	private LeftHandSideExpression ensureLHS(Expression expression, String failureMessage) throws SyntaxError {
@@ -734,20 +745,14 @@ public final class Parser {
 		consumeAllLineTerminators();
 
 		return switch (token.type) {
-			case Plus, Minus, Star, Slash, Percent, Exponent, Pipe, Ampersand, Caret, LeftShift, RightShift, UnsignedRightShift ->
-				new BinaryExpression(left, parseExpression(minPrecedence, assoc), token.getBinaryOp());
-			case StrictEqual, LooseEqual, StrictNotEqual, NotEqual ->
-				new EqualityExpression(left, parseExpression(minPrecedence, assoc), token.getEqualityOp());
-			case LogicalOr, LogicalAnd, NullishCoalescing ->
-				new LogicalExpression(left, parseExpression(minPrecedence, assoc), token.getLogicOp());
-			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf ->
-				new RelationalExpression(left, parseExpression(minPrecedence, assoc), token.getRelationalOp());
-			case MinusMinus, PlusPlus ->
-				new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), token.getUpdateOp());
+			case Plus, Minus, Star, Slash, Percent, Exponent, Pipe, Ampersand, Caret, LeftShift, RightShift, UnsignedRightShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), token.getBinaryOp());
+			case StrictEqual, LooseEqual, StrictNotEqual, NotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), token.getEqualityOp());
+			case LogicalOr, LogicalAnd, NullishCoalescing -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), token.getLogicOp());
+			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), token.getRelationalOp());
+			case MinusMinus, PlusPlus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), token.getUpdateOp());
 			case Equals, LogicalAndEquals, LogicalOrEquals, NullishCoalescingEquals, MultiplyEquals,
 				DivideEquals, PercentEquals, PlusEquals, MinusEquals, LeftShiftEquals, RightShiftEquals,
-				UnsignedRightShiftEquals, AmpersandEquals, CaretEquals, PipeEquals, ExponentEquals ->
-				new AssignmentExpression(ensureAssignable(left, token.getAssignmentOp()), parseExpression(minPrecedence, assoc), token.getAssignmentOp());
+				UnsignedRightShiftEquals, AmpersandEquals, CaretEquals, PipeEquals, ExponentEquals -> new AssignmentExpression(ensureAssignable(left, token.getAssignmentOp()), parseExpression(minPrecedence, assoc), token.getAssignmentOp());
 
 			case QuestionMark -> parseConditionalExpression(left);
 			case LParen -> parseCallExpression(left);
@@ -919,6 +924,7 @@ public final class Parser {
 		state.require(TokenType.LBrace);
 		consumeAllLineTerminators();
 		final ArrayList<ObjectExpression.ObjectEntryNode> entries = new ArrayList<>();
+		SourcePosition invalid_property = null;
 
 		// FIXME:
 		// 		- Methods { a() { alert(1) } }
@@ -937,16 +943,16 @@ public final class Parser {
 			// TODO: Remove duplication with parseClassBody
 			boolean isIdentifier = state.token.matchIdentifierName();
 			if (isIdentifier || state.is(TokenType.NumericLiteral, TokenType.StringLiteral)) {
+				final SourcePosition propertyStart = position();
 				final String propertyName = state.consume().value;
 				consumeAllLineTerminators();
 
-				// FIXME: This is necessary to allow the re-parsing of DestructuringAssignmentTarget
-				//        It covers shorthand entries with defaults
-				//        Static entries (with colons) with defaults are mis-parsed as AssignmentExpressions
 				if (isIdentifier && state.optional(TokenType.Equals)) {
 					// Not a valid object literal, but a valid destructuring pattern
 					// Parse the expression and throw it away
 					parseSpecAssignmentExpression();
+					if (invalid_property == null)
+						invalid_property = propertyStart;
 				} else if (state.is(TokenType.LParen)) {
 					throw new ParserNotImplemented(position(), "Parsing object literal methods");
 				} else if (isIdentifier && !state.is(TokenType.Colon)) {
@@ -980,7 +986,10 @@ public final class Parser {
 		consumeAllLineTerminators();
 		state.require(TokenType.RBrace);
 
-		return new ObjectExpression(range(start), entries);
+		final var result = new ObjectExpression(range(start), entries);
+		if (invalid_property != null)
+			state.invalidProperties.put(result, invalid_property);
+		return result;
 	}
 
 	private ClassExpression parseClassBody(SourcePosition start, String className, Expression heritage) throws SyntaxError, CannotParse {

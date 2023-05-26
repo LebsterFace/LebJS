@@ -321,14 +321,58 @@ public final class ArrayPrototype extends ObjectValue {
 		throw new NotImplemented("Array.prototype.groupToMap");
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.indexof")
-	private static NumberValue indexOf(Interpreter interpreter, Value<?>[] arguments) {
+	private static NumberValue indexOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.17 Array.prototype.indexOf ( searchElement [ , fromIndex ] )
 		final Value<?> searchElement = argument(0, arguments);
 		final Value<?> fromIndex = argument(1, arguments);
 
-		throw new NotImplemented("Array.prototype.indexOf");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// 3. If len = 0, return -1𝔽.
+		if (len == 0) return NumberValue.MINUS_ONE;
+		// 4. Let n be ? ToIntegerOrInfinity(fromIndex).
+		int n = toIntegerOrInfinity(interpreter, fromIndex);
+		// 5. Assert: If fromIndex is undefined, then n is 0.
+		// 6. If n = +∞, return -1𝔽.
+		if (n == Integer.MAX_VALUE) return NumberValue.MINUS_ONE;
+		// 7. Else if n = -∞, set n to 0.
+		else if (n == Integer.MIN_VALUE) n = 0;
+		// 8. If n ≥ 0, then
+		int k;
+		if (n >= 0) {
+			// a. Let k be n.
+			k = n;
+		}
+		// 9. Else,
+		else {
+			// a. Let k be len + n.
+			k = len + n;
+			// b. If k < 0, set k to 0.
+			if (k < 0) k = 0;
+		}
+
+		// 10. Repeat, while k < len,
+		while (k < len) {
+			final StringValue Pk = new StringValue(k);
+			// a. Let kPresent be ? HasProperty(O, ! ToString(𝔽(k))).
+			final boolean kPresent = O.hasProperty(Pk);
+			// b. If kPresent is true, then
+			if (kPresent) {
+				// i. Let elementK be ? Get(O, ! ToString(𝔽(k))).
+				final Value<?> elementK = O.get(interpreter, Pk);
+				// ii. If IsStrictlyEqual(searchElement, elementK) is true, return 𝔽(k).
+				if (searchElement.equals(elementK)) return new NumberValue(k);
+			}
+
+			// c. Set k to k + 1.
+			k = k + 1;
+		}
+
+		// 11. Return -1𝔽.
+		return NumberValue.MINUS_ONE;
 	}
 
 	@NonCompliant

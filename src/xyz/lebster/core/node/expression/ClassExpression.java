@@ -135,6 +135,7 @@ public record ClassExpression(
 	}
 
 	// FIXME: Currently unused
+	@NonCompliant
 	public record ClassFieldNode(Expression name, Expression initializer, SourceRange range) {
 	}
 
@@ -202,17 +203,25 @@ public record ClassExpression(
 		}
 	}
 
+	// TODO: Find way to reduce duplication of code between this and Function
 	private static final class ClassMethod extends Executable {
+		private final Environment environment;
 		private final ClassMethodNode code;
 
 		public ClassMethod(Interpreter interpreter, StringValue name, ClassExpression.ClassMethodNode code) {
 			super(interpreter.intrinsics, name, code.parameters.expectedArgumentCount());
+			this.environment = interpreter.environment();
 			this.code = code;
 		}
 
 		@Override
 		public StringValue toStringMethod() {
 			return new StringValue(code.toRepresentationString());
+		}
+
+		@Override
+		public Environment savedEnvironment(Interpreter interpreter) {
+			return environment;
 		}
 
 		@Override

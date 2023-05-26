@@ -279,7 +279,7 @@ public final class Parser {
 	}
 
 	private ForOfStatement parseForOfStatement(Assignable left) throws SyntaxError, CannotParse {
-		state.require(TokenType.Identifier, "of");
+		state.requireIdentifier("of");
 		final Expression expression = parseExpression();
 		state.require(TokenType.RParen);
 		final Statement body = parseContextualStatement(true, true);

@@ -54,8 +54,8 @@ public final class ParserState {
 		return consume().value;
 	}
 
-	void require(TokenType type, String value) throws SyntaxError {
-		if (token.type != type) throw expected(type);
+	void requireIdentifier(String value) throws SyntaxError {
+		if (token.type != TokenType.Identifier) throw expected(TokenType.Identifier);
 		if (!token.value.equals(value)) throw expected(value);
 		consume();
 	}
@@ -116,10 +116,6 @@ public final class ParserState {
 
 	void consumeAll(TokenType t) {
 		while (token.type == t) consume();
-	}
-
-	boolean isFinished() {
-		return index >= tokens.length;
 	}
 
 	public ParserState copy() {

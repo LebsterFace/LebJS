@@ -105,7 +105,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 	public NumberValue toNumberValue(Interpreter interpreter) {
 		// FIXME: Follow spec
 		if (value.isBlank())
-			return new NumberValue(0);
+			return NumberValue.ZERO;
 
 		try {
 			return new NumberValue(Double.parseDouble(value));

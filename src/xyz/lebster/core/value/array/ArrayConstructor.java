@@ -224,7 +224,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 				// i. Perform ! CreateDataPropertyOrThrow(array, "0", len).
 				array.set(interpreter, new StringValue(0), len);
 				// ii. Let intLen be 1𝔽.
-				intLen = new NumberValue(1);
+				intLen = NumberValue.ONE;
 			}
 
 			// e. Perform ! Set(array, "length", intLen, true).

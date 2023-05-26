@@ -202,7 +202,9 @@ public abstract class Value<JType> implements Displayable {
 	}
 
 	@Override
+	@NonCompliant
 	public boolean equals(Object o) {
+		// FIXME: 0 === -0 should be true
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		return Objects.equals(value, ((Value<?>) o).value);

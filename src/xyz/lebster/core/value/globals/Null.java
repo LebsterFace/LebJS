@@ -39,7 +39,7 @@ public final class Null extends PrimitiveValue<Void> {
 
 	@Override
 	public NumberValue toNumberValue(Interpreter interpreter) {
-		return new NumberValue(0.0);
+		return NumberValue.ZERO;
 	}
 
 	@Override

@@ -29,6 +29,7 @@ import java.util.List;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.*;
+import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
 
 public final class ArrayPrototype extends ObjectValue {
 	public static final long MAX_LENGTH = 9007199254740991L; // 2^53 - 1
@@ -84,7 +85,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let len be ? LengthOfArrayLike(O).
 		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. Let relativeIndex be ? ToIntegerOrInfinity(index).
-		final int relativeIndex = NumberPrototype.toIntegerOrInfinity(interpreter, index);
+		final int relativeIndex = toIntegerOrInfinity(interpreter, index);
 		// 4. If relativeIndex ≥ 0, then a. Let k be relativeIndex. 5. Else, a. Let k be len + relativeIndex.
 		final long k = relativeIndex >= 0 ? relativeIndex : len + relativeIndex;
 
@@ -224,7 +225,7 @@ public final class ArrayPrototype extends ObjectValue {
 		}
 
 		// 6. Return -1𝔽.
-		return new NumberValue(-1);
+		return NumberValue.MINUS_ONE;
 	}
 
 	@NonCompliant
@@ -287,7 +288,7 @@ public final class ArrayPrototype extends ObjectValue {
 		}
 
 		// 6. Return -1𝔽.
-		return new NumberValue(-1);
+		return NumberValue.MINUS_ONE;
 	}
 
 	@NonCompliant
@@ -425,9 +426,9 @@ public final class ArrayPrototype extends ObjectValue {
 			// a. If x and y are both undefined, return +0𝔽.
 			if (x == Undefined.instance && y == Undefined.instance) return NumberValue.ZERO;
 			// b. If x is undefined, return 1𝔽.
-			if (x == Undefined.instance) return new NumberValue(1.0D);
+			if (x == Undefined.instance) return NumberValue.ONE;
 			// c. If y is undefined, return -1𝔽.
-			if (y == Undefined.instance) return new NumberValue(-1.0D);
+			if (y == Undefined.instance) return NumberValue.MINUS_ONE;
 			// d. If comparefn is not undefined, then
 			if (comparefn instanceof final Executable executable) {
 				// i. Let v be ? ToNumber(? Call(comparefn, undefined, « x, y »)).
@@ -445,11 +446,11 @@ public final class ArrayPrototype extends ObjectValue {
 			// g. Let xSmaller be ! IsLessThan(xString, yString, true).
 			final boolean xSmaller = isLessThan($, xString, yString, true).value;
 			// h. If xSmaller is true, return -1𝔽.
-			if (xSmaller) return new NumberValue(-1.0D);
+			if (xSmaller) return NumberValue.MINUS_ONE;
 			// i. Let ySmaller be ! IsLessThan(yString, xString, true).
 			final boolean ySmaller = isLessThan($, yString, xString, true).value;
 			// j. If ySmaller is true, return 1𝔽.
-			if (ySmaller) return new NumberValue(1.0D);
+			if (ySmaller) return NumberValue.ONE;
 			// k. Return +0𝔽.
 			return NumberValue.ZERO;
 		};
@@ -625,7 +626,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 2. Let len be ? LengthOfArrayLike(O).
 		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. Let relativeStart be ? ToIntegerOrInfinity(start).
-		final int relativeStart = NumberPrototype.toIntegerOrInfinity(interpreter, start);
+		final int relativeStart = toIntegerOrInfinity(interpreter, start);
 		long k;
 		// 4. If relativeStart is -∞, let k be 0.
 		if (relativeStart == Integer.MIN_VALUE) k = 0;
@@ -634,7 +635,7 @@ public final class ArrayPrototype extends ObjectValue {
 			// 6. Else, let k be min(relativeStart, len).
 		else k = Math.min(relativeStart, len);
 		// 7. If end is undefined, let relativeEnd be len; else let relativeEnd be ? ToIntegerOrInfinity(end).
-		final long relativeEnd = end == Undefined.instance ? len : NumberPrototype.toIntegerOrInfinity(interpreter, end);
+		final long relativeEnd = end == Undefined.instance ? len : toIntegerOrInfinity(interpreter, end);
 		long final_;
 		// 8. If relativeEnd is -∞, let final be 0.
 		if (relativeEnd == Integer.MIN_VALUE) final_ = 0;
@@ -685,7 +686,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 3. If len is 0, return false.
 		if (len == 0) return BooleanValue.FALSE;
 		// 4. Let n be ? ToIntegerOrInfinity(fromIndex).
-		int n = NumberPrototype.toIntegerOrInfinity(interpreter, fromIndex);
+		int n = toIntegerOrInfinity(interpreter, fromIndex);
 		// 5. Assert: If fromIndex is undefined, then n is 0.
 		assert fromIndex != Undefined.instance || n == 0;
 		// 6. If n is +∞, return false.
@@ -872,7 +873,7 @@ public final class ArrayPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tolength")
 	private static int toLength(Interpreter interpreter, Value<?> argument) throws AbruptCompletion {
 		// 1. Let len be ? ToIntegerOrInfinity(argument).
-		final int len = NumberPrototype.toIntegerOrInfinity(interpreter, argument);
+		final int len = toIntegerOrInfinity(interpreter, argument);
 		// 2. If len ≤ 0, return +0𝔽.
 		if (len <= 0) return 0;
 		// 3. Return 𝔽(min(len, 2^53 - 1)).

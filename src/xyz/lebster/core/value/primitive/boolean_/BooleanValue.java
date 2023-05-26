@@ -37,7 +37,7 @@ public final class BooleanValue extends PrimitiveValue<Boolean> {
 
 	@Override
 	public NumberValue toNumberValue(Interpreter interpreter) {
-		return new NumberValue(value ? 1.0 : 0.0);
+		return value ? NumberValue.ONE : NumberValue.ZERO;
 	}
 
 	@Override

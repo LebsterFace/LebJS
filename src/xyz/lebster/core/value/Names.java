@@ -63,6 +63,7 @@ public final class Names {
 	public static final StringValue ceil = new StringValue("ceil");
 	public static final StringValue charAt = new StringValue("charAt");
 	public static final StringValue charCodeAt = new StringValue("charCodeAt");
+	public static final StringValue clamp = new StringValue("clamp");
 	public static final StringValue clear = new StringValue("clear");
 	public static final StringValue codePointAt = new StringValue("codePointAt");
 	public static final StringValue concat = new StringValue("concat");
@@ -76,6 +77,7 @@ public final class Names {
 	public static final StringValue cwd = new StringValue("cwd");
 	public static final StringValue declare = new StringValue("declare");
 	public static final StringValue default_ = new StringValue("default");
+	public static final StringValue degrees = new StringValue("degrees");
 	public static final StringValue delete = new StringValue("delete");
 	public static final StringValue description = new StringValue("description");
 	public static final StringValue details = new StringValue("details");
@@ -132,6 +134,7 @@ public final class Names {
 	public static final StringValue isFinite = new StringValue("isFinite");
 	public static final StringValue isNaN = new StringValue("isNaN");
 	public static final StringValue isPrototypeOf = new StringValue("isPrototypeOf");
+	public static final StringValue isStrictMode = new StringValue("isStrictMode");
 	public static final StringValue isSubsetOf = new StringValue("isSubsetOf");
 	public static final StringValue isSupersetOf = new StringValue("isSupersetOf");
 	public static final StringValue iterator = new StringValue("iterator");
@@ -165,6 +168,7 @@ public final class Names {
 	public static final StringValue propertyIsEnumerable = new StringValue("propertyIsEnumerable");
 	public static final StringValue prototype = new StringValue("prototype");
 	public static final StringValue push = new StringValue("push");
+	public static final StringValue radians = new StringValue("radians");
 	public static final StringValue random = new StringValue("random");
 	public static final StringValue range = new StringValue("range");
 	public static final StringValue readFile = new StringValue("readFile");
@@ -176,6 +180,7 @@ public final class Names {
 	public static final StringValue result = new StringValue("result");
 	public static final StringValue reverse = new StringValue("reverse");
 	public static final StringValue round = new StringValue("round");
+	public static final StringValue scale = new StringValue("scale");
 	public static final StringValue search = new StringValue("search");
 	public static final StringValue set = new StringValue("set");
 	public static final StringValue setPrototypeOf = new StringValue("setPrototypeOf");
@@ -222,10 +227,6 @@ public final class Names {
 	public static final StringValue warn = new StringValue("warn");
 	public static final StringValue writable = new StringValue("writable");
 	public static final StringValue write = new StringValue("write");
-	public static final StringValue clamp = new StringValue("clamp");
-	public static final StringValue scale = new StringValue("scale");
-	public static final StringValue radians = new StringValue("radians");
-	public static final StringValue degrees = new StringValue("degrees");
 
 	public static final StringValue EMPTY = new StringValue("");
 }

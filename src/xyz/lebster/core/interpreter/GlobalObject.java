@@ -139,6 +139,11 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.ShadowRealm, intrinsics.shadowRealmConstructor);
 		putMethod(intrinsics, Names.readFile, 2, GlobalObject::readFile);
 		putMethod(intrinsics, Names.cwd, 2, GlobalObject::cwd);
+		putMethod(intrinsics, Names.isStrictMode, 0, GlobalObject::isStrictMode);
+	}
+
+	private static BooleanValue isStrictMode(Interpreter interpreter, Value<?>[] arguments) {
+		return BooleanValue.of(interpreter.isStrictMode());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parseint-string-radix")

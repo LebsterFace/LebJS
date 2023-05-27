@@ -72,6 +72,12 @@ let obj = { a: 'a', b: 'b', c: [1, 2, 3] };
 	Test.expect(c, obj.c[2]);
 }
 
+{
+	let object = { bar: 'hi' };
+	([ object.bar ] = [ 999 ]);
+	Test.equals({ bar: 999 }, object);
+}
+
 Test.expectSyntaxError("Invalid left-hand side in assignment", "(({ a, b, c }) = obj)");
 Test.expectSyntaxError('Unexpected token "else"', "let { else } = { else: 1 };");
 Test.expectSyntaxError('Invalid shorthand property initializer', "let bar = { foo = 1 };")

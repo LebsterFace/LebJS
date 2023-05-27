@@ -633,24 +633,18 @@ public final class SetPrototype extends ObjectValue {
 		}
 
 		@Override
-		public ObjectValue next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-			final ObjectValue result = new ObjectValue(interpreter.intrinsics);
-
+		public Value<?> next(Interpreter interpreter, Value<?>[] arguments) {
 			while (true) {
 				if (index >= entries.size()) {
-					result.put(Names.done, BooleanValue.TRUE);
-					result.put(Names.value, Undefined.instance);
-					return result;
+					setCompleted();
+					return Undefined.instance;
 				}
 
-				final Value<?> e = entries.get(index);
+				final Value<?> value = entries.get(index);
 				index = index + 1;
-				if (e == null) continue;
-
-				final Value<?> value = kind == SetIteratorKind.KeyValue ? new ArrayObject(interpreter, e, e) : e;
-				result.put(Names.value, value);
-				result.put(Names.done, BooleanValue.FALSE);
-				return result;
+				if (value == null) continue;
+				if (kind == SetIteratorKind.KeyValue) return new ArrayObject(interpreter, value, value);
+				return value;
 			}
 		}
 	}

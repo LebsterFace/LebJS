@@ -4,11 +4,8 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Generator;
-import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 
 public final class NumberRange extends Generator {
 	private final boolean isValid;
@@ -46,14 +43,15 @@ public final class NumberRange extends Generator {
 	}
 
 	@Override
-	public ObjectValue next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final ObjectValue object = new ObjectValue(interpreter.intrinsics);
-		object.set(interpreter, Names.done, BooleanValue.of(done()));
-		final var value = done() ? Undefined.instance : new NumberValue(current);
-		object.set(interpreter, Names.value, value);
+	public Value<?> next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		if (done()) {
+			setCompleted();
+			return Undefined.instance;
+		}
 
-		if (!done()) current += step;
-		return object;
+		final NumberValue result = new NumberValue(current);
+		current += step;
+		return result;
 	}
 
 	private boolean done() {

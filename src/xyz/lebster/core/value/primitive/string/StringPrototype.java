@@ -741,19 +741,17 @@ public final class StringPrototype extends ObjectValue {
 			super(interpreter.intrinsics);
 			final String value = thisStringValue(interpreter, interpreter.thisValue()).value;
 			this.primitiveIterator = value.codePoints().iterator();
+			if (!primitiveIterator.hasNext()) setCompleted();
 		}
 
 		@Override
-		public ObjectValue next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-			final ObjectValue object = new ObjectValue(interpreter.intrinsics);
-			object.set(interpreter, Names.done, BooleanValue.of(!primitiveIterator.hasNext()));
+		public Value<?> next(Interpreter interpreter, Value<?>[] arguments) {
+			if (!primitiveIterator.hasNext()) {
+				setCompleted();
+				return Undefined.instance;
+			}
 
-			final var value = primitiveIterator.hasNext() ?
-				new StringValue(new String(new int[] { primitiveIterator.nextInt() }, 0, 1)) :
-				Undefined.instance;
-
-			object.set(interpreter, Names.value, value);
-			return object;
+			return new StringValue(new String(new int[] { primitiveIterator.nextInt() }, 0, 1));
 		}
 	}
 }

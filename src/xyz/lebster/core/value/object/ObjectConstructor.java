@@ -31,7 +31,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		putMethod(intrinsics, Names.create, 2, ObjectConstructor::create);
 		putMethod(intrinsics, Names.keys, 1, ObjectConstructor::keys);
 		putMethod(intrinsics, Names.values, 1, ObjectConstructor::values);
-		putMethod(intrinsics, Names.entries, 1, ObjectConstructor::entriesMethod);
+		putMethod(intrinsics, Names.entries, 1, ObjectConstructor::entries);
 		putMethod(intrinsics, Names.getOwnPropertyDescriptor, 2, ObjectConstructor::getOwnPropertyDescriptor);
 		putMethod(intrinsics, Names.getOwnPropertyDescriptors, 1, ObjectConstructor::getOwnPropertyDescriptors);
 		putMethod(intrinsics, Names.fromEntries, 1, ObjectConstructor::fromEntries);
@@ -141,7 +141,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.entries")
-	private static ArrayObject entriesMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static ArrayObject entries(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 20.1.2.5 Object.entries ( O )
 		final Value<?> O = argument(0, arguments);
 

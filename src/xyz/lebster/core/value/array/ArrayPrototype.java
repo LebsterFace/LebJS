@@ -4,6 +4,7 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
@@ -18,7 +19,6 @@ import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
-import xyz.lebster.core.value.primitive.number.NumberPrototype;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
@@ -39,7 +39,7 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.at, 1, ArrayPrototype::at);
 		putMethod(intrinsics, Names.concat, 1, ArrayPrototype::concat);
 		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
-		putMethod(intrinsics, Names.entries, 0, ArrayPrototype::entriesMethod);
+		putMethod(intrinsics, Names.entries, 0, ArrayPrototype::entries);
 		putMethod(intrinsics, Names.every, 1, ArrayPrototype::every);
 		putMethod(intrinsics, Names.fill, 1, ArrayPrototype::fill);
 		putMethod(intrinsics, Names.filter, 1, ArrayPrototype::filter);
@@ -113,11 +113,14 @@ public final class ArrayPrototype extends ObjectValue {
 		throw new NotImplemented("Array.prototype.copyWithin");
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.entries")
-	private static Value<?> entriesMethod(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> entries(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.5 Array.prototype.entries ( )
-		throw new NotImplemented("Array.prototype.entries");
+
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Return CreateArrayIterator(O, key+value).
+		return new ArrayIterator(interpreter, O, true, true);
 	}
 
 	@NonCompliant
@@ -375,12 +378,14 @@ public final class ArrayPrototype extends ObjectValue {
 		return NumberValue.MINUS_ONE;
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.keys")
-	private static Value<?> keys(Interpreter interpreter, Value<?>[] arguments) {
+	private static ArrayIterator keys(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.19 Array.prototype.keys ( )
 
-		throw new NotImplemented("Array.prototype.keys");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Return CreateArrayIterator(O, key).
+		return new ArrayIterator(interpreter, O, true, false);
 	}
 
 	@NonCompliant
@@ -582,12 +587,14 @@ public final class ArrayPrototype extends ObjectValue {
 		return new NumberValue(len + argCount);
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.values")
-	private static Value<?> values(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static ArrayIterator values(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.35 Array.prototype.values ( )
 
-		return new ArrayIterator(interpreter);
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Return CreateArrayIterator(O, value).
+		return new ArrayIterator(interpreter, O, false, true);
 	}
 
 	@Proposal
@@ -1118,30 +1125,41 @@ public final class ArrayPrototype extends ObjectValue {
 	private record ArrayGroup(Key<?> key, ArrayList<Value<?>> elements) {
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createarrayiterator")
 	private static final class ArrayIterator extends Generator {
-		private final ObjectValue O;
-		private final long len;
-		private int index;
+		private final ObjectValue array;
+		private final boolean keys;
+		private final boolean values;
+		private int index = 0;
 
-		public ArrayIterator(Interpreter interpreter) throws AbruptCompletion {
+		public ArrayIterator(Interpreter interpreter, ObjectValue array, boolean keys, boolean values) throws AbruptCompletion {
 			super(interpreter.intrinsics);
-			this.O = interpreter.thisValue().toObjectValue(interpreter);
-			this.len = lengthOfArrayLike(interpreter, O);
-			this.index = 0;
+			this.array = array;
+			this.keys = keys;
+			this.values = values;
+			if (!keys && !values)
+				throw new ShouldNotHappen("Cannot create array iterator of neither keys nor values.");
 		}
 
 		@Override
-		public ObjectValue next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-			final ObjectValue object = new ObjectValue(interpreter.intrinsics);
-
-			if (index > len) {
-				object.set(interpreter, Names.value, Undefined.instance);
-			} else {
-				object.set(interpreter, Names.value, O.get(interpreter, new StringValue(index++)));
+		public Value<?> next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+			final int len = lengthOfArrayLike(interpreter, array);
+			if (index >= len) {
+				setCompleted();
+				return Undefined.instance;
 			}
 
-			object.set(interpreter, Names.done, BooleanValue.of(index > len));
-			return object;
+			Value<?> result = null;
+
+			final StringValue Pk = new StringValue(index);
+			if (keys) result = new NumberValue(index);
+			if (values) {
+				final Value<?> value = array.get(interpreter, Pk);
+				result = keys ? new ArrayObject(interpreter, result, value) : value;
+			}
+
+			index += 1;
+			return result;
 		}
 	}
 }

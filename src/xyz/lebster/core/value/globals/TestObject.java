@@ -71,7 +71,7 @@ public final class TestObject extends ObjectValue {
 			final StringValue messageProperty = error.get(interpreter, Names.message).toStringValue(interpreter);
 			TestObject.expect(interpreter, name, nameProperty);
 			if (!messageProperty.value.contains(messageStarter.value))
-				assertionFailed(messageStarter, messageProperty);
+				throw assertionFailed(messageStarter, messageProperty);
 
 
 			return Undefined.instance;
@@ -89,7 +89,7 @@ public final class TestObject extends ObjectValue {
 			Realm.executeWith(sourceText.value, interpreter);
 		} catch (SyntaxError error) {
 			if (!error.getMessage().startsWith(messageStarter.value))
-				assertionFailed(messageStarter, new StringValue(error.getMessage()));
+				throw assertionFailed(messageStarter, new StringValue(error.getMessage()));
 
 			return Undefined.instance;
 		} catch (Throwable e) {
@@ -106,42 +106,55 @@ public final class TestObject extends ObjectValue {
 		final Value<?> a = argument(0, arguments);
 		final Value<?> b = argument(1, arguments);
 
+		if (equals(interpreter, a, b)) {
+			return Undefined.instance;
+		} else {
+			throw assertionFailed(a, b);
+		}
+	}
+
+	private static boolean equals(Interpreter interpreter, Value<?> a, Value<?> b) throws AbruptCompletion {
 		if (
 			a instanceof final ArrayObject expected &&
 			b instanceof final ArrayObject received
 		) {
 			final Value<?>[] expectedValues = expected.values(interpreter);
 			final Value<?>[] receivedValues = received.values(interpreter);
-			if (expectedValues.length != receivedValues.length) assertionFailed(a, b);
+			if (expectedValues.length != receivedValues.length) return false;
 			for (int i = 0; i < expectedValues.length; i++) {
 				final Value<?> expectedElement = expectedValues[i];
 				final Value<?> receivedElement = receivedValues[i];
 				// NOTE: expectedElement can be `null` if the expected array contains holes
-				if (!Objects.equals(expectedElement, receivedElement)) assertionFailed(a, b);
+				if (expectedElement == null || receivedElement == null) {
+					if (expectedElement != null || receivedElement != null)
+						return false;
+				} else if (!equals(interpreter, expectedElement, receivedElement)) {
+					return false;
+				}
 			}
 
-			return Undefined.instance;
+			return true;
 		} else if (
 			a.getClass() == ObjectValue.class &&
 			b.getClass() == ObjectValue.class
 		) {
 			final ObjectValue expected = (ObjectValue) a;
 			final ObjectValue received = (ObjectValue) b;
-			if (expected.getPrototype() != received.getPrototype()) assertionFailed(a, b);
+			if (expected.getPrototype() != received.getPrototype()) return false;
 			for (final Key<?> expectedKey : expected.ownPropertyKeys()) {
-				if (!received.hasOwnProperty(expectedKey)) assertionFailed(a, b);
+				if (!received.hasOwnProperty(expectedKey)) return false;
 				final var expectedValue = expected.get(interpreter, expectedKey);
 				final var recievedValue = received.get(interpreter, expectedKey);
-				if (!recievedValue.equals(expectedValue)) assertionFailed(a, b);
+				if (!equals(interpreter, expectedValue, recievedValue)) return false;
 			}
 
 			for (final Key<?> recievedKey : received.ownPropertyKeys()) {
-				if (!expected.hasOwnProperty(recievedKey)) assertionFailed(a, b);
+				if (!expected.hasOwnProperty(recievedKey)) return false;
 			}
 
-			return Undefined.instance;
+			return true;
 		} else {
-			return expect(a, b);
+			return a.equals(b);
 		}
 	}
 
@@ -153,13 +166,13 @@ public final class TestObject extends ObjectValue {
 
 	private static Undefined expect(Value<?> a, Value<?> b) {
 		if (!a.equals(b)) {
-			assertionFailed(a, b);
+			throw assertionFailed(a, b);
 		}
 
 		return Undefined.instance;
 	}
 
-	private static void assertionFailed(Value<?> expected, Value<?> received) {
+	private static ShouldNotHappen assertionFailed(Value<?> expected, Value<?> received) {
 		System.out.println(
 			ANSI.BRIGHT_MAGENTA + "Expected: " +
 			ANSI.CYAN + expected.getClass().getSimpleName() + " " +
@@ -170,7 +183,7 @@ public final class TestObject extends ObjectValue {
 			ANSI.RESET + received.toDisplayString() + ANSI.RESET
 		);
 
-		throw new ShouldNotHappen("Assertion failed.");
+		return new ShouldNotHappen("Assertion failed.");
 	}
 
 	private static Undefined fail(Interpreter interpreter, Value<?>[] values) {

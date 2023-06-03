@@ -10,8 +10,6 @@ import xyz.lebster.core.node.expression.LeftHandSideExpression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.util.List;
-
 public record IdentifierExpression(StringValue name) implements AssignmentTarget, LeftHandSideExpression {
 	public IdentifierExpression(String name) {
 		this(new StringValue(name));
@@ -20,11 +18,6 @@ public record IdentifierExpression(StringValue name) implements AssignmentTarget
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return this.toReference(interpreter).getValue(interpreter);
-	}
-
-	@Override
-	public List<BindingPair> getBindings(Interpreter interpreter, Value<?> input) {
-		return List.of(new BindingPair(name, input));
 	}
 
 	@Override
@@ -44,10 +37,8 @@ public record IdentifierExpression(StringValue name) implements AssignmentTarget
 		representation.append(name.value);
 	}
 
-	// Fast-path
-	public Value<?> assign(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
-		final Reference ref = this.toReference(interpreter);
-		ref.putValue(interpreter, value);
-		return value;
+	@Override
+	public void declare(Interpreter interpreter, Kind kind, Value<?> value) throws AbruptCompletion {
+		interpreter.declareVariable(kind, name, value);
 	}
 }

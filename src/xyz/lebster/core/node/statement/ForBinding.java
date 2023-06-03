@@ -10,8 +10,8 @@ import xyz.lebster.core.node.declaration.Kind;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.value.Value;
 
-public record BindingPattern(Kind kind, AssignmentTarget assignmentTarget) implements Assignable {
-	public BindingPattern(VariableDeclaration declaration) {
+public record ForBinding(Kind kind, AssignmentTarget assignmentTarget) implements Assignable {
+	public ForBinding(VariableDeclaration declaration) {
 		this(declaration.kind(), declaration.declarations()[0].target());
 	}
 

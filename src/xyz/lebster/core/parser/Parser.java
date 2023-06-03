@@ -310,13 +310,13 @@ public final class Parser {
 					if (declaration.declarations().length != 1) throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.", position());
 					if (declaration.declarations()[0].init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
 
-					return parseForOfStatement(new BindingPattern(declaration));
+					return parseForOfStatement(new ForBinding(declaration));
 				} else if (state.is(TokenType.In)) {
 					// for ( LetOrConst ForBinding in Expression ) Statement
 					if (declaration.declarations().length != 1) throw new SyntaxError("Invalid left-hand side in for-in loop: Must have a single binding.", position());
 					if (declaration.declarations()[0].init() != null) throw new SyntaxError("for-in loop variable declaration may not have an init.", position());
 
-					return parseForInStatement(new BindingPattern(declaration));
+					return parseForInStatement(new ForBinding(declaration));
 				} else {
 					init = declaration;
 				}
@@ -458,7 +458,7 @@ public final class Parser {
 
 	private VariableDeclarator parseVariableDeclarator() throws SyntaxError, CannotParse {
 		final SourcePosition declaratorStart = position();
-		final AssignmentTarget lhs = parseAssignmentTarget();
+		final AssignmentTarget lhs = parseAssignmentTarget(false);
 		final Expression value = state.optional(TokenType.Equals) ? parseSpecAssignmentExpression() : null;
 		return new VariableDeclarator(lhs, value, range(declaratorStart));
 	}
@@ -474,19 +474,23 @@ public final class Parser {
 		return new AssignmentPattern(assignmentTarget, defaultExpression);
 	}
 
-	private AssignmentTarget parseAssignmentTarget() throws SyntaxError, CannotParse {
+	private AssignmentTarget parseAssignmentTarget(boolean allowMemberExpressions) throws SyntaxError, CannotParse {
 		if (state.optional(TokenType.LBrace)) {
-			return parseObjectDestructuring();
+			return parseObjectDestructuring(allowMemberExpressions);
 		} else if (state.optional(TokenType.LBracket)) {
-			return parseArrayDestructuring();
-		} else if (state.is(TokenType.Identifier)) {
-			return new IdentifierExpression(state.consume().value);
+			return parseArrayDestructuring(allowMemberExpressions);
+		}
+
+		final Expression expression = parseExpression(2, Associativity.Right, Set.of(TokenType.Equals, TokenType.In));
+		if (expression instanceof final AssignmentTarget assignmentTarget) {
+			if (allowMemberExpressions || expression instanceof IdentifierExpression) return assignmentTarget;
+			throw new SyntaxError("Illegal property in declaration context", position());
 		} else {
-			throw state.unexpected();
+			throw new SyntaxError("Invalid destructuring assignment target", position());
 		}
 	}
 
-	private ArrayDestructuring parseArrayDestructuring() throws SyntaxError, CannotParse {
+	private ArrayDestructuring parseArrayDestructuring(boolean allowMemberExpressions) throws SyntaxError, CannotParse {
 		final ArrayList<AssignmentPattern> children = new ArrayList<>();
 		AssignmentTarget restTarget = null;
 
@@ -497,12 +501,12 @@ public final class Parser {
 				children.add(null);
 			} else if (state.optional(TokenType.DotDotDot)) {
 				consumeAllLineTerminators();
-				restTarget = parseAssignmentTarget();
+				restTarget = parseAssignmentTarget(allowMemberExpressions);
 				consumeAllLineTerminators();
 				if (state.optional(TokenType.Comma)) throw new SyntaxError("Rest element must be last element", position());
 				break;
 			} else {
-				children.add(parseInitializer(parseAssignmentTarget()));
+				children.add(parseInitializer(parseAssignmentTarget(allowMemberExpressions)));
 				consumeAllLineTerminators();
 				if (!state.optional(TokenType.Comma)) break;
 			}
@@ -512,7 +516,7 @@ public final class Parser {
 		return new ArrayDestructuring(restTarget, children.toArray(new AssignmentPattern[0]));
 	}
 
-	private ObjectDestructuring parseObjectDestructuring() throws SyntaxError, CannotParse {
+	private ObjectDestructuring parseObjectDestructuring(boolean allowMemberExpressions) throws SyntaxError, CannotParse {
 		consumeAllLineTerminators();
 
 		final Map<Expression, AssignmentPattern> pairs = new HashMap<>();
@@ -538,13 +542,13 @@ public final class Parser {
 
 				if (state.optional(TokenType.Colon)) {
 					consumeAllLineTerminators();
-					pairs.put(key, parseInitializer(parseAssignmentTarget()));
+					pairs.put(key, parseInitializer(parseAssignmentTarget(allowMemberExpressions)));
 				} else {
 					if (keyToken.type != TokenType.Identifier) throw state.unexpected(keyToken);
 					pairs.put(key, parseInitializer(new IdentifierExpression(key.value())));
 				}
 			} else {
-				pairs.put(parseComputedKeyExpression(), parseInitializer(parseAssignmentTarget()));
+				pairs.put(parseComputedKeyExpression(), parseInitializer(parseAssignmentTarget(allowMemberExpressions)));
 			}
 
 			consumeAllLineTerminators();
@@ -577,12 +581,12 @@ public final class Parser {
 			if (state.optional(TokenType.DotDotDot)) {
 				// Note: Rest parameter may not have a default initializer
 				consumeAllLineTerminators();
-				result.rest = parseAssignmentTarget();
+				result.rest = parseAssignmentTarget(false);
 				consumeAllLineTerminators();
 				if (state.optional(TokenType.Comma)) throw new SyntaxError("Rest parameter must be last formal parameter", position());
 				break;
 			} else {
-				final AssignmentTarget target = parseAssignmentTarget();
+				final AssignmentTarget target = parseAssignmentTarget(false);
 				consumeAllLineTerminators();
 				if (state.optional(TokenType.Equals)) {
 					final Expression defaultExpression = parseSpecAssignmentExpression();
@@ -784,7 +788,7 @@ public final class Parser {
 		} else if (op == AssignmentOp.Assign && (left_expr instanceof ArrayExpression || left_expr instanceof ObjectExpression)) {
 			// left_expr is a destructuring pattern we mis-parsed as an array / object literal
 			// TODO: Convert to DestructuringAssignmentTarget manually, rather than re-parsing the source
-			return new Parser(left_expr.range().getText()).parseAssignmentTarget();
+			return new Parser(left_expr.range().getText()).parseAssignmentTarget(true);
 		}
 
 		throw new SyntaxError(AssignmentExpression.invalidLHS, position());

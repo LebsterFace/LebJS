@@ -1,10 +1,10 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.declaration.AssignmentPattern;
 import xyz.lebster.core.node.declaration.AssignmentTarget;
 import xyz.lebster.core.node.declaration.Kind;
 import xyz.lebster.core.node.expression.Expression;
@@ -17,8 +17,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public final class FunctionParameters implements Iterable<FunctionParameters.Parameter>, Representable {
-	private final List<Parameter> formalParameters = new ArrayList<>();
+public final class FunctionParameters implements Iterable<AssignmentPattern>, Representable {
+	private final List<AssignmentPattern> formalParameters = new ArrayList<>();
 	public AssignmentTarget rest;
 
 	public FunctionParameters() {
@@ -31,11 +31,11 @@ public final class FunctionParameters implements Iterable<FunctionParameters.Par
 	}
 
 	public void addWithDefault(AssignmentTarget target, Expression defaultExpression) {
-		this.formalParameters.add(new Parameter(target, defaultExpression));
+		this.formalParameters.add(new AssignmentPattern(target, defaultExpression));
 	}
 
 	public void add(AssignmentTarget target) {
-		this.formalParameters.add(new Parameter(target, null));
+		this.formalParameters.add(new AssignmentPattern(target, null));
 	}
 
 	@Override
@@ -52,14 +52,14 @@ public final class FunctionParameters implements Iterable<FunctionParameters.Par
 	public void declareArguments(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
 		int i = 0;
 		while (i < formalParameters.size() && i < passedArguments.length) {
-			formalParameters.get(i).declare(interpreter, passedArguments[i]);
+			formalParameters.get(i).declare(interpreter, Kind.Let, passedArguments[i]);
 			i++;
 		}
 
 		if (rest == null) {
 			// For any remaining formal parameters
 			while (i < formalParameters.size()) {
-				formalParameters.get(i).declare(interpreter, Undefined.instance);
+				formalParameters.get(i).declare(interpreter, Kind.Let, Undefined.instance);
 				i++;
 			}
 		} else {
@@ -74,7 +74,7 @@ public final class FunctionParameters implements Iterable<FunctionParameters.Par
 	public int expectedArgumentCount() {
 		int count = 0;
 		for (final var parameter : formalParameters) {
-			if (parameter.defaultExpression != null) break;
+			if (parameter.defaultExpression() != null) break;
 			count++;
 		}
 
@@ -82,34 +82,7 @@ public final class FunctionParameters implements Iterable<FunctionParameters.Par
 	}
 
 	@Override
-	public Iterator<Parameter> iterator() {
+	public Iterator<AssignmentPattern> iterator() {
 		return formalParameters.iterator();
-	}
-
-	record Parameter(AssignmentTarget target, Expression defaultExpression) implements Dumpable {
-		@Override
-		public void dump(int indent) {
-			DumpBuilder.begin(indent)
-				.self(this)
-				.child("Target", target)
-				.optionalChild("Default Expression", defaultExpression);
-		}
-
-		@Override
-		public void represent(StringRepresentation representation) {
-			target.represent(representation);
-			if (defaultExpression != null) {
-				representation.append(" = ");
-				defaultExpression.represent(representation);
-			}
-		}
-
-		public void declare(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
-			if (value == Undefined.instance && defaultExpression != null) {
-				target.declare(interpreter, Kind.Let, defaultExpression);
-			} else {
-				target.declare(interpreter, Kind.Let, value);
-			}
-		}
 	}
 }

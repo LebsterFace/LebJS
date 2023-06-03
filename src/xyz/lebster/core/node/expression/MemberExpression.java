@@ -1,10 +1,12 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.DumpBuilder;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
 import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.declaration.Kind;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
@@ -50,5 +52,10 @@ public record MemberExpression(Expression base, Expression property, boolean com
 			representation.append('.');
 			representation.append(((StringLiteral) property).value().value);
 		}
+	}
+
+	@Override
+	public void declare(Interpreter interpreter, Kind kind, Value<?> value) throws AbruptCompletion {
+		throw new ShouldNotHappen("Cannot declare MemberExpression");
 	}
 }

@@ -22,7 +22,7 @@ public sealed interface AssignmentTarget extends Dumpable, Assignable, Declarabl
 		return this.assign(interpreter, getValue(interpreter, expression));
 	}
 
-	default void declare(Interpreter interpreter, VariableDeclaration.Kind kind, Expression expression) throws AbruptCompletion {
+	default void declare(Interpreter interpreter, Kind kind, Expression expression) throws AbruptCompletion {
 		this.declare(interpreter, kind, getValue(interpreter, expression));
 	}
 
@@ -36,7 +36,7 @@ public sealed interface AssignmentTarget extends Dumpable, Assignable, Declarabl
 		return value;
 	}
 
-	default void declare(Interpreter interpreter, VariableDeclaration.Kind kind, Value<?> value) throws AbruptCompletion {
+	default void declare(Interpreter interpreter, Kind kind, Value<?> value) throws AbruptCompletion {
 		for (var binding : this.getBindings(interpreter, value))
 			interpreter.declareVariable(kind, binding.name(), binding.value());
 	}

@@ -436,9 +436,9 @@ public final class Parser {
 	private VariableDeclaration parseVariableDeclaration() throws SyntaxError, CannotParse {
 		// TODO: Missing init in 'const' declaration
 		final var kind = switch (state.token.type) {
-			case Var -> VariableDeclaration.Kind.Var;
-			case Let -> VariableDeclaration.Kind.Let;
-			case Const -> VariableDeclaration.Kind.Const;
+			case Var -> Kind.Var;
+			case Let -> Kind.Let;
+			case Const -> Kind.Const;
 			default -> throw state.unexpected();
 		};
 
@@ -1072,7 +1072,7 @@ public final class Parser {
 	// FIXME: ClassDeclaration
 	private VariableDeclaration parseClassDeclaration() throws SyntaxError, CannotParse {
 		final ClassExpression classExpression = parseClassExpression();
-		return new VariableDeclaration(VariableDeclaration.Kind.Let, new VariableDeclarator(new IdentifierExpression(classExpression.className()), classExpression, null));
+		return new VariableDeclaration(Kind.Let, new VariableDeclarator(new IdentifierExpression(classExpression.className()), classExpression, null));
 	}
 
 	private Expression parseClassHeritage() throws SyntaxError, CannotParse {

@@ -6,10 +6,11 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Assignable;
 import xyz.lebster.core.node.declaration.AssignmentTarget;
+import xyz.lebster.core.node.declaration.Kind;
 import xyz.lebster.core.node.declaration.VariableDeclaration;
 import xyz.lebster.core.value.Value;
 
-public record BindingPattern(VariableDeclaration.Kind kind, AssignmentTarget assignmentTarget) implements Assignable {
+public record BindingPattern(Kind kind, AssignmentTarget assignmentTarget) implements Assignable {
 	public BindingPattern(VariableDeclaration declaration) {
 		this(declaration.kind(), declaration.declarations()[0].target());
 	}

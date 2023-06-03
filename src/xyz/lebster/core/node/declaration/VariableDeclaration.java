@@ -35,8 +35,4 @@ public record VariableDeclaration(Kind kind, VariableDeclarator... declarations)
 			declaration.represent(representation);
 		}
 	}
-
-	public enum Kind {
-		Const, Let, Var
-	}
 }

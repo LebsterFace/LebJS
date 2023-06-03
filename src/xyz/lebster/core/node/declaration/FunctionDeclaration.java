@@ -13,7 +13,7 @@ import xyz.lebster.core.value.function.Function;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import static xyz.lebster.core.node.declaration.VariableDeclaration.Kind.Let;
+import static xyz.lebster.core.node.declaration.Kind.Let;
 
 public record FunctionDeclaration(BlockStatement body, StringLiteral name, FunctionParameters parameters) implements FunctionNode, Declaration {
 	@Override

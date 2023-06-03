@@ -21,7 +21,7 @@ public record VariableDeclarator(AssignmentTarget target, Expression init, Sourc
 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		target.declare(interpreter, VariableDeclaration.Kind.Let, init);
+		target.declare(interpreter, Kind.Let, init);
 		return Undefined.instance;
 	}
 

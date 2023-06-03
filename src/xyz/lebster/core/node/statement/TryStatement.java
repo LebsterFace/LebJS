@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import static xyz.lebster.core.node.declaration.VariableDeclaration.Kind.Let;
+import static xyz.lebster.core.node.declaration.Kind.Let;
 
 public record TryStatement(BlockStatement body, StringValue catchParameter, BlockStatement catchBody, BlockStatement finallyBody) implements Statement {
 	@Override

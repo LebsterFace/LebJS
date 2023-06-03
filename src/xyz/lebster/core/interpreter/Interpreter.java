@@ -3,7 +3,7 @@ package xyz.lebster.core.interpreter;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.environment.*;
-import xyz.lebster.core.node.declaration.VariableDeclaration.Kind;
+import xyz.lebster.core.node.declaration.Kind;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.reference.ReferenceError;

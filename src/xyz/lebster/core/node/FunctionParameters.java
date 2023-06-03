@@ -6,7 +6,7 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.AssignmentTarget;
-import xyz.lebster.core.node.declaration.VariableDeclaration;
+import xyz.lebster.core.node.declaration.Kind;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
@@ -64,7 +64,7 @@ public final class FunctionParameters implements Iterable<FunctionParameters.Par
 			}
 		} else {
 			// let rest = passedArguments.slice(i)
-			rest.declare(interpreter, VariableDeclaration.Kind.Let, new ArrayObject(interpreter,
+			rest.declare(interpreter, Kind.Let, new ArrayObject(interpreter,
 				Arrays.copyOfRange(passedArguments, i, passedArguments.length)
 			));
 		}
@@ -106,9 +106,9 @@ public final class FunctionParameters implements Iterable<FunctionParameters.Par
 
 		public void declare(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 			if (value == Undefined.instance && defaultExpression != null) {
-				target.declare(interpreter, VariableDeclaration.Kind.Let, defaultExpression);
+				target.declare(interpreter, Kind.Let, defaultExpression);
 			} else {
-				target.declare(interpreter, VariableDeclaration.Kind.Let, value);
+				target.declare(interpreter, Kind.Let, value);
 			}
 		}
 	}

@@ -12,7 +12,7 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
-import static xyz.lebster.core.node.declaration.VariableDeclaration.Kind.Let;
+import static xyz.lebster.core.node.declaration.Kind.Let;
 
 public final class ShadowRealm extends ObjectValue {
 	private final Realm realm = new Realm(new Interpreter());

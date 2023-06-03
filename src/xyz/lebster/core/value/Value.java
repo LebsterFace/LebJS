@@ -8,6 +8,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
@@ -219,7 +220,7 @@ public abstract class Value<JType> implements Displayable {
 	public abstract String typeOf(Interpreter interpreter);
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-topropertykey")
-	public final ObjectValue.Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {
+	public final Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {
 		// 1. Let key be ? ToPrimitive(argument, string).
 		final PrimitiveValue<?> key = this.toPrimitive(interpreter, PreferredType.String);
 		// 2. If Type(key) is Symbol, then

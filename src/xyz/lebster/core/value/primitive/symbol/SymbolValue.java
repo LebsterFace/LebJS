@@ -6,6 +6,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.error.type.TypeError;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
@@ -14,7 +15,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-language-types-symbol-type")
-public final class SymbolValue extends ObjectValue.Key<Void> {
+public final class SymbolValue extends Key<Void> {
 	// https://tc39.es/ecma262/multipage#table-well-known-symbols
 
 	/**
@@ -101,7 +102,7 @@ public final class SymbolValue extends ObjectValue.Key<Void> {
 	}
 
 	@Override
-	public boolean equalsKey(ObjectValue.Key<?> other) {
+	public boolean equalsKey(Key<?> other) {
 		return other == this;
 	}
 

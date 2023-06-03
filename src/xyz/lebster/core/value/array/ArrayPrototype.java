@@ -17,6 +17,7 @@ import xyz.lebster.core.value.function.NativeCode;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;

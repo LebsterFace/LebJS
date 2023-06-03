@@ -19,6 +19,7 @@ import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;

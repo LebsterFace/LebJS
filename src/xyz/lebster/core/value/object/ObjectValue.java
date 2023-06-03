@@ -19,7 +19,6 @@ import xyz.lebster.core.value.function.NativeCode;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.object.ObjectValue.Key;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
@@ -293,7 +292,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-deletepropertyorthrow")
-	public final void deletePropertyOrThrow(Interpreter interpreter, ObjectValue.Key<?> P) throws AbruptCompletion {
+	public final void deletePropertyOrThrow(Interpreter interpreter, Key<?> P) throws AbruptCompletion {
 		// 7.3.10 DeletePropertyOrThrow ( O, P )
 		// 1. Let success be ? O.[[Delete]](P).
 		boolean success = this.delete(P);
@@ -328,7 +327,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinary-object-internal-methods-and-internal-slots-delete-p")
-	public boolean delete(ObjectValue.Key<?> P) {
+	public boolean delete(Key<?> P) {
 		// 10.1.10 [[Delete]] ( P )
 		// 1. Return ? OrdinaryDelete(O, P).
 		return this.ordinaryDelete(P);
@@ -541,20 +540,4 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	}
 
 	protected enum EnumerableOwnPropertyNamesKind { KEY, VALUE, KEY_VALUE }
-
-	public static abstract class Key<R> extends PrimitiveValue<R> {
-		public Key(R value) {
-			super(value);
-		}
-
-		public void displayForObjectKey(StringRepresentation representation) {
-			this.display(representation);
-		}
-
-		public abstract StringValue toFunctionName();
-
-		public abstract int toIndex();
-
-		public abstract boolean equalsKey(Key<?> other);
-	}
 }

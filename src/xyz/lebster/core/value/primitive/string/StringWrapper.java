@@ -6,6 +6,7 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.object.DataDescriptor;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.PropertyDescriptor;
 import xyz.lebster.core.value.primitive.PrimitiveWrapper;
 import xyz.lebster.core.value.primitive.number.NumberValue;

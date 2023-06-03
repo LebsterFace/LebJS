@@ -8,7 +8,7 @@ import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
-import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.object.Key;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
@@ -29,7 +29,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 	@Override
 	public Reference toReference(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> executedBase = base.execute(interpreter);
-		final ObjectValue.Key<?> executedProp = property.execute(interpreter).toPropertyKey(interpreter);
+		final Key<?> executedProp = property.execute(interpreter).toPropertyKey(interpreter);
 
 		if (executedBase.isNullish()) {
 			final String msg = "Cannot read property '" + executedProp.value + "' of " + executedBase;

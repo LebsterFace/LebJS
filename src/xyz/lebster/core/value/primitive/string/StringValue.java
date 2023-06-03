@@ -6,13 +6,13 @@ import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.parser.Lexer;
-import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 
 import java.util.PrimitiveIterator;
 
-public final class StringValue extends ObjectValue.Key<String> {
+public final class StringValue extends Key<String> {
 	public static final StringValue EMPTY = new StringValue("");
 
 	public StringValue(String value) {
@@ -58,7 +58,7 @@ public final class StringValue extends ObjectValue.Key<String> {
 	}
 
 	@Override
-	public boolean equalsKey(ObjectValue.Key<?> other) {
+	public boolean equalsKey(Key<?> other) {
 		return other instanceof final StringValue stringValue && stringValue.value.equals(value);
 	}
 

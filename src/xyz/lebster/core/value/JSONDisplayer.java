@@ -7,7 +7,7 @@ import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.object.AccessorDescriptor;
 import xyz.lebster.core.value.object.DataDescriptor;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.object.ObjectValue.Key;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.PropertyDescriptor;
 
 import java.util.ArrayList;

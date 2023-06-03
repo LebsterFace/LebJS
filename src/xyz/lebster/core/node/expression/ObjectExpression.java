@@ -10,6 +10,7 @@ import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -93,7 +94,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 	private record ComputedKeyEntryNode(Expression key, Expression value) implements ObjectEntryNode {
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
-			final ObjectValue.Key<?> executedKey = this.key.execute(interpreter).toPropertyKey(interpreter);
+			final Key<?> executedKey = this.key.execute(interpreter).toPropertyKey(interpreter);
 			final Value<?> executedValue = Executable.namedEvaluation(interpreter, value, executedKey);
 			result.put(executedKey, executedValue, true, true, true);
 		}

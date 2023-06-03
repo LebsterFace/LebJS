@@ -8,6 +8,7 @@ import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.object.PropertyDescriptor;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -19,10 +20,10 @@ public record ObjectDestructuring(Map<Expression, AssignmentPattern> pairs, Stri
 	public List<BindingPair> getBindings(Interpreter interpreter, Value<?> input) throws AbruptCompletion {
 		final ObjectValue objectValue = input.toObjectValue(interpreter);
 
-		final Set<ObjectValue.Key<?>> visitedKeys = new HashSet<>();
+		final Set<Key<?>> visitedKeys = new HashSet<>();
 		final ArrayList<BindingPair> result = new ArrayList<>();
 		for (final var entry : pairs.entrySet()) {
-			final ObjectValue.Key<?> key = entry.getKey().execute(interpreter).toPropertyKey(interpreter);
+			final Key<?> key = entry.getKey().execute(interpreter).toPropertyKey(interpreter);
 			final Value<?> property = objectValue.get(interpreter, key);
 			final Expression defaultExpression = entry.getValue().defaultExpression();
 			final Value<?> x = property == Undefined.instance && defaultExpression != null ?
@@ -34,7 +35,7 @@ public record ObjectDestructuring(Map<Expression, AssignmentPattern> pairs, Stri
 
 		if (restName != null) {
 			final ObjectValue restObject = new ObjectValue(interpreter.intrinsics);
-			for (final ObjectValue.Key<?> key : objectValue.ownPropertyKeys()) {
+			for (final Key<?> key : objectValue.ownPropertyKeys()) {
 				final PropertyDescriptor value = objectValue.getOwnProperty(key);
 				if (!visitedKeys.contains(key) && value.isEnumerable()) {
 					restObject.put(key, objectValue.get(interpreter, key));

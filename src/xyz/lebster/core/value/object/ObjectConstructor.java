@@ -106,7 +106,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 			if (!(value instanceof final ObjectValue entry))
 				throw error(new TypeError(interpreter, "Value is not an entry object"));
 
-			final ObjectValue.Key<?> entryKey = entry.get(interpreter, new StringValue("0")).toPropertyKey(interpreter);
+			final Key<?> entryKey = entry.get(interpreter, new StringValue("0")).toPropertyKey(interpreter);
 			final Value<?> entryValue = entry.get(interpreter, new StringValue("1"));
 			result.put(entryKey, entryValue, true, true, true);
 		}

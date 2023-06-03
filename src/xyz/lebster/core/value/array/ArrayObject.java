@@ -11,10 +11,7 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.object.AccessorDescriptor;
-import xyz.lebster.core.value.object.DataDescriptor;
-import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.object.PropertyDescriptor;
+import xyz.lebster.core.value.object.*;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 

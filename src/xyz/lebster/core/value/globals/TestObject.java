@@ -16,10 +16,9 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.EvalError;
 import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
-
-import java.util.Objects;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;

@@ -706,14 +706,147 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.splice")
-	private static Value<?> splice(Interpreter interpreter, Value<?>[] arguments) {
+	private static ArrayObject splice(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.31 Array.prototype.splice ( start, deleteCount, ...items )
 		final Value<?> start = argument(0, arguments);
 		final Value<?> deleteCount = argument(1, arguments);
 		final Value<?>[] items = argumentRest(2, arguments);
 
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// 3. Let relativeStart be ? ToIntegerOrInfinity(start).
+		final int relativeStart = toIntegerOrInfinity(interpreter, start);
+		// 4. If relativeStart = -∞, let actualStart be 0.
+		final int actualStart;
+		if (relativeStart == Integer.MIN_VALUE) actualStart = 0;
+		// 5. Else if relativeStart < 0, let actualStart be max(len + relativeStart, 0).
+		else if (relativeStart < 0) actualStart = Math.max(len + relativeStart, 0);
+		// 6. Else, let actualStart be min(relativeStart, len).
+		else actualStart = Math.min(relativeStart, len);
+		// 7. Let itemCount be the number of elements in items.
+		final int itemCount = items.length;
+		final int actualDeleteCount;
+		// 8. If start is not present, then
+		if (start == Undefined.instance) {
+			// a. Let actualDeleteCount be 0.
+			actualDeleteCount = 0;
+		}
+		// 9. Else if deleteCount is not present, then
+		else if (deleteCount == Undefined.instance) {
+			// a. Let actualDeleteCount be len - actualStart.
+			actualDeleteCount = len - actualStart;
+		}
+		// 10. Else,
+		else {
+			// a. Let dc be ? ToIntegerOrInfinity(deleteCount).
+			final int dc = toIntegerOrInfinity(interpreter, deleteCount);
+			// b. Let actualDeleteCount be the result of clamping dc between 0 and len - actualStart.
+			actualDeleteCount = Math.max(0, Math.min(dc, len - actualStart));
+		}
 
-		throw new NotImplemented("Array.prototype.splice");
+		// TODO: 11. If len + itemCount - actualDeleteCount > 2^53 - 1, throw a TypeError exception.
+		// TODO: 12. Let A be ? ArraySpeciesCreate(O, actualDeleteCount).
+		final Value<?>[] A = new Value<?>[actualDeleteCount];
+		// 13. Let k be 0.
+		int k = 0;
+		// 14. Repeat, while k < actualDeleteCount,
+		while (k < actualDeleteCount) {
+			// a. Let `from` be ! ToString(𝔽(actualStart + k)).
+			final StringValue from = new StringValue(actualStart + k);
+			// b. If ? HasProperty(O, from) is true, then
+			if (O.hasProperty(from)) {
+				// i. Let fromValue be ? Get(O, from).
+				final Value<?> fromValue = O.get(interpreter, from);
+				// ii. Perform ? CreateDataPropertyOrThrow(A, ! ToString(𝔽(k)), fromValue).
+				A[k] = fromValue;
+			}
+
+			// c. Set k to k + 1.
+			k += 1;
+		}
+
+		// 15. Perform ? Set(A, "length", 𝔽(actualDeleteCount), true).
+		// 16. If itemCount < actualDeleteCount, then
+		if (itemCount < actualDeleteCount) {
+			// a. Set k to actualStart.
+			k = actualStart;
+			// b. Repeat, while k < (len - actualDeleteCount),
+			while (k < (len - actualDeleteCount)) {
+				// i. Let `from` be ! ToString(𝔽(k + actualDeleteCount)).
+				final StringValue from = new StringValue(k + actualDeleteCount);
+				// ii. Let `to` be ! ToString(𝔽(k + itemCount)).
+				final StringValue to = new StringValue(k + itemCount);
+				// iii. If ? HasProperty(O, from) is true, then
+				if (O.hasProperty(from)) {
+					// 1. Let fromValue be ? Get(O, from).
+					final Value<?> fromValue = O.get(interpreter, from);
+					// 2. Perform ? Set(O, to, fromValue, true).
+					O.set(interpreter, to, fromValue/* FIXME: , true */);
+				}
+				// iv. Else,
+				else {
+					// 1. Perform ? DeletePropertyOrThrow(O, to).
+					O.deletePropertyOrThrow(interpreter, to);
+				}
+
+				// v. Set k to k + 1.
+				k += 1;
+			}
+
+			// c. Set k to len.
+			k = len;
+			// d. Repeat, while k > (len - actualDeleteCount + itemCount),
+			while (k > (len - actualDeleteCount + itemCount)) {
+				// i. Perform ? DeletePropertyOrThrow(O, ! ToString(𝔽(k - 1))).
+				O.deletePropertyOrThrow(interpreter, new StringValue(k - 1));
+				// ii. Set k to k - 1.
+				k -= 1;
+			}
+		}
+		// 17. Else if itemCount > actualDeleteCount, then
+		else if (itemCount > actualDeleteCount) {
+			// a. Set k to (len - actualDeleteCount).
+			k = (len - actualDeleteCount);
+			// b. Repeat, while k > actualStart,
+			while (k > actualStart) {
+				// i. Let `from` be ! ToString(𝔽(k + actualDeleteCount - 1)).
+				final StringValue from = new StringValue(k + actualDeleteCount - 1);
+				// ii. Let `to` be ! ToString(𝔽(k + itemCount - 1)).
+				final StringValue to = new StringValue(k + itemCount - 1);
+				// iii. If ? HasProperty(O, from) is true, then
+				if (O.hasProperty(from)) {
+					// 1. Let fromValue be ? Get(O, from).
+					final Value<?> fromValue = O.get(interpreter, from);
+					// 2. Perform ? Set(O, to, fromValue, true).
+					O.set(interpreter, to, fromValue/* FIXME: , true */);
+				}
+				// iv. Else,
+				else {
+					// 1. Perform ? DeletePropertyOrThrow(O, to).
+					O.deletePropertyOrThrow(interpreter, to);
+				}
+
+				// v. Set k to k - 1.
+				k -= 1;
+			}
+		}
+
+		// 18. Set k to actualStart.
+		k = actualStart;
+		// 19. For each element E of items, do
+		for (final Value<?> E : items) {
+			// a. Perform ? Set(O, ! ToString(𝔽(k)), E, true).
+			O.set(interpreter, new StringValue(k), E/* FIXME: , true */);
+			// b. Set k to k + 1.
+			k += 1;
+		}
+
+		// 20. Perform ? Set(O, "length", 𝔽(len - actualDeleteCount + itemCount), true).
+		O.set(interpreter, Names.length, new NumberValue(len - actualDeleteCount + itemCount)/* FIXME: , true */);
+		// 21. Return A.
+		return new ArrayObject(interpreter, A);
 	}
 
 	@NonCompliant

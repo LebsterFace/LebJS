@@ -57,6 +57,7 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.pop, 0, ArrayPrototype::pop);
 		putMethod(intrinsics, Names.push, 1, ArrayPrototype::push);
 		putMethod(intrinsics, Names.reduce, 1, ArrayPrototype::reduce);
+		putMethod(intrinsics, Names.reduceRight, 1, ArrayPrototype::reduceRight);
 		putMethod(intrinsics, Names.reverse, 0, ArrayPrototype::reverse);
 		putMethod(intrinsics, Names.shift, 0, ArrayPrototype::shift);
 		putMethod(intrinsics, Names.slice, 2, ArrayPrototype::slice);
@@ -75,7 +76,6 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
 		putMethod(intrinsics, Names.fill, 1, ArrayPrototype::fill);
 		putMethod(intrinsics, Names.lastIndexOf, 1, ArrayPrototype::lastIndexOf);
-		putMethod(intrinsics, Names.reduceRight, 1, ArrayPrototype::reduceRight);
 		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
 		putMethod(intrinsics, Names.toReversed, 0, ArrayPrototype::toReversed);
 		putMethod(intrinsics, Names.toSorted, 1, ArrayPrototype::toSorted);
@@ -152,12 +152,74 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reduceright")
-	private static Value<?> reduceRight(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> reduceRight(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.25 Array.prototype.reduceRight ( callbackfn [ , initialValue ] )
-		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> callbackfn_ = argument(0, arguments);
 		final Value<?> initialValue = argument(1, arguments);
 
-		throw new NotImplemented("Array.prototype.reduceRight");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
+		final Executable callbackfn = Executable.getExecutable(interpreter, callbackfn_);
+		// 4. If len = 0 and initialValue is not present, throw a TypeError exception.
+		if (len == 0 && initialValue == Undefined.instance)
+			throw error(new TypeError(interpreter, "Reduce of empty array with no initial value"));
+		// 5. Let k be len - 1.
+		int k = len - 1;
+		// 6. Let accumulator be undefined.
+		Value<?> accumulator = Undefined.instance;
+		// 7. If initialValue is present, then
+		if (initialValue != Undefined.instance) {
+			// a. Set accumulator to initialValue.
+			accumulator = initialValue;
+		}
+		// 8. Else,
+		else {
+			// a. Let kPresent be false.
+			boolean kPresent = false;
+			// b. Repeat, while kPresent is false and k ≥ 0,
+			while (!kPresent && k >= 0) {
+				// i. Let Pk be ! ToString(𝔽(k)).
+				final StringValue Pk = new StringValue(k);
+				// ii. Set kPresent to ? HasProperty(O, Pk).
+				kPresent = O.hasProperty(Pk);
+				// iii. If kPresent is true, then
+				if (kPresent) {
+					// 1. Set accumulator to ? Get(O, Pk).
+					accumulator = O.get(interpreter, Pk);
+				}
+
+				// iv. Set k to k - 1.
+				k = k - 1;
+			}
+
+			// c. If kPresent is false, throw a TypeError exception.
+			if (!kPresent)
+				throw error(new TypeError(interpreter, "Reduce of empty array with no initial value"));
+		}
+
+		// 9. Repeat, while k ≥ 0,
+		while (k >= 0) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final StringValue Pk = new StringValue(k);
+			// b. Let kPresent be ? HasProperty(O, Pk).
+			final boolean kPresent = O.hasProperty(Pk);
+			// c. If kPresent is true, then
+			if (kPresent) {
+				// i. Let kValue be ? Get(O, Pk).
+				final Value<?> kValue = O.get(interpreter, Pk);
+				// ii. Set accumulator to ? Call(callbackfn, undefined, « accumulator, kValue, 𝔽(k), O »).
+				accumulator = callbackfn.call(interpreter, Undefined.instance, accumulator, kValue, new NumberValue(k), O);
+			}
+
+			// d. Set k to k - 1.
+			k -= 1;
+		}
+
+		// 10. Return accumulator.
+		return accumulator;
 	}
 
 	@NonCompliant

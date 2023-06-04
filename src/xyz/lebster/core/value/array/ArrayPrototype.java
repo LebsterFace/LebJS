@@ -11,6 +11,7 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Generator;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.NativeCode;
@@ -69,6 +70,7 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.toReversed, 0, ArrayPrototype::toReversed);
 		putMethod(intrinsics, Names.toString, 0, ArrayPrototype::toStringMethod);
 		putMethod(intrinsics, Names.unshift, 1, ArrayPrototype::unshift);
+		putMethod(intrinsics, Names.with, 2, ArrayPrototype::with);
 		final NativeFunction values = putMethod(intrinsics, Names.values, 0, ArrayPrototype::values);
 		put(SymbolValue.iterator, values);
 
@@ -80,7 +82,6 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
 		putMethod(intrinsics, Names.toSorted, 1, ArrayPrototype::toSorted);
 		putMethod(intrinsics, Names.toSpliced, 2, ArrayPrototype::toSpliced);
-		putMethod(intrinsics, Names.with, 2, ArrayPrototype::with);
 	}
 
 	@NonCompliant
@@ -134,14 +135,44 @@ public final class ArrayPrototype extends ObjectValue {
 		throw new NotImplemented("Array.prototype.toSpliced");
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.with")
-	private static ArrayObject with(Interpreter interpreter, Value<?>[] arguments) {
+	private static ArrayObject with(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.39 Array.prototype.with ( index, value )
 		final Value<?> index = argument(0, arguments);
 		final Value<?> value = argument(1, arguments);
 
-		throw new NotImplemented("Array.prototype.with");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// 3. Let relativeIndex be ? ToIntegerOrInfinity(index).
+		final int relativeIndex = toIntegerOrInfinity(interpreter, index);
+		// 4. If relativeIndex ≥ 0, let actualIndex be relativeIndex.
+		// 5. Else, let actualIndex be len + relativeIndex.
+		final int actualIndex = relativeIndex >= 0 ? relativeIndex : len + relativeIndex;
+		// 6. If actualIndex ≥ len or actualIndex < 0, throw a RangeError exception.
+		if (actualIndex >= len || actualIndex < 0)
+			throw error(new RangeError(interpreter, "Index %d is out of range of array length %d".formatted(actualIndex, len)));
+
+		// TODO: 7. Let A be ? ArrayCreate(len).
+		final ArrayObject A = new ArrayObject(interpreter, len);
+		// 8. Let k be 0.
+		int k = 0;
+		// 9. Repeat, while k < len,
+		while (k < len) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final StringValue Pk = new StringValue(k);
+			// b. If k is actualIndex, let fromValue be value.
+			// c. Else, let fromValue be ? Get(O, Pk).
+			final Value<?> fromValue = k == actualIndex ? value : O.get(interpreter, Pk);
+			// TODO: d. Perform ! CreateDataPropertyOrThrow(A, Pk, fromValue).
+			A.set(interpreter, Pk, fromValue);
+			// e. Set k to k + 1.
+			k += 1;
+		}
+
+		// 10. Return A.
+		return A;
 	}
 
 	@NonCompliant
@@ -155,7 +186,6 @@ public final class ArrayPrototype extends ObjectValue {
 		throw new NotImplemented("Array.prototype.copyWithin");
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.fill")
 	private static ObjectValue fill(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.7 Array.prototype.fill ( value [ , start [ , end ] ] )
@@ -199,7 +229,6 @@ public final class ArrayPrototype extends ObjectValue {
 		return O;
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.lastindexof")
 	private static NumberValue lastIndexOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.20 Array.prototype.lastIndexOf ( searchElement [ , fromIndex ] )
@@ -240,7 +269,6 @@ public final class ArrayPrototype extends ObjectValue {
 		return NumberValue.MINUS_ONE;
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reduceright")
 	private static Value<?> reduceRight(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.25 Array.prototype.reduceRight ( callbackfn [ , initialValue ] )
@@ -319,6 +347,7 @@ public final class ArrayPrototype extends ObjectValue {
 		throw new NotImplemented("Array.prototype.toLocaleString()");
 	}
 
+	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.concat")
 	private static ArrayObject concat(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.2 Array.prototype.concat ( ...items )

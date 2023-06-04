@@ -393,12 +393,23 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.flatmap")
-	private static Value<?> flatMap(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> flatMap(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.14 Array.prototype.flatMap ( mapperFunction [ , thisArg ] )
-		final Value<?> mapperFunction = argument(0, arguments);
+		final Value<?> mapperFunction_ = argument(0, arguments);
 		final Value<?> thisArg = argument(1, arguments);
 
-		throw new NotImplemented("Array.prototype.flatMap");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let sourceLen be ? LengthOfArrayLike(O).
+		final int sourceLen = lengthOfArrayLike(interpreter, O);
+		// 3. If IsCallable(mapperFunction) is false, throw a TypeError exception.
+		final Executable mapperFunction = Executable.getExecutable(interpreter, mapperFunction_);
+		// 4. Let A be ? ArraySpeciesCreate(O, 0).
+		final ArrayObject A = new ArrayObject(interpreter);
+		// 5. Perform ? FlattenIntoArray(A, O, sourceLen, 0, 1, mapperFunction, thisArg).
+		flattenIntoArray(interpreter, A, O, sourceLen, 0, 1, mapperFunction, thisArg);
+		// 6. Return A.
+		return A;
 	}
 
 	@NonCompliant

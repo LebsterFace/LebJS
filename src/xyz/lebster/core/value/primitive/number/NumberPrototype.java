@@ -110,7 +110,7 @@ public final class NumberPrototype extends ObjectValue {
 		if (numberValue.value < 0) integer = -integer;
 		// 7. Return integer.
 		if (integer > Integer.MAX_VALUE)
-			throw new NotImplemented("ToIntegerOrInfinity returning values over 2^31-1");
+			throw new NotImplemented("ToIntegerOrInfinity returning values over 2^31-1 (%d)".formatted(integer));
 
 		return (int) integer;
 	}

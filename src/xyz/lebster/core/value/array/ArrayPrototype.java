@@ -297,11 +297,98 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.flat")
-	private static Value<?> flat(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> flat(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.13 Array.prototype.flat ( [ depth ] )
 		final Value<?> depth = argument(0, arguments);
 
-		throw new NotImplemented("Array.prototype.flat");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let sourceLen be ? LengthOfArrayLike(O).
+		final int sourceLen = lengthOfArrayLike(interpreter, O);
+		// 3. Let depthNum be 1.
+		int depthNum = 1;
+		// 4. If depth is not undefined, then
+		if (depth != Undefined.instance) {
+			// a. Set depthNum to ? ToIntegerOrInfinity(depth).
+			depthNum = toIntegerOrInfinity(interpreter, depth);
+			// b. If depthNum < 0, set depthNum to 0.
+			if (depthNum < 0) depthNum = 0;
+		}
+
+		// 5. Let A be ? ArraySpeciesCreate(O, 0).
+		final ArrayObject A = new ArrayObject(interpreter);
+		// 6. Perform ? FlattenIntoArray(A, O, sourceLen, 0, depthNum).
+		flattenIntoArray(interpreter, A, O, sourceLen, 0, depthNum);
+		// 7. Return A.
+		return A;
+	}
+
+	private static int flattenIntoArray(Interpreter interpreter, ArrayObject target, ObjectValue source, int sourceLen, int start, int depth) throws AbruptCompletion {
+		return flattenIntoArray(interpreter, target, source, sourceLen, start, depth, null, null);
+	}
+
+	private static int flattenIntoArray(Interpreter interpreter, ArrayObject target, ObjectValue source, int sourceLen, int start, int depth, Executable mapperFunction, Value<?> thisArg) throws AbruptCompletion {
+		// 1. Assert: If mapperFunction is present, then IsCallable(mapperFunction) is true, thisArg is present, and depth is 1.
+		if (mapperFunction != null) {
+			assert thisArg != null;
+			assert depth == 1;
+		}
+
+		// 2. Let targetIndex be start.
+		int targetIndex = start;
+		// 3. Let sourceIndex be +0𝔽.
+		int sourceIndex = 0;
+		// 4. Repeat, while ℝ(sourceIndex) < sourceLen,
+		while (sourceIndex < sourceLen) {
+			// a. Let P be ! ToString(sourceIndex).
+			final StringValue P = new StringValue(sourceIndex);
+			// b. Let exists be ? HasProperty(source, P).
+			final boolean exists = source.hasProperty(P);
+			// c. If exists is true, then
+			if (exists) {
+				// i. Let element be ? Get(source, P).
+				Value<?> element = source.get(interpreter, P);
+				// ii. If mapperFunction is present, then
+				if (mapperFunction != null) {
+					// 1. Set element to ? Call(mapperFunction, thisArg, « element, sourceIndex, source »).
+					element = mapperFunction.call(interpreter, thisArg, element, new NumberValue(sourceIndex), source);
+				}
+
+				// iii. Let shouldFlatten be false.
+				boolean shouldFlatten = false;
+				// iv. If depth > 0, then
+				if (depth > 0) {
+					// TODO: 1. Set shouldFlatten to ? IsArray(element).
+					shouldFlatten = element instanceof ArrayObject;
+				}
+
+				// v. If shouldFlatten is true, then
+				if (shouldFlatten) {
+					// 1. If depth = +∞, let newDepth be +∞.
+					// 2. Else, let newDepth be depth - 1.
+					final int newDepth = depth == Integer.MAX_VALUE ? Integer.MAX_VALUE : depth - 1;
+					// 3. Let elementLen be ? LengthOfArrayLike(element).
+					final ArrayObject arrayElement = (ArrayObject) element;
+					final int elementLen = lengthOfArrayLike(interpreter, arrayElement);
+					// 4. Set targetIndex to ? FlattenIntoArray(target, element, elementLen, targetIndex, newDepth).
+					targetIndex = flattenIntoArray(interpreter, target, arrayElement, elementLen, targetIndex, newDepth);
+				}
+				// vi. Else,
+				else {
+					// TODO: 1. If targetIndex ≥ 2^53 - 1, throw a TypeError exception.
+					// FIXME: 2. Perform ? CreateDataPropertyOrThrow(target, ! ToString(𝔽(targetIndex)), element).
+					target.set(interpreter, new StringValue(targetIndex), element);
+					// 3. Set targetIndex to targetIndex + 1.
+					targetIndex = targetIndex + 1;
+				}
+			}
+
+			// d. Set sourceIndex to sourceIndex + 1𝔽.
+			sourceIndex += 1;
+		}
+
+		// 5. Return targetIndex.
+		return targetIndex;
 	}
 
 	@NonCompliant

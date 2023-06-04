@@ -66,6 +66,7 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.some, 1, ArrayPrototype::some);
 		putMethod(intrinsics, Names.sort, 1, ArrayPrototype::sort);
 		putMethod(intrinsics, Names.splice, 2, ArrayPrototype::splice);
+		putMethod(intrinsics, Names.toReversed, 0, ArrayPrototype::toReversed);
 		putMethod(intrinsics, Names.toString, 0, ArrayPrototype::toStringMethod);
 		putMethod(intrinsics, Names.unshift, 1, ArrayPrototype::unshift);
 		final NativeFunction values = putMethod(intrinsics, Names.values, 0, ArrayPrototype::values);
@@ -77,7 +78,6 @@ public final class ArrayPrototype extends ObjectValue {
 		// Not implemented yet:
 		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
 		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
-		putMethod(intrinsics, Names.toReversed, 0, ArrayPrototype::toReversed);
 		putMethod(intrinsics, Names.toSorted, 1, ArrayPrototype::toSorted);
 		putMethod(intrinsics, Names.toSpliced, 2, ArrayPrototype::toSpliced);
 		putMethod(intrinsics, Names.with, 2, ArrayPrototype::with);
@@ -85,10 +85,33 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.toreversed")
-	private static ArrayObject toReversed(Interpreter interpreter, Value<?>[] arguments) {
+	private static ArrayObject toReversed(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.33 Array.prototype.toReversed ( )
 
-		throw new NotImplemented("Array.prototype.toReversed");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// TODO: 3. Let A be ? ArrayCreate(len).
+		final ArrayObject A = new ArrayObject(interpreter, len);
+		// 4. Let k be 0.
+		int k = 0;
+		// 5. Repeat, while k < len,
+		while (k < len) {
+			// a. Let `from` be ! ToString(𝔽(len - k - 1)).
+			final StringValue from = new StringValue(len - k - 1);
+			// b. Let Pk be ! ToString(𝔽(k)).
+			final StringValue Pk = new StringValue(k);
+			// c. Let fromValue be ? Get(O, from).
+			final Value<?> fromValue = O.get(interpreter, from);
+			// FIXME: d. Perform ! CreateDataPropertyOrThrow(A, Pk, fromValue).
+			A.set(interpreter, Pk, fromValue);
+			// e. Set k to k + 1.
+			k += 1;
+		}
+
+		// 6. Return A.
+		return A;
 	}
 
 	@NonCompliant

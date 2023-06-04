@@ -14,6 +14,15 @@ const myFunc = function myFunc(a, b) {
     return add(a, square(b), doNothing);
 }
 
+const self = function reference() {
+    return reference;
+};
+
+Test.expectError("ReferenceError", "reference is not defined", () => reference);
+const reference = 123;
+Test.expect(self, self());
+Test.expect(123, reference);
+
 Test.expect(5, myFunc(1, 2));
 Test.expectError("ReferenceError", "a is not defined", () => a);
 

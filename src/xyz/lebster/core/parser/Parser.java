@@ -138,8 +138,8 @@ public final class Parser {
 
 	private Statement parseStatementOrExpression() throws SyntaxError, CannotParse {
 		return switch (state.token.type) {
-			case Import, Export -> throw new ParserNotImplemented(position(), "Parsing import / export statements");
-			case With -> throw new ParserNotImplemented(position(), "Parsing with statements");
+			case Import, Export -> throw new ParserNotImplemented(position(), "import / export statements");
+			case With -> throw new ParserNotImplemented(position(), "with statements");
 
 			case Function -> parseFunctionDeclaration();
 			case Semicolon -> new EmptyStatement();
@@ -169,7 +169,7 @@ public final class Parser {
 				if (state.token.matchPrimaryExpression()) {
 					final Expression expression = parseExpression();
 					if (state.is(TokenType.Colon))
-						throw new ParserNotImplemented(position(), "Parsing labels");
+						throw new ParserNotImplemented(position(), "labels");
 					yield new ExpressionStatement(expression);
 				} else {
 					throw new CannotParse(state.token, "Statement");
@@ -764,7 +764,7 @@ public final class Parser {
 			case LBracket -> parseComputedMemberExpression(left);
 			case Comma -> new SequenceExpression(left, parseExpression());
 
-			case OptionalChain -> throw new ParserNotImplemented(position(), "Parsing optional chaining");
+			case OptionalChain -> throw new ParserNotImplemented(position(), "optional chaining");
 			default -> throw new CannotParse(token, "SecondaryExpression");
 		};
 	}
@@ -811,10 +811,10 @@ public final class Parser {
 		}
 
 		return switch (state.token.type) {
-			case Await -> throw new ParserNotImplemented(position(), "Parsing `await` expressions");
-			case Async -> throw new ParserNotImplemented(position(), "Parsing `async` functions");
-			case BigIntLiteral -> throw new ParserNotImplemented(position(), "Parsing BigIntLiterals");
-			case Super -> throw new ParserNotImplemented(position(), "Parsing Super property access");
+			case Await -> throw new ParserNotImplemented(position(), "`await` expressions");
+			case Async -> throw new ParserNotImplemented(position(), "`async` functions");
+			case BigIntLiteral -> throw new ParserNotImplemented(position(), "BigIntLiterals");
+			case Super -> throw new ParserNotImplemented(position(), "Super property access");
 
 			case Class -> parseClassExpression();
 			case Function -> parseFunctionExpression();
@@ -871,7 +871,7 @@ public final class Parser {
 
 	private Expression parseIdentifierExpressionOrArrowFunctionExpression() throws CannotParse, SyntaxError {
 		final var identifier = new IdentifierExpression(state.consume().value);
-		if (state.is(TokenType.TemplateStart)) throw new ParserNotImplemented(position(), "Parsing tagged template literals");
+		if (state.is(TokenType.TemplateStart)) throw new ParserNotImplemented(position(), "tagged template literals");
 		if (!state.optional(TokenType.Arrow)) return identifier;
 		return parseArrowFunctionBody(new FunctionParameters(identifier));
 	}
@@ -896,7 +896,7 @@ public final class Parser {
 	private NewExpression parseNewExpression() throws SyntaxError, CannotParse {
 		final Token newOperator = state.consume();
 		consumeAllLineTerminators();
-		if (state.is(TokenType.Period)) throw new ParserNotImplemented(position(), "Parsing new.target");
+		if (state.is(TokenType.Period)) throw new ParserNotImplemented(position(), "new.target");
 		final Expression constructExpr = parseExpression(newOperator.precedence(), newOperator.associativity(), Collections.singleton(TokenType.LParen));
 		final boolean hasArguments = state.is(TokenType.LParen);
 		final ExpressionList arguments = hasArguments ? parseExpressionList(true, false) : null;
@@ -958,7 +958,7 @@ public final class Parser {
 					if (invalid_property == null)
 						invalid_property = propertyStart;
 				} else if (state.is(TokenType.LParen)) {
-					throw new ParserNotImplemented(position(), "Parsing object literal methods");
+					throw new ParserNotImplemented(position(), "object literal methods");
 				} else if (isIdentifier && !state.is(TokenType.Colon)) {
 					entries.add(ObjectExpression.shorthandEntry(new StringValue(propertyName)));
 					couldBeGetterSetter = propertyName.equals("get") || propertyName.equals("set");
@@ -972,7 +972,7 @@ public final class Parser {
 				final Expression keyExpression = parseExpression();
 				state.require(TokenType.RBracket);
 				consumeAllLineTerminators();
-				if (state.is(TokenType.LParen)) throw new ParserNotImplemented(position(), "Parsing object literal methods");
+				if (state.is(TokenType.LParen)) throw new ParserNotImplemented(position(), "object literal methods");
 				state.require(TokenType.Colon);
 				consumeAllLineTerminators();
 				entries.add(ObjectExpression.computedKeyEntry(keyExpression, parseSpecAssignmentExpression()));
@@ -1008,24 +1008,24 @@ public final class Parser {
 		while (!state.is(TokenType.RBrace)) {
 			consumeAllSeparators();
 			if (state.optional(TokenType.Static))
-				throw new ParserNotImplemented(position(), "Parsing class `static` initialization blocks / methods / fields");
+				throw new ParserNotImplemented(position(), "class `static` initialization blocks / methods / fields");
 			if (state.optional(TokenType.Star))
-				throw new ParserNotImplemented(position(), "Parsing class generator methods");
+				throw new ParserNotImplemented(position(), "class generator methods");
 
 			if (!state.token.matchClassElementName()) {
 				if (state.is(TokenType.Hashtag))
-					throw new ParserNotImplemented(position(), "Parsing private class fields");
+					throw new ParserNotImplemented(position(), "private class fields");
 
 				throw state.unexpected();
 			}
 
 			final SourcePosition elementStart = position();
 			if (state.optional(TokenType.Async))
-				throw new ParserNotImplemented(position(), "Parsing class async methods");
+				throw new ParserNotImplemented(position(), "class async methods");
 
 			// FIXME: Methods named get / set
 			if (state.optional(TokenType.Identifier, "get") || state.optional(TokenType.Identifier, "set"))
-				throw new ParserNotImplemented(position(), "Parsing class getter / setters");
+				throw new ParserNotImplemented(position(), "class getter / setters");
 
 			// TODO: Remove duplication with parseObjectExpression
 			final Expression name;

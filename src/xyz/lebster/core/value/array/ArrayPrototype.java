@@ -41,6 +41,7 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.concat, 1, ArrayPrototype::concat);
 		putMethod(intrinsics, Names.entries, 0, ArrayPrototype::entries);
 		putMethod(intrinsics, Names.every, 1, ArrayPrototype::every);
+		putMethod(intrinsics, Names.fill, 1, ArrayPrototype::fill);
 		putMethod(intrinsics, Names.filter, 1, ArrayPrototype::filter);
 		putMethod(intrinsics, Names.find, 1, ArrayPrototype::find);
 		putMethod(intrinsics, Names.findIndex, 1, ArrayPrototype::findIndex);
@@ -74,7 +75,6 @@ public final class ArrayPrototype extends ObjectValue {
 
 		// Not implemented yet:
 		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
-		putMethod(intrinsics, Names.fill, 1, ArrayPrototype::fill);
 		putMethod(intrinsics, Names.lastIndexOf, 1, ArrayPrototype::lastIndexOf);
 		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
 		putMethod(intrinsics, Names.toReversed, 0, ArrayPrototype::toReversed);
@@ -131,13 +131,46 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.fill")
-	private static ObjectValue fill(Interpreter interpreter, Value<?>[] arguments) {
+	private static ObjectValue fill(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.7 Array.prototype.fill ( value [ , start [ , end ] ] )
 		final Value<?> value = argument(0, arguments);
 		final Value<?> start = argument(1, arguments);
 		final Value<?> end = argument(2, arguments);
 
-		throw new NotImplemented("Array.prototype.fill");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// 3. Let relativeStart be ? ToIntegerOrInfinity(start).
+		final int relativeStart = toIntegerOrInfinity(interpreter, start);
+		// 4. If relativeStart = -∞, let k be 0.
+		int k;
+		if (relativeStart == Integer.MIN_VALUE) k = 0;
+		// 5. Else if relativeStart < 0, let k be max(len + relativeStart, 0).
+		else if (relativeStart < 0) k = Math.max(len + relativeStart, 0);
+		// 6. Else, let k be min(relativeStart, len).
+		else k = Math.min(relativeStart, len);
+		// 7. If end is undefined, let relativeEnd be len; else let relativeEnd be ? ToIntegerOrInfinity(end).
+		final int relativeEnd = end == Undefined.instance ? len : toIntegerOrInfinity(interpreter, end);
+		// 8. If relativeEnd = -∞, let final be 0.
+		final int final_;
+		if (relativeEnd == Integer.MIN_VALUE) final_ = 0;
+		// 9. Else if relativeEnd < 0, let final be max(len + relativeEnd, 0).
+		else if (relativeEnd < 0) final_ = Math.max(len + relativeEnd, 0);
+		// 10. Else, let final be min(relativeEnd, len).
+		else final_ = Math.min(relativeEnd, len);
+		// 11. Repeat, while k < final,
+		while (k < final_) {
+			// a. Let Pk be ! ToString(𝔽(k)).
+			final StringValue Pk = new StringValue(k);
+			// b. Perform ? Set(O, Pk, value, true).
+			O.set(interpreter, Pk, value/* FIXME:, true */);
+			// c. Set k to k + 1.
+			k += 1;
+		}
+
+		// 12. Return O.
+		return O;
 	}
 
 	@NonCompliant

@@ -130,8 +130,7 @@ public final class NumberPrototype extends ObjectValue {
 	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
 		// 21.1.3.4 Number.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
 
-		final NumberValue x = thisNumberValue(interpreter, interpreter.thisValue());
-		return new StringValue(x.toLocaleString());
+		throw new NotImplemented("Number.prototype.toLocaleString");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tostring")

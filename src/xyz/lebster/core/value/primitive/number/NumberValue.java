@@ -2,7 +2,6 @@ package xyz.lebster.core.value.primitive.number;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
-import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -11,6 +10,9 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public final class NumberValue extends PrimitiveValue<Double> {
 	public static final long TWO_TO_THE_31 = 2147483648L;
@@ -59,87 +61,13 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		if (d.isNaN()) return "NaN";
 		else if (d < 0.0) return "-" + stringValueOf(-d);
 		else if (d.isInfinite()) return "Infinity";
-		final String input = String.valueOf(d).toLowerCase();
-		int decimalPosition = -1;
-		int firstZeros = -1;
-		for (int i = 0; i < input.length(); i++) {
-			if (input.charAt(i) == '.') {
-				decimalPosition = i;
-			} else if (decimalPosition != -1) {
-				if (input.charAt(i) == '0') {
-					if (firstZeros == -1) {
-						firstZeros = i;
-					}
-				} else {
-					firstZeros = -1;
-				}
-			}
-		}
-
-		if (decimalPosition == -1 || firstZeros == -1) {
-			return input;
+		// Scientific notation is used if the number's magnitude (ignoring sign)
+		// is greater than or equal to 10^21 or less than 10^-6
+		if (d >= Math.pow(10, 21) || d < Math.pow(10, -6)) {
+			return String.valueOf(d).toLowerCase();
 		} else {
-			if (decimalPosition + 1 == firstZeros) {
-				return input.substring(0, decimalPosition);
-			} else {
-				return input.substring(0, firstZeros);
-			}
+			return new BigDecimal(d).setScale(17, RoundingMode.FLOOR).stripTrailingZeros().toPlainString();
 		}
-	}
-
-	@NonCompliant
-	private static String toLocaleString(Double d) {
-		if (d.isNaN()) return "NaN";
-		else if (d == 0.0) return "0";
-		else if (d < 0.0) return "-" + NumberValue.toLocaleString(-d);
-		else if (d.isInfinite()) return "Infinity";
-
-		final String input = String.valueOf(d);
-		int decimalPosition = -1;
-		int firstZeros = -1;
-		for (int i = 0; i < input.length(); i++) {
-			if (input.charAt(i) == '.') {
-				decimalPosition = i;
-			} else if (decimalPosition != -1) {
-				if (input.charAt(i) == '0') {
-					if (firstZeros == -1) {
-						firstZeros = i;
-					}
-				} else {
-					firstZeros = -1;
-				}
-			}
-		}
-
-		String str;
-		if (decimalPosition == -1 || firstZeros == -1) {
-			str = input;
-		} else if (decimalPosition + 1 == firstZeros) {
-			str = input.substring(0, decimalPosition);
-		} else {
-			str = input.substring(0, firstZeros);
-		}
-
-		String afterDecimal = "";
-		StringBuilder output = new StringBuilder();
-		boolean isDecimal = str.contains(".");
-
-		if (isDecimal) {
-			int charPos = str.indexOf(".");
-			afterDecimal = str.substring(charPos);
-			str = str.substring(0, charPos);
-		}
-
-		int i = str.length();
-		for (; i > 2; i -= 3) {
-			output.insert(0, str.substring(i - 3, i) + ',');
-		}
-
-		if (i > 0) {
-			output.insert(0, str.substring(0, i) + ',');
-		}
-
-		return output.substring(0, output.length() - 1) + afterDecimal;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-sameValueZero")
@@ -253,10 +181,5 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		// 4. If x is the same Number value as y, return true.
 		// 5. Return false.
 		return this.value.doubleValue() == y.value.doubleValue();
-	}
-
-	@NonStandard
-	public String toLocaleString() {
-		return NumberValue.toLocaleString(this.value);
 	}
 }

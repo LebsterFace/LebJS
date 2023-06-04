@@ -39,10 +39,8 @@ public final class ArrayPrototype extends ObjectValue {
 		super(intrinsics);
 		putMethod(intrinsics, Names.at, 1, ArrayPrototype::at);
 		putMethod(intrinsics, Names.concat, 1, ArrayPrototype::concat);
-		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
 		putMethod(intrinsics, Names.entries, 0, ArrayPrototype::entries);
 		putMethod(intrinsics, Names.every, 1, ArrayPrototype::every);
-		putMethod(intrinsics, Names.fill, 1, ArrayPrototype::fill);
 		putMethod(intrinsics, Names.filter, 1, ArrayPrototype::filter);
 		putMethod(intrinsics, Names.find, 1, ArrayPrototype::find);
 		putMethod(intrinsics, Names.findIndex, 1, ArrayPrototype::findIndex);
@@ -51,29 +49,122 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.flat, 0, ArrayPrototype::flat);
 		putMethod(intrinsics, Names.flatMap, 1, ArrayPrototype::flatMap);
 		putMethod(intrinsics, Names.forEach, 1, ArrayPrototype::forEach);
-		putMethod(intrinsics, Names.group, 1, ArrayPrototype::group);
-		putMethod(intrinsics, Names.groupToMap, 1, ArrayPrototype::groupToMap);
 		putMethod(intrinsics, Names.includes, 1, ArrayPrototype::includes);
 		putMethod(intrinsics, Names.indexOf, 1, ArrayPrototype::indexOf);
 		putMethod(intrinsics, Names.join, 1, ArrayPrototype::join);
 		putMethod(intrinsics, Names.keys, 0, ArrayPrototype::keys);
-		putMethod(intrinsics, Names.lastIndexOf, 1, ArrayPrototype::lastIndexOf);
 		putMethod(intrinsics, Names.map, 1, ArrayPrototype::map);
 		putMethod(intrinsics, Names.pop, 0, ArrayPrototype::pop);
 		putMethod(intrinsics, Names.push, 1, ArrayPrototype::push);
 		putMethod(intrinsics, Names.reduce, 1, ArrayPrototype::reduce);
-		putMethod(intrinsics, Names.reduceRight, 1, ArrayPrototype::reduceRight);
 		putMethod(intrinsics, Names.reverse, 0, ArrayPrototype::reverse);
 		putMethod(intrinsics, Names.shift, 0, ArrayPrototype::shift);
 		putMethod(intrinsics, Names.slice, 2, ArrayPrototype::slice);
 		putMethod(intrinsics, Names.some, 1, ArrayPrototype::some);
 		putMethod(intrinsics, Names.sort, 1, ArrayPrototype::sort);
 		putMethod(intrinsics, Names.splice, 2, ArrayPrototype::splice);
-		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
 		putMethod(intrinsics, Names.toString, 0, ArrayPrototype::toStringMethod);
 		putMethod(intrinsics, Names.unshift, 1, ArrayPrototype::unshift);
 		final NativeFunction values = putMethod(intrinsics, Names.values, 0, ArrayPrototype::values);
 		put(SymbolValue.iterator, values);
+
+		// TODO: Follow new proposal spec: https://tc39.es/proposal-array-grouping/
+		putMethod(intrinsics, Names.group, 1, ArrayPrototype::group);
+
+		// Not implemented yet:
+		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
+		putMethod(intrinsics, Names.fill, 1, ArrayPrototype::fill);
+		putMethod(intrinsics, Names.lastIndexOf, 1, ArrayPrototype::lastIndexOf);
+		putMethod(intrinsics, Names.reduceRight, 1, ArrayPrototype::reduceRight);
+		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
+		putMethod(intrinsics, Names.toReversed, 0, ArrayPrototype::toReversed);
+		putMethod(intrinsics, Names.toSorted, 1, ArrayPrototype::toSorted);
+		putMethod(intrinsics, Names.toSpliced, 2, ArrayPrototype::toSpliced);
+		putMethod(intrinsics, Names.with, 2, ArrayPrototype::with);
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.toreversed")
+	private static ArrayObject toReversed(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.33 Array.prototype.toReversed ( )
+
+		throw new NotImplemented("Array.prototype.toReversed");
+	}
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tosorted")
+	private static ArrayObject toSorted(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.34 Array.prototype.toSorted ( comparefn )
+		final Value<?> comparefn = argument(0, arguments);
+
+		throw new NotImplemented("Array.prototype.toSorted");
+	}
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tospliced")
+	private static ArrayObject toSpliced(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.35 Array.prototype.toSpliced ( start, skipCount, ...items )
+		final Value<?> start = argument(0, arguments);
+		final Value<?> skipCount = argument(1, arguments);
+		final Value<?>[] items = argumentRest(2, arguments);
+
+		throw new NotImplemented("Array.prototype.toSpliced");
+	}
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.with")
+	private static ArrayObject with(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.39 Array.prototype.with ( index, value )
+		final Value<?> index = argument(0, arguments);
+		final Value<?> value = argument(1, arguments);
+
+		throw new NotImplemented("Array.prototype.with");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.copywithin")
+	private static ObjectValue copyWithin(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.4 Array.prototype.copyWithin ( target, start [ , end ] )
+		final Value<?> target = argument(0, arguments);
+		final Value<?> start = argument(1, arguments);
+		final Value<?> end = argument(2, arguments);
+
+		throw new NotImplemented("Array.prototype.copyWithin");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.fill")
+	private static ObjectValue fill(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.7 Array.prototype.fill ( value [ , start [ , end ] ] )
+		final Value<?> value = argument(0, arguments);
+		final Value<?> start = argument(1, arguments);
+		final Value<?> end = argument(2, arguments);
+
+		throw new NotImplemented("Array.prototype.fill");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.lastindexof")
+	private static NumberValue lastIndexOf(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.20 Array.prototype.lastIndexOf ( searchElement [ , fromIndex ] )
+		final Value<?> searchElement = argument(0, arguments);
+		final Value<?> fromIndex = argument(1, arguments);
+
+		throw new NotImplemented("Array.prototype.lastIndexOf");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reduceright")
+	private static Value<?> reduceRight(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.25 Array.prototype.reduceRight ( callbackfn [ , initialValue ] )
+		final Value<?> callbackfn = argument(0, arguments);
+		final Value<?> initialValue = argument(1, arguments);
+
+		throw new NotImplemented("Array.prototype.reduceRight");
+	}
+
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tolocalestring")
+	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] arguments) {
+		// 23.1.3.32 Array.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
+		throw new NotImplemented("Array.prototype.toLocaleString()");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.concat")
@@ -157,17 +248,6 @@ public final class ArrayPrototype extends ObjectValue {
 		return O.get(interpreter, new StringValue(k));
 	}
 
-	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.copywithin")
-	private static Value<?> copyWithin(Interpreter interpreter, Value<?>[] arguments) {
-		// 23.1.3.4 Array.prototype.copyWithin ( target, start [ , end ] )
-		final Value<?> target = argument(0, arguments);
-		final Value<?> start = argument(1, arguments);
-		final Value<?> end = argument(2, arguments);
-
-		throw new NotImplemented("Array.prototype.copyWithin");
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.entries")
 	private static Value<?> entries(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.5 Array.prototype.entries ( )
@@ -210,17 +290,6 @@ public final class ArrayPrototype extends ObjectValue {
 
 		// 6. Return true.
 		return BooleanValue.TRUE;
-	}
-
-	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.fill")
-	private static Value<?> fill(Interpreter interpreter, Value<?>[] arguments) {
-		// 23.1.3.7 Array.prototype.fill ( value [ , start [ , end ] ] )
-		final Value<?> value = argument(0, arguments);
-		final Value<?> start = argument(1, arguments);
-		final Value<?> end = argument(2, arguments);
-
-		throw new NotImplemented("Array.prototype.fill");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.find")
@@ -462,17 +531,6 @@ public final class ArrayPrototype extends ObjectValue {
 		return A;
 	}
 
-	@NonCompliant
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-array.prototype.grouptomap")
-	private static Value<?> groupToMap(Interpreter interpreter, Value<?>[] arguments) {
-		// 2.2 Array.prototype.groupToMap ( callbackfn [ , thisArg ] )
-		final Value<?> callbackfn = argument(0, arguments);
-		final Value<?> thisArg = argument(1, arguments);
-
-		throw new NotImplemented("Array.prototype.groupToMap");
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.indexof")
 	private static NumberValue indexOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.17 Array.prototype.indexOf ( searchElement [ , fromIndex ] )
@@ -535,26 +593,6 @@ public final class ArrayPrototype extends ObjectValue {
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Return CreateArrayIterator(O, key).
 		return new ArrayIterator(interpreter, O, true, false);
-	}
-
-	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.lastindexof")
-	private static NumberValue lastIndexOf(Interpreter interpreter, Value<?>[] arguments) {
-		// 23.1.3.20 Array.prototype.lastIndexOf ( searchElement [ , fromIndex ] )
-		final Value<?> searchElement = argument(0, arguments);
-		final Value<?> fromIndex = argument(1, arguments);
-
-		throw new NotImplemented("Array.prototype.lastIndexOf");
-	}
-
-	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reduceright")
-	private static Value<?> reduceRight(Interpreter interpreter, Value<?>[] arguments) {
-		// 23.1.3.25 Array.prototype.reduceRight ( callbackfn [ , initialValue ] )
-		final Value<?> callbackfn = argument(0, arguments);
-		final Value<?> initialValue = argument(1, arguments);
-
-		throw new NotImplemented("Array.prototype.reduceRight");
 	}
 
 	@NonCompliant
@@ -847,13 +885,6 @@ public final class ArrayPrototype extends ObjectValue {
 		O.set(interpreter, Names.length, new NumberValue(len - actualDeleteCount + itemCount)/* FIXME: , true */);
 		// 21. Return A.
 		return new ArrayObject(interpreter, A);
-	}
-
-	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tolocalestring")
-	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] arguments) {
-		// 23.1.3.32 Array.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
-		throw new NotImplemented("Array.prototype.toLocaleString");
 	}
 
 	@NonCompliant
@@ -1214,6 +1245,8 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tostring")
 	private static Value<?> toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.36 Array.prototype.toString ( )
+
 		// 1. Let array be ? ToObject(this value).
 		final ObjectValue array = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let func be ? Get(array, "join").
@@ -1380,9 +1413,9 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.reverse")
-	// TODO: Non-mutating Array.prototype.reverse*d*
 	private static ObjectValue reverse(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.24 Array.prototype.reverse ( )
+
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
 		// 2. Let len be ? LengthOfArrayLike(O).

@@ -107,7 +107,7 @@ public final class DumpBuilder {
 	}
 
 	public void container(ExpressionList expressionList) {
-		if (expressionList == null || expressionList.isEmpty()) return;
+		if (expressionList == null || expressionList.isEmpty()) missing("Children");
 		expressionList.dump(indentation + 1);
 	}
 

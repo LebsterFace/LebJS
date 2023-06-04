@@ -209,6 +209,9 @@ public final class Names {
 	public static final StringValue toLocaleUpperCase = new StringValue("toLocaleUpperCase");
 	public static final StringValue toLowerCase = new StringValue("toLowerCase");
 	public static final StringValue toPrimitive = new StringValue("toPrimitive");
+	public static final StringValue toReversed = new StringValue("toReversed");
+	public static final StringValue toSorted = new StringValue("toSorted");
+	public static final StringValue toSpliced = new StringValue("toSpliced");
 	public static final StringValue toString = new StringValue("toString");
 	public static final StringValue toStringTag = new StringValue("toStringTag");
 	public static final StringValue toUpperCase = new StringValue("toUpperCase");
@@ -225,6 +228,7 @@ public final class Names {
 	public static final StringValue valueOf = new StringValue("valueOf");
 	public static final StringValue values = new StringValue("values");
 	public static final StringValue warn = new StringValue("warn");
+	public static final StringValue with = new StringValue("with");
 	public static final StringValue writable = new StringValue("writable");
 	public static final StringValue write = new StringValue("write");
 

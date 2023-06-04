@@ -490,7 +490,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 5. Assert: If fromIndex is undefined, then n is 0.
 		// 6. If n = +∞, return -1𝔽.
 		if (n == Integer.MAX_VALUE) return NumberValue.MINUS_ONE;
-		// 7. Else if n = -∞, set n to 0.
+			// 7. Else if n = -∞, set n to 0.
 		else if (n == Integer.MIN_VALUE) n = 0;
 		// 8. If n ≥ 0, then
 		int k;
@@ -559,10 +559,57 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.shift")
-	private static Value<?> shift(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> shift(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.27 Array.prototype.shift ( )
 
-		throw new NotImplemented("Array.prototype.shift");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// 3. If len = 0, then
+		if (len == 0) {
+			// a. Perform ? Set(O, "length", +0𝔽, true).
+			O.set(interpreter, Names.length, NumberValue.ZERO/* FIXME: , true */);
+			// b. Return undefined.
+			return Undefined.instance;
+		}
+
+		// 4. Let first be ? Get(O, "0").
+		final Value<?> first = O.get(interpreter, new StringValue("0"));
+		// 5. Let k be 1.
+		int k = 1;
+		// 6. Repeat, while k < len,
+		while (k < len) {
+			// a. Let `from` be ! ToString(𝔽(k)).
+			final StringValue from = new StringValue(k);
+			// b. Let `to` be ! ToString(𝔽(k - 1)).
+			final StringValue to = new StringValue(k - 1);
+			// c. Let fromPresent be ? HasProperty(O, from).
+			final boolean fromPresent = O.hasProperty(from);
+			// d. If fromPresent is true, then
+			if (fromPresent) {
+				// i. Let fromVal be ? Get(O, from).
+				final Value<?> fromVal = O.get(interpreter, from);
+				// ii. Perform ? Set(O, to, fromVal, true).
+				O.set(interpreter, to, fromVal/* FIXME: , true */);
+			}
+			// e. Else,
+			else {
+				// i. Assert: fromPresent is false.
+				// ii. Perform ? DeletePropertyOrThrow(O, to).
+				O.deletePropertyOrThrow(interpreter, to);
+			}
+
+			// f. Set k to k + 1.
+			k += 1;
+		}
+
+		// 7. Perform ? DeletePropertyOrThrow(O, ! ToString(𝔽(len - 1))).
+		O.deletePropertyOrThrow(interpreter, new StringValue(len - 1));
+		// 8. Perform ? Set(O, "length", 𝔽(len - 1), true).
+		O.set(interpreter, Names.length, new NumberValue(len - 1)/* FIXME: , true */);
+		// 9. Return first.
+		return first;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.some")

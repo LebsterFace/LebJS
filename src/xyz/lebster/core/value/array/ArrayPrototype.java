@@ -54,6 +54,7 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.indexOf, 1, ArrayPrototype::indexOf);
 		putMethod(intrinsics, Names.join, 1, ArrayPrototype::join);
 		putMethod(intrinsics, Names.keys, 0, ArrayPrototype::keys);
+		putMethod(intrinsics, Names.lastIndexOf, 1, ArrayPrototype::lastIndexOf);
 		putMethod(intrinsics, Names.map, 1, ArrayPrototype::map);
 		putMethod(intrinsics, Names.pop, 0, ArrayPrototype::pop);
 		putMethod(intrinsics, Names.push, 1, ArrayPrototype::push);
@@ -75,7 +76,6 @@ public final class ArrayPrototype extends ObjectValue {
 
 		// Not implemented yet:
 		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
-		putMethod(intrinsics, Names.lastIndexOf, 1, ArrayPrototype::lastIndexOf);
 		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
 		putMethod(intrinsics, Names.toReversed, 0, ArrayPrototype::toReversed);
 		putMethod(intrinsics, Names.toSorted, 1, ArrayPrototype::toSorted);
@@ -90,6 +90,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 		throw new NotImplemented("Array.prototype.toReversed");
 	}
+
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tosorted")
 	private static ArrayObject toSorted(Interpreter interpreter, Value<?>[] arguments) {
@@ -98,6 +99,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 		throw new NotImplemented("Array.prototype.toSorted");
 	}
+
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tospliced")
 	private static ArrayObject toSpliced(Interpreter interpreter, Value<?>[] arguments) {
@@ -108,6 +110,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 		throw new NotImplemented("Array.prototype.toSpliced");
 	}
+
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.with")
 	private static ArrayObject with(Interpreter interpreter, Value<?>[] arguments) {
@@ -146,18 +149,18 @@ public final class ArrayPrototype extends ObjectValue {
 		// 4. If relativeStart = -∞, let k be 0.
 		int k;
 		if (relativeStart == Integer.MIN_VALUE) k = 0;
-		// 5. Else if relativeStart < 0, let k be max(len + relativeStart, 0).
+			// 5. Else if relativeStart < 0, let k be max(len + relativeStart, 0).
 		else if (relativeStart < 0) k = Math.max(len + relativeStart, 0);
-		// 6. Else, let k be min(relativeStart, len).
+			// 6. Else, let k be min(relativeStart, len).
 		else k = Math.min(relativeStart, len);
 		// 7. If end is undefined, let relativeEnd be len; else let relativeEnd be ? ToIntegerOrInfinity(end).
 		final int relativeEnd = end == Undefined.instance ? len : toIntegerOrInfinity(interpreter, end);
 		// 8. If relativeEnd = -∞, let final be 0.
 		final int final_;
 		if (relativeEnd == Integer.MIN_VALUE) final_ = 0;
-		// 9. Else if relativeEnd < 0, let final be max(len + relativeEnd, 0).
+			// 9. Else if relativeEnd < 0, let final be max(len + relativeEnd, 0).
 		else if (relativeEnd < 0) final_ = Math.max(len + relativeEnd, 0);
-		// 10. Else, let final be min(relativeEnd, len).
+			// 10. Else, let final be min(relativeEnd, len).
 		else final_ = Math.min(relativeEnd, len);
 		// 11. Repeat, while k < final,
 		while (k < final_) {
@@ -175,12 +178,43 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.lastindexof")
-	private static NumberValue lastIndexOf(Interpreter interpreter, Value<?>[] arguments) {
+	private static NumberValue lastIndexOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.20 Array.prototype.lastIndexOf ( searchElement [ , fromIndex ] )
 		final Value<?> searchElement = argument(0, arguments);
 		final Value<?> fromIndex = argument(1, arguments);
 
-		throw new NotImplemented("Array.prototype.lastIndexOf");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// 3. If len = 0, return -1𝔽.
+		if (len == 0) return NumberValue.MINUS_ONE;
+		// 4. If fromIndex is present, let n be ? ToIntegerOrInfinity(fromIndex); else let n be len - 1.
+		final int n = fromIndex != Undefined.instance ? toIntegerOrInfinity(interpreter, fromIndex) : len - 1;
+		// 5. If n = -∞, return -1𝔽.
+		if (n == Integer.MIN_VALUE) return NumberValue.MINUS_ONE;
+		// 6. If n ≥ 0, then a. Let k be min(n, len - 1).
+		// 7. Else, a. Let k be len + n.
+		int k = n >= 0 ? Math.min(n, len - 1) : len + n;
+		// 8. Repeat, while k ≥ 0,
+		while (k >= 0) {
+			// a. Let kPresent be ? HasProperty(O, ! ToString(𝔽(k))).
+			final StringValue Pk = new StringValue(k);
+			final boolean kPresent = O.hasProperty(Pk);
+			// b. If kPresent is true, then
+			if (kPresent) {
+				// i. Let elementK be ? Get(O, ! ToString(𝔽(k))).
+				final Value<?> elementK = O.get(interpreter, Pk);
+				// ii. If IsStrictlyEqual(searchElement, elementK) is true, return 𝔽(k).
+				if (searchElement.equals(elementK)) return new NumberValue(k);
+			}
+
+			// c. Set k to k - 1.
+			k -= 1;
+		}
+
+		// 9. Return -1𝔽.
+		return NumberValue.MINUS_ONE;
 	}
 
 	@NonCompliant
@@ -854,9 +888,9 @@ public final class ArrayPrototype extends ObjectValue {
 		// 4. If relativeStart = -∞, let actualStart be 0.
 		final int actualStart;
 		if (relativeStart == Integer.MIN_VALUE) actualStart = 0;
-		// 5. Else if relativeStart < 0, let actualStart be max(len + relativeStart, 0).
+			// 5. Else if relativeStart < 0, let actualStart be max(len + relativeStart, 0).
 		else if (relativeStart < 0) actualStart = Math.max(len + relativeStart, 0);
-		// 6. Else, let actualStart be min(relativeStart, len).
+			// 6. Else, let actualStart be min(relativeStart, len).
 		else actualStart = Math.min(relativeStart, len);
 		// 7. Let itemCount be the number of elements in items.
 		final int itemCount = items.length;

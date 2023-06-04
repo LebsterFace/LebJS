@@ -463,6 +463,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		return properties;
 	}
 
+	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-sortindexedproperties")
 	public final ObjectValue sortIndexedProperties(Interpreter interpreter, long len, NativeCode SortCompare) throws AbruptCompletion {
 		// 23.1.3.30.1 SortIndexedProperties ( obj, len, SortCompare )
@@ -537,6 +538,17 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 
 		// 9. Return obj.
 		return this;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isconcatspreadable")
+	public boolean isConcatSpreadable(Interpreter interpreter) throws AbruptCompletion {
+		// 1. If O is not an Object, return false.
+		// 2. Let spreadable be ? Get(O, @@isConcatSpreadable).
+		final Value<?> spreadable = this.get(interpreter, SymbolValue.isConcatSpreadable);
+		// 3. If spreadable is not undefined, return ToBoolean(spreadable).
+		if (spreadable != Undefined.instance) return spreadable.isTruthy(interpreter);
+		// TODO: 4. Return ? IsArray(O).
+		return this instanceof ArrayObject;
 	}
 
 	protected enum EnumerableOwnPropertyNamesKind { KEY, VALUE, KEY_VALUE }

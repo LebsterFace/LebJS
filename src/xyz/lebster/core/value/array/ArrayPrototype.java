@@ -76,6 +76,67 @@ public final class ArrayPrototype extends ObjectValue {
 		put(SymbolValue.iterator, values);
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.concat")
+	private static ArrayObject concat(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 23.1.3.2 Array.prototype.concat ( ...items )
+
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// TODO: 2. Let A be ? ArraySpeciesCreate(O, 0).
+		final ArrayObject A = new ArrayObject(interpreter);
+		// 3. Let n be 0.
+		int n = 0;
+		// 4. Prepend O to items.
+		final Value<?>[] items = new Value<?>[arguments.length + 1];
+		items[0] = O;
+		System.arraycopy(arguments, 0, items, 1, arguments.length);
+		// 5. For each element E of items, do
+		for (final Value<?> E : items) {
+			// a. Let spreadable be ? IsConcatSpreadable(E).
+			// b. If spreadable is true, then
+			if (E instanceof final ObjectValue object && object.isConcatSpreadable(interpreter)) {
+				// i. Let len be ? LengthOfArrayLike(E).
+				final int len = lengthOfArrayLike(interpreter, object);
+				// TODO: ii. If n + len > 2^53 - 1, throw a TypeError exception.
+				// iii. Let k be 0.
+				int k = 0;
+				// iv. Repeat, while k < len,
+				while (k < len) {
+					// 1. Let P be ! ToString(𝔽(k)).
+					final StringValue P = new StringValue(k);
+					// 2. Let exists be ? HasProperty(E, P).
+					final boolean exists = object.hasProperty(P);
+					// 3. If exists is true, then
+					if (exists) {
+						// a. Let subElement be ? Get(E, P).
+						final Value<?> subElement = object.get(interpreter, P);
+						// b. Perform ? CreateDataPropertyOrThrow(A, ! ToString(𝔽(n)), subElement).
+						A.set(interpreter, new StringValue(n), subElement);
+					}
+
+					// 4. Set n to n + 1.
+					n += 1;
+					// 5. Set k to k + 1.
+					k += 1;
+				}
+			}
+			// c. Else,
+			else {
+				// i. NOTE: E is added as a single item rather than spread.
+				// TODO: ii. If n ≥ 2^53 - 1, throw a TypeError exception.
+				// FIXME: iii. Perform ? CreateDataPropertyOrThrow(A, ! ToString(𝔽(n)), E).
+				A.set(interpreter, new StringValue(n), E);
+				// iv. Set n to n + 1.
+				n += 1;
+			}
+		}
+
+		// 6. Perform ? Set(A, "length", 𝔽(n), true).
+		A.set(interpreter, Names.length, new NumberValue(n)/* FIXME: , true */);
+		// 7. Return A.
+		return A;
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.at")
 	private static Value<?> at(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.1 Array.prototype.at ( index )
@@ -94,13 +155,6 @@ public final class ArrayPrototype extends ObjectValue {
 		if (k < 0 || k >= len) return Undefined.instance;
 		// 7. Return ? Get(O, ! ToString(𝔽(k))).
 		return O.get(interpreter, new StringValue(k));
-	}
-
-	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.concat")
-	private static Value<?> concat(Interpreter interpreter, Value<?>[] items) {
-		// 23.1.3.2 Array.prototype.concat ( ...items )
-		throw new NotImplemented("Array.prototype.concat");
 	}
 
 	@NonCompliant
@@ -124,7 +178,6 @@ public final class ArrayPrototype extends ObjectValue {
 		return new ArrayIterator(interpreter, O, true, true);
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.every")
 	private static BooleanValue every(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.6 Array.prototype.every ( callbackfn [ , thisArg ] )
@@ -170,7 +223,6 @@ public final class ArrayPrototype extends ObjectValue {
 		throw new NotImplemented("Array.prototype.fill");
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.find")
 	private static Value<?> find(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.9 Array.prototype.find ( predicate [ , thisArg ] )
@@ -232,7 +284,6 @@ public final class ArrayPrototype extends ObjectValue {
 		return NumberValue.MINUS_ONE;
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findlast")
 	private static Value<?> findLast(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.11 Array.prototype.findLast ( predicate [ , thisArg ] )
@@ -263,7 +314,6 @@ public final class ArrayPrototype extends ObjectValue {
 		return Undefined.instance;
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.findlastindex")
 	private static Value<?> findLastIndex(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.12 Array.prototype.findLastIndex ( predicate [ , thisArg ] )
@@ -315,7 +365,7 @@ public final class ArrayPrototype extends ObjectValue {
 			if (depthNum < 0) depthNum = 0;
 		}
 
-		// 5. Let A be ? ArraySpeciesCreate(O, 0).
+		// TODO: 5. Let A be ? ArraySpeciesCreate(O, 0).
 		final ArrayObject A = new ArrayObject(interpreter);
 		// 6. Perform ? FlattenIntoArray(A, O, sourceLen, 0, depthNum).
 		flattenIntoArray(interpreter, A, O, sourceLen, 0, depthNum);
@@ -404,7 +454,7 @@ public final class ArrayPrototype extends ObjectValue {
 		final int sourceLen = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(mapperFunction) is false, throw a TypeError exception.
 		final Executable mapperFunction = Executable.getExecutable(interpreter, mapperFunction_);
-		// 4. Let A be ? ArraySpeciesCreate(O, 0).
+		// TODO: 4. Let A be ? ArraySpeciesCreate(O, 0).
 		final ArrayObject A = new ArrayObject(interpreter);
 		// 5. Perform ? FlattenIntoArray(A, O, sourceLen, 0, 1, mapperFunction, thisArg).
 		flattenIntoArray(interpreter, A, O, sourceLen, 0, 1, mapperFunction, thisArg);
@@ -626,6 +676,7 @@ public final class ArrayPrototype extends ObjectValue {
 		throw new NotImplemented("Array.prototype.toLocaleString");
 	}
 
+	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.unshift")
 	private static NumberValue unshift(Interpreter interpreter, Value<?>[] items) throws AbruptCompletion {
 		// 23.1.3.34 Array.prototype.unshift ( ...items )
@@ -638,9 +689,7 @@ public final class ArrayPrototype extends ObjectValue {
 		final int argCount = items.length;
 		// 4. If argCount > 0, then
 		if (argCount > 0) {
-			// a. If len + argCount > 2^53 - 1, throw a TypeError exception.
-			if (len + argCount > MAX_LENGTH)
-				throw error(new TypeError(interpreter, "Invalid array length"));
+			// TODO: a. If len + argCount > 2^53 - 1, throw a TypeError exception.
 			// b. Let k be len.
 			long k = len;
 			// c. Repeat, while k > 0,
@@ -795,7 +844,7 @@ public final class ArrayPrototype extends ObjectValue {
 		else final_ = Math.min(relativeEnd, len);
 		// 11. Let count be max(final - k, 0).
 		final long count = Math.max(final_ - k, 0);
-		// FIXME: 12. Let A be ? ArraySpeciesCreate(O, count).
+		// TODO: 12. Let A be ? ArraySpeciesCreate(O, count).
 		final Value<?>[] A = new Value<?>[(int) count];
 		// 13. Let n be 0.
 		int n = 0;
@@ -914,7 +963,7 @@ public final class ArrayPrototype extends ObjectValue {
 		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
-		// 4. Let A be ? ArraySpeciesCreate(O, 0).
+		// TODO: 4. Let A be ? ArraySpeciesCreate(O, 0).
 		final Value<?>[] A = new Value<?>[(int) len];
 		// 5. Let k be 0.
 		int k = 0;

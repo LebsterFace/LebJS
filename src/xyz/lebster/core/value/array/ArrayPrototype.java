@@ -14,7 +14,6 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
-import xyz.lebster.core.value.function.NativeCode;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
@@ -68,6 +67,7 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.sort, 1, ArrayPrototype::sort);
 		putMethod(intrinsics, Names.splice, 2, ArrayPrototype::splice);
 		putMethod(intrinsics, Names.toReversed, 0, ArrayPrototype::toReversed);
+		putMethod(intrinsics, Names.toSorted, 1, ArrayPrototype::toSorted);
 		putMethod(intrinsics, Names.toString, 0, ArrayPrototype::toStringMethod);
 		putMethod(intrinsics, Names.unshift, 1, ArrayPrototype::unshift);
 		putMethod(intrinsics, Names.with, 2, ArrayPrototype::with);
@@ -80,7 +80,6 @@ public final class ArrayPrototype extends ObjectValue {
 		// Not implemented yet:
 		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
 		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
-		putMethod(intrinsics, Names.toSorted, 1, ArrayPrototype::toSorted);
 		putMethod(intrinsics, Names.toSpliced, 2, ArrayPrototype::toSpliced);
 	}
 
@@ -117,11 +116,36 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tosorted")
-	private static ArrayObject toSorted(Interpreter interpreter, Value<?>[] arguments) {
+	private static ArrayObject toSorted(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.34 Array.prototype.toSorted ( comparefn )
-		final Value<?> comparefn = argument(0, arguments);
+		final Value<?> comparefn_ = argument(0, arguments);
 
-		throw new NotImplemented("Array.prototype.toSorted");
+		// 1. If comparefn is not undefined and IsCallable(comparefn) is false, throw a TypeError exception.
+		final Executable comparefn = comparefn_ == Undefined.instance ? null : Executable.getExecutable(interpreter, comparefn_);
+		// 2. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 3. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// TODO: 4. Let A be ? ArrayCreate(len).
+		final ArrayObject A = new ArrayObject(interpreter, len);
+		// 5. Let SortCompare be a new Abstract Closure with parameters (x, y) that captures comparefn
+		// and performs the following steps when called:
+		// a. Return ? CompareArrayElements(x, y, comparefn).
+		final ValueComparator SortCompare = (x, y) -> compareArrayElements(interpreter, x, y, comparefn);
+		// 6. Let sortedList be ? SortIndexedProperties(O, len, SortCompare, read-through-holes).
+		final List<Value<?>> sortedList = O.sortIndexedProperties(interpreter, len, SortCompare, false);
+		// 7. Let j be 0.
+		int j = 0;
+		// 8. Repeat, while j < len,
+		while (j < len) {
+			// FIXME: a. Perform ! CreateDataPropertyOrThrow(A, ! ToString(𝔽(j)), sortedList[j]).
+			A.set(interpreter, new StringValue(j), sortedList.get(j));
+			// b. Set j to j + 1.
+			j += 1;
+		}
+
+		// 9. Return A.
+		return A;
 	}
 
 	@NonCompliant
@@ -867,60 +891,89 @@ public final class ArrayPrototype extends ObjectValue {
 		return BooleanValue.FALSE;
 	}
 
-	@NonCompliant
+	@FunctionalInterface
+	public interface ValueComparator {
+		int compare(Value<?> x, Value<?> y) throws AbruptCompletion;
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.sort")
 	private static Value<?> sort(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.30 Array.prototype.sort ( comparefn )
-		final Value<?> comparefn = argument(0, arguments);
+		final Value<?> comparefn_ = argument(0, arguments);
 
 		// 1. If comparefn is not undefined and IsCallable(comparefn) is false, throw a TypeError exception.
-		if (comparefn != Undefined.instance && !(comparefn instanceof Executable)) {
-			throw Executable.notCallable(interpreter, comparefn);
-		}
-
+		final Executable comparefn = comparefn_ == Undefined.instance ? null : Executable.getExecutable(interpreter, comparefn_);
 		// 2. Let obj be ? ToObject(this value).
 		final ObjectValue obj = interpreter.thisValue().toObjectValue(interpreter);
 		// 3. Let len be ? LengthOfArrayLike(obj).
-		final long len = lengthOfArrayLike(interpreter, obj);
+		final int len = lengthOfArrayLike(interpreter, obj);
 		// 4. Let SortCompare be a new Abstract Closure with parameters (x, y) that captures comparefn and performs the following steps when called:
-		final NativeCode SortCompare = ($, arguments_) -> {
-			final Value<?> x = argument(0, arguments_);
-			final Value<?> y = argument(1, arguments_);
+		// a. Return ? CompareArrayElements(x, y, comparefn).
+		final ValueComparator SortCompare = (x, y) -> compareArrayElements(interpreter, x, y, comparefn);
+		// 5. Let sortedList be ? SortIndexedProperties(obj, len, SortCompare, skip-holes).
+		final List<Value<?>> sortedList = obj.sortIndexedProperties(interpreter, len, SortCompare, true);
+		// 6. Let itemCount be the number of elements in sortedList.
+		final int itemCount = sortedList.size();
+		// 7. Let j be 0.
+		int j = 0;
+		// 8. Repeat, while j < itemCount,
+		while (j < itemCount) {
+			// a. Perform ? Set(obj, ! ToString(𝔽(j)), sortedList[j], true).
+			obj.set(interpreter, new StringValue(j), sortedList.get(j)/* FIXME: , true */);
+			// b. Set j to j + 1.
+			j += 1;
+		}
 
-			// a. If x and y are both undefined, return +0𝔽.
-			if (x == Undefined.instance && y == Undefined.instance) return NumberValue.ZERO;
-			// b. If x is undefined, return 1𝔽.
-			if (x == Undefined.instance) return NumberValue.ONE;
-			// c. If y is undefined, return -1𝔽.
-			if (y == Undefined.instance) return NumberValue.MINUS_ONE;
-			// d. If comparefn is not undefined, then
-			if (comparefn instanceof final Executable executable) {
-				// i. Let v be ? ToNumber(? Call(comparefn, undefined, « x, y »)).
-				final NumberValue v = executable.call($, Undefined.instance, x, y).toNumberValue($);
-				// ii. If v is NaN, return +0𝔽.
-				if (v.value.isNaN()) return NumberValue.ZERO;
-				// iii. Return v.
-				return v;
-			}
+		// 9. NOTE: The call to SortIndexedProperties in step 5 uses skip-holes.
+		// The remaining indices are deleted to preserve the number of holes that were
+		// detected and excluded from the sort.
 
-			// e. Let xString be ? ToString(x).
-			final StringValue xString = x.toStringValue($);
-			// f. Let yString be ? ToString(y).
-			final StringValue yString = y.toStringValue($);
-			// g. Let xSmaller be ! IsLessThan(xString, yString, true).
-			final boolean xSmaller = isLessThan($, xString, yString, true).value;
-			// h. If xSmaller is true, return -1𝔽.
-			if (xSmaller) return NumberValue.MINUS_ONE;
-			// i. Let ySmaller be ! IsLessThan(yString, xString, true).
-			final boolean ySmaller = isLessThan($, yString, xString, true).value;
-			// j. If ySmaller is true, return 1𝔽.
-			if (ySmaller) return NumberValue.ONE;
-			// k. Return +0𝔽.
-			return NumberValue.ZERO;
-		};
+		// 10. Repeat, while j < len,
+		while (j < len) {
+			// a. Perform ? DeletePropertyOrThrow(obj, ! ToString(𝔽(j))).
+			obj.deletePropertyOrThrow(interpreter, new StringValue(j));
+			// b. Set j to j + 1.
+			j += 1;
+		}
 
-		// 5. Return ? SortIndexedProperties(obj, len, SortCompare).
-		return obj.sortIndexedProperties(interpreter, len, SortCompare);
+		// 11. Return obj.
+		return obj;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-comparearrayelements")
+	private static int compareArrayElements(Interpreter interpreter, Value<?> x, Value<?> y, Executable comparefn) throws AbruptCompletion {
+		// 23.1.3.30.2 CompareArrayElements ( x, y, comparefn )
+
+		// 1. If x and y are both undefined, return +0𝔽.
+		if (x == Undefined.instance && y == Undefined.instance) return 0;
+		// 2. If x is undefined, return 1𝔽.
+		if (x == Undefined.instance) return 1;
+		// 3. If y is undefined, return -1𝔽.
+		if (y == Undefined.instance) return -1;
+		// 4. If comparefn is not undefined, then
+		if (comparefn != null) {
+			// a. Let v be ? ToNumber(? Call(comparefn, undefined, « x, y »)).
+			final NumberValue v = comparefn.call(interpreter, Undefined.instance, x, y).toNumberValue(interpreter);
+			// b. If v is NaN, return +0𝔽.
+			if (v.value.isNaN()) return 0;
+			// c. Return v.
+			return v.value.intValue();
+		}
+
+		// 5. Let xString be ? ToString(x).
+		final StringValue xString = x.toStringValue(interpreter);
+		// 6. Let yString be ? ToString(y).
+		final StringValue yString = y.toStringValue(interpreter);
+		// 7. Let xSmaller be ! IsLessThan(xString, yString, true).
+		final boolean xSmaller = isLessThan(interpreter, xString, yString, true).isTruthy(interpreter);
+		// 8. If xSmaller is true, return -1𝔽.
+		if (xSmaller) return -1;
+		// 9. Let ySmaller be ! IsLessThan(yString, xString, true).
+		final boolean ySmaller = isLessThan(interpreter, yString, xString, true).isTruthy(interpreter);
+		// 10. If ySmaller is true, return 1𝔽.
+		if (ySmaller) return 1;
+		// 11. Return +0𝔽.
+		return 0;
 	}
 
 	@NonCompliant

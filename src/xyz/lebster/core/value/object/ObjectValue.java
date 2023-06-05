@@ -11,6 +11,7 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.*;
 import xyz.lebster.core.value.array.ArrayObject;
+import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.error.CheckedError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
@@ -463,10 +464,9 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		return properties;
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-sortindexedproperties")
-	public final ObjectValue sortIndexedProperties(Interpreter interpreter, long len, NativeCode SortCompare) throws AbruptCompletion {
-		// 23.1.3.30.1 SortIndexedProperties ( obj, len, SortCompare )
+	public final List<Value<?>> sortIndexedProperties(Interpreter interpreter, int len, ArrayPrototype.ValueComparator SortCompare, boolean skipHoles) throws AbruptCompletion {
+		// 23.1.3.30.1 SortIndexedProperties ( obj, len, SortCompare, holes )
 
 		// 1. Let items be a new empty List.
 		final ArrayList<Value<?>> items = new ArrayList<>();
@@ -475,69 +475,47 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		// 3. Repeat, while k < len,
 		while (k < len) {
 			// a. Let Pk be ! ToString(𝔽(k)).
-			final var Pk = new StringValue(k);
-			// b. Let kPresent be ? HasProperty(obj, Pk).
-			final var kPresent = this.hasProperty(Pk);
-			// c. If kPresent is true, then
-			if (kPresent) {
+			final StringValue Pk = new StringValue(k);
+			// b. If holes is skip-holes, then Let kRead be ? HasProperty(obj, Pk).
+			// c. Else, Let kRead be true.
+			final boolean kRead = !skipHoles || this.hasProperty(Pk);
+			// d. If kRead is true, then
+			if (kRead) {
 				// i. Let kValue be ? Get(obj, Pk).
-				final var kValue = this.get(interpreter, Pk);
+				final Value<?> kValue = this.get(interpreter, Pk);
 				// ii. Append kValue to items.
 				items.add(kValue);
 			}
 
-			// d. Set k to k + 1.
+			// e. Set k to k + 1.
 			k += 1;
 		}
 
-		// 4. Let itemCount be the number of elements in items.
-		final int itemCount = items.size();
-		// 5. Sort items using an implementation-defined sequence of calls to SortCompare.
-		// If any such call returns an abrupt completion, stop before performing any further calls to SortCompare and return that Completion Record.
+		// 4. Sort items using an implementation-defined sequence of calls to SortCompare.
 		try {
-			items.sort((Value<?> a, Value<?> b) -> {
-				Value<?> returnValue;
+			items.sort((x, y) -> {
 				try {
-					returnValue = SortCompare.execute(interpreter, new Value[] { a, b });
+					return SortCompare.compare(x, y);
 				} catch (AbruptCompletion e) {
-					if (e.type != AbruptCompletion.Type.Return) throw new RuntimeException(e);
-					returnValue = e.value;
-				}
+					if (e.type != AbruptCompletion.Type.Throw)
+						throw new ShouldNotHappen("SortCompare gave " + e);
 
-				if (returnValue instanceof final NumberValue numberValue) {
-					return (int) numberValue.value.doubleValue();
-				} else {
-					throw new ShouldNotHappen("SortCompare returned non-number");
+					// If any such call returns an abrupt completion,
+					// stop before performing any further calls to SortCompare
+					throw new RuntimeException(e);
 				}
 			});
-		} catch (RuntimeException runtimeException) {
-			if (runtimeException.getCause() instanceof final AbruptCompletion abruptCompletion) {
+		} catch (RuntimeException e) {
+			if (e.getCause() instanceof final AbruptCompletion abruptCompletion) {
+				// and return that Completion Record.
 				throw abruptCompletion;
 			} else {
-				throw runtimeException;
+				throw e;
 			}
 		}
 
-		// 6. Let j be 0.
-		int j = 0;
-		// 7. Repeat, while j < itemCount,
-		while (j < itemCount) {
-			// a. Perform ? Set(obj, ! ToString(𝔽(j)), items[j], true).
-			this.set(interpreter, new StringValue(j), items.get(j)/* FIXME: , true */);
-			// b. Set j to j + 1.
-			j += 1;
-		}
-
-		// 8. Repeat, while j < len,
-		while (j < len) {
-			// a. Perform ? DeletePropertyOrThrow(obj, ! ToString(𝔽(j))).
-			this.deletePropertyOrThrow(interpreter, new StringValue(j));
-			// b. Set j to j + 1.
-			j += 1;
-		}
-
-		// 9. Return obj.
-		return this;
+		// 5. Return items.
+		return items;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isconcatspreadable")

@@ -39,6 +39,7 @@ public final class ArrayPrototype extends ObjectValue {
 		super(intrinsics);
 		putMethod(intrinsics, Names.at, 1, ArrayPrototype::at);
 		putMethod(intrinsics, Names.concat, 1, ArrayPrototype::concat);
+		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
 		putMethod(intrinsics, Names.entries, 0, ArrayPrototype::entries);
 		putMethod(intrinsics, Names.every, 1, ArrayPrototype::every);
 		putMethod(intrinsics, Names.fill, 1, ArrayPrototype::fill);
@@ -66,8 +67,10 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.some, 1, ArrayPrototype::some);
 		putMethod(intrinsics, Names.sort, 1, ArrayPrototype::sort);
 		putMethod(intrinsics, Names.splice, 2, ArrayPrototype::splice);
+		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
 		putMethod(intrinsics, Names.toReversed, 0, ArrayPrototype::toReversed);
 		putMethod(intrinsics, Names.toSorted, 1, ArrayPrototype::toSorted);
+		putMethod(intrinsics, Names.toSpliced, 2, ArrayPrototype::toSpliced);
 		putMethod(intrinsics, Names.toString, 0, ArrayPrototype::toStringMethod);
 		putMethod(intrinsics, Names.unshift, 1, ArrayPrototype::unshift);
 		putMethod(intrinsics, Names.with, 2, ArrayPrototype::with);
@@ -76,11 +79,6 @@ public final class ArrayPrototype extends ObjectValue {
 
 		// TODO: Follow new proposal spec: https://tc39.es/proposal-array-grouping/
 		putMethod(intrinsics, Names.group, 1, ArrayPrototype::group);
-
-		// Not implemented yet:
-		putMethod(intrinsics, Names.copyWithin, 2, ArrayPrototype::copyWithin);
-		putMethod(intrinsics, Names.toLocaleString, 0, ArrayPrototype::toLocaleString);
-		putMethod(intrinsics, Names.toSpliced, 2, ArrayPrototype::toSpliced);
 	}
 
 	@NonCompliant
@@ -150,14 +148,97 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.tospliced")
-	private static ArrayObject toSpliced(Interpreter interpreter, Value<?>[] arguments) {
+	private static ArrayObject toSpliced(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.35 Array.prototype.toSpliced ( start, skipCount, ...items )
 		final Value<?> start = argument(0, arguments);
 		final Value<?> skipCount = argument(1, arguments);
 		final Value<?>[] items = argumentRest(2, arguments);
 
-		throw new NotImplemented("Array.prototype.toSpliced");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final int len = lengthOfArrayLike(interpreter, O);
+		// 3. Let relativeStart be ? ToIntegerOrInfinity(start).
+		final int relativeStart = toIntegerOrInfinity(interpreter, start);
+		// 4. If relativeStart is -∞, let actualStart be 0.
+		final int actualStart;
+		if (relativeStart == Integer.MIN_VALUE) actualStart = 0;
+			// 5. Else if relativeStart < 0, let actualStart be max(len + relativeStart, 0).
+		else if (relativeStart < 0) actualStart = Math.max(len + relativeStart, 0);
+			// 6. Else, let actualStart be min(relativeStart, len).
+		else actualStart = Math.min(relativeStart, len);
+		// 7. Let insertCount be the number of elements in items.
+		final int insertCount = items.length;
+		// 8. If start is not present, then
+		final int actualSkipCount;
+		if (start == Undefined.instance) {
+			// a. Let actualSkipCount be 0.
+			actualSkipCount = 0;
+		}
+		// 9. Else if skipCount is not present, then
+		else if (skipCount == Undefined.instance) {
+			// a. Let actualSkipCount be len - actualStart.
+			actualSkipCount = len - actualStart;
+		}
+		// 10. Else,
+		else {
+			// a. Let sc be ? ToIntegerOrInfinity(skipCount).
+			final int sc = toIntegerOrInfinity(interpreter, skipCount);
+			// b. Let actualSkipCount be the result of clamping sc between 0 and len - actualStart.
+			actualSkipCount = Math.max(0, Math.min(sc, len - actualStart));
+		}
+
+		// 11. Let newLen be len + insertCount - actualSkipCount.
+		final int newLen = len + insertCount - actualSkipCount;
+		// TODO: 12. If newLen > 2^53 - 1, throw a TypeError exception.
+		// 13. Let A be ? ArrayCreate(newLen).
+		final ArrayObject A = new ArrayObject(interpreter, newLen);
+		// 14. Let i be 0.
+		int i = 0;
+		// 15. Let r be actualStart + actualSkipCount.
+		int r = actualStart + actualSkipCount;
+		// 16. Repeat, while i < actualStart,
+		while (i < actualStart) {
+			// a. Let Pi be ! ToString(𝔽(i)).
+			final StringValue Pi = new StringValue(i);
+			// b. Let iValue be ? Get(O, Pi).
+			final Value<?> iValue = O.get(interpreter, Pi);
+			// TODO: c. Perform ! CreateDataPropertyOrThrow(A, Pi, iValue).
+			A.set(interpreter, Pi, iValue);
+			// d. Set i to i + 1.
+			i += 1;
+		}
+
+		// 17. For each element E of items, do
+		for (final Value<?> E : items) {
+			// a. Let Pi be ! ToString(𝔽(i)).
+			final StringValue Pi = new StringValue(i);
+			// TODO: b. Perform ! CreateDataPropertyOrThrow(A, Pi, E).
+			A.set(interpreter, Pi, E);
+			// c. Set i to i + 1.
+			i += 1;
+		}
+
+		// 18. Repeat, while i < newLen,
+		while (i < newLen) {
+			// a. Let Pi be ! ToString(𝔽(i)).
+			final StringValue Pi = new StringValue(i);
+			// b. Let `from` be ! ToString(𝔽(r)).
+			final StringValue from = new StringValue(r);
+			// c. Let fromValue be ? Get(O, from).
+			final Value<?> fromValue = O.get(interpreter, from);
+			// TODO: d. Perform ! CreateDataPropertyOrThrow(A, Pi, fromValue).
+			A.set(interpreter, Pi, fromValue);
+			// e. Set i to i + 1.
+			i += 1;
+			// f. Set r to r + 1.
+			r += 1;
+		}
+
+		// 19. Return A.
+		return A;
 	}
+
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.with")
 	private static ArrayObject with(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
@@ -216,27 +297,27 @@ public final class ArrayPrototype extends ObjectValue {
 		// 4. If relativeTarget = -∞, let to be 0.
 		long to;
 		if (relativeTarget == Integer.MIN_VALUE) to = 0;
-		// 5. Else if relativeTarget < 0, let to be max(len + relativeTarget, 0).
+			// 5. Else if relativeTarget < 0, let to be max(len + relativeTarget, 0).
 		else if (relativeTarget < 0) to = Math.max(len + relativeTarget, 0);
-		// 6. Else, let to be min(relativeTarget, len).
+			// 6. Else, let to be min(relativeTarget, len).
 		else to = Math.min(relativeTarget, len);
 		// 7. Let relativeStart be ? ToIntegerOrInfinity(start).
 		final int relativeStart = toIntegerOrInfinity(interpreter, start);
 		// 8. If relativeStart = -∞, let from be 0.
 		long from;
 		if (relativeStart == Integer.MIN_VALUE) from = 0;
-		// 9. Else if relativeStart < 0, let from be max(len + relativeStart, 0).
+			// 9. Else if relativeStart < 0, let from be max(len + relativeStart, 0).
 		else if (relativeStart < 0) from = Math.max(len + relativeStart, 0);
-		// 10. Else, let from be min(relativeStart, len).
+			// 10. Else, let from be min(relativeStart, len).
 		else from = Math.min(relativeStart, len);
 		// 11. If end is undefined, let relativeEnd be len; else let relativeEnd be ? ToIntegerOrInfinity(end).
 		final int relativeEnd = end == Undefined.instance ? (int) len : toIntegerOrInfinity(interpreter, end);
 		// 12. If relativeEnd = -∞, let final be 0.
 		final long finalIndex;
 		if (relativeEnd == Integer.MIN_VALUE) finalIndex = 0;
-		// 13. Else if relativeEnd < 0, let final be max(len + relativeEnd, 0).
+			// 13. Else if relativeEnd < 0, let final be max(len + relativeEnd, 0).
 		else if (relativeEnd < 0) finalIndex = Math.max(len + relativeEnd, 0);
-		// 14. Else, let final be min(relativeEnd, len).
+			// 14. Else, let final be min(relativeEnd, len).
 		else finalIndex = Math.min(relativeEnd, len);
 		// 15. Let count be min(final - from, len - to).
 		long count = Math.min(finalIndex - from, len - to);

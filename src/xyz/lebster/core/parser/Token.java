@@ -141,7 +141,6 @@ public final class Token {
 			   || type == Var
 			   || type == Void
 			   || type == While
-			   || type == With
 			   || type == Yield;
 	}
 
@@ -161,7 +160,6 @@ public final class Token {
 			   || type == Throw
 			   || type == Try
 			   || type == While
-			   || type == With
 			   || type == For
 			   || type == LBrace
 			   || type == Switch

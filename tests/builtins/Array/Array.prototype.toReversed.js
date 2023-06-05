@@ -11,10 +11,3 @@ const b = a.toReversed();
 Test.expect(false, b === a);
 Test.equals([1, 2, 3, 4, 5], a);
 Test.equals([5, 4, 3, 2, 1], b);
-
-/* TODO: is unscopable
-Test.expect(true, Array.prototype[Symbol.unscopables].toReversed);
-const array = [];
-with (array) {
-    Test.expectError("ReferenceError", "'toReversed' is not defined", () => toReversed);
-} */

@@ -30,10 +30,3 @@ c = 0;
 const holes = [1, , , "foo", , undefined, , ,];
 Test.expect(1, holes.findIndex(value => { c++; return value === undefined; }));
 Test.expect(2, c);
-
-/* TODO: is unscopable
-    Test.expect(true, Array.prototype[Symbol.unscopables].findIndex);
-    const array = [];
-    with (array) {
-        Test.expectError("ReferenceError", "'findIndex' is not defined", () => { findIndex; });
-    } */

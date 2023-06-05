@@ -72,12 +72,3 @@ Test.expect(1, Array.prototype.flatMap.length);
     [].flatMap(callable);
     Test.expect(false, called);
 }
-
-/* TODO: is unscopable
-{
-    Test.expect(true, Array.prototype[Symbol.unscopables].flatMap);
-    const array = [];
-    with (array) {
-        Test.expectError("ReferenceError", "'flatMap' is not defined", () => flatMap);
-    }
-} */

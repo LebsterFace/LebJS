@@ -14,12 +14,3 @@ Test.equals([4, 2, 3], [1, 2, 3].fill(4, -3, -2));
 Test.equals([1, 2, 3], [1, 2, 3].fill(4, NaN, NaN));
 Test.equals([1, 2, 3], [1, 2, 3].fill(4, 3, 5));
 Test.equals([4, 4, 4], Array(3).fill(4));
-
-/* TODO: is unscopable
-{
-	Test.expect(true, Array.prototype[Symbol.unscopables].fill);
-	const array = [];
-	with (array) {
-		Test.expectError("ReferenceError", "'fill' is not defined", () => fill);
-	}
-} */

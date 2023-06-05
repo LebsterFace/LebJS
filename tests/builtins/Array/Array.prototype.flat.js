@@ -44,12 +44,3 @@ Test.expect(0, Array.prototype.flat.length); // length is 0
     Test.equals([1, 2, [3, 4, [5, 6, [7, 8]]]], array1.flat({}));
     Test.equals([1, 2, [3, 4, [5, 6, [7, 8]]]], array1.flat({ depth: 2 }));
 }
-
-/* TODO: is unscopable
-{
-    Test.expect(true, Array.prototype[Symbol.unscopables].flat);
-    const array = [];
-    with (array) {
-        Test.expectError("ReferenceError", "'flat' is not defined", () => flat);
-    }
-}); */

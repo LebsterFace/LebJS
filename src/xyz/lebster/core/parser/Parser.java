@@ -139,7 +139,6 @@ public final class Parser {
 	private Statement parseStatementOrExpression() throws SyntaxError, CannotParse {
 		return switch (state.token.type) {
 			case Import, Export -> throw new ParserNotImplemented(position(), "import / export statements");
-			case With -> throw new ParserNotImplemented(position(), "with statements");
 
 			case Function -> parseFunctionDeclaration();
 			case Semicolon -> new EmptyStatement();

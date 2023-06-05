@@ -43,15 +43,3 @@ Test.expect(0, Array.prototype.values.length);
     a.push(3);
     Test.equals({ value: undefined, done: true }, it.next());
 }
-
-/* TODO:
-// is unscopable
-{
-    expect(Array.prototype[Symbol.unscopables].values).toBeTrue();
-    const array = [];
-    with (array) {
-        expect(() => {
-            values;
-        }).toThrowWithMessage(ReferenceError, "'values' is not defined");
-    }
-} */

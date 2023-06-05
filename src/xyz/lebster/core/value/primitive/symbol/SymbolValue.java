@@ -76,11 +76,6 @@ public final class SymbolValue extends Key<Void> {
 	 * Accessed by the built-in method Object.prototype.toString.
 	 */
 	public static final SymbolValue toStringTag = new SymbolValue(Names.SymbolDotToStringTag);
-	/**
-	 * An object valued property whose own and inherited property names are property names that are excluded
-	 * from the with environment bindings of the associated object.
-	 */
-	public static final SymbolValue unscopables = new SymbolValue(Names.SymbolDotUnscopables);
 
 	private static int LAST_UNUSED_IDENTIFIER = 0;
 	public final StringValue description;

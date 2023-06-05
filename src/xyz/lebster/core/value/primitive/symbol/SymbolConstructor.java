@@ -26,7 +26,6 @@ public final class SymbolConstructor extends PrimitiveConstructor {
 		put(Names.split, SymbolValue.split, false, false, false);
 		put(Names.toPrimitive, SymbolValue.toPrimitive, false, false, false);
 		put(Names.toStringTag, SymbolValue.toStringTag, false, false, false);
-		put(Names.unscopables, SymbolValue.unscopables, false, false, false);
 	}
 
 	@Override

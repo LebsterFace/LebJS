@@ -42,10 +42,3 @@ Test.expect(2, Array.prototype.copyWithin.length);
     Test.equals(array, b);
     Test.equals([1, 2, 1], array);
 }
-
-/* TODO: is unscopable
-Test.expect(true, Array.prototype[Symbol.unscopables].copyWithin);
-const array = [];
-with (array) {
-    Test.expectError("ReferenceError", "'copyWithin' is not defined", () => copyWithin);
-} */

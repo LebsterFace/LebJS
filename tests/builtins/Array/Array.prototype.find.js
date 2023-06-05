@@ -30,10 +30,3 @@ c = 0;
 const holes = [1, , , "foo", , undefined, , ,];
 Test.expect(undefined, holes.find(value => { c++; return value === undefined; }));
 Test.expect(2, c);
-
-/* TODO: is unscopable
-    Test.expect(true, Array.prototype[Symbol.unscopables].find);
-    const array = [];
-    with (array) {
-        Test.expectError("ReferenceError", "'find' is not defined", () => { find; });
-    } */

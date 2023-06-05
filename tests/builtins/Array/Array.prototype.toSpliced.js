@@ -82,10 +82,3 @@ Test.expectError("TypeError", "Cannot convert null to object", () => Array.proto
 		Test.equals(expected, b);
 	}
 }
-
-/* TODO: is unscopable
-Test.expect(true, Array.prototype[Symbol.unscopables].toSpliced);
-const array = [];
-with (array) {
-	Test.expectError("ReferenceError", "'toSpliced' is not defined", () => toSpliced);
-} */

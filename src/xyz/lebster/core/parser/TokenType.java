@@ -117,6 +117,5 @@ public enum TokenType {
 	Var,
 	Void,
 	While,
-	With,
 	Yield
 }

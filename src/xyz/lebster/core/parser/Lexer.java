@@ -54,7 +54,6 @@ public final class Lexer {
 		keywords.put("var", TokenType.Var);
 		keywords.put("void", TokenType.Void);
 		keywords.put("while", TokenType.While);
-		keywords.put("with", TokenType.With);
 		keywords.put("yield", TokenType.Yield);
 		// TODO: get / set keywords
 

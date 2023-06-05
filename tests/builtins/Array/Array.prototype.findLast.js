@@ -32,10 +32,3 @@ c = 0;
 const holes = [1, , , "foo", , undefined, , , 6];
 Test.expect(undefined, holes.findLast(value => { c++; return value === undefined; }));
 Test.expect(2, c);
-
-/* TODO: is unscopable
-    Test.expect(true, Array.prototype[Symbol.unscopables].findLast);
-    const array = [];
-    with (array) {
-        Test.expectError("ReferenceError", "'findLast' is not defined", () => { findLast; });
-    } */

@@ -25,10 +25,3 @@ Test.expectError("TypeError", "'foo' is not a function", () => [].toSorted("foo"
 	Test.equals([2, 4, 1, 3, 5], a);
 	Test.equals([2, 4, 1, 3, 5], b);
 }
-
-/* TODO: is unscopable
-Test.expect(true, Array.prototype[Symbol.unscopables].toSorted);
-const array = [];
-with (array) {
-	Test.expectError("ReferenceError", "'toSorted' is not defined", () => toSorted);
-} */

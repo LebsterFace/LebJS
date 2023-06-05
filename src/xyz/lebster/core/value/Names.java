@@ -41,7 +41,6 @@ public final class Names {
 	public static final StringValue SymbolDotSplit = new StringValue("Symbol.split");
 	public static final StringValue SymbolDotToPrimitive = new StringValue("Symbol.toPrimitive");
 	public static final StringValue SymbolDotToStringTag = new StringValue("Symbol.toStringTag");
-	public static final StringValue SymbolDotUnscopables = new StringValue("Symbol.unscopables");
 	public static final StringValue Test = new StringValue("Test");
 	public static final StringValue TypeError = new StringValue("TypeError");
 	public static final StringValue __TestResults__ = new StringValue("__TestResults__");
@@ -222,7 +221,6 @@ public final class Names {
 	public static final StringValue trunc = new StringValue("trunc");
 	public static final StringValue undefined = new StringValue("undefined");
 	public static final StringValue union = new StringValue("union");
-	public static final StringValue unscopables = new StringValue("unscopables");
 	public static final StringValue unshift = new StringValue("unshift");
 	public static final StringValue value = new StringValue("value");
 	public static final StringValue valueOf = new StringValue("valueOf");

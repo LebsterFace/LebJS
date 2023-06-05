@@ -201,13 +201,91 @@ public final class ArrayPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.copywithin")
-	private static ObjectValue copyWithin(Interpreter interpreter, Value<?>[] arguments) {
+	private static ObjectValue copyWithin(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.4 Array.prototype.copyWithin ( target, start [ , end ] )
 		final Value<?> target = argument(0, arguments);
 		final Value<?> start = argument(1, arguments);
 		final Value<?> end = argument(2, arguments);
 
-		throw new NotImplemented("Array.prototype.copyWithin");
+		// 1. Let O be ? ToObject(this value).
+		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
+		// 2. Let len be ? LengthOfArrayLike(O).
+		final long len = lengthOfArrayLike(interpreter, O);
+		// 3. Let relativeTarget be ? ToIntegerOrInfinity(target).
+		final int relativeTarget = toIntegerOrInfinity(interpreter, target);
+		// 4. If relativeTarget = -∞, let to be 0.
+		long to;
+		if (relativeTarget == Integer.MIN_VALUE) to = 0;
+		// 5. Else if relativeTarget < 0, let to be max(len + relativeTarget, 0).
+		else if (relativeTarget < 0) to = Math.max(len + relativeTarget, 0);
+		// 6. Else, let to be min(relativeTarget, len).
+		else to = Math.min(relativeTarget, len);
+		// 7. Let relativeStart be ? ToIntegerOrInfinity(start).
+		final int relativeStart = toIntegerOrInfinity(interpreter, start);
+		// 8. If relativeStart = -∞, let from be 0.
+		long from;
+		if (relativeStart == Integer.MIN_VALUE) from = 0;
+		// 9. Else if relativeStart < 0, let from be max(len + relativeStart, 0).
+		else if (relativeStart < 0) from = Math.max(len + relativeStart, 0);
+		// 10. Else, let from be min(relativeStart, len).
+		else from = Math.min(relativeStart, len);
+		// 11. If end is undefined, let relativeEnd be len; else let relativeEnd be ? ToIntegerOrInfinity(end).
+		final int relativeEnd = end == Undefined.instance ? (int) len : toIntegerOrInfinity(interpreter, end);
+		// 12. If relativeEnd = -∞, let final be 0.
+		final long finalIndex;
+		if (relativeEnd == Integer.MIN_VALUE) finalIndex = 0;
+		// 13. Else if relativeEnd < 0, let final be max(len + relativeEnd, 0).
+		else if (relativeEnd < 0) finalIndex = Math.max(len + relativeEnd, 0);
+		// 14. Else, let final be min(relativeEnd, len).
+		else finalIndex = Math.min(relativeEnd, len);
+		// 15. Let count be min(final - from, len - to).
+		long count = Math.min(finalIndex - from, len - to);
+
+		// 16. If from < to and to < from + count, then
+		final int direction;
+		if (from < to && to < from + count) {
+			// a. Let direction be -1.
+			direction = -1;
+			// b. Set from to from + count - 1.
+			from += count - 1;
+			// c. Set to to to + count - 1.
+			to += count - 1;
+		} else {
+			// 17. Else,
+			// a. Let direction be 1.
+			direction = 1;
+		}
+
+		// 18. Repeat, while count > 0,
+		while (count > 0) {
+			// a. Let fromKey be ! ToString(𝔽(from)).
+			final StringValue fromKey = new StringValue(from);
+			// b. Let toKey be ! ToString(𝔽(to)).
+			final StringValue toKey = new StringValue(to);
+			// c. Let fromPresent be ? HasProperty(O, fromKey).
+			final boolean fromPresent = O.hasProperty(fromKey);
+			// d. If fromPresent is true, then
+			if (fromPresent) {
+				// i. Let fromVal be ? Get(O, fromKey).
+				final Value<?> fromVal = O.get(interpreter, fromKey);
+				// ii. Perform ? Set(O, toKey, fromVal, true).
+				O.set(interpreter, toKey, fromVal/* FIXME:, true */);
+			} else {
+				// e. Else,
+				// i. Assert: fromPresent is false.
+				// ii. Perform ? DeletePropertyOrThrow(O, toKey).
+				O.deletePropertyOrThrow(interpreter, toKey);
+			}
+			// f. Set from to from + direction.
+			from += direction;
+			// g. Set to to to + direction.
+			to += direction;
+			// h. Set count to count - 1.
+			count -= 1;
+		}
+
+		// 19. Return O.
+		return O;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.fill")

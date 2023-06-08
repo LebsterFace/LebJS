@@ -116,12 +116,14 @@ public final class Names {
 	public static final StringValue globalThis = new StringValue("globalThis");
 	public static final StringValue group = new StringValue("group");
 	public static final StringValue groupToMap = new StringValue("groupToMap");
+	public static final StringValue groups = new StringValue("groups");
 	public static final StringValue has = new StringValue("has");
 	public static final StringValue hasInstance = new StringValue("hasInstance");
 	public static final StringValue hasOwnProperty = new StringValue("hasOwnProperty");
 	public static final StringValue hasProperty = new StringValue("hasProperty");
 	public static final StringValue hypot = new StringValue("hypot");
 	public static final StringValue includes = new StringValue("includes");
+	public static final StringValue index = new StringValue("index");
 	public static final StringValue indexOf = new StringValue("indexOf");
 	public static final StringValue info = new StringValue("info");
 	public static final StringValue input = new StringValue("input");

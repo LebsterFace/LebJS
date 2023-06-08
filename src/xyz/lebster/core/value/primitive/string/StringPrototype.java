@@ -14,15 +14,18 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
+import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
+import xyz.lebster.core.value.regexp.RegExpObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.PrimitiveIterator;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
@@ -31,6 +34,7 @@ import static xyz.lebster.core.value.object.ObjectPrototype.requireObjectCoercib
 import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
 import static xyz.lebster.core.value.primitive.number.NumberPrototype.toLength;
 import static xyz.lebster.core.value.primitive.number.NumberValue.UINT32_LIMIT;
+import static xyz.lebster.core.value.regexp.RegExpPrototype.isRegExp;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-string-prototype-object")
 public final class StringPrototype extends ObjectValue {
@@ -147,8 +151,11 @@ public final class StringPrototype extends ObjectValue {
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 
-		// FIXME: 3. Let isRegExp be ? IsRegExp(searchString).
-		//        4. If isRegExp is true, throw a TypeError exception.
+		// 3. Let isRegExp be ? IsRegExp(searchString).
+		final boolean isRegExp = isRegExp(interpreter, searchString);
+		// 4. If isRegExp is true, throw a TypeError exception.
+		if (isRegExp)
+			throw error(new TypeError(interpreter, "First argument to String.prototype.endsWith must not be a regular expression"));
 
 		// 5. Let searchStr be ? ToString(searchString).
 		final String searchStr = searchString.toStringValue(interpreter).value;
@@ -173,7 +180,6 @@ public final class StringPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.includes")
-	@NonCompliant
 	private static BooleanValue includes(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 22.1.3.8 String.prototype.includes ( searchString [ , position ] )
 		final Value<?> searchString = argument(0, arguments);
@@ -184,8 +190,11 @@ public final class StringPrototype extends ObjectValue {
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 
-		// FIXME: 3. Let isRegExp be ? IsRegExp(searchString).
-		//        4. If isRegExp is true, throw a TypeError exception.
+		// 3. Let isRegExp be ? IsRegExp(searchString).
+		final boolean isRegExp = isRegExp(interpreter, searchString);
+		// 4. If isRegExp is true, throw a TypeError exception.
+		if (isRegExp)
+			throw error(new TypeError(interpreter, "First argument to String.prototype.includes must not be a regular expression"));
 
 		// 5. Let searchStr be ? ToString(searchString).
 		final String searchStr = searchString.toStringValue(interpreter).value;
@@ -270,11 +279,64 @@ public final class StringPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.match")
-	private static Value<?> match(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> match(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 22.1.3.12 String.prototype.match ( regexp )
 		final Value<?> regexp = argument(0, arguments);
 
-		throw new NotImplemented("String.prototype.match");
+		if (!(regexp instanceof final RegExpObject re)) {
+			throw new NotImplemented("String.prototype.match for non RegExp objects");
+		}
+
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.match");
+		final StringValue S = O.toStringValue(interpreter);
+
+		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match#return_value
+		final Matcher matcher = re.pattern.matcher(S.value);
+		if (!matcher.find()) return Null.instance;
+
+		if (re.isGlobal()) {
+			// If the g flag is used, all results matching the complete regular expression
+			// will be returned, but capturing groups are not included.
+			final ArrayList<StringValue> results = new ArrayList<>();
+			do {
+				results.add(new StringValue(matcher.group()));
+			} while (matcher.find());
+
+			return new ArrayObject(interpreter, results);
+		} else {
+			final StringValue[] elements = new StringValue[matcher.groupCount() + 1];
+			// The returned array has the matched text as the first item, and then
+			// one item for each capturing group of the matched text.
+			for (int i = 0; i < matcher.groupCount() + 1; i++) {
+				elements[i] = new StringValue(matcher.group(i));
+			}
+
+			final ArrayObject result = new ArrayObject(interpreter, elements);
+
+			// The array also has the following additional properties:
+			// index - The 0-based index of the match in the string.
+			result.set(interpreter, Names.index, new NumberValue(matcher.start()));
+			// input - The original string that was matched against.
+			result.set(interpreter, Names.input, S);
+			// groups - A null-prototype object of named capturing groups,
+			// whose keys are the names, and values are the capturing groups,
+			// or undefined if no named capturing groups were defined.
+			if (matcher.namedGroups().size() == 0) {
+				result.set(interpreter, Names.groups, Undefined.instance);
+			} else {
+				final ObjectValue groups = new ObjectValue(Null.instance);
+				for (final var entry : matcher.namedGroups().entrySet()) {
+					final StringValue key = new StringValue(entry.getKey());
+					final StringValue value = new StringValue(matcher.group(entry.getValue()));
+					groups.put(key, value);
+				}
+
+				result.set(interpreter, Names.groups, groups);
+			}
+
+			// TODO: other properties
+			return result;
+		}
 	}
 
 	@NonCompliant
@@ -494,8 +556,11 @@ public final class StringPrototype extends ObjectValue {
 		// 2. Let S be ? ToString(O).
 		final String S = O.toStringValue(interpreter).value;
 
-		// FIXME: 3. Let isRegExp be ? IsRegExp(searchString).
-		//         4. If isRegExp is true, throw a TypeError exception.
+		// 3. Let isRegExp be ? IsRegExp(searchString).
+		final boolean isRegExp = isRegExp(interpreter, searchString);
+		// 4. If isRegExp is true, throw a TypeError exception.
+		if (isRegExp)
+			throw error(new TypeError(interpreter, "First argument to String.prototype.startsWith must not be a regular expression"));
 
 		// 5. Let searchStr be ? ToString(searchString).
 		final String searchStr = searchString.toStringValue(interpreter).value;

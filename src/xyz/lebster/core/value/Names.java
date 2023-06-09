@@ -14,6 +14,7 @@ public final class Names {
 	public static final StringValue LN2 = new StringValue("LN2");
 	public static final StringValue LOG10E = new StringValue("LOG10E");
 	public static final StringValue LOG2E = new StringValue("LOG2E");
+	public static final StringValue Map = new StringValue("Map");
 	public static final StringValue Math = new StringValue("Math");
 	public static final StringValue NaN = new StringValue("NaN");
 	public static final StringValue Number = new StringValue("Number");

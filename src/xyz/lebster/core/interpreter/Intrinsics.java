@@ -17,6 +17,8 @@ import xyz.lebster.core.value.function.FunctionPrototype;
 import xyz.lebster.core.value.globals.ConsoleObject;
 import xyz.lebster.core.value.globals.MathObject;
 import xyz.lebster.core.value.globals.TestObject;
+import xyz.lebster.core.value.map.MapConstructor;
+import xyz.lebster.core.value.map.MapPrototype;
 import xyz.lebster.core.value.object.ObjectConstructor;
 import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -42,6 +44,8 @@ public final class Intrinsics {
 	public final BooleanPrototype booleanPrototype;
 	public final FunctionConstructor functionConstructor;
 	public final FunctionPrototype functionPrototype;
+	public final MapConstructor mapConstructor;
+	public final MapPrototype mapPrototype;
 	public final NumberConstructor numberConstructor;
 	public final NumberPrototype numberPrototype;
 	public final ObjectConstructor objectConstructor;
@@ -80,6 +84,7 @@ public final class Intrinsics {
 		linkPrototypeAndConstructor(arrayConstructor = new ArrayConstructor(this), arrayPrototype = new ArrayPrototype(this));
 		linkPrototypeAndConstructor(booleanConstructor = new BooleanConstructor(this), booleanPrototype = new BooleanPrototype(this));
 		linkPrototypeAndConstructor(errorConstructor = new ErrorConstructor(this), errorPrototype = new ErrorPrototype(this));
+		linkPrototypeAndConstructor(mapConstructor = new MapConstructor(this), mapPrototype = new MapPrototype(this));
 		linkPrototypeAndConstructor(numberConstructor = new NumberConstructor(this), numberPrototype = new NumberPrototype(this));
 		linkPrototypeAndConstructor(rangeErrorConstructor = new RangeErrorConstructor(this), rangeErrorPrototype = new RangeErrorPrototype(this));
 		linkPrototypeAndConstructor(referenceErrorConstructor = new ReferenceErrorConstructor(this), referenceErrorPrototype = new ReferenceErrorPrototype(this));

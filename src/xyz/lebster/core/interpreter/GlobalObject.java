@@ -48,15 +48,7 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.Boolean, intrinsics.booleanConstructor);
 		put(Names.Error, intrinsics.errorConstructor);
 		put(Names.Function, intrinsics.functionConstructor);
-		// 19.3.16 Int8Array
-		// put(Names.Int8Array, intrinsics.int8ArrayConstructor);
-		// 19.3.17 Int16Array
-		// put(Names.Int16Array, intrinsics.int16ArrayConstructor);
-		// 19.3.18 Int32Array
-		// put(Names.Int32Array, intrinsics.int32ArrayConstructor);
-		// 19.3.19 Map
-		// put(Names.Map, intrinsics.mapConstructor);
-		// 19.3.20 Number
+		put(Names.Map, intrinsics.mapConstructor);
 		put(Names.Number, intrinsics.numberConstructor);
 		put(Names.Object, intrinsics.objectConstructor);
 		put(Names.RangeError, intrinsics.rangeErrorConstructor);

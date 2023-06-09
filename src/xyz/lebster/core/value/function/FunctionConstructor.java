@@ -2,7 +2,6 @@ package xyz.lebster.core.value.function;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
-import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.BuiltinConstructor;
@@ -17,11 +16,6 @@ public class FunctionConstructor extends BuiltinConstructor<Function, FunctionPr
 	}
 
 	public Function construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) {
-		throw new NotImplemented("new Function()");
-	}
-
-	@Override
-	public Function internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
-		throw new NotImplemented("Function()");
+		throw new NotImplemented("The Function constructor");
 	}
 }

@@ -549,7 +549,7 @@ public final class ArrayPrototype extends ObjectValue {
 		for (final Value<?> E : items) {
 			// a. Let spreadable be ? IsConcatSpreadable(E).
 			// b. If spreadable is true, then
-			if (E instanceof final ObjectValue object && object.isConcatSpreadable(interpreter)) {
+			if (E instanceof final ObjectValue object && isConcatSpreadable(interpreter, object)) {
 				// i. Let len be ? LengthOfArrayLike(E).
 				final int len = lengthOfArrayLike(interpreter, object);
 				// TODO: ii. If n + len > 2^53 - 1, throw a TypeError exception.
@@ -590,6 +590,31 @@ public final class ArrayPrototype extends ObjectValue {
 		A.set(interpreter, Names.length, new NumberValue(n)/* FIXME: , true */);
 		// 7. Return A.
 		return A;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isconcatspreadable")
+	public static boolean isConcatSpreadable(Interpreter interpreter, ObjectValue O) throws AbruptCompletion {
+		// 23.1.3.2.1 IsConcatSpreadable ( O )
+
+		// 1. If O is not an Object, return false.
+		// 2. Let spreadable be ? Get(O, @@isConcatSpreadable).
+		final Value<?> spreadable = O.get(interpreter, SymbolValue.isConcatSpreadable);
+		// 3. If spreadable is not undefined, return ToBoolean(spreadable).
+		if (spreadable != Undefined.instance) return spreadable.isTruthy(interpreter);
+		// 4. Return ? IsArray(O).
+		return isArray(O);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isarray")
+	@NonCompliant
+	public static boolean isArray(Value<?> argument) {
+		// 7.2.2 IsArray ( argument )
+
+		// 1. If argument is not an Object, return false.
+		// 2. If argument is an Array exotic object, return true.
+		// TODO: 3. If argument is a Proxy exotic object, then...
+		// 4. Return false.
+		return argument instanceof ArrayObject;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.at")
@@ -841,8 +866,8 @@ public final class ArrayPrototype extends ObjectValue {
 				boolean shouldFlatten = false;
 				// iv. If depth > 0, then
 				if (depth > 0) {
-					// TODO: 1. Set shouldFlatten to ? IsArray(element).
-					shouldFlatten = element instanceof ArrayObject;
+					// 1. Set shouldFlatten to ? IsArray(element).
+					shouldFlatten = isArray(element);
 				}
 
 				// v. If shouldFlatten is true, then
@@ -1048,11 +1073,6 @@ public final class ArrayPrototype extends ObjectValue {
 
 		// 6. Return false.
 		return BooleanValue.FALSE;
-	}
-
-	@FunctionalInterface
-	public interface ValueComparator {
-		int compare(Value<?> x, Value<?> y) throws AbruptCompletion;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.sort")
@@ -1874,6 +1894,11 @@ public final class ArrayPrototype extends ObjectValue {
 
 		// 6. Return O.
 		return O;
+	}
+
+	@FunctionalInterface
+	public interface ValueComparator {
+		int compare(Value<?> x, Value<?> y) throws AbruptCompletion;
 	}
 
 	private record ArrayGroup(Key<?> key, ArrayList<Value<?>> elements) {

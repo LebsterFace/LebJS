@@ -9,9 +9,11 @@ import xyz.lebster.core.value.Displayable;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.object.*;
+import xyz.lebster.core.value.object.DataDescriptor;
+import xyz.lebster.core.value.object.Key;
+import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.object.PropertyDescriptor;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -38,12 +40,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 			}
 		}
 
-		value.put(Names.length, new AccessorDescriptor(
-			new NativeFunction(interpreter.intrinsics, StringValue.EMPTY, this::getLength, 0),
-			new NativeFunction(interpreter.intrinsics, StringValue.EMPTY, this::arraySetLength, 1),
-			false,
-			false
-		));
+		putAccessor(interpreter.intrinsics, Names.length, this::getLength, this::arraySetLength, false, false);
 	}
 
 	public <T extends Value<?>> ArrayObject(Interpreter interpreter, List<T> arrayValues) {

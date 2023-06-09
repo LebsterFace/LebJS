@@ -110,7 +110,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return UNIQUE_ID;
 	}
 
@@ -121,7 +121,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
-	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, PreferredType preferredType) throws AbruptCompletion {
+	public final PrimitiveValue<?> toPrimitive(Interpreter interpreter, PreferredType preferredType) throws AbruptCompletion {
 		// a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
 		final PropertyDescriptor exoticToPrim_property = this.getProperty(SymbolValue.toPrimitive);
 
@@ -188,7 +188,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	}
 
 	@Override
-	public ObjectValue toObjectValue(Interpreter interpreter) {
+	public final ObjectValue toObjectValue(Interpreter interpreter) {
 		return this;
 	}
 
@@ -248,7 +248,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 
 	@NonCompliant
 	// FIXME: `boolean throw` argument
-	public void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
+	public final void set(Interpreter interpreter, Key<?> key, Value<?> value) throws AbruptCompletion {
 		final PropertyDescriptor property = this.getOwnProperty(key);
 		if (property == null) {
 			this.defineOwnProperty(interpreter, key, new DataDescriptor(value, true, true, true));
@@ -263,7 +263,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getmethod")
-	public Executable getMethod(Interpreter interpreter, Key<?> P) throws AbruptCompletion {
+	public final Executable getMethod(Interpreter interpreter, Key<?> P) throws AbruptCompletion {
 		// 1. Let func be ? GetV(V, P).
 		final Value<?> func = get(interpreter, P);
 		// 2. If func is either undefined or null, return undefined.
@@ -328,37 +328,37 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinary-object-internal-methods-and-internal-slots-delete-p")
-	public boolean delete(Key<?> P) {
+	public final boolean delete(Key<?> P) {
 		// 10.1.10 [[Delete]] ( P )
 		// 1. Return ? OrdinaryDelete(O, P).
 		return this.ordinaryDelete(P);
 	}
 
-	public void put(Key<?> key, Value<?> value, boolean writable, boolean enumerable, boolean configurable) {
+	public final void put(Key<?> key, Value<?> value, boolean writable, boolean enumerable, boolean configurable) {
 		this.value.put(key, new DataDescriptor(value, writable, enumerable, configurable));
 	}
 
-	public void put(Key<?> key, Value<?> value) {
+	public final void put(Key<?> key, Value<?> value) {
 		this.value.put(key, new DataDescriptor(value, true, false, true));
 	}
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createbuiltinfunction")
-	protected NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, int length, NativeCode code, boolean writable, boolean enumerable, boolean configurable) {
+	protected final NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, int length, NativeCode code, boolean writable, boolean enumerable, boolean configurable) {
 		final var function = new NativeFunction(functionPrototype, key.toFunctionName(), code, length);
 		this.put(key, function, writable, enumerable, configurable);
 		return function;
 	}
 
-	protected NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, int length, NativeCode code) {
+	protected final NativeFunction putMethod(FunctionPrototype functionPrototype, Key<?> key, int length, NativeCode code) {
 		return putMethod(functionPrototype, key, length, code, true, false, true);
 	}
 
-	public NativeFunction putMethod(Intrinsics intrinsics, Key<?> key, int length, NativeCode code) {
+	public final NativeFunction putMethod(Intrinsics intrinsics, Key<?> key, int length, NativeCode code) {
 		return putMethod(intrinsics.functionPrototype, key, length, code, true, false, true);
 	}
 
-	public void putAccessor(Intrinsics intrinsics, Key<?> key, NativeCode getter, NativeCode setter, boolean enumerable, boolean configurable) {
+	public final void putAccessor(Intrinsics intrinsics, Key<?> key, NativeCode getter, NativeCode setter, boolean enumerable, boolean configurable) {
 		final NativeFunction getterFn = getter == null ? null : new NativeFunction(intrinsics, new StringValue("get " + key.toFunctionName()), getter, 0);
 		final NativeFunction setterFn = setter == null ? null : new NativeFunction(intrinsics, new StringValue("set " + key.toFunctionName()), setter, 1);
 
@@ -516,17 +516,6 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 
 		// 5. Return items.
 		return items;
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isconcatspreadable")
-	public boolean isConcatSpreadable(Interpreter interpreter) throws AbruptCompletion {
-		// 1. If O is not an Object, return false.
-		// 2. Let spreadable be ? Get(O, @@isConcatSpreadable).
-		final Value<?> spreadable = this.get(interpreter, SymbolValue.isConcatSpreadable);
-		// 3. If spreadable is not undefined, return ToBoolean(spreadable).
-		if (spreadable != Undefined.instance) return spreadable.isTruthy(interpreter);
-		// TODO: 4. Return ? IsArray(O).
-		return this instanceof ArrayObject;
 	}
 
 	protected enum EnumerableOwnPropertyNamesKind { KEY, VALUE, KEY_VALUE }

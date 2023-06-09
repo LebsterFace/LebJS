@@ -23,6 +23,7 @@ import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.IteratorHelper.iteratorValue;
+import static xyz.lebster.core.value.array.ArrayPrototype.isArray;
 import static xyz.lebster.core.value.array.ArrayPrototype.lengthOfArrayLike;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentInt;
@@ -33,7 +34,13 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 		super(intrinsics, Names.Array, 1);
 		putMethod(intrinsics, Names.of, 2, ArrayConstructor::of);
 		putMethod(intrinsics, Names.from, 1, ArrayConstructor::from);
-		putMethod(intrinsics, Names.isArray, 1, ArrayConstructor::isArray);
+		putMethod(intrinsics, Names.isArray, 1, (interpreter, arguments) -> {
+			// 23.1.2.2 Array.isArray ( arg )
+			final Value<?> arg = argument(0, arguments);
+
+			// 1. Return ? IsArray(arg).
+			return BooleanValue.of(isArray(arg));
+		});
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.from")
@@ -149,15 +156,6 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 		A.set(interpreter, Names.length, new NumberValue(len)/* FIXME: , true */);
 		// 14. Return A.
 		return A;
-	}
-
-	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isarray")
-	private static BooleanValue isArray(Interpreter interpreter, Value<?>[] arguments) {
-		// 7.2.2 IsArray ( argument )
-		final Value<?> argument = argument(0, arguments);
-
-		return BooleanValue.of(argument instanceof ArrayObject);
 	}
 
 	@NonStandard

@@ -11,7 +11,7 @@ import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-public interface AssignmentTarget extends Dumpable, Assignable, Declarable  {
+public interface AssignmentTarget extends Dumpable, Assignable, Declarable {
 	default Value<?> assign(Interpreter interpreter, Expression expression) throws AbruptCompletion {
 		return this.assign(interpreter, getValue(interpreter, expression));
 	}

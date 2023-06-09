@@ -4,11 +4,7 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.array.ArrayObject;
-import xyz.lebster.core.value.object.AccessorDescriptor;
-import xyz.lebster.core.value.object.DataDescriptor;
-import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.object.Key;
-import xyz.lebster.core.value.object.PropertyDescriptor;
+import xyz.lebster.core.value.object.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

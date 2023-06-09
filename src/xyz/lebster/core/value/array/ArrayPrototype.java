@@ -537,7 +537,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 		// 1. Let O be ? ToObject(this value).
 		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
-		// TODO: 2. Let A be ? ArraySpeciesCreate(O, 0).
+		// 2. Let A be ? ArraySpeciesCreate(O, 0).
 		final ArrayObject A = new ArrayObject(interpreter);
 		// 3. Let n be 0.
 		int n = 0;
@@ -823,7 +823,7 @@ public final class ArrayPrototype extends ObjectValue {
 			if (depthNum < 0) depthNum = 0;
 		}
 
-		// TODO: 5. Let A be ? ArraySpeciesCreate(O, 0).
+		// 5. Let A be ? ArraySpeciesCreate(O, 0).
 		final ArrayObject A = new ArrayObject(interpreter);
 		// 6. Perform ? FlattenIntoArray(A, O, sourceLen, 0, depthNum).
 		flattenIntoArray(interpreter, A, O, sourceLen, 0, depthNum);
@@ -912,7 +912,7 @@ public final class ArrayPrototype extends ObjectValue {
 		final int sourceLen = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(mapperFunction) is false, throw a TypeError exception.
 		final Executable mapperFunction = Executable.getExecutable(interpreter, mapperFunction_);
-		// TODO: 4. Let A be ? ArraySpeciesCreate(O, 0).
+		// 4. Let A be ? ArraySpeciesCreate(O, 0).
 		final ArrayObject A = new ArrayObject(interpreter);
 		// 5. Perform ? FlattenIntoArray(A, O, sourceLen, 0, 1, mapperFunction, thisArg).
 		flattenIntoArray(interpreter, A, O, sourceLen, 0, 1, mapperFunction, thisArg);
@@ -1198,7 +1198,7 @@ public final class ArrayPrototype extends ObjectValue {
 		}
 
 		// TODO: 11. If len + itemCount - actualDeleteCount > 2^53 - 1, throw a TypeError exception.
-		// TODO: 12. Let A be ? ArraySpeciesCreate(O, actualDeleteCount).
+		// 12. Let A be ? ArraySpeciesCreate(O, actualDeleteCount).
 		final Value<?>[] A = new Value<?>[actualDeleteCount];
 		// 13. Let k be 0.
 		int k = 0;
@@ -1468,7 +1468,7 @@ public final class ArrayPrototype extends ObjectValue {
 		else final_ = Math.min(relativeEnd, len);
 		// 11. Let count be max(final - k, 0).
 		final long count = Math.max(final_ - k, 0);
-		// TODO: 12. Let A be ? ArraySpeciesCreate(O, count).
+		// 12. Let A be ? ArraySpeciesCreate(O, count).
 		final Value<?>[] A = new Value<?>[(int) count];
 		// 13. Let n be 0.
 		int n = 0;
@@ -1587,7 +1587,7 @@ public final class ArrayPrototype extends ObjectValue {
 		final long len = lengthOfArrayLike(interpreter, O);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
-		// TODO: 4. Let A be ? ArraySpeciesCreate(O, 0).
+		// 4. Let A be ? ArraySpeciesCreate(O, 0).
 		final Value<?>[] A = new Value<?>[(int) len];
 		// 5. Let k be 0.
 		int k = 0;

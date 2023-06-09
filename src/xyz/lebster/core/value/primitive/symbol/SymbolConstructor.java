@@ -1,5 +1,6 @@
 package xyz.lebster.core.value.primitive.symbol;
 
+import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -11,6 +12,7 @@ import xyz.lebster.core.value.primitive.PrimitiveConstructor;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol-constructor")
+@NonStandard
 public final class SymbolConstructor extends PrimitiveConstructor {
 	public SymbolConstructor(Intrinsics functionPrototype) {
 		super(functionPrototype, Names.Symbol);
@@ -22,7 +24,6 @@ public final class SymbolConstructor extends PrimitiveConstructor {
 		put(Names.matchAll, SymbolValue.matchAll, false, false, false);
 		put(Names.replace, SymbolValue.replace, false, false, false);
 		put(Names.search, SymbolValue.search, false, false, false);
-		put(Names.species, SymbolValue.species, false, false, false);
 		put(Names.split, SymbolValue.split, false, false, false);
 		put(Names.toPrimitive, SymbolValue.toPrimitive, false, false, false);
 		put(Names.toStringTag, SymbolValue.toStringTag, false, false, false);

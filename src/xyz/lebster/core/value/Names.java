@@ -38,7 +38,6 @@ public final class Names {
 	public static final StringValue SymbolDotMatchAll = new StringValue("Symbol.matchAll");
 	public static final StringValue SymbolDotReplace = new StringValue("Symbol.replace");
 	public static final StringValue SymbolDotSearch = new StringValue("Symbol.search");
-	public static final StringValue SymbolDotSpecies = new StringValue("Symbol.species");
 	public static final StringValue SymbolDotSplit = new StringValue("Symbol.split");
 	public static final StringValue SymbolDotToPrimitive = new StringValue("Symbol.toPrimitive");
 	public static final StringValue SymbolDotToStringTag = new StringValue("Symbol.toStringTag");
@@ -195,7 +194,6 @@ public final class Names {
 	public static final StringValue slice = new StringValue("slice");
 	public static final StringValue some = new StringValue("some");
 	public static final StringValue sort = new StringValue("sort");
-	public static final StringValue species = new StringValue("species");
 	public static final StringValue splice = new StringValue("splice");
 	public static final StringValue split = new StringValue("split");
 	public static final StringValue sqrt = new StringValue("sqrt");

@@ -1,5 +1,6 @@
 package xyz.lebster.core.value.primitive.symbol;
 
+import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -15,6 +16,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-language-types-symbol-type")
+@NonStandard
 public final class SymbolValue extends Key<Void> {
 	// https://tc39.es/ecma262/multipage#table-well-known-symbols
 
@@ -57,10 +59,6 @@ public final class SymbolValue extends Key<Void> {
 	 * Called by the String.prototype.search method.
 	 */
 	public static final SymbolValue search = new SymbolValue(Names.SymbolDotSearch);
-	/**
-	 * A function valued property that is the constructor function that is used to create derived objects.
-	 */
-	public static final SymbolValue species = new SymbolValue(Names.SymbolDotSpecies);
 	/**
 	 * A regular expression method that splits a string at the indices that match the regular expression.
 	 * Called by the String.prototype.split method.

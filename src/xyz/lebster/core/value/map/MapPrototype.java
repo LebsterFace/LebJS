@@ -40,7 +40,7 @@ public final class MapPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.has, 1, MapPrototype::has);
 		putMethod(intrinsics, Names.keys, 0, MapPrototype::keys);
 		putMethod(intrinsics, Names.set, 2, MapPrototype::setMethod);
-		putAccessor(intrinsics, Names.size, MapPrototype::getSize, null, false, true);
+		putAccessor(intrinsics, Names.size, ($, __) -> requireMapData($, "size").getSize(), null, false, true);
 		putMethod(intrinsics, Names.values, 0, MapPrototype::values);
 		put(SymbolValue.iterator, entries);
 		put(SymbolValue.toStringTag, Names.Map, false, false, true);
@@ -212,25 +212,6 @@ public final class MapPrototype extends ObjectValue {
 		M.mapData.add(p);
 		// 7. Return M.
 		return M;
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-get-map.prototype.size")
-	private static NumberValue getSize(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 24.1.3.10 get Map.prototype.size
-
-		// 1. Let M be the `this` value.
-		// 2. Perform ? RequireInternalSlot(M, [[MapData]]).
-		final MapObject M = requireMapData(interpreter, "size");
-		// 3. Let count be 0.
-		int count = 0;
-		// 4. For each Record { [[Key]], [[Value]] } p of M.[[MapData]], do
-		for (final MapEntry p : M.mapData) {
-			// a. If p.[[Key]] is not empty, set count to count + 1.
-			if (p != null) count += 1;
-		}
-
-		// 5. Return 𝔽(count).
-		return new NumberValue(count);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-map.prototype.values")

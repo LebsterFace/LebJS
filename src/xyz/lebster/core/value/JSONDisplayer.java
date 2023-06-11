@@ -14,17 +14,10 @@ interface DisplayNode {
 	void display(boolean singleLine, StringRepresentation representation);
 }
 
-record AccessorNode(AccessorDescriptor descriptor) implements DisplayNode {
+record DisplayableNode(Displayable displayable) implements DisplayNode {
 	@Override
 	public void display(boolean singleLine, StringRepresentation representation) {
-		descriptor.display(representation);
-	}
-}
-
-record ValueNode(Value<?> value) implements DisplayNode {
-	@Override
-	public void display(boolean singleLine, StringRepresentation representation) {
-		value.display(representation);
+		displayable.display(representation);
 	}
 }
 
@@ -110,7 +103,7 @@ final class ObjectNode implements DisplayNode {
 
 		int emptyCount = 0;
 		while (valuesIt.hasNext()) {
-			final var next = valuesIt.next();
+			final DisplayNode next = valuesIt.next();
 			if (next == null) {
 				emptyCount++;
 				continue;
@@ -163,7 +156,7 @@ public final class JSONDisplayer {
 	public static void display(StringRepresentation representation, ObjectValue object) {
 		final var singleLine = new StringRepresentation();
 		final JSONDisplayer displayer = new JSONDisplayer();
-		final DisplayNode rootNode = displayer.buildTree(object);
+		final DisplayNode rootNode = displayer.buildTreeFromValue(object, false);
 		rootNode.display(true, singleLine);
 		if (singleLine.length() >= 72) {
 			rootNode.display(false, representation);
@@ -174,11 +167,11 @@ public final class JSONDisplayer {
 
 	public static void display(StringRepresentation representation, ObjectValue object, boolean singleLine, boolean forceJSON) {
 		final JSONDisplayer displayer = new JSONDisplayer();
-		final DisplayNode rootNode = displayer.buildTree(object, forceJSON);
+		final DisplayNode rootNode = displayer.buildTreeFromValue(object, forceJSON);
 		rootNode.display(singleLine, representation);
 	}
 
-	private DisplayNode buildTree(Value<?> current, boolean forceJSON) {
+	private DisplayNode buildTreeFromValue(Value<?> current, boolean forceJSON) {
 		if (current instanceof final ObjectValue currentObject && (forceJSON || currentObject.displayAsJSON())) {
 			final ObjectNode found = objects.get(currentObject);
 			if (found != null) {
@@ -195,32 +188,28 @@ public final class JSONDisplayer {
 			}
 
 			for (final Entry<Key<?>, PropertyDescriptor> entry : currentObject.displayableProperties()) {
-				final DisplayNode node = buildTree(entry.getValue());
+				DisplayNode node;
+				PropertyDescriptor value = entry.getValue();
+				if (value instanceof final DataDescriptor descriptor) {
+					node = buildTreeFromValue(descriptor.value(), false);
+				} else if (value instanceof final AccessorDescriptor descriptor) {
+					node = new DisplayableNode(descriptor);
+				} else {
+					throw new ShouldNotHappen("Displaying " + value.getClass().getSimpleName());
+				}
 				result.properties.put(entry.getKey(), node);
 			}
 
 			return result;
 		} else {
-			return new ValueNode(current);
+			return new DisplayableNode(current);
 		}
 	}
 
 	private DisplayNode buildTree(Displayable d) {
 		if (d == null) return null;
-		if (d instanceof final Value<?> value) return buildTree(value);
-		if (d instanceof final PropertyDescriptor descriptor) return buildTree(descriptor);
-		throw new ShouldNotHappen("Attempting to build tree for " + d.getClass().getSimpleName());
-	}
-
-	private DisplayNode buildTree(Value<?> current) {
-		return buildTree(current, false);
-	}
-
-	private DisplayNode buildTree(PropertyDescriptor value) {
-		if (value instanceof final DataDescriptor descriptor)
-			return buildTree(descriptor.value());
-		if (value instanceof final AccessorDescriptor descriptor)
-			return new AccessorNode(descriptor);
-		throw new ShouldNotHappen("Displaying " + value.getClass().getSimpleName());
+		if (d instanceof final Value<?> value) return buildTreeFromValue(value, false);
+		if (d instanceof final DataDescriptor descriptor) return buildTreeFromValue(descriptor.value(), false);
+		return new DisplayableNode(d);
 	}
 }

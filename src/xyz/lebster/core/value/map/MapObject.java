@@ -2,8 +2,11 @@ package xyz.lebster.core.value.map;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Intrinsics;
+import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.value.Displayable;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 
 import java.util.ArrayList;
 
@@ -11,7 +14,46 @@ import java.util.ArrayList;
 public final class MapObject extends ObjectValue {
 	public final ArrayList<MapEntry> mapData;
 
-	static final class MapEntry {
+	public MapObject(Intrinsics intrinsics, ArrayList<MapEntry> mapData) {
+		super(intrinsics.mapPrototype);
+		this.mapData = mapData;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-get-map.prototype.size")
+	NumberValue getSize() {
+		// 3. Let count be 0.
+		int count = 0;
+		// 4. For each Record { [[Key]], [[Value]] } p of M.[[MapData]], do
+		for (final MapEntry p : mapData) {
+			// a. If p.[[Key]] is not empty, set count to count + 1.
+			if (p != null) count += 1;
+		}
+
+		// 5. Return 𝔽(count).
+		return new NumberValue(count);
+	}
+
+	@Override
+	public Iterable<Displayable> displayableValues() {
+		final ArrayList<Displayable> result = new ArrayList<>(mapData.size());
+		for (final MapEntry p : mapData) {
+			if (p != null) {
+				result.add(p);
+			}
+		}
+
+		return result;
+	}
+
+	@Override
+	public void displayPrefix(StringRepresentation representation) {
+		representation.append("Map");
+		representation.append('(');
+		getSize().display(representation);
+		representation.append(')');
+	}
+
+	public static final class MapEntry implements Displayable {
 		public Value<?> key;
 		public Value<?> value;
 
@@ -19,11 +61,12 @@ public final class MapObject extends ObjectValue {
 			this.key = key;
 			this.value = value;
 		}
-	}
 
-
-	public MapObject(Intrinsics intrinsics, ArrayList<MapEntry> mapData) {
-		super(intrinsics.mapPrototype);
-		this.mapData = mapData;
+		@Override
+		public void display(StringRepresentation representation) {
+			key.display(representation);
+			representation.append(" => ");
+			value.display(representation);
+		}
 	}
 }

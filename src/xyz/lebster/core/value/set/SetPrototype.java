@@ -53,19 +53,12 @@ public final class SetPrototype extends ObjectValue {
 		put(Names.keys, values); // https://tc39.es/ecma262/multipage#sec-set.prototype.keys
 
 		put(SymbolValue.toStringTag, Names.Set, false, false, true);
-		putAccessor(intrinsics, Names.size, SetPrototype::getSize, null, false, true);
+		putAccessor(intrinsics, Names.size, ($, __) -> requireSetData($, "size").getSize(), null, false, true);
 	}
 
 	private static SetObject requireSetData(Interpreter interpreter, String methodName) throws AbruptCompletion {
 		if (interpreter.thisValue() instanceof final SetObject S) return S;
 		throw error(new TypeError(interpreter, "Set.prototype.%s requires that 'this' be a Set.".formatted(methodName)));
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-get-set.prototype.size")
-	public static NumberValue getSize(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 1. Let S be the `this` value.
-		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		return requireSetData(interpreter, "size").getSize();
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.add")

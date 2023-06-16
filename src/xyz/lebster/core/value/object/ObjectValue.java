@@ -110,6 +110,11 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	}
 
 	@Override
+	public boolean equals(Object o) {
+		return this == o;
+	}
+
+	@Override
 	public final int hashCode() {
 		return UNIQUE_ID;
 	}

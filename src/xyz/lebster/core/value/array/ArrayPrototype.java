@@ -441,7 +441,7 @@ public final class ArrayPrototype extends ObjectValue {
 				// i. Let elementK be ? Get(O, ! ToString(𝔽(k))).
 				final Value<?> elementK = O.get(interpreter, Pk);
 				// ii. If IsStrictlyEqual(searchElement, elementK) is true, return 𝔽(k).
-				if (searchElement.equals(elementK)) return new NumberValue(k);
+				if (searchElement.isStrictlyEqual(elementK)) return new NumberValue(k);
 			}
 
 			// c. Set k to k - 1.
@@ -963,7 +963,7 @@ public final class ArrayPrototype extends ObjectValue {
 				// i. Let elementK be ? Get(O, ! ToString(𝔽(k))).
 				final Value<?> elementK = O.get(interpreter, Pk);
 				// ii. If IsStrictlyEqual(searchElement, elementK) is true, return 𝔽(k).
-				if (searchElement.equals(elementK)) return new NumberValue(k);
+				if (searchElement.isStrictlyEqual(elementK)) return new NumberValue(k);
 			}
 
 			// c. Set k to k + 1.

@@ -2,6 +2,7 @@ package xyz.lebster.core.value.primitive.number;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
+import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -70,18 +71,12 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		}
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-sameValueZero")
-	public static boolean sameValueZero(NumberValue x, NumberValue y) {
-		// 6.1.6.1.15 Number::sameValueZero ( x, y )
-
-		// 1. If x is NaN and y is NaN, return true.
-		if (x.value.isNaN() && y.value.isNaN()) return true;
-		// 2. If x is +0𝔽 and y is -0𝔽, return true.
-		if (x.value == 0 && y.value == -0) return true;
-		// 3. If x is -0𝔽 and y is +0𝔽, return true.
-		// 4. If x is the same Number value as y, return true.
-		// 5. Return false.
-		return x.value.equals(y.value);
+	@NonStandard
+	public boolean isEqualTo(NumberValue y, boolean negative_zero_equals_zero, boolean NaN_equals_NaN) {
+		if (value.isNaN() && y.value.isNaN()) return NaN_equals_NaN;
+		if (isNegativeZero(value) && isPositiveZero(y.value)) return negative_zero_equals_zero;
+		if (isPositiveZero(value) && isNegativeZero(y.value)) return negative_zero_equals_zero;
+		return value.doubleValue() == y.value.doubleValue();
 	}
 
 	public String stringValueOf() {
@@ -168,18 +163,5 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		// 2. If y is NaN, return undefined.
 		if (this.value.isNaN() || other.value.isNaN()) return null;
 		return BooleanValue.of(this.value < other.value);
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-sameValue")
-	public boolean sameValue(NumberValue y) {
-		// 1. If x is NaN and y is NaN, return true.
-		if (this.value.isNaN() && y.value.isNaN()) return true;
-		// 2. If x is +0𝔽 and y is -0𝔽, return false.
-		if (isPositiveZero(this) && isNegativeZero(y)) return false;
-		// 3. If x is -0𝔽 and y is +0𝔽, return false.
-		if (isNegativeZero(this) && isPositiveZero(y)) return false;
-		// 4. If x is the same Number value as y, return true.
-		// 5. Return false.
-		return this.value.doubleValue() == y.value.doubleValue();
 	}
 }

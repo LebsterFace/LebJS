@@ -41,9 +41,9 @@ Test.expect(true, Array.prototype.isPrototypeOf([]));
     const baz = new Baz();
 
     // prototype chains:
-    // foo: Foo <- Object
-    // bar: Bar <- Foo <- Object
-    // baz: Baz <- Bar <- Foo <- Object
+    // foo: Foo -> Object
+    // bar: Bar -> Foo -> Object
+    // baz: Baz -> Bar -> Foo -> Object
     Test.expect(true, Baz.prototype.isPrototypeOf(baz));
     Test.expect(false, Baz.prototype.isPrototypeOf(bar));
     Test.expect(false, Baz.prototype.isPrototypeOf(foo));

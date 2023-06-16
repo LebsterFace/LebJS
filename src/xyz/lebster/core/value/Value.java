@@ -137,19 +137,16 @@ public abstract class Value<JType> implements Displayable {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevaluezero")
 	public boolean sameValueZero(Value<?> y) {
-		// 7.2.12 SameValueZero ( x, y )
-		// 1. If Type(x) is different from Type(y), return false.
-		if (!sameType(y)) return false;
-		// 2. If Type(x) is Number, then
-		if (this instanceof final NumberValue x) {
-			// a. Return Number::sameValueZero(x, y).
-			return NumberValue.sameValueZero(x, (NumberValue) y);
-		}
-		// TODO: 3. If Type(x) is BigInt, then
-		//           a. Return BigInt::sameValueZero(x, y).
+		// 7.2.11 SameValueZero ( x, y )
 
-		// 4. Return SameValueNonNumeric(x, y).
-		return sameValueNonNumeric(y);
+		// 1. If Type(x) is not Type(y), return false.
+		if (!sameType(y)) return false;
+		// 2. If x is a Number, then
+		if (this instanceof final NumberValue x)
+			// a. Return Number::sameValueZero(x, y).
+			return x.isEqualTo((NumberValue) y, true, true);
+		// 3. Return SameValueNonNumber(x, y).
+		return sameValueNonNumber(y);
 	}
 
 	public final boolean sameType(Value<?> y) {
@@ -162,50 +159,46 @@ public abstract class Value<JType> implements Displayable {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevalue")
 	public final boolean sameValue(Value<?> y) {
-		// 1. If Type(x) is different from Type(y), return false.
+		// 1. If Type(x) is not Type(y), return false.
 		if (!this.sameType(y)) return false;
-
-		// 2. If Type(x) is Number, then
-		if (this instanceof final NumberValue x_n)
-			// a. Return ! Number::sameValue(x, y).
-			return x_n.sameValue((NumberValue) y);
-
-		// FIXME: BigInt
-		// 3. If Type(x) is BigInt, then
-		// a. Return ! BigInt::sameValue(x, y).
-
-		// 4. Return ! SameValueNonNumeric(x, y).
-		return this.sameValueNonNumeric(y);
+		// 2. If x is a Number, then
+		if (this instanceof final NumberValue x)
+			// a. Return Number::sameValue(x, y).
+			return x.isEqualTo((NumberValue) y, false, true);
+		// 3. Return SameValueNonNumber(x, y).
+		return sameValueNonNumber(y);
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevaluenonnumeric")
-	public boolean sameValueNonNumeric(Value<?> y) {
-		// 1. Assert: Type(x) is the same as Type(y).
-		// 2. If Type(x) is Undefined, return true.
-		if (this == Undefined.instance) return true;
-		// 3. If Type(x) is Null, return true.
-		if (this == Null.instance) return true;
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isstrictlyequal")
+	public final boolean isStrictlyEqual(Value<?> y) {
+		// 1. If Type(x) is not Type(y), return false.
+		if (!this.sameType(y)) return false;
+		// 2. If x is a Number, then
+		if (this instanceof final NumberValue x)
+			// a. Return Number::equal(x, y).
+			return x.isEqualTo((NumberValue) y, true, false);
+		// 3. Return SameValueNonNumber(x, y).
+		return sameValueNonNumber(y);
+	}
 
-		if (this instanceof StringValue)
-			// 4. If Type(x) is String, then
-			// a. If x and y are exactly the same sequence of code units
-			//    (same length and same code units at corresponding indices),
-			//    return true; otherwise, return false.
-			return this.value.equals(y.value);
-
-		// 5. If Type(x) is Boolean, then
-		// a. return (x and y are both true or both false)
-		// 6. If Type(x) is Symbol, then
-		// a. return (x and y are both the same Symbol value)
-		// 7. If x and y are the same Object value, return true. Otherwise, return false.
-
-		return this == y;
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-samevaluenonnumber")
+	public final boolean sameValueNonNumber(Value<?> y) {
+		// 1. Assert: Type(x) is Type(y).
+		assert sameType(y);
+		// 2. If x is either null or undefined, return true.
+		if (isNullish()) return true;
+		// TODO: 3. If x is a BigInt, then Return BigInt::equal(x, y).
+		// 4. If x is a String, then
+		// a. If x and y have the same length and the same code units in the same positions, return true; otherwise, return false.
+		// 5. If x is a Boolean, then
+		// a. If x and y are both true or both false, return true; otherwise, return false.
+		// 6. NOTE: All other ECMAScript language values are compared by identity.
+		// 7. If x is y, return true; otherwise, return false.
+		return equals(y);
 	}
 
 	@Override
-	@NonCompliant
 	public boolean equals(Object o) {
-		// FIXME: 0 === -0 should be true
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		return Objects.equals(value, ((Value<?>) o).value);

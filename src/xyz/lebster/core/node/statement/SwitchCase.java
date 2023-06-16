@@ -13,7 +13,7 @@ import xyz.lebster.core.value.globals.Undefined;
 @NonCompliant
 public record SwitchCase(Expression test, Statement... statements) implements Dumpable {
 	public boolean matches(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
-		return test.execute(interpreter).equals(value);
+		return test.execute(interpreter).isStrictlyEqual(value);
 	}
 
 	public Value<?> executeStatements(Interpreter interpreter) throws AbruptCompletion {

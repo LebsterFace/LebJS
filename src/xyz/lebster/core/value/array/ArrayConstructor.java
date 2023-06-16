@@ -216,7 +216,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 				// i. Let intLen be ! ToUint32(len).
 				intLen = new NumberValue(len_number.toUint32());
 				// ii. If SameValueZero(intLen, len) is false, throw a RangeError exception.
-				if (!NumberValue.sameValueZero(intLen, len_number))
+				if (!intLen.sameValueZero(len_number))
 					throw error(new RangeError(interpreter, "Invalid array length"));
 			} else {
 				// i. Perform ! CreateDataPropertyOrThrow(array, "0", len).

@@ -23,8 +23,8 @@ public record EqualityExpression(Expression left, Expression right, EqualityOp o
 		final Value<?> right_value = right.execute(interpreter);
 
 		return BooleanValue.of(switch (op) {
-			case StrictEquals -> left_value.equals(right_value);
-			case StrictNotEquals -> !left_value.equals(right_value);
+			case StrictEquals -> left_value.isStrictlyEqual(right_value);
+			case StrictNotEquals -> !left_value.isStrictlyEqual(right_value);
 			default -> throw new NotImplemented("EqualityOp: " + op);
 		});
 	}

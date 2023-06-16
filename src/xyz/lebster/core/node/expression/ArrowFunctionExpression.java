@@ -44,7 +44,9 @@ public final class ArrowFunctionExpression implements Expression {
 
 	@Override
 	public void represent(StringRepresentation representation) {
+		representation.append('(');
 		parameters.represent(representation);
+		representation.append(')');
 		representation.append(" => ");
 
 		if (this.hasFullBody) {

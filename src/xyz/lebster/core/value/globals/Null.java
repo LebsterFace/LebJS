@@ -53,7 +53,7 @@ public final class Null extends PrimitiveValue<Void> {
 	}
 
 	@Override
-	public String typeOf(Interpreter interpreter) {
+	public String typeOf() {
 		return "object";
 	}
 }

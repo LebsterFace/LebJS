@@ -55,7 +55,7 @@ public final class BooleanValue extends PrimitiveValue<Boolean> {
 	}
 
 	@Override
-	public String typeOf(Interpreter interpreter) {
+	public String typeOf() {
 		return "boolean";
 	}
 }

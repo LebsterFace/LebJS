@@ -120,7 +120,7 @@ public final class SymbolValue extends Key<Void> {
 	}
 
 	@Override
-	public String typeOf(Interpreter interpreter) {
+	public String typeOf() {
 		return "symbol";
 	}
 

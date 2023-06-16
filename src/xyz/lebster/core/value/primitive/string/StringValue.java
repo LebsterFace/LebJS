@@ -125,7 +125,7 @@ public final class StringValue extends Key<String> {
 	}
 
 	@Override
-	public String typeOf(Interpreter interpreter) {
+	public String typeOf() {
 		return "string";
 	}
 }

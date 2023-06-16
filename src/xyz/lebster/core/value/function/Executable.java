@@ -155,7 +155,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	public abstract Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion;
 
 	@Override
-	public String typeOf(Interpreter interpreter) {
+	public String typeOf() {
 		return "function";
 	}
 }

@@ -210,7 +210,7 @@ public abstract class Value<JType> implements Displayable {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#table-typeof-operator-results")
-	public abstract String typeOf(Interpreter interpreter);
+	public abstract String typeOf();
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-topropertykey")
 	public final Key<?> toPropertyKey(Interpreter interpreter) throws AbruptCompletion {

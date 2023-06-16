@@ -50,12 +50,12 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 		if (expression instanceof final LeftHandSideExpression lhs) {
 			final Reference reference = lhs.toReference(interpreter);
 			if (reference.isResolvable()) {
-				return new StringValue(reference.getValue(interpreter).typeOf(interpreter));
+				return new StringValue(reference.getValue(interpreter).typeOf());
 			} else {
 				return Names.undefined;
 			}
 		} else {
-			return new StringValue(expression.execute(interpreter).typeOf(interpreter));
+			return new StringValue(expression.execute(interpreter).typeOf());
 		}
 	}
 

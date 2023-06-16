@@ -1,0 +1,1 @@
+function foo() {} object.property = 'bar';

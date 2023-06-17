@@ -1,15 +1,18 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.DumpBuilder;
-import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Dumpable;
 import xyz.lebster.core.node.SourceRange;
+import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.function.Function;
+import xyz.lebster.core.value.object.AccessorDescriptor;
 import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -18,21 +21,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-initializer")
-public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> entries) implements Expression {
-	public static StaticEntryNode staticEntry(StringValue key, Expression value) {
-		return new StaticEntryNode(key, value);
-	}
+public final class ObjectExpression implements Expression {
+	public final ArrayList<ObjectEntryNode> entries = new ArrayList<>();
+	public SourceRange range;
 
-	public static ComputedKeyEntryNode computedKeyEntry(Expression key, Expression value) {
-		return new ComputedKeyEntryNode(key, value);
-	}
-
-	public static ShorthandEntryNode shorthandEntry(StringValue key) {
-		return new ShorthandEntryNode(key);
-	}
-
-	public static SpreadEntryNode spreadEntry(Expression name) {
-		return new SpreadEntryNode(name);
+	public ObjectExpression() {
 	}
 
 	@Override
@@ -68,30 +61,22 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 		void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion;
 	}
 
-	private record StaticEntryNode(StringValue key, Expression value) implements ObjectEntryNode {
-		@Override
-		@NonCompliant
-		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
-			final Value<?> executedValue = Executable.namedEvaluation(interpreter, value, key);
-			result.put(key, executedValue, true, true, true);
-		}
-
-		@Override
-		public void dump(int indent) {
-			DumpBuilder.begin(indent)
-				.selfParameterized(this, key.value)
-				.container(value);
-		}
-
-		@Override
-		public void represent(StringRepresentation representation) {
-			key.displayForObjectKey(representation);
-			representation.append(": ");
-			value.represent(representation);
+	private static void displayKey(Expression key, boolean computed, StringRepresentation representation) {
+		if (computed) {
+			representation.append('[');
+			key.represent(representation);
+			representation.append("]");
+		} else {
+			((StringLiteral) key).value().displayForObjectKey(representation);
 		}
 	}
 
-	private record ComputedKeyEntryNode(Expression key, Expression value) implements ObjectEntryNode {
+	@Override
+	public SourceRange range() {
+		return range;
+	}
+
+	public record EntryNode(Expression key, Expression value, boolean computed, boolean method) implements ObjectEntryNode {
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
 			final Key<?> executedKey = this.key.execute(interpreter).toPropertyKey(interpreter);
@@ -109,14 +94,54 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 
 		@Override
 		public void represent(StringRepresentation representation) {
-			representation.append('[');
-			key.represent(representation);
-			representation.append("]: ");
-			value.represent(representation);
+			displayKey(key, computed, representation);
+			if (method) {
+				if (!(value instanceof final FunctionExpression function))
+					throw new ShouldNotHappen("Method EntryNode had non-function value");
+				function.representCall(representation);
+				representation.append(' ');
+				function.body().represent(representation);
+			} else {
+				representation.append(": ");
+				value.represent(representation);
+			}
 		}
 	}
 
-	private record ShorthandEntryNode(StringValue key) implements ObjectEntryNode {
+	public record GetterSetterNode(boolean getter, Expression name, FunctionExpression value, boolean computed) implements ObjectEntryNode {
+		@Override
+		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
+			final Key<?> key = name.execute(interpreter).toPropertyKey(interpreter);
+			final Function function = value.execute(interpreter);
+			final String newName = "%s %s".formatted(getter ? "get" : "set", key.toFunctionName().value);
+			function.updateName(new StringValue(newName));
+
+			final var existing = result.value.get(key) instanceof AccessorDescriptor A ? A : null;
+			final var descriptor = existing == null ? new AccessorDescriptor(null, null, true, true) : existing;
+			if (getter) descriptor.setGetter(function);
+			else descriptor.setSetter(function);
+			if (existing == null) result.value.put(key, descriptor);
+		}
+
+		@Override
+		public void dump(int indent) {
+			DumpBuilder.begin(indent)
+				.selfParameterized(this, getter ? "Getter" : "Setter")
+				.child("Name", name)
+				.child("Function", value);
+		}
+
+		@Override
+		public void represent(StringRepresentation representation) {
+			representation.append(getter ? "get " : "set ");
+			displayKey(name, computed, representation);
+			value.representCall(representation);
+			representation.append(' ');
+			value.body().represent(representation);
+		}
+	}
+
+	public record ShorthandNode(StringValue key) implements ObjectEntryNode {
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
 			result.put(key, interpreter.getBinding(key).getValue(interpreter), true, true, true);
@@ -134,7 +159,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 		}
 	}
 
-	private record SpreadEntryNode(Expression name) implements ObjectEntryNode {
+	public record SpreadNode(Expression name) implements ObjectEntryNode {
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
 			final ObjectValue value = name.execute(interpreter).toObjectValue(interpreter);
@@ -149,7 +174,7 @@ public record ObjectExpression(SourceRange range, ArrayList<ObjectEntryNode> ent
 		public void dump(int indent) {
 			DumpBuilder.begin(indent)
 				.self(this)
-				.child("Key", name);
+				.container(name);
 		}
 
 		@Override

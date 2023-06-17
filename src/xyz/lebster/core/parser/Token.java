@@ -273,11 +273,18 @@ public final class Token {
 	}
 
 	boolean matchClassElementName() {
-		return matchIdentifierName()
-			   || type == LBracket
+		return type == LBracket
 			   || type == NumericLiteral
 			   || type == PrivateIdentifier
-			   || type == StringLiteral;
+			   || type == StringLiteral
+			   || matchIdentifierName();
+	}
+
+	boolean matchObjectExpressionKey() {
+		return type == NumericLiteral
+			   || type == StringLiteral
+			   || type == LBracket
+			   || matchIdentifierName();
 	}
 
 	UpdateOp getUpdateOp() throws CannotParse {

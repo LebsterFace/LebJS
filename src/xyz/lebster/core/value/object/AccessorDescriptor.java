@@ -12,8 +12,8 @@ import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 
 public final class AccessorDescriptor implements PropertyDescriptor, Displayable {
-	private final Executable getter;
-	private final Executable setter;
+	private Executable getter;
+	private Executable setter;
 	private boolean enumerable;
 	private boolean configurable;
 
@@ -64,6 +64,14 @@ public final class AccessorDescriptor implements PropertyDescriptor, Displayable
 		if (setter != null) {
 			setter.call(interpreter, thisValue, newValue);
 		}
+	}
+
+	public void setGetter(Executable getter) {
+		this.getter = getter;
+	}
+
+	public void setSetter(Executable setter) {
+		this.setter = setter;
 	}
 
 	@Override

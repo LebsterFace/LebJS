@@ -10,14 +10,13 @@ import xyz.lebster.core.node.FunctionParameters;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.Names;
-import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Function;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 public record FunctionExpression(BlockStatement body, StringLiteral name, FunctionParameters parameters) implements FunctionNode, Expression {
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-runtime-semantics-instantiateordinaryfunctionexpression")
-	public Value<?> execute(Interpreter interpreter) {
+	public Function execute(Interpreter interpreter) {
 		if (name == null) {
 			return new Function(interpreter.intrinsics, Names.EMPTY, interpreter.environment(), this);
 		} else {

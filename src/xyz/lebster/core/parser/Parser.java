@@ -3,6 +3,7 @@ package xyz.lebster.core.parser;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.ParserNotImplemented;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.*;
 import xyz.lebster.core.node.declaration.*;
@@ -10,6 +11,7 @@ import xyz.lebster.core.node.expression.*;
 import xyz.lebster.core.node.expression.ClassExpression.ClassConstructorNode;
 import xyz.lebster.core.node.expression.ClassExpression.ClassFieldNode;
 import xyz.lebster.core.node.expression.ClassExpression.ClassMethodNode;
+import xyz.lebster.core.node.expression.ObjectExpression.*;
 import xyz.lebster.core.node.expression.UpdateExpression.UpdateOp;
 import xyz.lebster.core.node.expression.literal.*;
 import xyz.lebster.core.node.statement.*;
@@ -618,10 +620,9 @@ public final class Parser {
 		return new FunctionDeclaration(parseFunctionBody(), name, parameters);
 	}
 
-	private FunctionExpression parseFunctionExpression() throws SyntaxError, CannotParse {
-		state.require(TokenType.Function);
+	private FunctionExpression parseFunctionExpression(boolean allowName) throws SyntaxError, CannotParse {
 		if (state.is(TokenType.Star)) throw new ParserNotImplemented(position(), "Generator function expressions");
-		final StringLiteral name = state.optionalStringLiteral(TokenType.Identifier);
+		final StringLiteral name = allowName ? state.optionalStringLiteral(TokenType.Identifier) : null;
 		final FunctionParameters parameters = parseFunctionParameters(true);
 		return new FunctionExpression(parseFunctionBody(), name, parameters);
 	}
@@ -816,17 +817,21 @@ public final class Parser {
 			case Super -> throw new ParserNotImplemented(position(), "Super property access");
 
 			case Class -> parseClassExpression();
-			case Function -> parseFunctionExpression();
 			case LBracket -> parseArrayExpression();
 			case LBrace -> parseObjectExpression();
 			case TemplateStart -> parseTemplateLiteral();
 			case New -> parseNewExpression();
 			case LParen -> parseParenthesizedExpressionOrArrowFunctionExpression();
 			case Identifier -> parseIdentifierExpressionOrArrowFunctionExpression();
-
 			case RegexpPattern -> parseRegexpLiteral();
 			case StringLiteral -> state.consume().asStringLiteral();
 			case NumericLiteral -> parseNumericLiteral(false);
+
+			case Function -> {
+				state.require(TokenType.Function);
+				yield parseFunctionExpression(true);
+			}
+
 			case Period -> {
 				state.consume();
 				yield parseNumericLiteral(true);
@@ -922,77 +927,96 @@ public final class Parser {
 		return parseClassBody(start, className, heritage);
 	}
 
+	private record ObjectExpressionKey(SourcePosition start, Expression expression, boolean computed, boolean isIdentifier) {
+		private StringValue stringValue() {
+			if (computed) throw new ShouldNotHappen("Cannot get non-computed key of computed key");
+			return ((StringLiteral) expression).value();
+		}
+	}
+
+	private ObjectExpressionKey parseObjectExpressionKey() throws SyntaxError, CannotParse {
+		final SourcePosition start = position();
+		final boolean isIdentifier = state.token.matchIdentifierName();
+		final boolean nonComputed = isIdentifier || state.is(TokenType.NumericLiteral, TokenType.StringLiteral);
+		final Expression key;
+		if (nonComputed) {
+			key = state.consume().asStringLiteral();
+		} else {
+			state.require(TokenType.LBracket);
+			key = parseExpression();
+			state.require(TokenType.RBracket);
+		}
+
+		consumeAllLineTerminators();
+		return new ObjectExpressionKey(start, key, !nonComputed, isIdentifier);
+	}
+
 	private ObjectExpression parseObjectExpression() throws SyntaxError, CannotParse {
 		final SourcePosition start = position();
 		state.require(TokenType.LBrace);
 		consumeAllLineTerminators();
-		final ArrayList<ObjectExpression.ObjectEntryNode> entries = new ArrayList<>();
-		SourcePosition invalid_property = null;
+		final ObjectExpression result = new ObjectExpression();
 
-		// FIXME:
-		// 		- Methods { a() { alert(1) } }
-		// 		- Getters / Setters { get a() { return Math.random() } }
-		boolean couldBeGetterSetter = false;
 		while (!state.is(TokenType.RBrace)) {
-			if (state.optional(TokenType.DotDotDot)) {
-				consumeAllLineTerminators();
-				entries.add(ObjectExpression.spreadEntry(parseSpecAssignmentExpression()));
-				consumeAllLineTerminators();
-				if (!state.optional(TokenType.Comma)) break;
-				consumeAllLineTerminators();
-				continue;
-			}
-
-			// TODO: Remove duplication with parseClassBody
-			boolean isIdentifier = state.token.matchIdentifierName();
-			if (isIdentifier || state.is(TokenType.NumericLiteral, TokenType.StringLiteral)) {
-				final SourcePosition propertyStart = position();
-				final String propertyName = state.consume().value;
-				consumeAllLineTerminators();
-
-				if (isIdentifier && state.optional(TokenType.Equals)) {
-					// Not a valid object literal, but a valid destructuring pattern
-					// Parse the expression and throw it away
-					parseSpecAssignmentExpression();
-					if (invalid_property == null)
-						invalid_property = propertyStart;
-				} else if (state.is(TokenType.LParen)) {
-					throw new ParserNotImplemented(position(), "object literal methods");
-				} else if (isIdentifier && !state.is(TokenType.Colon)) {
-					entries.add(ObjectExpression.shorthandEntry(new StringValue(propertyName)));
-					couldBeGetterSetter = propertyName.equals("get") || propertyName.equals("set");
-				} else {
-					state.require(TokenType.Colon);
-					consumeAllLineTerminators();
-					entries.add(ObjectExpression.staticEntry(new StringValue(propertyName), parseSpecAssignmentExpression()));
-				}
-			} else {
-				state.require(TokenType.LBracket);
-				final Expression keyExpression = parseExpression();
-				state.require(TokenType.RBracket);
-				consumeAllLineTerminators();
-				if (state.is(TokenType.LParen)) throw new ParserNotImplemented(position(), "object literal methods");
-				state.require(TokenType.Colon);
-				consumeAllLineTerminators();
-				entries.add(ObjectExpression.computedKeyEntry(keyExpression, parseSpecAssignmentExpression()));
-			}
-
+			final var property = parseObjectProperty(result);
+			if (property != null) result.entries.add(property);
 			consumeAllLineTerminators();
 			if (!state.optional(TokenType.Comma)) break;
 			consumeAllLineTerminators();
 		}
 
-		if (couldBeGetterSetter) {
-			throw new ParserNotImplemented(position(), "Object literal getter & setter syntax");
-		}
-
 		consumeAllLineTerminators();
 		state.require(TokenType.RBrace);
-
-		final var result = new ObjectExpression(range(start), entries);
-		if (invalid_property != null)
-			state.invalidProperties.put(result, invalid_property);
+		result.range = range(start);
 		return result;
+	}
+
+	private ObjectEntryNode parseObjectProperty(ObjectExpression result) throws CannotParse, SyntaxError {
+		if (state.optional(TokenType.DotDotDot)) {
+			consumeAllLineTerminators();
+			return new SpreadNode(parseSpecAssignmentExpression());
+		} else if (state.optional(TokenType.Star))
+			throw new ParserNotImplemented(position(), "generator object literal methods");
+
+		final ObjectExpressionKey key = parseObjectExpressionKey();
+		consumeAllLineTerminators();
+
+		if (!key.computed) {
+			final String prefix = key.stringValue().value;
+			if (state.token.matchObjectExpressionKey())
+				if (prefix.equals("async")) {
+					throw new ParserNotImplemented(position(), "`async` object literal methods");
+				} else if (prefix.equals("get") || prefix.equals("set")) {
+					consumeAllLineTerminators();
+					final ObjectExpressionKey name = parseObjectExpressionKey();
+					final FunctionExpression function = parseFunctionExpression(false);
+					return new GetterSetterNode(prefix.equals("get"), name.expression, function, name.computed);
+				}
+		}
+
+		if (key.isIdentifier && state.optional(TokenType.Equals)) {
+			// Not a valid object literal, but a valid destructuring pattern
+			// Parse the expression and throw it away
+			parseSpecAssignmentExpression();
+			if (!state.invalidProperties.containsKey(result)) {
+				state.invalidProperties.put(result, key.start);
+			}
+
+			return null;
+		}
+
+		if (state.is(TokenType.LParen)) {
+			final FunctionExpression function = parseFunctionExpression(false);
+			return new EntryNode(key.expression, function, key.computed, true);
+		}
+
+		if (state.optional(TokenType.Colon)) {
+			consumeAllLineTerminators();
+			final Expression value = parseSpecAssignmentExpression();
+			return new EntryNode(key.expression, value, key.computed, false);
+		}
+
+		return new ShorthandNode(key.stringValue());
 	}
 
 	private ClassExpression parseClassBody(SourcePosition start, String className, Expression heritage) throws SyntaxError, CannotParse {
@@ -1007,9 +1031,9 @@ public final class Parser {
 		while (!state.is(TokenType.RBrace)) {
 			consumeAllSeparators();
 			if (state.optional(TokenType.Static))
-				throw new ParserNotImplemented(position(), "class `static` initialization blocks / methods / fields");
+				throw new ParserNotImplemented(position(), "`static` class elements");
 			if (state.optional(TokenType.Star))
-				throw new ParserNotImplemented(position(), "class generator methods");
+				throw new ParserNotImplemented(position(), "generator class methods");
 
 			if (!state.token.matchClassElementName()) {
 				if (state.is(TokenType.Hashtag))
@@ -1020,11 +1044,11 @@ public final class Parser {
 
 			final SourcePosition elementStart = position();
 			if (state.optional(TokenType.Async))
-				throw new ParserNotImplemented(position(), "class async methods");
+				throw new ParserNotImplemented(position(), "`async` class methods");
 
 			// FIXME: Methods named get / set
 			if (state.optional(TokenType.Identifier, "get") || state.optional(TokenType.Identifier, "set"))
-				throw new ParserNotImplemented(position(), "class getter / setters");
+				throw new ParserNotImplemented(position(), "class getters & setters");
 
 			// TODO: Remove duplication with parseObjectExpression
 			final Expression name;

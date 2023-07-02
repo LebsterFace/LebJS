@@ -14,18 +14,22 @@ public class ErrorObject extends ObjectValue implements HasBuiltinTag {
 		super(prototype);
 		this.message = ANSI.stripFormatting(message);
 		put(Names.message, new StringValue(message));
-		put(Names.name, getClass() == ErrorObject.class ? Names.Error : new StringValue(getClass().getSimpleName()));
+		put(Names.name, new StringValue(getName()));
 	}
 
 	@Override
 	public void display(StringRepresentation representation) {
 		representation.append(ANSI.BRIGHT_CYAN);
 		representation.append("[");
-		representation.append(getClass().getSimpleName());
+		representation.append(getName());
 		representation.append(": ");
 		representation.append(message);
 		representation.append("]");
 		representation.append(ANSI.RESET);
+	}
+
+	private String getName() {
+		return getClass() == ErrorObject.class ? "Error" : getClass().getSimpleName();
 	}
 
 	@Override

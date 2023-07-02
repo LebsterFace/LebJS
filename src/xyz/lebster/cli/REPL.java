@@ -51,9 +51,9 @@ public final class REPL {
 					System.out.flush();
 				} else if (input.startsWith(".inspect ")) {
 					final Value<?> lastValue = realm.execute(input.substring(".inspect ".length()), options.showAST());
-					if (lastValue instanceof final ObjectValue LVO) {
+					if (lastValue instanceof final ObjectValue obj) {
 						final var representation = new StringRepresentation();
-						JSONDisplayer.display(representation, LVO, false, true);
+						JSONDisplayer.display(representation, obj, true);
 						System.out.println(representation);
 					} else {
 						System.out.println(lastValue.toDisplayString());

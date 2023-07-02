@@ -10,20 +10,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-interface DisplayNode {
-	void display(boolean singleLine, StringRepresentation representation);
+interface DisplayNode extends Displayable {
+	@Override
+	default void display(StringRepresentation representation) {
+		final var firstAttempt = new StringRepresentation();
+		display(firstAttempt, true);
+		if (firstAttempt.length() >= 72) {
+			display(representation, false);
+		} else {
+			representation.append(firstAttempt);
+		}
+	}
+
+	void display(StringRepresentation representation, boolean singleLine);
 }
 
 record DisplayableNode(Displayable displayable) implements DisplayNode {
 	@Override
-	public void display(boolean singleLine, StringRepresentation representation) {
+	public void display(StringRepresentation representation, boolean singleLine) {
 		displayable.display(representation);
 	}
 }
 
 record ReferenceNode(int id) implements DisplayNode {
 	@Override
-	public void display(boolean singleLine, StringRepresentation representation) {
+	public void display(StringRepresentation representation, boolean singleLine) {
 		representation.append(ANSI.BRIGHT_CYAN);
 		representation.append("[Circular *");
 		representation.append(id);
@@ -64,7 +75,7 @@ final class ObjectNode implements DisplayNode {
 	}
 
 	@Override
-	public void display(boolean singleLine, StringRepresentation representation) {
+	public void display(StringRepresentation representation, boolean singleLine) {
 		final boolean isArray = value.getClass() == ArrayObject.class;
 		final var valuesIt = values.iterator();
 		final var propertiesIt = properties.entrySet().iterator();
@@ -117,7 +128,7 @@ final class ObjectNode implements DisplayNode {
 			}
 
 			if (!singleLine) representation.appendIndent();
-			next.display(singleLine, representation);
+			next.display(representation);
 			appendDelimiter(representation, singleLine, valuesIt.hasNext() || propertiesIt.hasNext());
 		}
 
@@ -133,7 +144,7 @@ final class ObjectNode implements DisplayNode {
 			entry.getKey().displayForObjectKey(representation);
 			representation.append(ANSI.RESET);
 			representation.append(": ");
-			entry.getValue().display(singleLine, representation);
+			entry.getValue().display(representation);
 			appendDelimiter(representation, singleLine, propertiesIt.hasNext());
 		}
 
@@ -154,21 +165,12 @@ public final class JSONDisplayer {
 	}
 
 	public static void display(StringRepresentation representation, ObjectValue object) {
-		final var singleLine = new StringRepresentation();
-		final JSONDisplayer displayer = new JSONDisplayer();
-		final DisplayNode rootNode = displayer.buildTreeFromValue(object, false);
-		rootNode.display(true, singleLine);
-		if (singleLine.length() >= 72) {
-			rootNode.display(false, representation);
-		} else {
-			representation.append(singleLine);
-		}
+		display(representation, object, false);
 	}
 
-	public static void display(StringRepresentation representation, ObjectValue object, boolean singleLine, boolean forceJSON) {
-		final JSONDisplayer displayer = new JSONDisplayer();
-		final DisplayNode rootNode = displayer.buildTreeFromValue(object, forceJSON);
-		rootNode.display(singleLine, representation);
+	public static void display(StringRepresentation representation, ObjectValue object, boolean forceJSON) {
+		final DisplayNode rootNode = new JSONDisplayer().buildTreeFromValue(object, forceJSON);
+		rootNode.display(representation);
 	}
 
 	private DisplayNode buildTreeFromValue(Value<?> current, boolean forceJSON) {

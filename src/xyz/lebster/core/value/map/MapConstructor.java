@@ -2,6 +2,7 @@ package xyz.lebster.core.value.map;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
+import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -10,6 +11,8 @@ import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.array.ArrayObject;
+import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.map.MapObject.MapEntry;
@@ -26,6 +29,33 @@ import static xyz.lebster.core.value.function.NativeFunction.argument;
 public final class MapConstructor extends BuiltinConstructor<MapObject, MapPrototype> {
 	public MapConstructor(Intrinsics intrinsics) {
 		super(intrinsics, Names.Map, 0);
+		putMethod(intrinsics, Names.groupBy, 2, MapConstructor::groupBy);
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-map.groupby")
+	private static MapObject groupBy(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 3.1 Map.groupBy ( items, callbackfn )
+		final Value<?> items = argument(0, arguments);
+		final Value<?> callbackfn = argument(1, arguments);
+
+		// 1. Let groups be ? GroupBy(items, callbackfn, zero).
+		final var groups = ArrayPrototype.groupBy(interpreter, items, callbackfn, false);
+		// 2. Let map be ! Construct(%Map%).
+		final ArrayList<MapEntry> mapData = new ArrayList<>();
+		final MapObject map = new MapObject(interpreter.intrinsics, mapData);
+		// 3. For each Record { [[Key]], [[Elements]] } g of groups, do
+		for (final var g : groups) {
+			// a. Let elements be CreateArrayFromList(g.[[Elements]]).
+			final ArrayObject elements = new ArrayObject(interpreter, g.elements());
+			// b. Let entry be the Record { [[Key]]: g.[[Key]], [[Value]]: elements }.
+			final var entry = new MapEntry(g.key(), elements);
+			// c. Append entry to map.[[MapData]].
+			mapData.add(entry);
+		}
+
+		// 4. Return map.
+		return map;
 	}
 
 	@Override

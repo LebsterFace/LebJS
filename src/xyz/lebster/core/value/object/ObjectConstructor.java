@@ -1,7 +1,9 @@
 package xyz.lebster.core.value.object;
 
 import xyz.lebster.core.NonCompliant;
+import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
@@ -9,6 +11,7 @@ import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
+import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
@@ -26,16 +29,52 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	public ObjectConstructor(Intrinsics intrinsics) {
 		super(intrinsics, Names.Object, 1);
 
-		putMethod(intrinsics, Names.setPrototypeOf, 2, ObjectConstructor::setPrototypeOf);
-		putMethod(intrinsics, Names.getPrototypeOf, 1, ObjectConstructor::getPrototypeOf);
+		putMethod(intrinsics, Names.assign, 2, ObjectConstructor::assign);
 		putMethod(intrinsics, Names.create, 2, ObjectConstructor::create);
-		putMethod(intrinsics, Names.keys, 1, ObjectConstructor::keys);
-		putMethod(intrinsics, Names.values, 1, ObjectConstructor::values);
+		putMethod(intrinsics, Names.defineProperties, 2, ObjectConstructor::defineProperties);
+		putMethod(intrinsics, Names.defineProperty, 3, ObjectConstructor::defineProperty);
 		putMethod(intrinsics, Names.entries, 1, ObjectConstructor::entries);
+		putMethod(intrinsics, Names.freeze, 1, ObjectConstructor::freeze);
+		putMethod(intrinsics, Names.fromEntries, 1, ObjectConstructor::fromEntries);
 		putMethod(intrinsics, Names.getOwnPropertyDescriptor, 2, ObjectConstructor::getOwnPropertyDescriptor);
 		putMethod(intrinsics, Names.getOwnPropertyDescriptors, 1, ObjectConstructor::getOwnPropertyDescriptors);
-		putMethod(intrinsics, Names.fromEntries, 1, ObjectConstructor::fromEntries);
+		putMethod(intrinsics, Names.getOwnPropertyNames, 1, ObjectConstructor::getOwnPropertyNames);
+		putMethod(intrinsics, Names.getOwnPropertySymbols, 1, ObjectConstructor::getOwnPropertySymbols);
+		putMethod(intrinsics, Names.groupBy, 2, ObjectConstructor::groupBy);
+		putMethod(intrinsics, Names.getPrototypeOf, 1, ObjectConstructor::getPrototypeOf);
+		putMethod(intrinsics, Names.hasOwn, 2, ObjectConstructor::hasOwn);
 		putMethod(intrinsics, Names.is, 2, ObjectConstructor::is);
+		putMethod(intrinsics, Names.isExtensible, 1, ObjectConstructor::isExtensible);
+		putMethod(intrinsics, Names.isFrozen, 1, ObjectConstructor::isFrozen);
+		putMethod(intrinsics, Names.isSealed, 1, ObjectConstructor::isSealed);
+		putMethod(intrinsics, Names.keys, 1, ObjectConstructor::keys);
+		putMethod(intrinsics, Names.preventExtensions, 1, ObjectConstructor::preventExtensions);
+		putMethod(intrinsics, Names.seal, 1, ObjectConstructor::seal);
+		putMethod(intrinsics, Names.setPrototypeOf, 2, ObjectConstructor::setPrototypeOf);
+		putMethod(intrinsics, Names.values, 1, ObjectConstructor::values);
+	}
+
+	@Proposal
+	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-object.groupby")
+	private static ObjectValue groupBy(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 2.1 Object.groupBy ( items, callbackfn )
+		final Value<?> items = argument(0, arguments);
+		final Value<?> callbackfn = argument(1, arguments);
+
+		// 1. Let groups be ? GroupBy(items, callbackfn, property).
+		final var groups = ArrayPrototype.groupBy(interpreter, items, callbackfn, true);
+		// TODO: 2. Let obj be OrdinaryObjectCreate(null).
+		final ObjectValue obj = new ObjectValue(Null.instance);
+		// 3. For each Record { [[Key]], [[Elements]] } g of groups, do
+		for (final var g : groups) {
+			// a. Let elements be CreateArrayFromList(g.[[Elements]]).
+			final ArrayObject elements = new ArrayObject(interpreter, g.elements());
+			// TODO: b. Perform ! CreateDataPropertyOrThrow(obj, g.[[Key]], elements).
+			obj.put((Key<?>) g.key(), elements);
+		}
+
+		// 4. Return obj.
+		return obj;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getownpropertydescriptors")
@@ -203,6 +242,71 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// 2. Return ? obj.[[GetPrototypeOf]]().
 		final ObjectValue prototype = O.toObjectValue(interpreter).getPrototype();
 		return prototype == null ? Null.instance : prototype;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.assign")
+	private static Value<?> assign(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.assign");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.defineproperties")
+	private static Value<?> defineProperties(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.defineProperties");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.defineproperty")
+	private static Value<?> defineProperty(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.defineProperty");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.freeze")
+	private static Value<?> freeze(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.freeze");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getownpropertynames")
+	private static Value<?> getOwnPropertyNames(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.getOwnPropertyNames");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getownpropertysymbols")
+	private static Value<?> getOwnPropertySymbols(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.getOwnPropertySymbols");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.hasown")
+	private static Value<?> hasOwn(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.hasOwn");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.isextensible")
+	private static Value<?> isExtensible(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.isExtensible");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.isfrozen")
+	private static Value<?> isFrozen(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.isFrozen");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.issealed")
+	private static Value<?> isSealed(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.isSealed");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.preventextensions")
+	private static Value<?> preventExtensions(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.preventExtensions");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype")
+	private static Value<?> prototype(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.prototype");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.seal")
+	private static Value<?> seal(Interpreter interpreter, Value<?>[] arguments) {
+		throw new NotImplemented("Object.seal");
 	}
 
 	@Override

@@ -15,9 +15,7 @@ import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.NativeFunction;
-import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
-import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
@@ -29,7 +27,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+import static xyz.lebster.core.value.IteratorHelper.getIterator;
+import static xyz.lebster.core.value.IteratorHelper.iteratorValue;
 import static xyz.lebster.core.value.function.NativeFunction.*;
+import static xyz.lebster.core.value.object.ObjectPrototype.requireObjectCoercible;
 import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
 
 public final class ArrayPrototype extends ObjectValue {
@@ -76,9 +77,6 @@ public final class ArrayPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.with, 2, ArrayPrototype::with);
 		final NativeFunction values = putMethod(intrinsics, Names.values, 0, ArrayPrototype::values);
 		put(SymbolValue.iterator, values);
-
-		// TODO: Follow new proposal spec: https://tc39.es/proposal-array-grouping/
-		putMethod(intrinsics, Names.group, 1, ArrayPrototype::group);
 	}
 
 	@NonCompliant
@@ -1370,61 +1368,70 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-array.prototype.group")
-	private static ObjectValue group(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 2.1 Array.prototype.group ( callbackfn [ , thisArg ] )
-		final Value<?> callbackfn = argument(0, arguments);
-		final Value<?> thisArg = argument(1, arguments);
-
-		// 1. Let O be ? ToObject(this value).
-		final ObjectValue O = interpreter.thisValue().toObjectValue(interpreter);
-		// 2. Let len be ? LengthOfArrayLike(O).
-		final long len = lengthOfArrayLike(interpreter, O);
-		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
-		final Executable executable = Executable.getExecutable(interpreter, callbackfn);
-		// 4. Let k be 0.
-		int k = 0;
-		// 5. Let groups be a new empty List.
+	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-group-by")
+	public static List<ArrayGroup> groupBy(Interpreter interpreter, Value<?> items, Value<?> callbackfn_, boolean toObject) throws AbruptCompletion {
+		// 1. Perform ? RequireObjectCoercible(items).
+		requireObjectCoercible(interpreter, items, (toObject ? "Object." : "Map.") + "groupBy");
+		// 2. If IsCallable(callbackfn) is false, throw a TypeError exception.
+		final Executable callbackfn = Executable.getExecutable(interpreter, callbackfn_);
+		// 3. Let groups be a new empty List.
 		final ArrayList<ArrayGroup> groups = new ArrayList<>();
-		// 6. Repeat, while k < len
-		while (k < len) {
-			// a. Let Pk be ! ToString(𝔽(k)).
-			final var Pk = new StringValue(k);
-			// b. Let kValue be ? Get(O, Pk).
-			final Value<?> kValue = O.get(interpreter, Pk);
-			// c. Let propertyKey be ? ToPropertyKey(? Call(callbackfn, thisArg, « kValue, 𝔽(k), O »)).
-			final Key<?> propertyKey = executable.call(interpreter, thisArg, kValue, new NumberValue(k), O).toPropertyKey(interpreter);
-			// d. Perform AddValueToKeyedGroup(groups, propertyKey, kValue).
-			addValueToKeyedGroup(groups, propertyKey, kValue);
-			// e. Set k to k + 1.
+		// 4. Let iteratorRecord be ? GetIterator(items).
+		final var iteratorRecord = getIterator(interpreter, items);
+		// 5. Let k be 0.
+		int k = 0;
+		// 6. Repeat,
+		while (true) {
+			// a. If k ≥ 2^53 - 1, then
+			if (k >= MAX_LENGTH) {
+				// i. Let error be ThrowCompletion(a newly created TypeError object).
+				// FIXME: ii. Return ? IteratorClose(iteratorRecord, error).
+				throw AbruptCompletion.error(new TypeError(interpreter, "Maximum array size exceeded"));
+			}
+
+			// b. Let next be ? IteratorStep(iteratorRecord).
+			final ObjectValue next = iteratorRecord.step(interpreter);
+			// c. If next is false, then
+			if (next == null) {
+				// i. Return groups.
+				return groups;
+			}
+
+			// d. Let value be ? IteratorValue(next).
+			final Value<?> value = iteratorValue(interpreter, next);
+			// e. Let key be Completion(Call(callbackfn, undefined, « value, 𝔽(k) »)).
+			Value<?> key = callbackfn.call(interpreter, Undefined.instance, value, new NumberValue(k));
+			// FIXME: f. IfAbruptCloseIterator(key, iteratorRecord).
+			// g. If keyCoercion is property, then
+			if (toObject) {
+				// i. Set key to Completion(ToPropertyKey(key)).
+				key = key.toPropertyKey(interpreter);
+				// FIXME: ii. IfAbruptCloseIterator(key, iteratorRecord).
+			}
+			// h. Else,
+			else {
+				// i. Assert: keyCoercion is zero.
+				// ii. If key is -0𝔽, set key to +0𝔽.
+				if (NumberValue.isNegativeZero(key)) key = NumberValue.ZERO;
+			}
+
+			// i. Perform AddValueToKeyedGroup(groups, key, value).
+			addValueToKeyedGroup(groups, key, value);
+			// j. Set k to k + 1.
 			k = k + 1;
 		}
-
-		// 7. Let obj be OrdinaryObjectCreate(null).
-		final var obj = new ObjectValue(Null.instance);
-		// 8. For each Record { [[Key]], [[Elements]] } g of groups, do
-		for (final ArrayGroup g : groups) {
-			// a. Let elements be CreateArrayFromList(g.[[Elements]]).
-			final var elements = new ArrayObject(interpreter, g.elements);
-			// FIXME: b. Perform ! CreateDataPropertyOrThrow(obj, g.[[Key]], elements).
-			obj.set(interpreter, g.key, elements);
-		}
-
-		// 9. Return obj.
-		return obj;
 	}
 
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-add-value-to-keyed-group")
-	private static void addValueToKeyedGroup(ArrayList<ArrayGroup> groups, Key<?> key, Value<?> value) {
-		// 2.3 AddValueToKeyedGroup ( groups, key, value )
+	private static void addValueToKeyedGroup(ArrayList<ArrayGroup> groups, Value<?> key, Value<?> value) {
+		// 4.2 AddValueToKeyedGroup ( groups, key, value )
 
 		// 1. For each Record { [[Key]], [[Elements]] } g of groups, do
 		for (final ArrayGroup g : groups) {
 			// a. If SameValue(g.[[Key]], key) is true, then
 			if (g.key.sameValue(key)) {
-				// i. Assert: exactly one element of groups meets this criteria.
-				// ii. Append value as the last element of g.[[Elements]].
+				// ii. Append value to g.[[Elements]].
 				g.elements.add(value);
 				// iii. Return unused.
 				return;
@@ -1433,7 +1440,7 @@ public final class ArrayPrototype extends ObjectValue {
 
 		// 2. Let group be the Record { [[Key]]: key, [[Elements]]: « value » }.
 		final var group = new ArrayGroup(key, new ArrayList<>(List.of(value)));
-		// 3. Append group as the last element of groups.
+		// 3. Append group to groups.
 		groups.add(group);
 		// 4. Return unused.
 	}
@@ -1901,7 +1908,7 @@ public final class ArrayPrototype extends ObjectValue {
 		int compare(Value<?> x, Value<?> y) throws AbruptCompletion;
 	}
 
-	private record ArrayGroup(Key<?> key, ArrayList<Value<?>> elements) {
+	public record ArrayGroup(Value<?> key, ArrayList<Value<?>> elements) {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createarrayiterator")
@@ -1911,7 +1918,7 @@ public final class ArrayPrototype extends ObjectValue {
 		private final boolean values;
 		private int index = 0;
 
-		public ArrayIterator(Interpreter interpreter, ObjectValue array, boolean keys, boolean values) throws AbruptCompletion {
+		public ArrayIterator(Interpreter interpreter, ObjectValue array, boolean keys, boolean values) {
 			super(interpreter.intrinsics);
 			this.array = array;
 			this.keys = keys;

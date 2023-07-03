@@ -8,11 +8,13 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.FunctionEnvironment;
+import xyz.lebster.core.interpreter.environment.ThisEnvironment;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.statement.Statement;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Constructor;
+import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
@@ -34,18 +36,22 @@ public record SuperCallStatement(ExpressionList arguments, SourceRange range) im
 		// 4. Let argList be ? ArgumentListEvaluation of Arguments.
 		final Value<?>[] argList = arguments.executeAll(interpreter).toArray(new Value[0]);
 		// 5. If IsConstructor(func) is false, throw a TypeError exception.
-		if (!(func instanceof final Constructor parentConstructor)) {
-			throw error(new TypeError(interpreter, "Not a constructor!"));
-		}
+		if (!(func instanceof final Constructor parentConstructor))
+			throw error(new TypeError(interpreter, "Super constructor was not a function."));
+
 		// 6. Let result be ? Construct(func, argList, newTarget).
 		final ObjectValue result = parentConstructor.construct(interpreter, argList, newTarget);
 		// 7. Let thisER be GetThisEnvironment().
-		final FunctionEnvironment thisER = interpreter.getThisEnvironment();
-		// 8. Perform ? thisER.BindThisValue(result).
-		thisER.thisValue = result;
-		// FIXME: 9. Let F be thisER.[[FunctionObject]].
-		//        10. Assert: F is an ECMAScript function object.
-		//        11. Perform ? InitializeInstanceElements(result, F).
+		final ThisEnvironment thisER = interpreter.getThisEnvironment();
+		if (!(thisER instanceof final FunctionEnvironment functionEnvironment))
+			throw new ShouldNotHappen("super() executed without Function environment.");
+
+		// TODO: 8. Perform ? thisER.BindThisValue(result).
+		functionEnvironment.thisValue = result;
+		// 9. Let F be thisER.[[FunctionObject]].
+		final Executable F = functionEnvironment.functionObject;
+		// 10. Assert: F is an ECMAScript function object.
+		// FIXME: 11. Perform ? InitializeInstanceElements(result, F).
 		// 12. Return result.
 		return result;
 	}

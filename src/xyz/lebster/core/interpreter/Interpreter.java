@@ -64,45 +64,56 @@ public final class Interpreter {
 		}
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-resolvethisbinding")
 	public Value<?> thisValue() {
-		final FunctionEnvironment thisEnvironment = getThisEnvironment();
-		if (thisEnvironment == null) return globalObject;
-		return thisEnvironment.thisValue;
+		// 1. Let envRec be GetThisEnvironment().
+		final ThisEnvironment envRec = getThisEnvironment();
+		// 2. Return ? envRec.GetThisBinding().
+		return envRec.thisValue();
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getnewtarget")
 	public ObjectValue getNewTarget() {
-		final FunctionEnvironment thisEnvironment = getThisEnvironment();
-		if (thisEnvironment == null) return null;
-		return thisEnvironment.newTarget;
+		// 1. Let envRec be GetThisEnvironment().
+		final ThisEnvironment envRec = getThisEnvironment();
+		// 2. Assert: envRec has a [[NewTarget]] field.
+		if (!(envRec instanceof final FunctionEnvironment functionEnvironment))
+			throw new ShouldNotHappen("getNewTarget() called in non-function environment");
+		// 3. Return envRec.[[NewTarget]].
+		return functionEnvironment.newTarget;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getsuperconstructor")
 	public ObjectValue getSuperConstructor() {
 		// 1. Let envRec be GetThisEnvironment().
-		final FunctionEnvironment envRec = getThisEnvironment();
+		final ThisEnvironment envRec = getThisEnvironment();
 		// 2. Assert: envRec is a function Environment Record.
-		if (envRec == null) throw new ShouldNotHappen("getSuperConstructor() called when getThisEnvironment() returns null");
+		if (!(envRec instanceof final FunctionEnvironment functionEnvironment))
+			throw new ShouldNotHappen("getSuperConstructor() called in non-function environment");
 		// 3. Let activeFunction be envRec.[[FunctionObject]].
-		final Executable activeFunction = envRec.functionObject;
+		final Executable activeFunction = functionEnvironment.functionObject;
 		// 4. Assert: activeFunction is an ECMAScript function object.
 		// 5. Let superConstructor be ! activeFunction.[[GetPrototypeOf]]().
 		// 6. Return superConstructor.
 		return activeFunction.getPrototype();
 	}
 
-	public FunctionEnvironment getThisEnvironment() {
-		for (final ExecutionContext context : executionContextStack) {
-			Environment env = context.environment();
-			while (env != null) {
-				if (env instanceof final FunctionEnvironment result) {
-					return result;
-				}
-
-				env = env.parent();
-			}
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getthisenvironment")
+	public ThisEnvironment getThisEnvironment() {
+		// 1. Let env be the running execution context's LexicalEnvironment.
+		Environment env = environment();
+		// 2. Repeat,
+		while (true) {
+			// a. Let exists be env.HasThisBinding().
+			// b. If exists is true, return env.
+			if (env instanceof final ThisEnvironment thisEnv) return thisEnv;
+			// c. Let outer be env.[[OuterEnv]].
+			final Environment outer = env.parent();
+			// d. Assert: outer is not null.
+			if (outer == null) throw new ShouldNotHappen("outer == null");
+			// e. Set env to outer.
+			env = outer;
 		}
-
-		return null;
 	}
 
 	public Environment environment() {

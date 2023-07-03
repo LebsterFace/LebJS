@@ -8,7 +8,7 @@ import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-public record GlobalEnvironment(ObjectValue variables, GlobalObject globalObject) implements Environment {
+public record GlobalEnvironment(ObjectValue variables, GlobalObject globalObject) implements ThisEnvironment {
 	public GlobalEnvironment(GlobalObject globalObject) {
 		this(new ObjectValue(Null.instance), globalObject);
 	}
@@ -30,5 +30,10 @@ public record GlobalEnvironment(ObjectValue variables, GlobalObject globalObject
 	@Override
 	public void createBinding(Interpreter interpreter, StringValue name, Value<?> value) {
 		variables.put(name, value);
+	}
+
+	@Override
+	public Value<?> thisValue() {
+		return globalObject;
 	}
 }

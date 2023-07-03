@@ -53,6 +53,11 @@ public final class Parser {
 		this.state = savedStack.removeLast();
 	}
 
+	private void pop() {
+		if (this.savedStack.isEmpty()) throw new IllegalStateException("Attempting to pop invalid ParseState");
+		savedStack.removeLast();
+	}
+
 	public Program parse() throws SyntaxError, CannotParse {
 		final Program program = new Program();
 		populateAppendableNode(program, EOF);
@@ -817,7 +822,7 @@ public final class Parser {
 			case LBrace -> parseObjectExpression();
 			case TemplateStart -> parseTemplateLiteral();
 			case New -> parseNewExpression();
-			case LParen -> parseParenthesizedExpressionOrArrowFunctionExpression();
+			case LParen -> parseParenthesizedOrArrowFunctionExpression();
 			case Identifier -> parseIdentifierExpressionOrArrowFunctionExpression();
 			case RegexpPattern -> parseRegexpLiteral();
 			case StringLiteral -> state.consume().asStringLiteral();
@@ -876,7 +881,7 @@ public final class Parser {
 		return parseArrowFunctionBody(new FunctionParameters(identifier));
 	}
 
-	private Expression parseParenthesizedExpressionOrArrowFunctionExpression() throws CannotParse, SyntaxError {
+	private Expression parseParenthesizedOrArrowFunctionExpression() throws CannotParse, SyntaxError {
 		final SourcePosition start = state.consume().position;
 
 		consumeAllLineTerminators();
@@ -1139,6 +1144,7 @@ public final class Parser {
 		}
 
 		// At this point, we know it's an arrow function
+		pop();
 		return parseArrowFunctionBody(parameters);
 	}
 

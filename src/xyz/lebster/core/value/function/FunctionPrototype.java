@@ -14,6 +14,7 @@ import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
+import static xyz.lebster.core.value.array.ArrayPrototype.createListFromArrayLike;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentRest;
 
@@ -32,12 +33,27 @@ public final class FunctionPrototype extends ObjectValue {
 
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function.prototype.apply")
-	private static Value<?> apply(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> apply(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 20.2.3.1 Function.prototype.apply ( thisArg, argArray )
 		final Value<?> thisArg = argument(0, arguments);
 		final Value<?> argArray = argument(1, arguments);
 
-		throw new NotImplemented("Function.prototype.apply()");
+		// 1. Let func be the `this` value.
+		final Value<?> func_ = interpreter.thisValue();
+		// 2. If IsCallable(func) is false, throw a TypeError exception.
+		final Executable func = Executable.getExecutable(interpreter, func_);
+		// 3. If argArray is either undefined or null, then
+		if (argArray.isNullish()) {
+			// TODO: a. Perform PrepareForTailCall().
+			// b. Return ? Call(func, thisArg).
+			return func.call(interpreter, thisArg);
+		}
+
+		// 4. Let argList be ? CreateListFromArrayLike(argArray).
+		final Value<?>[] argList = createListFromArrayLike(interpreter, argArray);
+		// TODO: 5. Perform PrepareForTailCall().
+		// 6. Return ? Call(func, thisArg, argList).
+		return func.call(interpreter, thisArg, argList);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-function.prototype.bind")
@@ -55,7 +71,12 @@ public final class FunctionPrototype extends ObjectValue {
 		final Value<?> thisArg = argument(0, arguments);
 		final Value<?>[] args = argumentRest(1, arguments);
 
-		final Executable func = Executable.getExecutable(interpreter, interpreter.thisValue());
+		// 1. Let func be the `this` value.
+		final Value<?> func_ = interpreter.thisValue();
+		// 2. If IsCallable(func) is false, throw a TypeError exception.
+		final Executable func = Executable.getExecutable(interpreter, func_);
+		// TODO: 3. Perform PrepareForTailCall().
+		// 4. Return ? Call(func, thisArg, args).
 		return func.call(interpreter, thisArg, args);
 	}
 

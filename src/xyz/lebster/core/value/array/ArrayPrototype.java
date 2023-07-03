@@ -1903,6 +1903,38 @@ public final class ArrayPrototype extends ObjectValue {
 		return O;
 	}
 
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createlistfromarraylike")
+	public static Value<?>[] createListFromArrayLike(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
+		// 7.3.20 CreateListFromArrayLike ( obj [ , elementTypes ] )
+
+		// 1. If elementTypes is not present, set elementTypes to « Undefined, Null, Boolean, String, Symbol, Number, BigInt, Object ».
+		// 2. If obj is not an Object, throw a TypeError exception.
+		// TODO: More applicable error messages
+		if (!(value instanceof final ObjectValue obj))
+			throw error(new TypeError(interpreter, "Second argument to Function.prototype.apply must be an array"));
+
+		// 3. Let len be ? LengthOfArrayLike(obj).
+		final int len = lengthOfArrayLike(interpreter, obj);
+		// 4. Let list be a new empty List.
+		final ArrayList<Value<?>> list = new ArrayList<>();
+		// 5. Let index be 0.
+		// 6. Repeat, while index < len,
+		for (int index = 0; index < len; index++) {
+			// a. Let indexName be ! ToString(𝔽(index)).
+			final StringValue indexName = new StringValue(index);
+			// b. Let next be ? Get(obj, indexName).
+			final Value<?> next = obj.get(interpreter, indexName);
+			// TODO: c. If elementTypes does not contain Type(next), throw a TypeError exception.
+			// d. Append next to list.
+			list.add(next);
+			// e. Set index to index + 1.
+		}
+
+		// 7. Return list.
+		return list.toArray(new Value[0]);
+	}
+
 	@FunctionalInterface
 	public interface ValueComparator {
 		int compare(Value<?> x, Value<?> y) throws AbruptCompletion;

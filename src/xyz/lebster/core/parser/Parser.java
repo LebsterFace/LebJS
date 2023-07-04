@@ -455,7 +455,13 @@ public final class Parser {
 	private VariableDeclarator parseVariableDeclarator() throws SyntaxError {
 		final SourcePosition declaratorStart = position();
 		final AssignmentTarget lhs = parseAssignmentTarget(false);
-		final Expression value = state.optional(Equals) ? parseSpecAssignmentExpression() : null;
+		final Expression value;
+		if (state.optional(Equals)) {
+			consumeAllLineTerminators();
+			value = parseSpecAssignmentExpression();
+		} else {
+			value = null;
+		}
 		return new VariableDeclarator(lhs, value, range(declaratorStart));
 	}
 

@@ -59,6 +59,7 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.TypeError, intrinsics.typeErrorConstructor);
 
 		// 19.4 Other Properties of the Global Object
+		put(Names.JSON, intrinsics.jsonObject);
 		put(Names.Math, intrinsics.mathObject);
 
 		// Non-Standard properties

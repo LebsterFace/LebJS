@@ -10,6 +10,7 @@ public final class Names {
 	public static final StringValue Error = new StringValue("Error");
 	public static final StringValue Function = new StringValue("Function");
 	public static final StringValue Infinity = new StringValue("Infinity");
+	public static final StringValue JSON = new StringValue("JSON");
 	public static final StringValue LN10 = new StringValue("LN10");
 	public static final StringValue LN2 = new StringValue("LN2");
 	public static final StringValue LOG10E = new StringValue("LOG10E");
@@ -210,6 +211,7 @@ public final class Names {
 	public static final StringValue sqrt = new StringValue("sqrt");
 	public static final StringValue startsWith = new StringValue("startsWith");
 	public static final StringValue string = new StringValue("string");
+	public static final StringValue stringify = new StringValue("stringify");
 	public static final StringValue substring = new StringValue("substring");
 	public static final StringValue symmetricDifference = new StringValue("symmetricDifference");
 	public static final StringValue tan = new StringValue("tan");

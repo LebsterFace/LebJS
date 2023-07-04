@@ -67,7 +67,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		if (d >= Math.pow(10, 21) || d < Math.pow(10, -6)) {
 			return String.valueOf(d).toLowerCase();
 		} else {
-			return new BigDecimal(d).setScale(17, RoundingMode.FLOOR).stripTrailingZeros().toPlainString();
+			return new BigDecimal(d).setScale(15, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
 		}
 	}
 

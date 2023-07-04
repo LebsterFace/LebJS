@@ -1,7 +1,9 @@
 package xyz.lebster.core.value.globals;
 
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
@@ -14,6 +16,7 @@ import xyz.lebster.core.node.expression.ObjectExpression;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.runtimesyntax.SyntaxErrorObject;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
@@ -21,6 +24,7 @@ import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.array.ArrayPrototype.isArray;
 import static xyz.lebster.core.value.array.ArrayPrototype.lengthOfArrayLike;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
@@ -45,7 +49,11 @@ public final class JSONObject extends ObjectValue {
 		final StringValue jsonString = text.toStringValue(interpreter);
 		// 2. Parse StringToCodePoints(jsonString) as a JSON text as specified in ECMA-404.
 		// Throw a SyntaxError exception if it is not a valid JSON text as defined in that specification.
-		validateJSON(jsonString.value);
+		try {
+			new JSONParser(jsonString.value).parse();
+		} catch (JSONParser.JSONParseError e) {
+			throw error(new SyntaxErrorObject(interpreter, e.getMessage()));
+		}
 		// 3. Let scriptString be the string-concatenation of "(", jsonString, and ");".
 		// 4. Let script be ParseText(StringToCodePoints(scriptString), Script).
 		// 6. Assert: script is a Parse Node.
@@ -160,10 +168,7 @@ public final class JSONObject extends ObjectValue {
 		return reviver.call(interpreter, holder, name, val);
 	}
 
-	private static void validateJSON(String value) {
-		throw new NotImplemented("JSON parsing");
-	}
-
+	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-json.stringify")
 	private static StringValue stringify(Interpreter interpreter, Value<?>[] arguments) {
 		// 25.5.2 JSON.stringify ( value [ , replacer [ , space ] ] )
@@ -172,5 +177,219 @@ public final class JSONObject extends ObjectValue {
 		final Value<?> space = argument(2, arguments);
 
 		throw new NotImplemented("JSON.stringify");
+	}
+
+	// TODO: More specific parsing errors
+	@SpecificationURL("https://www.ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf")
+	private static final class JSONParser {
+		private int index = 0;
+		private final String sourceText;
+		private final int[] codepoints;
+
+		private static final class JSONParseError extends Exception {
+			public JSONParseError(String message) {
+				super(message);
+			}
+		}
+
+		public JSONParser(String sourceText) {
+			this.sourceText = sourceText;
+			this.codepoints = sourceText.codePoints().toArray();
+		}
+
+		public void parse() throws JSONParseError {
+			whitespace();
+			parseValue();
+			if (index < codepoints.length)
+				throw new JSONParseError("Unexpected non-whitespace character " + quoteCurrent() + " after JSON");
+		}
+
+		private JSONParseError unexpected() {
+			if (outOfBounds()) return new JSONParseError("Unexpected end of JSON input");
+			return new JSONParseError("Unexpected token " + quoteCurrent() + " in JSON");
+		}
+
+		private boolean outOfBounds() {
+			return index >= codepoints.length;
+		}
+
+		public void parseValue() throws JSONParseError {
+			if (is('{')) parseObject();
+			else if (is('[')) parseArray();
+			else if (is('-') || isDigit()) parseNumber();
+			else if (is('"')) parseString();
+			else if (optional("true") || optional("false") || optional("null")) whitespace();
+			else throw unexpected();
+		}
+
+		private void parseEscapeSequence() throws JSONParseError {
+			if (outOfBounds()) throw new JSONParseError("Unexpected end of JSON input");
+			if (optional('u')) {
+				// Four hex digits
+				for (int i = 0; i < 4; i++) {
+					if (isHexDigit()) {
+						index++;
+					} else {
+						throw new JSONParseError("Bad Unicode escape in JSON");
+					}
+				}
+			} else if (!optional('"')
+				 && !optional('\\')
+				 && !optional('/')
+				 && !optional('b')
+				 && !optional('f')
+				 && !optional('n')
+				 && !optional('r')
+				 && !optional('t')
+			) {
+				throw new JSONParseError("Bad escaped character in JSON");
+			}
+		}
+
+		private void parseString() throws JSONParseError {
+			require('"');
+			while (true) {
+				if (outOfBounds())
+					throw new JSONParseError("Unterminated string in JSON");
+
+				if (optional('"')) {
+					whitespace();
+					break;
+				}
+
+				if (codepoints[index] <= 0x001F) {
+					throw new JSONParseError("Bad control character " + quoteCurrent() + " in string literal in JSON");
+				} else if (optional('\\')) {
+					parseEscapeSequence();
+				} else {
+					index++;
+				}
+			}
+		}
+
+		private void parseNumber() throws JSONParseError {
+			optional('-');
+			if (!isDigit()) throw new JSONParseError("No number after minus sign in JSON");
+			// If the first digit is zero, there must only be one.
+			if (!optional('0')) consumeDigits();
+
+			if (optional('.')) {
+				if (!isDigit()) throw new JSONParseError("Unterminated fractional number in JSON");
+				else consumeDigits();
+			}
+
+			if (optional('e') || optional('E')) {
+				if (is('+') || is('-')) index++;
+				if (!isDigit()) throw new JSONParseError("Exponent part is missing a number in JSON");
+				consumeDigits();
+			}
+
+			whitespace();
+		}
+
+		private void consumeDigits() {
+			while (isDigit()) {
+				index++;
+			}
+		}
+
+		private void parseArray() throws JSONParseError {
+			require('[');
+			whitespace();
+
+			if (optional(']')) {
+				whitespace();
+				return;
+			}
+
+			while (true) {
+				parseValue();
+				if (optional(']')) {
+					whitespace();
+					return;
+				}
+
+				require(',');
+				whitespace();
+			}
+		}
+
+		private void parseObject() throws JSONParseError {
+			require('{');
+			whitespace();
+
+			if (optional('}')) {
+				whitespace();
+				return;
+			}
+
+			while (true) {
+				parseString();
+				require(':');
+				whitespace();
+				parseValue();
+				if (optional('}')) {
+					whitespace();
+					return;
+				}
+				require(',');
+				whitespace();
+			}
+		}
+
+		private String quoteCurrent() {
+			return StringEscapeUtils.quote(Character.toString(codepoints[index]), false);
+		}
+
+		private void whitespace() {
+			while (index < codepoints.length && isWhitespace()) {
+				index++;
+			}
+		}
+
+		private boolean isWhitespace() {
+			return '\t' == codepoints[index] ||
+				   '\n' == codepoints[index] ||
+				   '\r' == codepoints[index] ||
+				   ' ' == codepoints[index];
+		}
+
+		private boolean is(int codepoint) {
+			if (outOfBounds()) return false;
+			return codepoints[index] == codepoint;
+		}
+
+		private boolean isDigit() {
+			if (outOfBounds()) return false;
+			return codepoints[index] >= (int) '0' && codepoints[index] <= (int) '9';
+		}
+
+		private boolean isHexDigit() {
+			if (outOfBounds()) return false;
+			return (codepoints[index] >= (int) '0' && codepoints[index] <= (int) '9') || (codepoints[index] >= 'A' && codepoints[index] <= 'F') || (codepoints[index] >= 'a' && codepoints[index] <= 'f');
+		}
+
+		private boolean optional(int codepoint) {
+			if (is(codepoint)) {
+				index++;
+				return true;
+			}
+
+			return false;
+		}
+
+		private boolean optional(String string) {
+			for (int I : string.codePoints().toArray()) {
+				if (!is(I)) return false;
+				index++;
+			}
+
+			return true;
+		}
+
+		private void require(int codepoint) throws JSONParseError {
+			if (!is(codepoint)) throw unexpected();
+			index++;
+		}
 	}
 }

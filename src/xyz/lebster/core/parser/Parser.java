@@ -1,7 +1,6 @@
 package xyz.lebster.core.parser;
 
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.ParserNotImplemented;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
@@ -58,13 +57,13 @@ public final class Parser {
 		savedStack.removeLast();
 	}
 
-	public Program parse() throws SyntaxError, CannotParse {
+	public Program parse() throws SyntaxError {
 		final Program program = new Program();
 		populateAppendableNode(program, EOF);
 		return program;
 	}
 
-	private <T extends AppendableNode> void populateAppendableNode(T root, TokenType... end) throws CannotParse, SyntaxError {
+	private <T extends AppendableNode> void populateAppendableNode(T root, TokenType... end) throws SyntaxError {
 		boolean isFirstStatement = true;
 		while (state.index < state.tokens.length && !state.is(end)) {
 			if (isFirstStatement) {
@@ -119,14 +118,14 @@ public final class Parser {
 		}
 	}
 
-	private Statement parseLine() throws SyntaxError, CannotParse {
+	private Statement parseLine() throws SyntaxError {
 		consumeAllLineTerminators();
 		final Statement result = parseStatementOrExpression();
 		consumeAllSeparators();
 		return result;
 	}
 
-	private Statement parseAny() throws SyntaxError, CannotParse {
+	private Statement parseAny() throws SyntaxError {
 		if (state.token.matchDeclaration()) {
 			return parseDeclaration();
 		} else if (state.token.matchPrimaryExpression() || state.token.matchStatement()) {
@@ -136,7 +135,7 @@ public final class Parser {
 		}
 	}
 
-	private BlockStatement parseBlockStatement() throws SyntaxError, CannotParse {
+	private BlockStatement parseBlockStatement() throws SyntaxError {
 		state.require(LBrace);
 		final BlockStatement result = new BlockStatement();
 		populateAppendableNode(result, RBrace);
@@ -144,7 +143,7 @@ public final class Parser {
 		return result;
 	}
 
-	private Statement parseStatementOrExpression() throws SyntaxError, CannotParse {
+	private Statement parseStatementOrExpression() throws SyntaxError {
 		return switch (state.token.type) {
 			case Import, Export -> throw new ParserNotImplemented(position(), "import / export statements");
 
@@ -173,19 +172,15 @@ public final class Parser {
 			}
 
 			default -> {
-				if (state.token.matchPrimaryExpression()) {
-					final Expression expression = parseExpression();
-					if (state.is(Colon))
-						throw new ParserNotImplemented(position(), "labels");
-					yield new ExpressionStatement(expression);
-				} else {
-					throw new CannotParse(state.token, "Statement");
-				}
+				if (!state.token.matchPrimaryExpression()) throw state.unexpected();
+				final Expression expression = parseExpression();
+				if (state.is(Colon)) throw new ParserNotImplemented(position(), "labels");
+				yield new ExpressionStatement(expression);
 			}
 		};
 	}
 
-	private Statement parseSwitchStatement() throws SyntaxError, CannotParse {
+	private Statement parseSwitchStatement() throws SyntaxError {
 		state.require(Switch);
 		consumeAllLineTerminators();
 		state.require(LParen);
@@ -203,7 +198,7 @@ public final class Parser {
 		}
 	}
 
-	private SwitchCase[] parseSwitchCases() throws SyntaxError, CannotParse {
+	private SwitchCase[] parseSwitchCases() throws SyntaxError {
 		final List<SwitchCase> cases = new ArrayList<>();
 		while (!(state.is(RBrace, EOF))) {
 			consumeAllLineTerminators();
@@ -225,7 +220,7 @@ public final class Parser {
 		return cases.toArray(new SwitchCase[0]);
 	}
 
-	private Statement[] parseSwitchCaseStatements() throws CannotParse, SyntaxError {
+	private Statement[] parseSwitchCaseStatements() throws SyntaxError {
 		boolean isFirstStatement = true;
 		final List<Statement> statementList = new ArrayList<>();
 		while (true) {
@@ -238,8 +233,7 @@ public final class Parser {
 				requireAtLeastOneSeparator();
 			}
 
-			if (state.is(Case, Default, RBrace, EOF))
-				break;
+			if (state.is(Case, Default, RBrace, EOF)) break;
 
 			statementList.add(parseAny());
 		}
@@ -259,7 +253,7 @@ public final class Parser {
 		return new BreakStatement();
 	}
 
-	private BlockStatement parseFunctionBody() throws CannotParse, SyntaxError {
+	private BlockStatement parseFunctionBody() throws SyntaxError {
 		final boolean old_inBreakContext = state.inBreakContext;
 		final boolean old_inContinueContext = state.inContinueContext;
 		state.inBreakContext = false;
@@ -272,7 +266,7 @@ public final class Parser {
 		}
 	}
 
-	private Statement parseContextualStatement(boolean inBreakContext, boolean inContinueContext) throws CannotParse, SyntaxError {
+	private Statement parseContextualStatement(boolean inBreakContext, boolean inContinueContext) throws SyntaxError {
 		final boolean old_inBreakContext = state.inBreakContext;
 		final boolean old_inContinueContext = state.inContinueContext;
 		state.inBreakContext = inBreakContext;
@@ -285,7 +279,7 @@ public final class Parser {
 		}
 	}
 
-	private ForOfStatement parseForOfStatement(Assignable left) throws SyntaxError, CannotParse {
+	private ForOfStatement parseForOfStatement(Assignable left) throws SyntaxError {
 		state.requireIdentifier("of");
 		final Expression expression = parseExpression();
 		state.require(RParen);
@@ -293,7 +287,7 @@ public final class Parser {
 		return new ForOfStatement(left, expression, body);
 	}
 
-	private ForInStatement parseForInStatement(Assignable left) throws SyntaxError, CannotParse {
+	private ForInStatement parseForInStatement(Assignable left) throws SyntaxError {
 		state.require(In);
 		final Expression expression = parseExpression();
 		state.require(RParen);
@@ -301,7 +295,7 @@ public final class Parser {
 		return new ForInStatement(left, expression, body);
 	}
 
-	private Statement parseForStatement() throws SyntaxError, CannotParse {
+	private Statement parseForStatement() throws SyntaxError {
 		state.require(For);
 		consumeAllLineTerminators();
 		state.require(LParen);
@@ -355,7 +349,7 @@ public final class Parser {
 		return new ForStatement(init, test, update, body);
 	}
 
-	private Expression parseWhileCondition() throws SyntaxError, CannotParse {
+	private Expression parseWhileCondition() throws SyntaxError {
 		state.require(While);
 		consumeAllLineTerminators();
 		state.require(LParen);
@@ -365,20 +359,20 @@ public final class Parser {
 		return condition;
 	}
 
-	private WhileStatement parseWhileStatement() throws SyntaxError, CannotParse {
+	private WhileStatement parseWhileStatement() throws SyntaxError {
 		final Expression condition = parseWhileCondition();
 		final Statement body = parseContextualStatement(true, true);
 		return new WhileStatement(condition, body);
 	}
 
-	private DoWhileStatement parseDoWhileStatement() throws SyntaxError, CannotParse {
+	private DoWhileStatement parseDoWhileStatement() throws SyntaxError {
 		state.require(Do);
 		final Statement body = parseContextualStatement(true, true);
 		final Expression condition = parseWhileCondition();
 		return new DoWhileStatement(body, condition);
 	}
 
-	private TryStatement parseTryStatement() throws SyntaxError, CannotParse {
+	private TryStatement parseTryStatement() throws SyntaxError {
 		state.require(Try);
 		final BlockStatement body = parseBlockStatement();
 		consumeAllLineTerminators();
@@ -406,7 +400,7 @@ public final class Parser {
 		return new TryStatement(body, catchParameter, catchBody, finallyBody);
 	}
 
-	private IfStatement parseIfStatement() throws SyntaxError, CannotParse {
+	private IfStatement parseIfStatement() throws SyntaxError {
 		state.require(If);
 		consumeAllLineTerminators();
 		state.require(LParen);
@@ -418,12 +412,12 @@ public final class Parser {
 		return new IfStatement(condition, consequence, elseStatement);
 	}
 
-	private Declaration parseDeclaration() throws SyntaxError, CannotParse {
+	private Declaration parseDeclaration() throws SyntaxError {
 		return switch (state.token.type) {
 			case Let, Var, Const -> parseVariableDeclaration();
 			case Function -> parseFunctionDeclaration();
 			case Class -> parseClassDeclaration();
-			default -> throw new CannotParse(state.token, "Declaration");
+			default -> throw state.unexpected();
 		};
 	}
 
@@ -435,7 +429,7 @@ public final class Parser {
 		return new SourceRange(sourceText, start, position());
 	}
 
-	private VariableDeclaration parseVariableDeclaration() throws SyntaxError, CannotParse {
+	private VariableDeclaration parseVariableDeclaration() throws SyntaxError {
 		// TODO: Missing init in 'const' declaration
 		final var kind = switch (state.token.type) {
 			case Var -> Kind.Var;
@@ -458,14 +452,14 @@ public final class Parser {
 		return new VariableDeclaration(kind, declarators.toArray(new VariableDeclarator[0]));
 	}
 
-	private VariableDeclarator parseVariableDeclarator() throws SyntaxError, CannotParse {
+	private VariableDeclarator parseVariableDeclarator() throws SyntaxError {
 		final SourcePosition declaratorStart = position();
 		final AssignmentTarget lhs = parseAssignmentTarget(false);
 		final Expression value = state.optional(Equals) ? parseSpecAssignmentExpression() : null;
 		return new VariableDeclarator(lhs, value, range(declaratorStart));
 	}
 
-	private AssignmentPattern parseInitializer(final AssignmentTarget assignmentTarget) throws CannotParse, SyntaxError {
+	private AssignmentPattern parseInitializer(final AssignmentTarget assignmentTarget) throws SyntaxError {
 		// =(opt) Expression(opt)
 		consumeAllLineTerminators();
 		if (!state.optional(Equals)) // No default expression
@@ -476,7 +470,7 @@ public final class Parser {
 		return new AssignmentPattern(assignmentTarget, defaultExpression);
 	}
 
-	private AssignmentTarget parseAssignmentTarget(boolean allowMemberExpressions) throws SyntaxError, CannotParse {
+	private AssignmentTarget parseAssignmentTarget(boolean allowMemberExpressions) throws SyntaxError {
 		if (state.optional(LBrace)) {
 			return parseObjectDestructuring(allowMemberExpressions);
 		} else if (state.optional(LBracket)) {
@@ -492,7 +486,7 @@ public final class Parser {
 		}
 	}
 
-	private ArrayDestructuring parseArrayDestructuring(boolean allowMemberExpressions) throws SyntaxError, CannotParse {
+	private ArrayDestructuring parseArrayDestructuring(boolean allowMemberExpressions) throws SyntaxError {
 		final ArrayList<AssignmentPattern> children = new ArrayList<>();
 		AssignmentTarget restTarget = null;
 
@@ -518,7 +512,7 @@ public final class Parser {
 		return new ArrayDestructuring(restTarget, children.toArray(new AssignmentPattern[0]));
 	}
 
-	private ObjectDestructuring parseObjectDestructuring(boolean allowMemberExpressions) throws SyntaxError, CannotParse {
+	private ObjectDestructuring parseObjectDestructuring(boolean allowMemberExpressions) throws SyntaxError {
 		consumeAllLineTerminators();
 
 		final Map<Expression, AssignmentPattern> pairs = new HashMap<>();
@@ -563,7 +557,7 @@ public final class Parser {
 		return new ObjectDestructuring(pairs, restName);
 	}
 
-	private Expression parseComputedKeyExpression() throws SyntaxError, CannotParse {
+	private Expression parseComputedKeyExpression() throws SyntaxError {
 		state.require(LBracket);
 		final Expression keyExpression = parseExpression();
 		state.require(RBracket);
@@ -573,7 +567,7 @@ public final class Parser {
 		return keyExpression;
 	}
 
-	private FunctionParameters parseFunctionParameters(boolean expectLParen) throws SyntaxError, CannotParse {
+	private FunctionParameters parseFunctionParameters(boolean expectLParen) throws SyntaxError {
 		if (expectLParen) state.require(LParen);
 
 		final FunctionParameters result = new FunctionParameters();
@@ -606,13 +600,11 @@ public final class Parser {
 		return result;
 	}
 
-	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError, CannotParse {
+	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError {
 		state.require(Function);
-		if (state.is(Star))
-			throw new ParserNotImplemented(position(), "Generator function declarations");
+		if (state.is(Star)) throw new ParserNotImplemented(position(), "Generator function declarations");
 		consumeAllLineTerminators();
-		if (!state.is(Identifier))
-			throw new SyntaxError("Function declarations require a function name", position());
+		if (!state.is(Identifier)) throw new SyntaxError("Function declarations require a function name", position());
 
 		final StringLiteral name = state.consume().asStringLiteral();
 		consumeAllLineTerminators();
@@ -621,14 +613,14 @@ public final class Parser {
 		return new FunctionDeclaration(parseFunctionBody(), name, parameters);
 	}
 
-	private FunctionExpression parseFunctionExpression(boolean allowName) throws SyntaxError, CannotParse {
+	private FunctionExpression parseFunctionExpression(boolean allowName) throws SyntaxError {
 		if (state.is(Star)) throw new ParserNotImplemented(position(), "Generator function expressions");
 		final StringLiteral name = allowName ? state.optionalStringLiteral(Identifier) : null;
 		final FunctionParameters parameters = parseFunctionParameters(true);
 		return new FunctionExpression(parseFunctionBody(), name, parameters);
 	}
 
-	private ExpressionList parseExpressionList(boolean expectParens, boolean canHaveEmpty) throws SyntaxError, CannotParse {
+	private ExpressionList parseExpressionList(boolean expectParens, boolean canHaveEmpty) throws SyntaxError {
 		final ExpressionList result = new ExpressionList(canHaveEmpty);
 		if (expectParens) state.require(LParen);
 		consumeAllLineTerminators();
@@ -655,14 +647,14 @@ public final class Parser {
 		return result;
 	}
 
-	private CallExpression parseCallExpression(Expression left) throws SyntaxError, CannotParse {
+	private CallExpression parseCallExpression(Expression left) throws SyntaxError {
 		final ExpressionList arguments = parseExpressionList(false, false);
 		state.require(RParen);
 		return new CallExpression(left, arguments);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-UnaryExpression")
-	private Expression parseUnaryPrefixedExpression() throws SyntaxError, CannotParse {
+	private Expression parseUnaryPrefixedExpression() throws SyntaxError {
 		final Token token = state.consume();
 		final Associativity assoc = token.associativity();
 		final int minPrecedence = token.precedence();
@@ -676,14 +668,14 @@ public final class Parser {
 			case Tilde -> UnaryExpression.UnaryOp.BitwiseNot;
 			case Bang -> UnaryExpression.UnaryOp.LogicalNot;
 			case Await -> UnaryExpression.UnaryOp.Await;
-			default -> throw new CannotParse(token, "Unary Operator");
+			default -> throw state.unexpected();
 		};
 
 		return new UnaryExpression(parseExpression(minPrecedence, assoc), op);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-UpdateExpression")
-	private UpdateExpression parsePrefixedUpdateExpression() throws CannotParse, SyntaxError {
+	private UpdateExpression parsePrefixedUpdateExpression() throws SyntaxError {
 		final Token token = state.consume();
 		final Associativity assoc = token.associativity();
 		final int minPrecedence = token.precedence();
@@ -691,25 +683,25 @@ public final class Parser {
 		final UpdateOp op = switch (token.type) {
 			case PlusPlus -> UpdateOp.PreIncrement;
 			case MinusMinus -> UpdateOp.PreDecrement;
-			default -> throw new CannotParse(token, "Prefix update Operator");
+			default -> throw state.unexpected();
 		};
 
 		return new UpdateExpression(ensureLHS(parseExpression(minPrecedence, assoc), UpdateExpression.invalidPreLHS), op);
 	}
 
-	private Expression parseSpecAssignmentExpression() throws CannotParse, SyntaxError {
+	private Expression parseSpecAssignmentExpression() throws SyntaxError {
 		return parseExpression(1, Left, new HashSet<>());
 	}
 
-	private Expression parseExpression() throws SyntaxError, CannotParse {
+	public Expression parseExpression() throws SyntaxError {
 		return parseExpression(0, Left, new HashSet<>());
 	}
 
-	private Expression parseExpression(int minPrecedence, Associativity assoc) throws SyntaxError, CannotParse {
+	private Expression parseExpression(int minPrecedence, Associativity assoc) throws SyntaxError {
 		return parseExpression(minPrecedence, assoc, new HashSet<>());
 	}
 
-	private Expression parseExpression(int minPrecedence, Associativity assoc, Set<TokenType> forbidden) throws SyntaxError, CannotParse {
+	private Expression parseExpression(int minPrecedence, Associativity assoc, Set<TokenType> forbidden) throws SyntaxError {
 		Expression latestExpr = parsePrimaryExpression();
 		consumeAllLineTerminators();
 
@@ -745,19 +737,57 @@ public final class Parser {
 		}
 	}
 
-	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws SyntaxError, CannotParse {
+	private Expression parseSecondaryExpression(Expression left, int minPrecedence, Associativity assoc) throws SyntaxError {
 		final Token token = state.consume();
 		consumeAllLineTerminators();
 
 		return switch (token.type) {
-			case Plus, Minus, Star, Slash, Percent, Exponent, Pipe, Ampersand, Caret, LeftShift, RightShift, UnsignedRightShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), token.getBinaryOp());
-			case StrictEqual, LooseEqual, StrictNotEqual, NotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), token.getEqualityOp());
-			case LogicalOr, LogicalAnd, NullishCoalescing -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), token.getLogicOp());
-			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), token.getRelationalOp());
-			case MinusMinus, PlusPlus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), token.getUpdateOp());
-			case Equals, LogicalAndEquals, LogicalOrEquals, NullishCoalescingEquals, MultiplyEquals,
-				DivideEquals, PercentEquals, PlusEquals, MinusEquals, LeftShiftEquals, RightShiftEquals,
-				UnsignedRightShiftEquals, AmpersandEquals, CaretEquals, PipeEquals, ExponentEquals -> new AssignmentExpression(ensureAssignable(left, token.getAssignmentOp()), parseExpression(minPrecedence, assoc), token.getAssignmentOp());
+			case Plus,
+				Minus,
+				Star,
+				Slash,
+				Percent,
+				Exponent,
+				Pipe,
+				Ampersand,
+				Caret,
+				LeftShift,
+				RightShift,
+				UnsignedRightShift -> new BinaryExpression(left, parseExpression(minPrecedence, assoc), token.getBinaryOp(state));
+			case StrictEqual,
+				LooseEqual,
+				StrictNotEqual,
+				NotEqual -> new EqualityExpression(left, parseExpression(minPrecedence, assoc), token.getEqualityOp(state));
+			case LogicalOr,
+				LogicalAnd,
+				NullishCoalescing -> new LogicalExpression(left, parseExpression(minPrecedence, assoc), token.getLogicOp(state));
+			case LessThan,
+				LessThanEqual,
+				GreaterThan,
+				GreaterThanEqual,
+				In,
+				InstanceOf -> new RelationalExpression(left, parseExpression(minPrecedence, assoc), token.getRelationalOp(state));
+			case MinusMinus,
+				PlusPlus -> new UpdateExpression(ensureLHS(left, UpdateExpression.invalidPostLHS), token.getUpdateOp(state));
+			case Equals,
+				LogicalAndEquals,
+				LogicalOrEquals,
+				NullishCoalescingEquals,
+				MultiplyEquals,
+				DivideEquals,
+				PercentEquals,
+				PlusEquals,
+				MinusEquals,
+				LeftShiftEquals,
+				RightShiftEquals,
+				UnsignedRightShiftEquals,
+				AmpersandEquals,
+				CaretEquals,
+				PipeEquals,
+				ExponentEquals -> {
+				final AssignmentOp op = token.getAssignmentOp(state);
+				yield new AssignmentExpression(ensureAssignable(left, op), parseExpression(minPrecedence, assoc), op);
+			}
 
 			case QuestionMark -> parseConditionalExpression(left);
 			case LParen -> parseCallExpression(left);
@@ -766,11 +796,11 @@ public final class Parser {
 			case Comma -> new SequenceExpression(left, parseExpression());
 
 			case OptionalChain -> throw new ParserNotImplemented(position(), "optional chaining");
-			default -> throw new CannotParse(token, "SecondaryExpression");
+			default -> throw state.unexpected();
 		};
 	}
 
-	private MemberExpression parseComputedMemberExpression(Expression left) throws SyntaxError, CannotParse {
+	private MemberExpression parseComputedMemberExpression(Expression left) throws SyntaxError {
 		final Expression prop = parseExpression();
 		state.require(RBracket);
 		return new MemberExpression(left, prop, true);
@@ -781,7 +811,7 @@ public final class Parser {
 		return new MemberExpression(left, state.consume().asStringLiteral(), false);
 	}
 
-	private Assignable ensureAssignable(Expression left_expr, AssignmentOp op) throws SyntaxError, CannotParse {
+	private Assignable ensureAssignable(Expression left_expr, AssignmentOp op) throws SyntaxError {
 		if (left_expr instanceof final Assignable assignable) {
 			if (left_expr instanceof LeftHandSideExpression || op == AssignmentOp.Assign) {
 				return assignable;
@@ -795,7 +825,7 @@ public final class Parser {
 		throw new SyntaxError(AssignmentExpression.invalidLHS, position());
 	}
 
-	private Expression parseConditionalExpression(Expression test) throws CannotParse, SyntaxError {
+	private Expression parseConditionalExpression(Expression test) throws SyntaxError {
 		final Expression left = parseExpression(2, Right);
 		consumeAllLineTerminators();
 		state.require(Colon);
@@ -804,7 +834,7 @@ public final class Parser {
 		return new ConditionalExpression(test, left, right);
 	}
 
-	private Expression parsePrimaryExpression() throws SyntaxError, CannotParse {
+	private Expression parsePrimaryExpression() throws SyntaxError {
 		if (state.token.matchPrefixedUpdateExpression()) {
 			return parsePrefixedUpdateExpression();
 		} else if (state.token.matchUnaryPrefixedExpression()) {
@@ -859,7 +889,7 @@ public final class Parser {
 			}
 
 			case TemplateExpressionEnd -> throw new SyntaxError("Unexpected end of template expression", position());
-			default -> throw new CannotParse(state.token, "PrimaryExpression");
+			default -> throw state.unexpected();
 		};
 	}
 
@@ -874,14 +904,14 @@ public final class Parser {
 		return new RegExpLiteral(pattern, flags);
 	}
 
-	private Expression parseIdentifierExpressionOrArrowFunctionExpression() throws CannotParse, SyntaxError {
+	private Expression parseIdentifierExpressionOrArrowFunctionExpression() throws SyntaxError {
 		final var identifier = new IdentifierExpression(state.consume().value);
 		if (state.is(TemplateStart)) throw new ParserNotImplemented(position(), "tagged template literals");
 		if (!state.optional(Arrow)) return identifier;
 		return parseArrowFunctionBody(new FunctionParameters(identifier));
 	}
 
-	private Expression parseParenthesizedOrArrowFunctionExpression() throws CannotParse, SyntaxError {
+	private Expression parseParenthesizedOrArrowFunctionExpression() throws SyntaxError {
 		final SourcePosition start = state.consume().position;
 
 		consumeAllLineTerminators();
@@ -898,7 +928,7 @@ public final class Parser {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-new-operator")
-	private NewExpression parseNewExpression() throws SyntaxError, CannotParse {
+	private NewExpression parseNewExpression() throws SyntaxError {
 		final Token newOperator = state.consume();
 		consumeAllLineTerminators();
 		if (state.is(Period)) throw new ParserNotImplemented(position(), "new.target");
@@ -909,14 +939,14 @@ public final class Parser {
 	}
 
 	// FIXME: Correctly handle super in all cases
-	private SuperCallStatement parseSuperCall() throws SyntaxError, CannotParse {
+	private SuperCallStatement parseSuperCall() throws SyntaxError {
 		final SourcePosition start = position();
 		state.require(Super);
 		final ExpressionList args = parseExpressionList(true, false);
 		return new SuperCallStatement(args, range(start));
 	}
 
-	private ClassExpression parseClassExpression() throws SyntaxError, CannotParse {
+	private ClassExpression parseClassExpression() throws SyntaxError {
 		final SourcePosition start = position();
 		state.require(Class);
 		consumeAllLineTerminators();
@@ -928,7 +958,7 @@ public final class Parser {
 		return parseClassBody(start, className, heritage);
 	}
 
-	private ObjectExpressionKey parseObjectExpressionKey() throws SyntaxError, CannotParse {
+	private ObjectExpressionKey parseObjectExpressionKey() throws SyntaxError {
 		final SourcePosition start = position();
 		final boolean isIdentifier = state.token.matchIdentifierName();
 		final boolean nonComputed = isIdentifier || state.is(NumericLiteral, StringLiteral);
@@ -945,7 +975,7 @@ public final class Parser {
 		return new ObjectExpressionKey(start, key, !nonComputed, isIdentifier);
 	}
 
-	private ObjectExpression parseObjectExpression() throws SyntaxError, CannotParse {
+	private ObjectExpression parseObjectExpression() throws SyntaxError {
 		final SourcePosition start = position();
 		state.require(LBrace);
 		consumeAllLineTerminators();
@@ -965,27 +995,25 @@ public final class Parser {
 		return result;
 	}
 
-	private ObjectEntryNode parseObjectProperty(ObjectExpression result) throws CannotParse, SyntaxError {
+	private ObjectEntryNode parseObjectProperty(ObjectExpression result) throws SyntaxError {
 		if (state.optional(DotDotDot)) {
 			consumeAllLineTerminators();
 			return new SpreadNode(parseSpecAssignmentExpression());
-		} else if (state.optional(Star))
-			throw new ParserNotImplemented(position(), "generator object literal methods");
+		} else if (state.optional(Star)) throw new ParserNotImplemented(position(), "generator object literal methods");
 
 		final ObjectExpressionKey key = parseObjectExpressionKey();
 		consumeAllLineTerminators();
 
 		if (!key.computed) {
 			final String prefix = key.stringValue().value;
-			if (state.token.matchObjectExpressionKey())
-				if (prefix.equals("async")) {
-					throw new ParserNotImplemented(position(), "`async` object literal methods");
-				} else if (prefix.equals("get") || prefix.equals("set")) {
-					consumeAllLineTerminators();
-					final ObjectExpressionKey name = parseObjectExpressionKey();
-					final FunctionExpression function = parseFunctionExpression(false);
-					return new GetterSetterNode(prefix.equals("get"), name.expression, function, name.computed);
-				}
+			if (state.token.matchObjectExpressionKey()) if (prefix.equals("async")) {
+				throw new ParserNotImplemented(position(), "`async` object literal methods");
+			} else if (prefix.equals("get") || prefix.equals("set")) {
+				consumeAllLineTerminators();
+				final ObjectExpressionKey name = parseObjectExpressionKey();
+				final FunctionExpression function = parseFunctionExpression(false);
+				return new GetterSetterNode(prefix.equals("get"), name.expression, function, name.computed);
+			}
 		}
 
 		if (key.isIdentifier && state.optional(Equals)) {
@@ -1013,7 +1041,7 @@ public final class Parser {
 		return new ShorthandNode(key.stringValue());
 	}
 
-	private ClassExpression parseClassBody(SourcePosition start, String className, Expression heritage) throws SyntaxError, CannotParse {
+	private ClassExpression parseClassBody(SourcePosition start, String className, Expression heritage) throws SyntaxError {
 		ClassConstructorNode constructor = null;
 		final List<ClassMethodNode> methods = new ArrayList<>();
 		final List<ClassFieldNode> fields = new ArrayList<>();
@@ -1024,25 +1052,20 @@ public final class Parser {
 
 		while (!state.is(RBrace)) {
 			consumeAllSeparators();
-			if (state.optional(Static))
-				throw new ParserNotImplemented(position(), "`static` class elements");
-			if (state.optional(Star))
-				throw new ParserNotImplemented(position(), "generator class methods");
+			if (state.optional(Static)) throw new ParserNotImplemented(position(), "`static` class elements");
+			if (state.optional(Star)) throw new ParserNotImplemented(position(), "generator class methods");
 
 			if (!state.token.matchClassElementName()) {
-				if (state.is(Hashtag))
-					throw new ParserNotImplemented(position(), "private class fields");
+				if (state.is(Hashtag)) throw new ParserNotImplemented(position(), "private class fields");
 
 				throw state.unexpected();
 			}
 
 			final SourcePosition elementStart = position();
-			if (state.optional(Async))
-				throw new ParserNotImplemented(position(), "`async` class methods");
+			if (state.optional(Async)) throw new ParserNotImplemented(position(), "`async` class methods");
 
 			// FIXME: Methods named get / set
-			if (state.optional(Identifier, "get") || state.optional(Identifier, "set"))
-				throw new ParserNotImplemented(position(), "class getters & setters");
+			if (state.optional(Identifier, "get") || state.optional(Identifier, "set")) throw new ParserNotImplemented(position(), "class getters & setters");
 
 			// TODO: Remove duplication with parseObjectExpression
 			final Expression name;
@@ -1070,8 +1093,7 @@ public final class Parser {
 				continue;
 			}
 
-			if (isConstructor && constructor != null)
-				throw new SyntaxError("A class may only have one constructor", elementStart);
+			if (isConstructor && constructor != null) throw new SyntaxError("A class may only have one constructor", elementStart);
 
 			final FunctionParameters parameters = parseFunctionParameters(true);
 			consumeAllLineTerminators();
@@ -1091,19 +1113,19 @@ public final class Parser {
 	}
 
 	// FIXME: ClassDeclaration
-	private VariableDeclaration parseClassDeclaration() throws SyntaxError, CannotParse {
+	private VariableDeclaration parseClassDeclaration() throws SyntaxError {
 		final ClassExpression classExpression = parseClassExpression();
 		return new VariableDeclaration(Kind.Let, new VariableDeclarator(new IdentifierExpression(classExpression.className()), classExpression, null));
 	}
 
-	private Expression parseClassHeritage() throws SyntaxError, CannotParse {
+	private Expression parseClassHeritage() throws SyntaxError {
 		if (!state.optional(Extends)) return null;
 		consumeAllLineTerminators();
 		if (!state.token.matchPrimaryExpression()) throw state.unexpected();
 		return parseExpression();
 	}
 
-	private TemplateLiteral parseTemplateLiteral() throws SyntaxError, CannotParse {
+	private TemplateLiteral parseTemplateLiteral() throws SyntaxError {
 		state.require(TemplateStart);
 		final TemplateLiteral result = new TemplateLiteral();
 
@@ -1127,13 +1149,13 @@ public final class Parser {
 		return result;
 	}
 
-	private ArrowFunctionExpression tryParseArrowFunctionExpression() throws CannotParse, SyntaxError {
+	private ArrowFunctionExpression tryParseArrowFunctionExpression() throws SyntaxError {
 		save();
 
 		final FunctionParameters parameters;
 		try {
 			parameters = parseFunctionParameters(false);
-		} catch (SyntaxError | CannotParse e) {
+		} catch (SyntaxError e) {
 			load();
 			return null;
 		}
@@ -1148,7 +1170,7 @@ public final class Parser {
 		return parseArrowFunctionBody(parameters);
 	}
 
-	private ArrowFunctionExpression parseArrowFunctionBody(FunctionParameters parameters) throws CannotParse, SyntaxError {
+	private ArrowFunctionExpression parseArrowFunctionBody(FunctionParameters parameters) throws SyntaxError {
 		consumeAllLineTerminators();
 		if (state.is(LBrace)) {
 			return new ArrowFunctionExpression(parseBlockStatement(), parameters);
@@ -1159,7 +1181,7 @@ public final class Parser {
 		}
 	}
 
-	private ArrayExpression parseArrayExpression() throws SyntaxError, CannotParse {
+	private ArrayExpression parseArrayExpression() throws SyntaxError {
 		final SourcePosition start = position();
 		state.require(LBracket);
 		final ExpressionList elements = parseExpressionList(false, true);

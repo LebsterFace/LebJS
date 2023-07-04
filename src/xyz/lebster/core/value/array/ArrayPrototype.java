@@ -1697,7 +1697,7 @@ public final class ArrayPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-lengthofarraylike")
-	static int lengthOfArrayLike(Interpreter interpreter, ObjectValue O) throws AbruptCompletion {
+	public static int lengthOfArrayLike(Interpreter interpreter, ObjectValue O) throws AbruptCompletion {
 		// 1. Return ℝ(? ToLength(? Get(obj, "length"))).
 		return toLength(interpreter, O.get(interpreter, Names.length));
 	}

@@ -1,7 +1,10 @@
 package xyz.lebster.cli;
 
 import xyz.lebster.Main;
-import xyz.lebster.core.exception.*;
+import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.exception.ParserNotImplemented;
+import xyz.lebster.core.exception.ShouldNotHappen;
+import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Realm;
@@ -21,7 +24,7 @@ final class SerenityTestHarness implements TestHarness {
 	private final Program testCommon;
 	private final Path commonPath;
 
-	SerenityTestHarness(CLArguments arguments) throws CannotParse, SyntaxError, CLArgumentException {
+	SerenityTestHarness(CLArguments arguments) throws SyntaxError, CLArgumentException {
 		final Path path = arguments.filePathOrNull();
 		if (path == null) throw new CLArgumentException("Test path is required for Serenity test harness");
 		this.commonPath = path.resolve("test-common.js");

@@ -5,7 +5,6 @@ import xyz.lebster.cli.CLArguments;
 import xyz.lebster.cli.REPL;
 import xyz.lebster.cli.Testing;
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -50,12 +49,12 @@ public final class Main {
 		}
 	}
 
-	private static void file(CLArguments arguments) throws CannotParse, AbruptCompletion, SyntaxError {
+	private static void file(CLArguments arguments) throws AbruptCompletion, SyntaxError {
 		final String sourceText = Main.readFile(arguments.filePathOrNull());
 		Realm.executeStatic(sourceText, arguments.options().showAST());
 	}
 
-	private static void gif() throws CannotParse, AbruptCompletion, SyntaxError {
+	private static void gif() throws AbruptCompletion, SyntaxError {
 		final Scanner scanner = new Scanner(System.in);
 		final Realm realm = new Realm(new Interpreter());
 		while (scanner.hasNextLine()) {

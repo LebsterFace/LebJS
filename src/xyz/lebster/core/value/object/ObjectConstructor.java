@@ -22,7 +22,6 @@ import java.util.ArrayList;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
-import static xyz.lebster.core.value.object.ObjectValue.EnumerableOwnPropertyNamesKind.*;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
 public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, ObjectPrototype> {
@@ -161,7 +160,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// 1. Let obj be ? ToObject(O).
 		final ObjectValue obj = O.toObjectValue(interpreter);
 		// 2. Let nameList be ? EnumerableOwnPropertyNames(obj, key).
-		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, KEY);
+		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, true, false);
 		// 3. Return CreateArrayFromList(nameList).
 		return new ArrayObject(interpreter, nameList);
 	}
@@ -174,7 +173,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// 1. Let obj be ? ToObject(O).
 		final ObjectValue obj = O.toObjectValue(interpreter);
 		// 2. Let nameList be ? EnumerableOwnPropertyNames(obj, value).
-		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, VALUE);
+		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, false, true);
 		// 3. Return CreateArrayFromList(nameList).
 		return new ArrayObject(interpreter, nameList);
 	}
@@ -187,7 +186,7 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// 1. Let obj be ? ToObject(O).
 		final ObjectValue obj = O.toObjectValue(interpreter);
 		// 2. Let nameList be ? EnumerableOwnPropertyNames(obj, key+value).
-		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, KEY_VALUE);
+		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, true, true);
 		// 3. Return CreateArrayFromList(nameList).
 		return new ArrayObject(interpreter, nameList);
 	}

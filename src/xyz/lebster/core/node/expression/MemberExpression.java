@@ -55,7 +55,7 @@ public record MemberExpression(Expression base, Expression property, boolean com
 	}
 
 	@Override
-	public void declare(Interpreter interpreter, Kind kind, Value<?> value) throws AbruptCompletion {
+	public void declare(Interpreter interpreter, Kind kind, Value<?> value) {
 		throw new ShouldNotHappen("Cannot declare MemberExpression");
 	}
 }

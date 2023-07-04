@@ -1,6 +1,5 @@
 package xyz.lebster.core.value.shadowrealm;
 
-import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -24,7 +23,7 @@ public final class ShadowRealm extends ObjectValue {
 	public Value<?> evaluate(String sourceText) throws AbruptCompletion {
 		try {
 			return this.realm.execute(sourceText, false);
-		} catch (AbruptCompletion | SyntaxError | CannotParse e) {
+		} catch (AbruptCompletion | SyntaxError e) {
 			throw error(new EvalError(realm.interpreter(), e));
 		}
 	}

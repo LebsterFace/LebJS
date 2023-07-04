@@ -2,7 +2,6 @@ package xyz.lebster.cli;
 
 import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.SyntaxError;
 
 import java.io.ByteArrayOutputStream;
@@ -20,7 +19,7 @@ public final class Testing {
 	private int successfulTests = 0;
 	private int totalTests = 0;
 
-	public Testing(CLArguments arguments) throws CannotParse, SyntaxError, CLArgumentException {
+	public Testing(CLArguments arguments) throws SyntaxError, CLArgumentException {
 		this.arguments = arguments;
 		if (arguments.options().disableTestOutputBuffers()) {
 			passedOutput = null;

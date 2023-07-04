@@ -1,6 +1,5 @@
 package xyz.lebster.core.value.primitive.number;
 
-import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Generator;
@@ -43,7 +42,7 @@ public final class NumberRange extends Generator {
 	}
 
 	@Override
-	public Value<?> next(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	public Value<?> next(Interpreter interpreter, Value<?>[] arguments) {
 		if (done()) {
 			setCompleted();
 			return Undefined.instance;

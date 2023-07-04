@@ -2,8 +2,8 @@ package xyz.lebster.core.parser;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.StringEscapeUtils;
-import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.ShouldNotHappen;
+import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.SourcePosition;
 import xyz.lebster.core.node.expression.AssignmentExpression.AssignmentOp;
 import xyz.lebster.core.node.expression.BinaryExpression.BinaryOp;
@@ -287,15 +287,15 @@ public final class Token {
 			   || matchIdentifierName();
 	}
 
-	UpdateOp getUpdateOp() throws CannotParse {
+	UpdateOp getUpdateOp(ParserState state) throws SyntaxError {
 		return switch (type) {
 			case MinusMinus -> PostDecrement;
 			case PlusPlus -> PostIncrement;
-			default -> throw new CannotParse(this, "UpdateOp");
+			default -> throw state.unexpected();
 		};
 	}
 
-	RelationalOp getRelationalOp() throws CannotParse {
+	RelationalOp getRelationalOp(ParserState state) throws SyntaxError {
 		return switch (type) {
 			case LessThan -> RelationalOp.LessThan;
 			case LessThanEqual -> LessThanEquals;
@@ -303,30 +303,30 @@ public final class Token {
 			case GreaterThanEqual -> GreaterThanEquals;
 			case In -> RelationalOp.In;
 			case InstanceOf -> RelationalOp.InstanceOf;
-			default -> throw new CannotParse(this, "RelationalOp");
+			default -> throw state.unexpected();
 		};
 	}
 
-	LogicOp getLogicOp() throws CannotParse {
+	LogicOp getLogicOp(ParserState state) throws SyntaxError {
 		return switch (type) {
 			case LogicalOr -> Or;
 			case LogicalAnd -> And;
 			case NullishCoalescing -> Coalesce;
-			default -> throw new CannotParse(this, "LogicOp");
+			default -> throw state.unexpected();
 		};
 	}
 
-	EqualityOp getEqualityOp() throws CannotParse {
+	EqualityOp getEqualityOp(ParserState state) throws SyntaxError {
 		return switch (type) {
 			case StrictEqual -> StrictEquals;
 			case LooseEqual -> LooseEquals;
 			case StrictNotEqual -> StrictNotEquals;
 			case NotEqual -> LooseNotEquals;
-			default -> throw new CannotParse(this, "EqualityOp");
+			default -> throw state.unexpected();
 		};
 	}
 
-	BinaryOp getBinaryOp() throws CannotParse {
+	BinaryOp getBinaryOp(ParserState state) throws SyntaxError {
 		return switch (type) {
 			case Plus -> Add;
 			case Minus -> Subtract;
@@ -340,11 +340,11 @@ public final class Token {
 			case LeftShift -> BinaryOp.LeftShift;
 			case RightShift -> SignedRightShift;
 			case UnsignedRightShift -> BinaryOp.UnsignedRightShift;
-			default -> throw new CannotParse(this, "BinaryOp");
+			default -> throw state.unexpected();
 		};
 	}
 
-	AssignmentOp getAssignmentOp() throws CannotParse {
+	AssignmentOp getAssignmentOp(ParserState state) throws SyntaxError {
 		return switch (type) {
 			case Equals -> Assign;
 			case LogicalAndEquals -> LogicalAndAssign;
@@ -362,7 +362,7 @@ public final class Token {
 			case CaretEquals -> BitwiseExclusiveOrAssign;
 			case PipeEquals -> BitwiseOrAssign;
 			case ExponentEquals -> ExponentAssign;
-			default -> throw new CannotParse(this, "AssignmentOp");
+			default -> throw state.unexpected();
 		};
 	}
 

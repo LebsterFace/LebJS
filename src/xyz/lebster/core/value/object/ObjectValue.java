@@ -431,7 +431,10 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
-	public final ArrayList<Value<?>> enumerableOwnPropertyNames(Interpreter interpreter, EnumerableOwnPropertyNamesKind kind) throws AbruptCompletion {
+	// TODO: Update to new EnumerableOwnProperties
+	public final ArrayList<Value<?>> enumerableOwnPropertyNames(Interpreter interpreter, boolean keys, boolean values) throws AbruptCompletion {
+		if (!keys && !values) throw new ShouldNotHappen("enumerableOwnPropertyNames called with (false, false)");
+
 		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
 		final Iterable<Key<?>> ownKeys = this.ownPropertyKeys();
 		// 2. Let properties be a new empty List.
@@ -446,13 +449,13 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 			// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
 			if (desc != null && desc.isEnumerable()) {
 				// 1. If kind is key, append key to properties.
-				if (kind == EnumerableOwnPropertyNamesKind.KEY) properties.add(key);
+				if (keys & !values) properties.add(key);
 					// 2. Else,
 				else {
 					// a. Let value be ? Get(O, key).
 					final Value<?> value = this.get(interpreter, key);
 					// b. If kind is value, append value to properties.
-					if (kind == EnumerableOwnPropertyNamesKind.VALUE) properties.add(value);
+					if (!keys) properties.add(value);
 						// c. Else,
 					else {
 						// i. Assert: kind is key+value.
@@ -522,6 +525,4 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		// 5. Return items.
 		return items;
 	}
-
-	protected enum EnumerableOwnPropertyNamesKind { KEY, VALUE, KEY_VALUE }
 }

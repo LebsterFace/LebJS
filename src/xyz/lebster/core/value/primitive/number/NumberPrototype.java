@@ -127,7 +127,7 @@ public final class NumberPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tolocalestring")
 	@NonCompliant
-	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
+	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] values) {
 		// 21.1.3.4 Number.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
 
 		throw new NotImplemented("Number.prototype.toLocaleString");

@@ -3,7 +3,6 @@ package xyz.lebster.core.value.globals;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.StringEscapeUtils;
-import xyz.lebster.core.exception.CannotParse;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -44,7 +43,7 @@ public final class TestObject extends ObjectValue {
 
 		try {
 			Realm.parse(sourceTextSV.value, false);
-		} catch (SyntaxError | CannotParse e) {
+		} catch (SyntaxError e) {
 			throw new RuntimeException(e);
 		}
 

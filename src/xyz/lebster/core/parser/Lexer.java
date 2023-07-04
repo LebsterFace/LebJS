@@ -646,7 +646,7 @@ public final class Lexer {
 		final boolean hasExponent = codePoint == 'e' || codePoint == 'E';
 		if (hasExponent) {
 			collect(builder);
-			if (codePoint == '-') collect(builder);
+			if (codePoint == '-' || codePoint == '+') collect(builder);
 
 			lastWasNumericSeparator = false;
 			while (codePoint == '_' || isDigit(codePoint)) {

@@ -30,9 +30,9 @@ public final class GlobalObject extends ObjectValue {
 		super(intrinsics);
 
 		// 19.1 Value Properties of the Global Object
-		put(Names.globalThis, this);
-		put(Names.NaN, NumberValue.NaN, false, false, false);
 		put(Names.Infinity, new NumberValue(Double.POSITIVE_INFINITY), false, false, false);
+		put(Names.NaN, NumberValue.NaN, false, false, false);
+		put(Names.globalThis, this);
 		put(Names.undefined, Undefined.instance, false, false, false);
 
 		// 19.2 Function Properties of the Global Object
@@ -56,6 +56,7 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.Set, intrinsics.setConstructor);
 		put(Names.String, intrinsics.stringConstructor);
 		put(Names.Symbol, intrinsics.symbolConstructor);
+		put(Names.SyntaxError, intrinsics.syntaxErrorConstructor);
 		put(Names.TypeError, intrinsics.typeErrorConstructor);
 
 		// 19.4 Other Properties of the Global Object
@@ -63,12 +64,12 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.Math, intrinsics.mathObject);
 
 		// Non-Standard properties
+		put(Names.ShadowRealm, intrinsics.shadowRealmConstructor);
 		put(Names.Test, intrinsics.testObject);
 		put(Names.console, intrinsics.consoleObject);
-		put(Names.ShadowRealm, intrinsics.shadowRealmConstructor);
-		putMethod(intrinsics, Names.readFile, 2, GlobalObject::readFile);
 		putMethod(intrinsics, Names.cwd, 2, GlobalObject::cwd);
 		putMethod(intrinsics, Names.isStrictMode, 0, GlobalObject::isStrictMode);
+		putMethod(intrinsics, Names.readFile, 2, GlobalObject::readFile);
 	}
 
 	private static BooleanValue isStrictMode(Interpreter interpreter, Value<?>[] arguments) {

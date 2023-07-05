@@ -42,6 +42,7 @@ public final class Names {
 	public static final StringValue SymbolDotSplit = new StringValue("Symbol.split");
 	public static final StringValue SymbolDotToPrimitive = new StringValue("Symbol.toPrimitive");
 	public static final StringValue SymbolDotToStringTag = new StringValue("Symbol.toStringTag");
+	public static final StringValue SyntaxError = new StringValue("SyntaxError");
 	public static final StringValue Test = new StringValue("Test");
 	public static final StringValue TypeError = new StringValue("TypeError");
 	public static final StringValue __TestResults__ = new StringValue("__TestResults__");

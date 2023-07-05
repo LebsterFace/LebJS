@@ -9,6 +9,8 @@ import xyz.lebster.core.value.error.range.RangeErrorConstructor;
 import xyz.lebster.core.value.error.range.RangeErrorPrototype;
 import xyz.lebster.core.value.error.reference.ReferenceErrorConstructor;
 import xyz.lebster.core.value.error.reference.ReferenceErrorPrototype;
+import xyz.lebster.core.value.error.runtimesyntax.SyntaxErrorConstructor;
+import xyz.lebster.core.value.error.runtimesyntax.SyntaxErrorPrototype;
 import xyz.lebster.core.value.error.type.TypeErrorConstructor;
 import xyz.lebster.core.value.error.type.TypeErrorPrototype;
 import xyz.lebster.core.value.function.Executable;
@@ -70,6 +72,8 @@ public final class Intrinsics {
 	public final ReferenceErrorPrototype referenceErrorPrototype;
 	public final TypeErrorConstructor typeErrorConstructor;
 	public final TypeErrorPrototype typeErrorPrototype;
+	public final SyntaxErrorConstructor syntaxErrorConstructor;
+	public final SyntaxErrorPrototype syntaxErrorPrototype;
 
 	public final TestObject testObject;
 	public final ConsoleObject consoleObject;
@@ -96,6 +100,7 @@ public final class Intrinsics {
 		linkPrototypeAndConstructor(stringConstructor = new StringConstructor(this), stringPrototype = new StringPrototype(this));
 		linkPrototypeAndConstructor(symbolConstructor = new SymbolConstructor(this), symbolPrototype = new SymbolPrototype(this));
 		linkPrototypeAndConstructor(typeErrorConstructor = new TypeErrorConstructor(this), typeErrorPrototype = new TypeErrorPrototype(this));
+		linkPrototypeAndConstructor(syntaxErrorConstructor = new SyntaxErrorConstructor(this), syntaxErrorPrototype = new SyntaxErrorPrototype(this));
 
 		mathObject = new MathObject(this);
 		testObject = new TestObject(this);

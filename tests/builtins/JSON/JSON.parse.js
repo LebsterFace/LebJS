@@ -1,3 +1,39 @@
+// basic functionality
+Test.expect(2, JSON.parse.length);
+
+Test.equals(5, JSON.parse("5"));
+Test.equals(null, JSON.parse("null"));
+Test.equals(true, JSON.parse("true"));
+Test.equals(false, JSON.parse("false"));
+Test.equals("test", JSON.parse('"test"'));
+Test.equals([1, 2, "foo"], JSON.parse('[1,2,"foo"]'));
+Test.equals({ foo: 1, bar: "baz" }, JSON.parse('{"foo":1,"bar":"baz"}'));
+
+// negative zero
+for (const testCase of ["-0", " \n-0", "-0  \t", "\n\t -0\n   ", "-0.0"]) {
+	Test.expect(-0.0, JSON.parse(testCase));
+}
+
+Test.expect(0, JSON.parse(-0));
+Test.expect(1644452550.6489999294281, JSON.parse("1644452550.6489999294281"));
+Test.expect(1234567890123, JSON.parse("1234567890123"));
+Test.expect(4294967295, JSON.parse("4294967295"));
+Test.expect(4294967296, JSON.parse("4294967296"));
+Test.expect(4294967297, JSON.parse("4294967297"));
+Test.expect(4294967298, JSON.parse("4294967298"));
+Test.expect(2147483647, JSON.parse("2147483647"));
+Test.expect(2147483648, JSON.parse("2147483648"));
+Test.expect(2147483649, JSON.parse("2147483649"));
+Test.expect(2147483650, JSON.parse("2147483650"));
+Test.expect(9007199254740991, JSON.parse("9007199254740991"));
+Test.expect(9007199254740992, JSON.parse("9007199254740992"));
+Test.expect(9007199254740993, JSON.parse("9007199254740993"));
+Test.expect(9007199254740994, JSON.parse("9007199254740994"));
+Test.expect(9008199254740994, JSON.parse("9008199254740994"));
+Test.expect(18446744073709551615, JSON.parse("18446744073709551615"));
+Test.expect(18446744073709551616, JSON.parse("18446744073709551616"));
+Test.expect(18446744073709551617, JSON.parse("18446744073709551617"));
+
 Test.equals(-0.1, JSON.parse("-0.1"));
 Test.equals(" ", JSON.parse("\" \""));
 Test.equals("", JSON.parse("\"\""));
@@ -285,3 +321,16 @@ Test.expectError("SyntaxError", `Unexpected token "'" in JSON`, () => JSON.parse
 Test.expectError("SyntaxError", `Unexpected token "'" in JSON`, () => JSON.parse("{'a':0}"));
 Test.expectError("SyntaxError", `Unexpected token "'" in JSON`, () => JSON.parse("{'a'"));
 Test.expectError("SyntaxError", `Unexpected token "'"`, () => JSON.parse("['"));
+
+Test.expectError("SyntaxError", "Unexpected token 'u' in JSON", () => JSON.parse(undefined));
+Test.expectError("SyntaxError", "Unexpected token 'N' in JSON", () => JSON.parse(NaN));
+Test.expectError("SyntaxError", "Unexpected token 'N' in JSON", () => JSON.parse(-NaN));
+Test.expectError("SyntaxError", "Unexpected token 'I' in JSON", () => JSON.parse(Infinity));
+Test.expectError("SyntaxError", 'No number after minus sign in JSON', () => JSON.parse(-Infinity));
+Test.expectError("SyntaxError", "Unexpected token '}' in JSON", () => JSON.parse('{ "foo" }'));
+Test.expectError("SyntaxError", "Unexpected token 'f' in JSON", () => JSON.parse('{ foo: "bar" }'));
+Test.expectError("SyntaxError", "Unexpected token ']' in JSON", () => JSON.parse("[1,2,3,]"));
+Test.expectError("SyntaxError", "Unexpected token ']' in JSON", () => JSON.parse("[1,2,3, ]"));
+Test.expectError("SyntaxError", "Unexpected token '}' in JSON", () => JSON.parse('{ "foo": "bar",}'));
+Test.expectError("SyntaxError", "Unexpected token '}' in JSON", () => JSON.parse('{ "foo": "bar", }'));
+Test.expectError("SyntaxError", 'Unexpected end of JSON input', () => JSON.parse(""));

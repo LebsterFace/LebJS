@@ -62,7 +62,7 @@ public final class JSONObject extends ObjectValue {
 		// NOTE: This should be equivalent:
 		final Expression expression;
 		try {
-			final Parser parser = new Parser(jsonString.value);
+			final Parser parser = new Parser(jsonString.value.trim());
 			expression = parser.parseExpression();
 		} catch (SyntaxError e) {
 			throw new ShouldNotHappen("SyntaxError while parsing JSON");

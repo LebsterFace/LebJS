@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
@@ -54,13 +53,6 @@ public record SuperCallStatement(ExpressionList arguments, SourceRange range) im
 		// FIXME: 11. Perform ? InitializeInstanceElements(result, F).
 		// 12. Return result.
 		return result;
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.expressionList("Arguments", arguments);
 	}
 
 	@Override

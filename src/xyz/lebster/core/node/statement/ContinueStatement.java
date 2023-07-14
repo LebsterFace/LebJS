@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -15,11 +14,6 @@ public final class ContinueStatement implements Statement {
 	// FIXME: Follow spec (labels)
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		throw new AbruptCompletion(null, AbruptCompletion.Type.Continue);
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent).selfString(this);
 	}
 
 	@Override

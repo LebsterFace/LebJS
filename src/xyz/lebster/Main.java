@@ -8,9 +8,10 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.Realm;
+import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.EvalError;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -45,21 +46,23 @@ public final class Main {
 				case Tests -> new Testing(arguments).test();
 			}
 		} catch (Throwable e) {
-			handleError(e, System.out, arguments.options().hideStackTrace());
+			handleError(e, System.err, arguments.options().hideStackTrace());
 		}
 	}
 
 	private static void file(CLArguments arguments) throws AbruptCompletion, SyntaxError {
 		final String sourceText = Main.readFile(arguments.filePathOrNull());
-		Realm.executeStatic(sourceText, arguments.options().showAST());
+		Parser.parse(sourceText).execute(new Interpreter());
 	}
 
 	private static void gif() throws AbruptCompletion, SyntaxError {
 		final Scanner scanner = new Scanner(System.in);
-		final Realm realm = new Realm(new Interpreter());
+		final Interpreter interpreter = new Interpreter();
 		while (scanner.hasNextLine()) {
-			final Value<?> lastValue = realm.execute(scanner.nextLine(), true);
+			final String sourceText = scanner.nextLine();
+			final Value<?> lastValue = Parser.parse(sourceText).execute(interpreter);
 			System.out.println(lastValue.toDisplayString());
+			interpreter.globalObject.put(new StringValue("$"), lastValue);
 			System.out.print("#[END-OF-OUTPUT]#");
 		}
 	}

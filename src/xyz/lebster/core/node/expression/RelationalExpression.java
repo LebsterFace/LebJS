@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -17,18 +16,11 @@ import static xyz.lebster.core.value.Value.isLessThan;
 
 public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.binaryExpression(this, left, op, right);
-	}
-
-	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-relational-operators")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> left_value = left.execute(interpreter);
 		final Value<?> right_value = right.execute(interpreter);
 
-		// https://tc39.es/ecma262/multipage#sec-relational-operators-runtime-semantics-evaluation
 		return switch (op) {
 			case LessThan -> {
 				// 5. Let r be ? IsLessThan(left_value, right_value, true).

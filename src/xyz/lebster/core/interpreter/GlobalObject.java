@@ -4,6 +4,7 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
+import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.EvalError;
@@ -190,7 +191,7 @@ public final class GlobalObject extends ObjectValue {
 		final String sourceText = x.toStringValue(interpreter).value;
 		final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 		try {
-			return Realm.executeWith(sourceText, interpreter);
+			return Parser.parse(sourceText).execute(interpreter);
 		} catch (SyntaxError e) {
 			throw error(new EvalError(interpreter, e));
 		} finally {

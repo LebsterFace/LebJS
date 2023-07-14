@@ -1,12 +1,11 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.Dumpable;
+import xyz.lebster.core.node.Representable;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.value.Value;
@@ -37,13 +36,6 @@ public final class ObjectExpression implements Expression {
 	}
 
 	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.children("Entries", entries);
-	}
-
-	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append("{ ");
 
@@ -57,7 +49,7 @@ public final class ObjectExpression implements Expression {
 		representation.append('}');
 	}
 
-	public interface ObjectEntryNode extends Dumpable {
+	public interface ObjectEntryNode extends Representable {
 		void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion;
 	}
 
@@ -82,14 +74,6 @@ public final class ObjectExpression implements Expression {
 			final Key<?> executedKey = this.key.execute(interpreter).toPropertyKey(interpreter);
 			final Value<?> executedValue = Executable.namedEvaluation(interpreter, value, executedKey);
 			result.put(executedKey, executedValue, true, true, true);
-		}
-
-		@Override
-		public void dump(int indent) {
-			DumpBuilder.begin(indent)
-				.self(this)
-				.child("Key", key)
-				.child("Value", value);
 		}
 
 		@Override
@@ -124,14 +108,6 @@ public final class ObjectExpression implements Expression {
 		}
 
 		@Override
-		public void dump(int indent) {
-			DumpBuilder.begin(indent)
-				.selfParameterized(this, getter ? "Getter" : "Setter")
-				.child("Name", name)
-				.child("Function", value);
-		}
-
-		@Override
 		public void represent(StringRepresentation representation) {
 			representation.append(getter ? "get " : "set ");
 			displayKey(name, computed, representation);
@@ -145,12 +121,6 @@ public final class ObjectExpression implements Expression {
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
 			result.put(key, interpreter.getBinding(key).getValue(interpreter), true, true, true);
-		}
-
-		@Override
-		public void dump(int indent) {
-			DumpBuilder.begin(indent)
-				.selfValue(this, key.value);
 		}
 
 		@Override
@@ -168,13 +138,6 @@ public final class ObjectExpression implements Expression {
 					result.put(entry.getKey(), value.get(interpreter, entry.getKey()));
 				}
 			}
-		}
-
-		@Override
-		public void dump(int indent) {
-			DumpBuilder.begin(indent)
-				.self(this)
-				.container(name);
 		}
 
 		@Override

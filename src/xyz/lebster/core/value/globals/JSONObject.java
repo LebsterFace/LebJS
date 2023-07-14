@@ -16,7 +16,7 @@ import xyz.lebster.core.node.expression.ObjectExpression;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.runtimesyntax.SyntaxErrorObject;
+import xyz.lebster.core.value.error.syntax.SyntaxErrorObject;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;

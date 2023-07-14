@@ -635,12 +635,28 @@ public final class Lexer {
 		if (accept("0o")) return numericLiteralRadix(8, "Octal");
 
 		final StringBuilder builder = new StringBuilder();
-		boolean isInteger = true;
+		final boolean startsWithZero = codePoint == '0';
+		final SourcePosition start = position();
+
+		boolean inIntegerPart = true;
 		boolean lastWasNumericSeparator = false;
-		while (isDigit(codePoint) || (codePoint == '.' && isInteger) || codePoint == '_') {
-			if (codePoint == '.') isInteger = false;
+		while (isDigit(codePoint) || (codePoint == '.' && inIntegerPart) || codePoint == '_') {
+			final boolean isDecimalPoint = codePoint == '.';
+			if (isDecimalPoint) {
+				if (!lastWasNumericSeparator) inIntegerPart = false;
+				else throw new SyntaxError("Numeric separators are not allowed at the end of numeric literals", position());
+			}
+
 			lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
 			if (!lastWasNumericSeparator) collect(builder);
+
+			if (isDecimalPoint && codePoint == '_') {
+				throw new SyntaxError("Numeric separators are not allowed immediately after '.'", position());
+			}
+		}
+
+		if (startsWithZero && !(inIntegerPart && builder.length() == 1) && !builder.toString().startsWith("0.")) {
+			throw new SyntaxError("Unexpected leading zero", start);
 		}
 
 		final boolean hasExponent = codePoint == 'e' || codePoint == 'E';
@@ -655,7 +671,7 @@ public final class Lexer {
 			}
 		}
 
-		if (isInteger && !hasExponent) return potentialBigInt(builder.toString(), 10);
+		if (inIntegerPart && !hasExponent) return potentialBigInt(builder.toString(), 10);
 		return new Token(TokenType.NumericLiteral, builder.toString(), position());
 	}
 

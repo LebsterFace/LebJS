@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -18,14 +17,6 @@ public record MemberExpression(Expression base, Expression property, boolean com
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return toReference(interpreter).getValue(interpreter);
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.selfParameterized(this, computed ? "Computed" : "Non-Computed")
-			.child("Base", base)
-			.child("ReferencedName", property);
 	}
 
 	@Override

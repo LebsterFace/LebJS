@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -13,14 +12,6 @@ import xyz.lebster.core.value.Value;
 public record ForBinding(Kind kind, AssignmentTarget assignmentTarget) implements Assignable {
 	public ForBinding(VariableDeclaration declaration) {
 		this(declaration.kind(), declaration.declarations()[0].target());
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.enumChild("Kind", kind)
-			.child("Target", assignmentTarget);
 	}
 
 	@Override

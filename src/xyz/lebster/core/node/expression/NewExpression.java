@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -23,14 +22,6 @@ public record NewExpression(Expression constructExpr, ExpressionList arguments) 
 			final String message = constructExpr.toRepresentationString() + " is not a constructor";
 			throw error(new TypeError(interpreter, message));
 		}
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Construct Expression", constructExpr)
-			.expressionList("Arguments", arguments);
 	}
 
 	@Override

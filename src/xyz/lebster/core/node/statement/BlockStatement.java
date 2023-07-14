@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -54,12 +53,5 @@ public record BlockStatement(List<Statement> children) implements Statement, App
 		representation.unindent();
 		representation.appendIndent();
 		representation.append('}');
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.children("Children", children);
 	}
 }

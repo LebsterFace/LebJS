@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.FunctionParameters;
@@ -31,15 +30,6 @@ public final class ArrowFunctionExpression implements Expression {
 	@Override
 	public ArrowFunction execute(Interpreter interpreter) {
 		return new ArrowFunction(interpreter.intrinsics, this, interpreter.executionContext());
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.children("Parameters", parameters)
-			.optionalChild("Body", body)
-			.hiddenChild("Implicit Return", implicitReturn);
 	}
 
 	@Override

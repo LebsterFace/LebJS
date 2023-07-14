@@ -1,11 +1,9 @@
 package xyz.lebster.core.node.expression.literal;
 
-import xyz.lebster.core.DumpBuilder;
-import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.Dumpable;
+import xyz.lebster.core.node.Representable;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -34,13 +32,6 @@ public class TemplateLiteral implements Expression {
 	}
 
 	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.children("Nodes", backingList);
-	}
-
-	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append('`');
 		for (final TemplateLiteralNode node : this.backingList) {
@@ -49,7 +40,7 @@ public class TemplateLiteral implements Expression {
 		representation.append('`');
 	}
 
-	private sealed interface TemplateLiteralNode extends Dumpable {
+	private sealed interface TemplateLiteralNode extends Representable {
 		void append(Interpreter interpreter, StringBuilder builder) throws AbruptCompletion;
 	}
 
@@ -57,12 +48,6 @@ public class TemplateLiteral implements Expression {
 		@Override
 		public void append(Interpreter interpreter, StringBuilder builder) {
 			builder.append(string);
-		}
-
-		@Override
-		public void dump(int indent) {
-			DumpBuilder.begin(indent)
-				.selfValue(this, StringEscapeUtils.quote(string, false));
 		}
 
 		@Override
@@ -75,13 +60,6 @@ public class TemplateLiteral implements Expression {
 		@Override
 		public void append(Interpreter interpreter, StringBuilder builder) throws AbruptCompletion {
 			builder.append(expression.execute(interpreter).toStringValue(interpreter).value);
-		}
-
-		@Override
-		public void dump(int indent) {
-			DumpBuilder.begin(indent)
-				.self(this)
-				.child("Expression", expression);
 		}
 
 		@Override

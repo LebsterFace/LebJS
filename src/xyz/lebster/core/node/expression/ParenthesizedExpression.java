@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -11,13 +10,6 @@ public record ParenthesizedExpression(Expression expression, SourceRange range) 
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return expression.execute(interpreter);
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Expression", expression);
 	}
 
 	@Override

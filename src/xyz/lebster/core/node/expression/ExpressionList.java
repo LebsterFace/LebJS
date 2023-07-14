@@ -1,18 +1,17 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.Dumper;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.Dumpable;
+import xyz.lebster.core.node.Representable;
 import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Value;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public final class ExpressionList implements Dumpable {
+public final class ExpressionList implements Representable {
 	private final ArrayList<ExpressionNode> backingList;
 	private final boolean canHaveEmpty;
 
@@ -48,20 +47,6 @@ public final class ExpressionList implements Dumpable {
 		}
 
 		return result;
-	}
-
-	@Override
-	public void dump(int indent) {
-		for (final ExpressionNode node : backingList) {
-			switch (node.type) {
-				case SPREAD -> {
-					Dumper.dumpIndicator(indent + 1, "Spread");
-					node.expression.dump(indent + 2);
-				}
-				case SINGLE -> node.expression.dump(indent + 1);
-				case EMPTY -> Dumper.dumpString(indent + 1, "Empty");
-			}
-		}
 	}
 
 	@Override

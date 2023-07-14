@@ -34,13 +34,9 @@ public final class Parser {
 	private ParserState state;
 	private boolean hasConsumedSeparator = false;
 
-	public Parser(String sourceText, Token[] tokens) {
-		this.sourceText = sourceText;
-		this.state = new ParserState(tokens);
-	}
-
 	public Parser(String sourceText) throws SyntaxError {
-		this(sourceText, Lexer.tokenize(sourceText));
+		this.sourceText = sourceText;
+		this.state = new ParserState(Lexer.tokenize(sourceText));
 	}
 
 	private void save() {
@@ -57,13 +53,15 @@ public final class Parser {
 		savedStack.removeLast();
 	}
 
-	public Program parse() throws SyntaxError {
-		final Program program = new Program();
-		populateAppendableNode(program, EOF);
-		return program;
+	private Program parse() throws SyntaxError {
+		return populateAppendableNode(new Program(), EOF);
 	}
 
-	private <T extends AppendableNode> void populateAppendableNode(T root, TokenType... end) throws SyntaxError {
+	public static Program parse(String sourceText) throws SyntaxError {
+		return new Parser(sourceText).parse();
+	}
+
+	private <T extends AppendableNode> T populateAppendableNode(T root, TokenType end) throws SyntaxError {
 		boolean isFirstStatement = true;
 		while (state.index < state.tokens.length && !state.is(end)) {
 			if (isFirstStatement) {
@@ -78,6 +76,9 @@ public final class Parser {
 			if (state.is(end)) break;
 			root.append(parseAny());
 		}
+
+		state.require(end);
+		return root;
 	}
 
 	private void requireAtLeastOneSeparator() throws SyntaxError {
@@ -137,10 +138,7 @@ public final class Parser {
 
 	private BlockStatement parseBlockStatement() throws SyntaxError {
 		state.require(LBrace);
-		final BlockStatement result = new BlockStatement();
-		populateAppendableNode(result, RBrace);
-		state.require(RBrace);
-		return result;
+		return populateAppendableNode(new BlockStatement(), RBrace);
 	}
 
 	private Statement parseStatementOrExpression() throws SyntaxError {

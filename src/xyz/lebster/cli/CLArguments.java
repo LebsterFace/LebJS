@@ -19,7 +19,6 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 			) {
 				// Special case for help:
 				System.out.printf("%sLebJS Usage: %slebjs %s[parameters] %s[path]%s%n", ANSI.RED, ANSI.RESET, ANSI.CYAN, ANSI.GREEN, ANSI.RESET);
-				System.out.printf("%s-a%s, %s--ast%s             Show AST%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
 				System.out.printf("%s-v%s, %s--verbose%s         Don't hide stack traces%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
 				System.out.printf("%s--parse-only%s          Ignore test failures from parsing%n", ANSI.CYAN, ANSI.RESET);
 				System.out.printf("%s--ignore-not-impl%s     Ignore test failures from unimplemented features%n", ANSI.CYAN, ANSI.RESET);
@@ -28,7 +27,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				System.out.printf("%s--disable-prompt%s      Disable the %s'> '%s prompt in the REPL%n", ANSI.CYAN, ANSI.RESET, ANSI.BRIGHT_GREEN, ANSI.RESET);
 				System.out.printf("%s--harness %s[value]%s     Test harness. Valid options: %sserenity%s%n", ANSI.CYAN, ANSI.MAGENTA, ANSI.RESET, ANSI.MAGENTA, ANSI.RESET);
 				System.out.printf("%s-t%s, %s--test%s            Run tests%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
-				System.out.printf("%s--gif%s                 Enable GIF rendering mode (No error handling, no prompt, print delimiter after execution, print AST)%n", ANSI.CYAN, ANSI.RESET);
+				System.out.printf("%s--gif%s                 Enable GIF rendering mode (No error handling, no prompt, print delimiter after execution)%n", ANSI.CYAN, ANSI.RESET);
 				System.exit(0);
 			}
 
@@ -47,7 +46,6 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 	}
 
 	public record ExecutionOptions(
-		boolean showAST,
 		boolean hideStackTrace,
 		boolean parseOnly,
 		boolean ignoreNotImplemented,
@@ -62,7 +60,6 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		private final Iterator<String> arguments;
 		private String fileNameOrNull = null;
 		private ExecutionMode mode = null;
-		private boolean showAST = false;
 		private boolean hideStackTrace = true;
 		private boolean parseOnly = false;
 		private boolean ignoreNotImplemented = false;
@@ -77,7 +74,6 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 
 		private ExecutionOptions toExecutionOptions() {
 			return new ExecutionOptions(
-				this.showAST,
 				this.hideStackTrace,
 				this.parseOnly,
 				this.ignoreNotImplemented,
@@ -90,7 +86,6 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 
 		private void setFlag(String flag) throws CLArgumentException {
 			switch (flag) {
-				case "a", "ast" -> showAST = true;
 				case "v", "verbose" -> hideStackTrace = false;
 				case "parse-only" -> parseOnly = true;
 				case "ignore-not-impl" -> ignoreNotImplemented = true;
@@ -98,12 +93,8 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				case "disable-prompt" -> showPrompt = false;
 				case "no-buffer" -> disableTestOutputBuffers = true;
 				case "harness" -> harness = getFlagValue("Missing harness filepath");
-
 				case "t", "test" -> setMode(ExecutionMode.Tests);
-				case "gif" -> {
-					setMode(ExecutionMode.GIF);
-					showAST = true;
-				}
+				case "gif" -> setMode(ExecutionMode.GIF);
 
 				default -> throw new CLArgumentException("Unknown flag '%s'".formatted(flag));
 			}

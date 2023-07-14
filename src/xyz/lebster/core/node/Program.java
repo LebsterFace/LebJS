@@ -36,10 +36,4 @@ public final class Program implements AppendableNode {
 		for (final ASTNode child : children)
 			child.represent(representation);
 	}
-
-	@Override
-	public void dump(int indent) {
-		for (final ASTNode child : children)
-			child.dump(indent);
-	}
 }

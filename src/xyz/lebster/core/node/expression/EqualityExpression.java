@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -10,12 +9,6 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 
 public record EqualityExpression(Expression left, Expression right, EqualityOp op) implements Expression {
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.binaryExpression(this, left, op, right);
-	}
-
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-equality-operators-runtime-semantics-evaluation")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {

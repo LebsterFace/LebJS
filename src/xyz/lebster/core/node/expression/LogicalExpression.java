@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -14,12 +13,6 @@ public record LogicalExpression(Expression left, Expression right, LogicOp op) i
 			case Or -> left_value.isTruthy(interpreter) ? left_value : right_value;
 			case Coalesce -> left_value.isNullish() ? right_value : left_value;
 		};
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.binaryExpression(this, left, op, right);
 	}
 
 	@Override

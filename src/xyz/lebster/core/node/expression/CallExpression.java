@@ -1,7 +1,6 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -38,14 +37,6 @@ public record CallExpression(Expression callee, ExpressionList arguments) implem
 
 		final String message = ANSI.stripFormatting(callee.toRepresentationString()) + " is not a function";
 		throw error(new TypeError(interpreter, message));
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Callee", callee)
-			.expressionList("Arguments", arguments);
 	}
 
 	@Override

@@ -4,7 +4,8 @@ import xyz.lebster.Main;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.exception.ParserNotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
-import xyz.lebster.core.interpreter.Realm;
+import xyz.lebster.core.interpreter.Interpreter;
+import xyz.lebster.core.parser.Parser;
 
 import java.io.File;
 
@@ -17,7 +18,8 @@ record DefaultTestHarness() implements TestHarness {
 			return new TestResult(SKIPPED, null);
 
 		try {
-			Realm.executeStatic(Main.readFile(file.toPath()), arguments.options().showAST());
+			final String sourceText = Main.readFile(file.toPath());
+			Parser.parse(sourceText).execute(new Interpreter());
 		} catch (AbruptCompletion exception) {
 			if (!arguments.options().parseOnly())
 				return new TestResult(FAILED, exception);

@@ -2,11 +2,15 @@ package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
+import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.environment.*;
+import xyz.lebster.core.node.Program;
 import xyz.lebster.core.node.declaration.Kind;
+import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.reference.ReferenceError;
+import xyz.lebster.core.value.error.syntax.SyntaxErrorObject;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -28,6 +32,14 @@ public final class Interpreter {
 		this.executionContextStack = new ArrayDeque<>();
 		this.executionContextStack.addFirst(new ExecutionContext(new GlobalEnvironment(globalObject)));
 		this.mode = Mode.Strict;
+	}
+
+	public Program runtimeParse(String sourceText) throws AbruptCompletion {
+		try {
+			return Parser.parse(sourceText);
+		} catch (SyntaxError e) {
+			throw error(new SyntaxErrorObject(this, e.getMessage()));
+		}
 	}
 
 	public void enterExecutionContext(ExecutionContext context) throws AbruptCompletion {

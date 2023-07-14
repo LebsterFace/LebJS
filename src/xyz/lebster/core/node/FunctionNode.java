@@ -1,6 +1,5 @@
 package xyz.lebster.core.node;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -52,14 +51,5 @@ public interface FunctionNode extends ASTNode {
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}
-	}
-
-	@Override
-	default void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.optionalChild("Name", name())
-			.children("Parameters", parameters())
-			.child("Body", body());
 	}
 }

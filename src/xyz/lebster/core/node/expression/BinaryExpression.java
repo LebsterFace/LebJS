@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -64,15 +63,6 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 			case BitwiseXOR -> (double) (left_number.toInt32() ^ right_number.toInt32());
 			case BitwiseOR -> (double) (left_number.toInt32() | right_number.toInt32());
 		});
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Left", left)
-			.operator(op)
-			.child("Right", right);
 	}
 
 	@Override

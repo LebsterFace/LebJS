@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -17,14 +16,6 @@ public record SequenceExpression(Expression left, Expression right) implements E
 		// 3. Let rref be the result of evaluating right.
 		// 4. Return ? GetValue(rref).
 		return right.execute(interpreter);
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Left", left)
-			.child("Right", right);
 	}
 
 	@Override

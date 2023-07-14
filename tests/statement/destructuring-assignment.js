@@ -78,7 +78,7 @@ let obj = { a: 'a', b: 'b', c: [1, 2, 3] };
 	Test.equals({ bar: 999 }, object);
 }
 
-Test.expectSyntaxError("Invalid left-hand side in assignment", "(({ a, b, c }) = obj)");
-Test.expectSyntaxError('Unexpected token "else"', "let { else } = { else: 1 };");
-Test.expectSyntaxError('Invalid shorthand property initializer', "let bar = { foo = 1 };")
-Test.expectSyntaxError('Invalid shorthand property initializer', "let { foo = 1 } = (1, 2, { a: 1, b: 2, c: 3, foo = 1 });")
+Test.expectError("SyntaxError", "Invalid left-hand side in assignment", () => Test.parse("(({ a, b, c }) = obj)"));
+Test.expectError("SyntaxError", 'Unexpected token "else"', () => Test.parse("let { else } = { else: 1 };"));
+Test.expectError("SyntaxError", 'Invalid shorthand property initializer', () => Test.parse("let bar = { foo = 1 };"))
+Test.expectError("SyntaxError", 'Invalid shorthand property initializer', () => Test.parse("let { foo = 1 } = (1, 2, { a: 1, b: 2, c: 3, foo = 1 });"))

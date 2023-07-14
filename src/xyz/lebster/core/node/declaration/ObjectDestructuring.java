@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.declaration;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -17,25 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 public record ObjectDestructuring(Map<Expression, AssignmentPattern> pairs, StringValue restName) implements AssignmentTarget {
-	@Override
-	public void dump(int indent) {
-		final var dumper = DumpBuilder.begin(indent)
-			.self(this)
-			.stringChild("Rest Name", restName);
-
-		if (pairs.isEmpty()) {
-			dumper.missing("Children");
-			return;
-		}
-
-		final var pairsDumper = dumper.nestedChild("Children");
-		for (final var entry : pairs.entrySet()) {
-			pairsDumper.nestedName("Child")
-				.child("Key", entry.getKey())
-				.child("Value", entry.getValue());
-		}
-	}
-
 	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append("{ ");

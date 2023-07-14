@@ -1,7 +1,7 @@
 package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.node.Dumpable;
+import xyz.lebster.core.node.expression.ObjectExpression;
 
 public final class StringRepresentation implements CharSequence {
 	private final StringBuilder builder = new StringBuilder();
@@ -11,7 +11,7 @@ public final class StringRepresentation implements CharSequence {
 		builder.append(o);
 	}
 
-	public void append(Dumpable dumpable) {
+	public void append(ObjectExpression.ObjectEntryNode dumpable) {
 		dumpable.represent(this);
 	}
 

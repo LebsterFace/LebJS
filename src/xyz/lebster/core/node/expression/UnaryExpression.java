@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
@@ -79,14 +78,6 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 		final ObjectValue obj = memberExpression.base().execute(interpreter).toObjectValue(interpreter);
 		final Value<?> propertyName = memberExpression.property().execute(interpreter);
 		return BooleanValue.of(obj.delete(propertyName.toPropertyKey(interpreter)));
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Expression", expression)
-			.operator(op);
 	}
 
 	@Override

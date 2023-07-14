@@ -4,22 +4,17 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.ShouldNotHappen;
-import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.interpreter.Realm;
-import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
-import xyz.lebster.core.value.error.EvalError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @NonStandard
@@ -31,22 +26,16 @@ public final class TestObject extends ObjectValue {
 		putMethod(intrinsics, Names.equals, 2, TestObject::equalsMethod);
 		putMethod(intrinsics, Names.fail, 0, TestObject::fail);
 		putMethod(intrinsics, Names.expectError, 3, TestObject::expectError);
-		putMethod(intrinsics, Names.expectSyntaxError, 2, TestObject::expectSyntaxError);
 		putMethod(intrinsics, Names.parse, 1, TestObject::parse);
 	}
 
-	private static Undefined parse(Interpreter interpreter, Value<?>[] arguments) {
+	private static Undefined parse(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		if (arguments.length != 1)
 			throw new ShouldNotHappen("Test.parse should be called with only one argument");
 		if (!(arguments[0] instanceof final StringValue sourceTextSV))
 			throw new ShouldNotHappen("Test.parse not called with a string");
 
-		try {
-			Realm.parse(sourceTextSV.value, false);
-		} catch (SyntaxError e) {
-			throw new RuntimeException(e);
-		}
-
+		interpreter.runtimeParse(sourceTextSV.value);
 		return Undefined.instance;
 	}
 
@@ -76,27 +65,6 @@ public final class TestObject extends ObjectValue {
 		}
 
 		throw new ShouldNotHappen("Callback did not throw. Expecting " + StringEscapeUtils.quote(name.value + ": " + messageStarter.value, true));
-	}
-
-	private static Undefined expectSyntaxError(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final StringValue messageStarter = argument(0, arguments).toStringValue(interpreter);
-		final StringValue sourceText = argument(1, arguments).toStringValue(interpreter);
-
-		final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
-		try {
-			Realm.executeWith(sourceText.value, interpreter);
-		} catch (SyntaxError error) {
-			if (!error.getMessage().startsWith(messageStarter.value))
-				throw assertionFailed(messageStarter, new StringValue(error.getMessage()));
-
-			return Undefined.instance;
-		} catch (Throwable e) {
-			throw error(new EvalError(interpreter, e));
-		} finally {
-			interpreter.exitExecutionContext(context);
-		}
-
-		throw new ShouldNotHappen("Callback did not throw. Expecting " + StringEscapeUtils.quote("SyntaxError: " + messageStarter.value, true));
 	}
 
 	private static Undefined equalsMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {

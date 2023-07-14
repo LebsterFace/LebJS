@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -13,13 +12,6 @@ public record ReturnStatement(Expression value) implements Statement {
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> valueToReturn = value == null ? Undefined.instance : value.execute(interpreter);
 		throw new AbruptCompletion(valueToReturn, AbruptCompletion.Type.Return);
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.optionalContainer(value);
 	}
 
 	@Override

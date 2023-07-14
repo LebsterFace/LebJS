@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.declaration;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -18,12 +17,6 @@ public record IdentifierExpression(StringValue name) implements AssignmentTarget
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return this.toReference(interpreter).getValue(interpreter);
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.selfValue(this, name.value);
 	}
 
 	@Override

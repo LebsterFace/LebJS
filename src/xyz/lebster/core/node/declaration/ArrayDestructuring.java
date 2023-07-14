@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.declaration;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -12,14 +11,6 @@ import xyz.lebster.core.value.object.ObjectValue;
 import java.util.ArrayList;
 
 public record ArrayDestructuring(AssignmentTarget restTarget, AssignmentPattern... children) implements AssignmentTarget {
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.optionalChild("Rest Target", restTarget)
-			.children("Elements", children);
-	}
-
 	@Override
 	public void represent(StringRepresentation representation) {
 		representation.append('[');

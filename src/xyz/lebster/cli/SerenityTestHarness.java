@@ -7,8 +7,8 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.node.Program;
+import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.DataDescriptor;
@@ -28,7 +28,7 @@ final class SerenityTestHarness implements TestHarness {
 		final Path path = arguments.filePathOrNull();
 		if (path == null) throw new CLArgumentException("Test path is required for Serenity test harness");
 		this.commonPath = path.resolve("test-common.js");
-		this.testCommon = Realm.parse(Main.readFile(commonPath), arguments.options().showAST());
+		this.testCommon = Parser.parse(Main.readFile(commonPath));
 	}
 
 	private ObjectValue getTestResults(Interpreter interpreter) throws AbruptCompletion {
@@ -53,7 +53,7 @@ final class SerenityTestHarness implements TestHarness {
 				throw new RuntimeException(e);
 			}
 
-			final Program program = Realm.parse(Main.readFile(file.toPath()), arguments.options().showAST());
+			final Program program = Parser.parse(Main.readFile(file.toPath()));
 			program.execute(interpreter);
 
 			for (final var entry : getTestResults(interpreter).value.entrySet()) {

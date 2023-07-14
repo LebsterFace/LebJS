@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -9,15 +8,6 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 
 public record IfStatement(Expression condition, Statement consequence, Statement elseStatement) implements Statement {
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Condition", condition)
-			.child("Consequence", consequence)
-			.hiddenChild("Else", elseStatement);
-	}
-
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		if (condition.execute(interpreter).isTruthy(interpreter)) {

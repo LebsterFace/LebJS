@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -45,15 +44,6 @@ public record ForInStatement(Assignable left, Expression right, Statement body) 
 		}
 
 		return lastValue;
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Left", left)
-			.child("Right", right)
-			.child("Body", body);
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -56,15 +55,6 @@ public record AssignmentExpression(Assignable left, Expression right, Assignment
 			case NullishCoalesceAssign -> Coalesce;
 			default -> throw new ShouldNotHappen("AssignmentExpression#lookupLogicOp called on " + op.name());
 		};
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Left", left)
-			.operator(op)
-			.child("Right", right);
 	}
 
 	@Override

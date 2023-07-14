@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.declaration;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -11,14 +10,6 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 
 public record VariableDeclarator(AssignmentTarget target, Expression init, SourceRange range) implements ASTNode {
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.child("Target", target)
-			.optionalChild("Initializer", init);
-	}
-
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		target.declare(interpreter, Kind.Let, init);

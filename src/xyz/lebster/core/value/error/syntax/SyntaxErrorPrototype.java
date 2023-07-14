@@ -1,4 +1,4 @@
-package xyz.lebster.core.value.error.runtimesyntax;
+package xyz.lebster.core.value.error.syntax;
 
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.error.ErrorPrototype;

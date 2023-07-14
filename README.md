@@ -26,11 +26,9 @@ lebjs
 .help                      Display this message
 .clear                     Clear the screen
 .inspect [expression]      Deep print the result of [expression]
-.dump [code]               Dump the parsed AST of [code]
 ```
 
 ## Flags
-- `-a`, `--ast` - Show AST
 - `-v`, `--verbose` - Don't hide stack traces
 - `--parse-only` - Ignore test failures from parsing
 - `--ignore-not-impl` - Ignore test failures from unimplemented features

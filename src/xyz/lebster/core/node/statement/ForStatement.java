@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -47,15 +46,5 @@ public record ForStatement(Statement init, Expression test, Expression update, S
 		if (update != null) update.represent(representation);
 		representation.append(") ");
 		body.represent(representation);
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.optionalChild("Init", init)
-			.optionalChild("Test", test)
-			.optionalChild("Update", update)
-			.child("Body", body);
 	}
 }

@@ -1,6 +1,5 @@
 package xyz.lebster.core.node.expression;
 
-import xyz.lebster.core.DumpBuilder;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
@@ -69,14 +68,6 @@ public record ClassExpression(
 		}
 
 		return constructorFunction;
-	}
-
-	@Override
-	public void dump(int indent) {
-		DumpBuilder.begin(indent)
-			.self(this)
-			.optionalChild("Constructor", constructor)
-			.children("Methods", methods);
 	}
 
 	@Override

@@ -4,9 +4,9 @@ import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.Realm;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.parser.Lexer;
+import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.parser.Token;
 import xyz.lebster.core.value.JSONDisplayer;
 import xyz.lebster.core.value.Value;
@@ -26,7 +26,6 @@ public final class REPL {
 
 	public void run() {
 		System.out.println("Starting REPL...");
-		final Realm realm = new Realm(interpreter);
 		int result = 0;
 
 		while (true) {
@@ -39,18 +38,16 @@ public final class REPL {
 							%s.help%s                      Display this message
 							%s.clear%s                     Clear the screen
 							%s.inspect%s [expression]%s      Deep print the result of %s[expression]%s
-							%s.dump%s [code]%s               Dump the parsed AST of %s[code]%s
 							""",
 						ANSI.CYAN, ANSI.RESET,
 						ANSI.CYAN, ANSI.RESET,
-						ANSI.CYAN, ANSI.BRIGHT_GREEN, ANSI.RESET, ANSI.BRIGHT_GREEN, ANSI.RESET,
 						ANSI.CYAN, ANSI.BRIGHT_GREEN, ANSI.RESET, ANSI.BRIGHT_GREEN, ANSI.RESET
 					);
 				} else if (input.equals(".clear")) {
 					System.out.print("\033[H\033[2J");
 					System.out.flush();
 				} else if (input.startsWith(".inspect ")) {
-					final Value<?> lastValue = realm.execute(input.substring(".inspect ".length()), options.showAST());
+					final Value<?> lastValue = Parser.parse(input.substring(".inspect ".length())).execute(interpreter);
 					if (lastValue instanceof final ObjectValue obj) {
 						final var representation = new StringRepresentation();
 						JSONDisplayer.display(representation, obj, true);
@@ -58,10 +55,8 @@ public final class REPL {
 					} else {
 						System.out.println(lastValue.toDisplayString());
 					}
-				} else if (input.startsWith(".dump ")) {
-					Realm.parse(input.substring(".dump ".length()), true);
 				} else {
-					final Value<?> lastValue = realm.execute(input, options.showAST());
+					final Value<?> lastValue = Parser.parse(input).execute(interpreter);
 					interpreter.globalObject.set(interpreter, new StringValue("$"), lastValue);
 					interpreter.globalObject.set(interpreter, new StringValue("$" + result), lastValue);
 					result += 1;

@@ -57,33 +57,36 @@ public final class Token {
 	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
 	int precedence() {
 		return switch (type) {
-			case Period, LBracket, LParen, OptionalChain -> 20;
-			case New -> 19;
-			case PlusPlus, MinusMinus -> 18;
-			case Bang, Tilde, Typeof, Void, Delete, Await -> 17;
-			case Exponent -> 16;
-			case Star, Slash, Percent -> 15;
-			case Plus, Minus -> 14;
-			case LeftShift, RightShift, UnsignedRightShift -> 13;
-			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf -> 12;
-			case LooseEqual, NotEqual, StrictEqual, StrictNotEqual -> 11;
-			case Ampersand -> 10;
-			case Caret -> 9;
-			case Pipe -> 8;
-			case NullishCoalescing -> 7;
-			case LogicalAnd -> 6;
-			case LogicalOr -> 5;
-			case QuestionMark -> 4;
-			case Equals, PlusEquals, MinusEquals, ExponentEquals, NullishCoalescingEquals, LogicalOrEquals,
-				LogicalAndEquals, PipeEquals, CaretEquals, AmpersandEquals, UnsignedRightShiftEquals, RightShiftEquals,
-				LeftShiftEquals, PercentEquals, DivideEquals, MultiplyEquals -> 3;
-			case Yield -> 2;
+			// /* TODO: Is this required? */ case LParen -> 18; // Grouping
+			case Period, OptionalChain, LBracket, New, LParen -> 17;
+			// TODO: `new` (without argument list)
+			// TODO: Distinguish between postfix / prefix
+			case PlusPlus, MinusMinus -> 15;
+			// TODO: Distinguish between unary/binary '+'/'-'
+			case Bang, Tilde, Typeof, Void, Delete, Await -> 14;
+			case Exponent -> 13;
+			case Star, Slash, Percent -> 12;
+			case Plus, Minus -> 11;
+			case LeftShift, RightShift, UnsignedRightShift -> 10;
+			case LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf -> 9;
+			case LooseEqual, NotEqual, StrictEqual, StrictNotEqual -> 8;
+			case Ampersand -> 7;
+			case Caret -> 6;
+			case Pipe -> 5;
+			case LogicalAnd -> 4;
+			case LogicalOr, NullishCoalescing -> 3;
+			// TODO: yield*
+			case Equals, PlusEquals, MinusEquals, ExponentEquals, MultiplyEquals, DivideEquals,
+				PercentEquals, LeftShiftEquals, RightShiftEquals, UnsignedRightShiftEquals,
+				AmpersandEquals, CaretEquals, PipeEquals, LogicalAndEquals, LogicalOrEquals,
+				NullishCoalescingEquals, QuestionMark, Arrow, Yield -> 2;
 			case Comma -> 1;
 			default -> throw new ShouldNotHappen("Attempting to get precedence for token type '" + type + "'");
 		};
 	}
 
 	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
+	// TOOD: Confirm this is accurate
 	Associativity associativity() {
 		return switch (type) {
 			case Period, LBracket, LParen, OptionalChain, Star, Slash, Percent, Plus, Minus, LeftShift, RightShift,

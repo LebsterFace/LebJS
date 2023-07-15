@@ -183,7 +183,6 @@ public final class JSONObject extends ObjectValue {
 	@SpecificationURL("https://www.ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf")
 	private static final class JSONParser {
 		private int index = 0;
-		private final String sourceText;
 		private final int[] codepoints;
 
 		private static final class JSONParseError extends Exception {
@@ -193,7 +192,6 @@ public final class JSONObject extends ObjectValue {
 		}
 
 		public JSONParser(String sourceText) {
-			this.sourceText = sourceText;
 			this.codepoints = sourceText.codePoints().toArray();
 		}
 

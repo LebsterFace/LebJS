@@ -10,7 +10,6 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.EvalError;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.io.IOException;
@@ -91,11 +90,6 @@ public final class Main {
 		}
 
 		if (throwable instanceof final AbruptCompletion abruptCompletion && abruptCompletion.type == AbruptCompletion.Type.Throw) {
-			if (abruptCompletion.value instanceof final EvalError evalError) {
-				handleError(evalError.wrappedThrowable, stream, false);
-				return;
-			}
-
 			stream.print("Uncaught ");
 			stream.print(abruptCompletion.getValue());
 			stream.println(ANSI.RESET);

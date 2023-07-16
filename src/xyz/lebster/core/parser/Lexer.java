@@ -271,6 +271,11 @@ public final class Lexer {
 		return sourceText.substring(sourceText.offsetByCodePoints(0, index), sourceText.offsetByCodePoints(0, Integer.min(index + length, this.codePoints.length)));
 	}
 
+	private int peekNext() throws SyntaxError {
+		if (!hasNext()) throw new SyntaxError("Unexpected end of input", position());
+		return codePoints[index + 1];
+	}
+
 	private boolean peek(String compare) {
 		return sourceText.startsWith(compare, sourceText.offsetByCodePoints(0, index));
 	}
@@ -300,24 +305,26 @@ public final class Lexer {
 	}
 
 	private boolean slashMeansDivision() {
-		return lastTokenType != null && (lastTokenType == TokenType.BigIntLiteral
-										 || lastTokenType == TokenType.True
-										 || lastTokenType == TokenType.False
-										 || lastTokenType == TokenType.RBrace
-										 || lastTokenType == TokenType.RBracket
-										 || lastTokenType == TokenType.Identifier
-										 || lastTokenType == TokenType.In
-										 || lastTokenType == TokenType.InstanceOf
-										 || lastTokenType == TokenType.MinusMinus
-										 || lastTokenType == TokenType.Null
-										 || lastTokenType == TokenType.NumericLiteral
-										 || lastTokenType == TokenType.RParen
-										 || lastTokenType == TokenType.PlusPlus
-										 || lastTokenType == TokenType.PrivateIdentifier
-										 || lastTokenType == TokenType.RegexpPattern
-										 || lastTokenType == TokenType.StringLiteral
-										 || lastTokenType == TokenType.TemplateExpressionEnd
-										 || lastTokenType == TokenType.This);
+		final boolean isAcceptedType =
+			lastTokenType == TokenType.BigIntLiteral
+			|| lastTokenType == TokenType.True
+			|| lastTokenType == TokenType.False
+			|| lastTokenType == TokenType.RBrace
+			|| lastTokenType == TokenType.RBracket
+			|| lastTokenType == TokenType.Identifier
+			|| lastTokenType == TokenType.In
+			|| lastTokenType == TokenType.InstanceOf
+			|| lastTokenType == TokenType.MinusMinus
+			|| lastTokenType == TokenType.Null
+			|| lastTokenType == TokenType.NumericLiteral
+			|| lastTokenType == TokenType.RParen
+			|| lastTokenType == TokenType.PlusPlus
+			|| lastTokenType == TokenType.PrivateIdentifier
+			|| lastTokenType == TokenType.RegexpPattern
+			|| lastTokenType == TokenType.StringLiteral
+			|| lastTokenType == TokenType.TemplateExpressionEnd
+			|| lastTokenType == TokenType.This;
+		return lastTokenType != null && isAcceptedType;
 	}
 
 	public Token next() throws SyntaxError {
@@ -372,7 +379,7 @@ public final class Lexer {
 			return tokenizeKeywordOrIdentifier();
 		}
 
-		if (isDigit(codePoint)) {
+		if (isDigit(codePoint) || (codePoint == '.' && isDigit(peekNext()))) {
 			return tokenizeNumericLiteral();
 		}
 
@@ -635,7 +642,6 @@ public final class Lexer {
 		if (accept("0o")) return numericLiteralRadix(8, "Octal");
 
 		final StringBuilder builder = new StringBuilder();
-		final boolean startsWithZero = codePoint == '0';
 		final SourcePosition start = position();
 
 		boolean inIntegerPart = true;
@@ -655,7 +661,8 @@ public final class Lexer {
 			}
 		}
 
-		if (startsWithZero && !(inIntegerPart && builder.length() == 1) && !builder.toString().startsWith("0.")) {
+		// If matches ^0\d
+		if (builder.codePointAt(0) == '0' && builder.length() > 1 && isDigit(builder.codePointAt(1))) {
 			throw new SyntaxError("Unexpected leading zero", start);
 		}
 

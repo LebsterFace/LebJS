@@ -860,16 +860,11 @@ public final class Parser {
 			case Identifier -> parseIdentifierExpressionOrArrowFunctionExpression();
 			case RegexpPattern -> parseRegexpLiteral();
 			case StringLiteral -> state.consume().asStringLiteral();
-			case NumericLiteral -> parseNumericLiteral(false);
+			case NumericLiteral -> parseNumericLiteral();
 
 			case Function -> {
 				state.require(Function);
 				yield parseFunctionExpression(true);
-			}
-
-			case Period -> {
-				state.consume();
-				yield parseNumericLiteral(true);
 			}
 
 			case True -> {
@@ -897,9 +892,9 @@ public final class Parser {
 		};
 	}
 
-	private NumericLiteral parseNumericLiteral(boolean leadingDecimal) throws SyntaxError {
-		final String value = (leadingDecimal ? "." : "") + state.require(NumericLiteral);
-		return new NumericLiteral(new NumberValue(Double.parseDouble(value)));
+	private NumericLiteral parseNumericLiteral() throws SyntaxError {
+		final double value = Double.parseDouble(state.require(NumericLiteral));
+		return new NumericLiteral(new NumberValue(value));
 	}
 
 	private RegExpLiteral parseRegexpLiteral() throws SyntaxError {

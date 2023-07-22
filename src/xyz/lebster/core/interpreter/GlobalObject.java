@@ -13,6 +13,7 @@ import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -87,9 +88,9 @@ public final class GlobalObject extends ObjectValue {
 		// 2. Let S be ! TrimString(inputString, start).
 		final StringBuilder S = new StringBuilder(inputString.stripLeading());
 		// 3. Let sign be 1.
-		int sign = 1;
+		boolean isPositive = true;
 		// 4. If S is not empty and the first code unit of S is the code unit 0x002D (HYPHEN-MINUS), set sign to -1.
-		if (!S.isEmpty() && S.charAt(0) == 0x002D) sign = -1;
+		if (!S.isEmpty() && S.charAt(0) == 0x002D) isPositive = false;
 		// 5. If S is not empty and the first code unit of S is the code unit 0x002B (PLUS SIGN) or the code unit 0x002D (HYPHEN-MINUS)
 		if (!S.isEmpty() && (S.charAt(0) == 0x002B || S.charAt(0) == 0x002D))
 			// remove the first code unit from S.
@@ -138,17 +139,18 @@ public final class GlobalObject extends ObjectValue {
 		// significant digits, every significant digit after the 20th may be replaced by a 0 digit, at the option
 		// of the implementation; and if R is not 2, 4, 8, 10, 16, or 32, then mathInt may be an
 		// implementation-approximated integer representing the integer value denoted by Z in radix-R notation.)
-		int mathInt = Integer.parseInt(Z, R);
+		final BigInteger mathInt = new BigInteger(Z, R);
 
 		// 15. If mathInt = 0, then
-		if (mathInt == 0) {
+		if (mathInt.signum() == 0) {
 			// a. If sign = -1, return -0𝔽.
+			if (!isPositive) return NumberValue.NEGATIVE_ZERO;
 			// b. Return +0𝔽.
-			return new NumberValue(0.0D * sign);
+			return NumberValue.ZERO;
 		}
 
 		// 16. Return 𝔽(sign × mathInt).
-		return new NumberValue(mathInt * sign);
+		return new NumberValue((isPositive ? mathInt : mathInt.negate()).doubleValue());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parsefloat-string")

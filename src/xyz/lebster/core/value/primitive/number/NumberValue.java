@@ -24,6 +24,7 @@ public final class NumberValue extends PrimitiveValue<Double> {
 	public static final long POSITIVE_ZERO_BITS = 0;
 	public static final NumberValue NaN = new NumberValue(Double.NaN);
 	public static final NumberValue ZERO = new NumberValue(0.0D);
+	public static final NumberValue NEGATIVE_ZERO = new NumberValue(-0.0D);
 	public static final NumberValue ONE = new NumberValue(1.0D);
 	public static final NumberValue MINUS_ONE = new NumberValue(-1.0D);
 

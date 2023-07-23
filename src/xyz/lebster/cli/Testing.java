@@ -10,27 +10,36 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 public final class Testing {
+	private int total = 0;
+
+	private int passed = 0;
 	private final ByteArrayOutputStream passedOutput;
 	private final PrintStream passedStream;
+
+	private int skipped = 0;
+	private final ByteArrayOutputStream skippedOutput;
+	private final PrintStream skippedStream;
+
+	private int failed = 0;
 	private final ByteArrayOutputStream failedOutput;
 	private final PrintStream failedStream;
+
 	private final TestHarness harness;
 	private final CLArguments arguments;
-	private int successfulTests = 0;
-	private int totalTests = 0;
 
 	public Testing(CLArguments arguments) throws SyntaxError, CLArgumentException {
 		this.arguments = arguments;
 		if (arguments.options().disableTestOutputBuffers()) {
 			passedOutput = null;
 			passedStream = System.out;
+			skippedOutput = null;
+			skippedStream = System.out;
 			failedOutput = null;
 			failedStream = System.out;
 		} else {
-			passedOutput = new ByteArrayOutputStream();
-			passedStream = new PrintStream(passedOutput);
-			failedOutput = new ByteArrayOutputStream();
-			failedStream = new PrintStream(failedOutput);
+			passedStream = new PrintStream(passedOutput = new ByteArrayOutputStream());
+			skippedStream = new PrintStream(skippedOutput = new ByteArrayOutputStream());
+			failedStream = new PrintStream(failedOutput = new ByteArrayOutputStream());
 		}
 
 		if (arguments.options().harness() == null) {
@@ -55,25 +64,28 @@ public final class Testing {
 		if (!file.getName().endsWith(".js") && !file.getName().endsWith(".js.skip")) return;
 
 		final String fileName = prefix + file.getName();
-		totalTests++;
+		total++;
 
 		final ByteArrayOutputStream tempOutput = new ByteArrayOutputStream();
 		final PrintStream tempStream = new PrintStream(tempOutput);
 		final PrintStream stdout = System.out;
 		System.setOut(tempStream);
 
-
 		final TestResult result = harness.run(file, arguments);
 		switch (result.status()) {
-			case SKIPPED -> printTestResult(failedStream, ANSI.YELLOW, "SKIPPED", fileName);
+			case SKIPPED -> {
+				skipped++;
+				printTestResult(skippedStream, ANSI.YELLOW, "SKIPPED", fileName);
+			}
 
 			case PASSED -> {
-				successfulTests++;
+				passed++;
 				printTestResult(passedStream, ANSI.BRIGHT_GREEN, "PASSED", fileName);
 				printTestOutput(passedStream, tempOutput);
 			}
 
 			case FAILED -> {
+				failed++;
 				printTestResult(failedStream, ANSI.BRIGHT_RED, "FAILED", fileName);
 				printTestOutput(failedStream, tempOutput);
 				Main.handleError(result.cause(), failedStream, arguments.options().hideStackTrace());
@@ -106,15 +118,20 @@ public final class Testing {
 		}
 
 		try {
-			System.out.printf("%n%s%s\t\tPassing Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_GREEN, ANSI.BLACK, successfulTests, totalTests, ANSI.RESET);
+			System.out.printf("%n%s%s\t\tPassing Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_GREEN, ANSI.BLACK, passed, total, ANSI.RESET);
 			if (!arguments.options().disableTestOutputBuffers() && !arguments.options().hidePassing())
 				passedOutput.writeTo(System.out);
 
-			System.out.printf("%n%s%s\t\tFailing Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_RED, ANSI.BLACK, totalTests - successfulTests, totalTests, ANSI.RESET);
+			System.out.printf("%n%s%s\t\tSkipped Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_YELLOW, ANSI.BLACK, skipped, total, ANSI.RESET);
+			if (!arguments.options().disableTestOutputBuffers() && !arguments.options().hidePassing())
+				skippedOutput.writeTo(System.out);
+
+			System.out.printf("%n%s%s\t\tFailing Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_RED, ANSI.BLACK, failed, total, ANSI.RESET);
 			if (!arguments.options().disableTestOutputBuffers())
 				failedOutput.writeTo(System.out);
-			if (totalTests != successfulTests)
-				System.out.printf("%n%s\t\t%.2f%% of tests passed%n%s%n", ANSI.MAGENTA, 100.0D * ((double) successfulTests / (double) totalTests), ANSI.RESET);
+
+			if (total != passed)
+				System.out.printf("%n%s\t\t%.2f%% of tests passed%n%s%n", ANSI.MAGENTA, 100.0D * ((double) passed / (double) total), ANSI.RESET);
 		} catch (IOException e) {
 			throw new Error(e.getMessage());
 		}

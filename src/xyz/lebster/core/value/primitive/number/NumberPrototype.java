@@ -25,10 +25,28 @@ public final class NumberPrototype extends ObjectValue {
 
 	public NumberPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
-		putMethod(intrinsics, Names.toString, 0, NumberPrototype::toStringMethod);
+		putMethod(intrinsics, Names.toExponential, 1, NumberPrototype::toExponential);
 		putMethod(intrinsics, Names.toFixed, 1, NumberPrototype::toFixed);
-		putMethod(intrinsics, Names.valueOf, 0, NumberPrototype::valueOf);
 		putMethod(intrinsics, Names.toLocaleString, 0, NumberPrototype::toLocaleString);
+		putMethod(intrinsics, Names.toPrecision, 1, NumberPrototype::toPrecision);
+		putMethod(intrinsics, Names.toString, 1, NumberPrototype::toStringMethod);
+		putMethod(intrinsics, Names.valueOf, 0, NumberPrototype::valueOf);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.toprecision")
+	private static StringValue toPrecision(Interpreter interpreter, Value<?>[] arguments) {
+		// 21.1.3.5 Number.prototype.toPrecision ( precision )
+		final Value<?> precision = argument(0, arguments);
+
+		throw new NotImplemented("Number.prototype.toPrecision");
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.toexponential")
+	private static StringValue toExponential(Interpreter interpreter, Value<?>[] arguments) {
+		// 21.1.3.2 Number.prototype.toExponential ( fractionDigits )
+		final Value<?> fractionDigits = argument(0, arguments);
+
+		throw new NotImplemented("Number.prototype.toExponential");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tofixed")
@@ -37,7 +55,7 @@ public final class NumberPrototype extends ObjectValue {
 		final Value<?> fractionDigits = argument(0, arguments);
 
 		// 1. Let x be ? thisNumberValue(this value).
-		final NumberValue x_ = interpreter.thisValue().toNumberValue(interpreter);
+		final NumberValue x_ = thisNumberValue(interpreter, interpreter.thisValue());
 		// 2. Let f be ? ToIntegerOrInfinity(fractionDigits).
 		final int f = toIntegerOrInfinity(interpreter, fractionDigits);
 		// 3. Assert: If fractionDigits is undefined, then f is 0.
@@ -146,13 +164,13 @@ public final class NumberPrototype extends ObjectValue {
 		final int radixMV = radix == Undefined.instance ? 10 : toIntegerOrInfinity(interpreter, radix);
 		// 4. If radixMV < 2 or radixMV > 36, throw a RangeError exception.
 		if (radixMV < 2 || radixMV > 36)
-			throw error(new TypeError(interpreter, "toString() radix argument must be between 2 and 36"));
+			throw error(new RangeError(interpreter, "toString() radix argument must be between 2 and 36"));
 		// 5. If radixMV = 10, return ! ToString(x).
 		if (radixMV == 10) return x.toStringValue(interpreter);
 		// 6. Return the String representation of this Number value using the radix specified by radixMV. Letters a-z
 		// are used for digits with values 10 through 35. The precise algorithm is implementation-defined, however the
 		// algorithm should be a generalization of that specified in 6.1.6.1.20.
 		// FIXME: Follow spec
-		return x.toStringValue(interpreter);
+		throw new NotImplemented("Number.prototype.toString() with radix other than 10");
 	}
 }

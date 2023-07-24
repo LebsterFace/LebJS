@@ -59,10 +59,6 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS;
 	}
 
-	public static boolean isPositiveZero(Value<?> v) {
-		return v instanceof final NumberValue n && isPositiveZero(n.value);
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-tostring")
 	@NonCompliant
 	public static String stringValueOf(Double d) {
@@ -73,7 +69,12 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		// Scientific notation is used if the number's magnitude (ignoring sign)
 		// is greater than or equal to 10^21 or less than 10^-6
 		if (d >= Math.pow(10, 21) || d < Math.pow(10, -6)) {
-			return String.valueOf(d).toLowerCase();
+		final String result = d.toString().toLowerCase();
+			if (!result.contains(".")) return result;
+			return result
+				.replaceAll("(?<=\\.\\d*)0*(?=$|e)", "") // IntelliJ bug: '* repetition not allowed inside lookbehind'
+				.replaceAll("\\.(?=$|e)", "")
+				.replaceAll("e(?=\\d)", "e+");
 		} else {
 			return new BigDecimal(d).setScale(15, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
 		}

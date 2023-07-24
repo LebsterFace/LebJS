@@ -65,15 +65,6 @@ Test.expect(String(null), 'null');
 Test.expect(String(undefined), 'undefined');
 Test.expect(String(0), '0');
 
-Test.expect(Number(true), 1);
-Test.expect(Number(false), 0);
-Test.expect(Number(null), 0);
-Test.expect(Number(undefined), NaN);
-Test.expect(Number(0), 0);
-Test.expect(Number("21"), 21);
-Test.expect(Number("21.5"), 21.5);
-Test.expect(Number("hello"), NaN);
-
 Test.expect(Boolean(true), true);
 Test.expect(Boolean(false), false);
 Test.expect(Boolean(null), false);

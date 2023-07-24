@@ -55,3 +55,6 @@ Test.parse(".1");
 Test.parse(".0");
 Test.parse("0.0");
 Test.parse("0.00");
+
+// The SourceCharacter immediately following a NumericLiteral must not be an IdentifierStart or DecimalDigit.
+Test.expectError("SyntaxError", 'Identifier starts immediately after numeric literal', () => Test.parse("3in ['a', 'b', 'c', 'd']"));

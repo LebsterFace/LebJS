@@ -66,8 +66,8 @@ function example(a, b, c, d) {
     return a + b + c + d;
 }
 
-Test.expect("1234", example("1", "2", "3", "4"))
-Test.expect("123undefined", example("1", "2", "3"))
-Test.expect("12undefinedundefined", example("1", "2"))
-Test.expect("1undefinedundefinedundefined", example("1"))
-Test.expect(true, isNaN(example()))
+Test.expect("1234", example("1", "2", "3", "4"));
+Test.expect("123undefined", example("1", "2", "3"));
+Test.expect("12undefinedundefined", example("1", "2"));
+Test.expect("1undefinedundefinedundefined", example("1"));
+Test.expect(NaN, example());

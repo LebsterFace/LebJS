@@ -180,24 +180,14 @@ public final class MathObject extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-math.trunc")
 	private static double trunc(double n) {
-		// 2. If n is NaN, n is +0𝔽, n is -0𝔽, n is +∞𝔽, or n is -∞𝔽, return n.
-		if (Double.isNaN(n) || n == 0 || Double.isInfinite(n)) {
-			return n;
-		}
+		// 2. If n is not finite or n is either +0𝔽 or -0𝔽, return n.
+		if (!Double.isFinite(n) || n == 0) return n;
 		// 3. If n < 1𝔽 and n > +0𝔽, return +0𝔽.
-		else if (n < 1.0D && n > 0.0D) {
-			return 0.0D;
-		}
-		// 4. If n < +0𝔽 and n > -1𝔽, return -0𝔽.
-		else if (n < 0 && n > -1.0D) {
-			return -0.0D;
-		}
+		if (n < 1.0D && n > 0.0D) return 0.0D;
+		// 4. If n < -0𝔽 and n > -1𝔽, return -0𝔽.
+		if (n < -0.0D && n > -1.0D) return -0.0D;
 		// 5. Return the integral Number nearest n in the direction of +0𝔽.
-		else if (n > 0.0D) {
-			return Math.floor(n);
-		} else {
-			return Math.ceil(n);
-		}
+		return NumberValue.truncate(n);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-math.min")

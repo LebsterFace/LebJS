@@ -127,6 +127,16 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		return new NumberValue(-value);
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#eqn-truncate")
+	public static double truncate(double x) {
+		// The mathematical function truncate(x) removes the fractional part of x by rounding towards zero
+		if (x < 0) {
+			return Math.ceil(x);
+		} else {
+			return Math.floor(x);
+		}
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-bitwiseNOT")
 	public NumberValue bitwiseNOT() {
 		// 1. Let oldValue be ! ToInt32(x).

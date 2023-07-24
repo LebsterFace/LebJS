@@ -152,20 +152,18 @@ public final class Lexer {
 		final ArrayList<Token> tokens = new ArrayList<>();
 		while (instance.hasNext()) {
 			final Token next = instance.next();
-			if (next == null) {
-				break;
-			} else {
-				instance.lastTokenType = next.type;
-				if (!instance.templateLiteralStates.isEmpty() && instance.templateLiteralStates.getFirst().inExpression) {
-					if (next.type == TokenType.LBrace) {
-						instance.templateLiteralStates.getFirst().bracketCount++;
-					} else if (next.type == TokenType.RBrace) {
-						instance.templateLiteralStates.getFirst().bracketCount--;
-					}
-				}
+			if (next == null) break;
 
-				tokens.add(next);
+			instance.lastTokenType = next.type;
+			if (!instance.templateLiteralStates.isEmpty() && instance.templateLiteralStates.getFirst().inExpression) {
+				if (next.type == TokenType.LBrace) {
+					instance.templateLiteralStates.getFirst().bracketCount++;
+				} else if (next.type == TokenType.RBrace) {
+					instance.templateLiteralStates.getFirst().bracketCount--;
+				}
 			}
+
+			tokens.add(next);
 		}
 
 		tokens.add(new Token(TokenType.EOF, null));
@@ -335,6 +333,8 @@ public final class Lexer {
 			}
 
 			return new Token(TokenType.RegexpFlags, regexpFlags.toString(), position());
+		} else if (lastTokenType == TokenType.NumericLiteral && isIdentifierStart(codePoint)) {
+			throw new SyntaxError("Identifier starts immediately after numeric literal", position());
 		}
 
 		final boolean inTemplateLiteral = !templateLiteralStates.isEmpty();

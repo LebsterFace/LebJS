@@ -79,7 +79,7 @@ public final class NumberPrototype extends ObjectValue {
 		// 10. If x ≥ 10^21, then
 		if (x >= Math.pow(10, 21)) {
 			// a. Let m be ! ToString(𝔽(x)).
-			m = x_.stringValueOf();
+			m = x_.stringValueOf(10);
 		}
 		// 11. Else,
 		else {
@@ -160,7 +160,6 @@ public final class NumberPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tostring")
-	@NonCompliant
 	private static StringValue toStringMethod(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 21.1.3.6 Number.prototype.toString ( [ radix ] )
 		final Value<?> radix = argument(0, arguments);
@@ -173,12 +172,8 @@ public final class NumberPrototype extends ObjectValue {
 		// 4. If radixMV is not in the inclusive interval from 2 to 36, throw a RangeError exception.
 		if (radixMV < 2 || radixMV > 36)
 			throw error(new RangeError(interpreter, "toString() radix argument must be between 2 and 36"));
-		// 5. If radixMV = 10, return ! ToString(x).
-		if (radixMV == 10) return x.toStringValue(interpreter);
-		// 6. Return the String representation of this Number value using the radix specified by radixMV. Letters a-z
-		// are used for digits with values 10 through 35. The precise algorithm is implementation-defined, however the
-		// algorithm should be a generalization of that specified in 6.1.6.1.20.
-		// FIXME: Follow spec
-		throw new NotImplemented("Number.prototype.toString() with radix other than 10");
+
+		// 5. Return Number::toString(x, radixMV).
+		return new StringValue(x.stringValueOf(radixMV));
 	}
 }

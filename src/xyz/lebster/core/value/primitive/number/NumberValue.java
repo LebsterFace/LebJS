@@ -1,9 +1,6 @@
 package xyz.lebster.core.value.primitive.number;
 
-import xyz.lebster.core.ANSI;
-import xyz.lebster.core.NonCompliant;
-import xyz.lebster.core.NonStandard;
-import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.*;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
@@ -12,10 +9,9 @@ import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 public final class NumberValue extends PrimitiveValue<Double> {
+	private static final String DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
+
 	public static final long TWO_TO_THE_31 = 2147483648L;
 	public static final long TWO_TO_THE_32 = 4294967296L;
 	public static final long UINT32_LIMIT = TWO_TO_THE_32 - 1;
@@ -59,27 +55,6 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS;
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-tostring")
-	@NonCompliant
-	public static String stringValueOf(Double d) {
-		if (d == 0.0) return "0";
-		if (d.isNaN()) return "NaN";
-		else if (d < 0.0) return "-" + stringValueOf(-d);
-		else if (d.isInfinite()) return "Infinity";
-		// Scientific notation is used if the number's magnitude (ignoring sign)
-		// is greater than or equal to 10^21 or less than 10^-6
-		if (d >= Math.pow(10, 21) || d < Math.pow(10, -6)) {
-		final String result = d.toString().toLowerCase();
-			if (!result.contains(".")) return result;
-			return result
-				.replaceAll("(?<=\\.\\d*)0*(?=$|e)", "") // IntelliJ bug: '* repetition not allowed inside lookbehind'
-				.replaceAll("\\.(?=$|e)", "")
-				.replaceAll("e(?=\\d)", "e+");
-		} else {
-			return new BigDecimal(d).setScale(15, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
-		}
-	}
-
 	@NonStandard
 	public boolean isEqualTo(NumberValue y, boolean negative_zero_equals_zero, boolean NaN_equals_NaN) {
 		if (value.isNaN() && y.value.isNaN()) return NaN_equals_NaN;
@@ -88,19 +63,59 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		return value.doubleValue() == y.value.doubleValue();
 	}
 
-	public String stringValueOf() {
-		return NumberValue.stringValueOf(this.value);
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-tostring")
+	public String stringValueOf(int radix) {
+		if (radix == 10) return Ryu.doubleToString(this.value);
+
+		// Doesn't always produce identical output to other engines, but should be good enough for the foreseeable future.
+		double number = this.value;
+		final boolean negative = number < 0;
+		if (negative) number *= -1;
+
+		double intPart = Math.floor(number);
+		double decimalPart = number - intPart;
+		final StringBuilder characters = new StringBuilder();
+
+		if (intPart == 0) {
+			characters.append('0');
+		} else {
+			while (intPart > 0) {
+				characters.append(DIGITS.charAt((int) (intPart % radix)));
+				intPart /= radix;
+				intPart = Math.floor(intPart);
+			}
+		}
+
+		if (negative) characters.append('-');
+		characters.reverse();
+
+		if (decimalPart != 0.0) {
+			characters.append('.');
+
+			// An approximation of the best formula, based on rough test data :^)
+			final int precision = ((int) Math.ceil(Math.log(Math.pow(2, 150)) / Math.log(radix)));
+			for (int i = 0; i < precision; ++i) {
+				decimalPart *= radix;
+				final long integral = (long) Math.floor(decimalPart);
+				characters.append(DIGITS.charAt((int) integral));
+				decimalPart -= integral;
+			}
+
+			Ryu.removeTrailingZeroes(characters);
+		}
+
+		return characters.toString();
 	}
 
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) {
-		return new StringValue(stringValueOf(value));
+		return new StringValue(stringValueOf(10));
 	}
 
 	@Override
 	public void display(StringRepresentation representation) {
 		representation.append(ANSI.BRIGHT_YELLOW);
-		representation.append(stringValueOf(value));
+		representation.append(stringValueOf(10));
 		representation.append(ANSI.RESET);
 	}
 

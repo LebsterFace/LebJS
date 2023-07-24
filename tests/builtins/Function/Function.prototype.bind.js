@@ -44,7 +44,7 @@ function sum(a, b, c) {
 const boundSum = sum.bind(null, 10, 5);
 
 // arguments are bound to the function
-Test.equals(NaN, boundSum());
+Test.expect(NaN, boundSum());
 Test.expect(20, boundSum(5));
 Test.expect(20, boundSum(5, 6, 7));
 

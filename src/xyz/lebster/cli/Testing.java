@@ -122,9 +122,11 @@ public final class Testing {
 			if (!arguments.options().disableTestOutputBuffers() && !arguments.options().hidePassing())
 				passedOutput.writeTo(System.out);
 
-			System.out.printf("%n%s%s\t\tSkipped Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_YELLOW, ANSI.BLACK, skipped, total, ANSI.RESET);
-			if (!arguments.options().disableTestOutputBuffers() && !arguments.options().hidePassing())
-				skippedOutput.writeTo(System.out);
+			if (skipped != 0) {
+				System.out.printf("%n%s%s\t\tSkipped Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_YELLOW, ANSI.BLACK, skipped, total, ANSI.RESET);
+				if (!arguments.options().disableTestOutputBuffers() && !arguments.options().hidePassing())
+					skippedOutput.writeTo(System.out);
+			}
 
 			System.out.printf("%n%s%s\t\tFailing Tests (%d/%d)%n%s%n", ANSI.BACKGROUND_RED, ANSI.BLACK, failed, total, ANSI.RESET);
 			if (!arguments.options().disableTestOutputBuffers())

@@ -36,8 +36,6 @@ public final class GlobalObject extends ObjectValue {
 
 		// 19.2 Function Properties of the Global Object
 		putMethod(intrinsics, Names.eval, 1, GlobalObject::eval);
-		putMethod(intrinsics, Names.isFinite, 1, GlobalObject::isFinite);
-		putMethod(intrinsics, Names.isNaN, 1, GlobalObject::isNaN);
 		putMethod(intrinsics, Names.parseFloat, 1, GlobalObject::parseFloat);
 		putMethod(intrinsics, Names.parseInt, 2, GlobalObject::parseInt);
 
@@ -167,19 +165,6 @@ public final class GlobalObject extends ObjectValue {
 		return new NumberValue(Double.parseDouble(trimmedString));
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isfinite-number")
-	private static BooleanValue isFinite(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 19.2.2 isFinite ( number )
-		final Value<?> number = argument(0, arguments);
-		if (arguments.length == 0) return BooleanValue.FALSE;
-
-		// 1. Let num be ? ToNumber(number).
-		final double num = number.toNumberValue(interpreter).value;
-		// 2. If num is NaN, +∞𝔽, or -∞𝔽, return false.
-		// 3. Otherwise, return true.
-		return BooleanValue.of(!(Double.isNaN(num) || Double.isInfinite(num)));
-	}
-
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-eval-x")
 	private static Value<?> eval(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
@@ -194,18 +179,6 @@ public final class GlobalObject extends ObjectValue {
 		} finally {
 			interpreter.exitExecutionContext(context);
 		}
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isnan-number")
-	private static BooleanValue isNaN(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 19.2.3 isNaN ( number )
-		final Value<?> number = argument(0, arguments);
-
-		// 1. Let num be ? ToNumber(number).
-		final NumberValue num = number.toNumberValue(interpreter);
-		// 2. If num is NaN, return true.
-		// 3. Otherwise, return false.
-		return BooleanValue.of(num.value.isNaN());
 	}
 
 	private static StringValue readFile(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {

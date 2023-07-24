@@ -104,11 +104,14 @@ public final class StringValue extends Key<String> {
 	@NonCompliant
 	public NumberValue toNumberValue(Interpreter interpreter) {
 		// FIXME: Follow spec
-		if (value.isBlank())
-			return NumberValue.ZERO;
+		if (value.isBlank()) return NumberValue.ZERO;
 
+		final String string = value.trim();
 		try {
-			return new NumberValue(Double.parseDouble(value));
+			if (string.toLowerCase().startsWith("0b")) return new NumberValue(Integer.parseInt(string.substring(2), 2));
+			if (string.toLowerCase().startsWith("0o")) return new NumberValue(Integer.parseInt(string.substring(2), 8));
+			if (string.toLowerCase().startsWith("0x")) return new NumberValue(Integer.parseInt(string.substring(2), 16));
+			return new NumberValue(Double.parseDouble(string));
 		} catch (NumberFormatException e) {
 			return NumberValue.NaN;
 		}

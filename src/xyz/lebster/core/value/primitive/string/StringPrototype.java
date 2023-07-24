@@ -2,7 +2,6 @@ package xyz.lebster.core.value.primitive.string;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
-import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -74,9 +73,6 @@ public final class StringPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.substring, 2, StringPrototype::substring);
 		putMethod(intrinsics, Names.toLocaleLowerCase, 0, StringPrototype::toLocaleLowerCase);
 		putMethod(intrinsics, Names.toLocaleUpperCase, 0, StringPrototype::toLocaleUpperCase);
-
-		// Non-standard
-		putMethod(intrinsics, Names.reverse, 0, StringPrototype::reverse);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charcodeat")
@@ -762,7 +758,7 @@ public final class StringPrototype extends ObjectValue {
 		// 22.1.3.33 String.prototype.valueOf ( )
 
 		// 1. Return ? thisStringValue(this value).
-		return thisStringValue(interpreter, interpreter.thisValue());
+		return thisStringValue(interpreter, "valueOf");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tostring")
@@ -770,23 +766,15 @@ public final class StringPrototype extends ObjectValue {
 		// 22.1.3.28 String.prototype.toString ( )
 
 		// 1. Return ? thisStringValue(this value).
-		return thisStringValue(interpreter, interpreter.thisValue());
-	}
-
-	@NonStandard
-	private static StringValue reverse(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// String.prototype.reverse(): string
-
-		final String S = thisStringValue(interpreter, interpreter.thisValue()).value;
-		return new StringValue(new StringBuilder(S).reverse().toString());
+		return thisStringValue(interpreter, "toString");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#thisstringvalue")
-	private static StringValue thisStringValue(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
+	private static StringValue thisStringValue(Interpreter interpreter, String methodName) throws AbruptCompletion {
 		// 1. If Type(value) is String, return value.
-		if (value instanceof final StringValue stringValue) return stringValue;
+		if (interpreter.thisValue() instanceof final StringValue stringValue) return stringValue;
 		// 2. If Type(value) is Object and value has a [[StringData]] internal slot, then
-		if (value instanceof final StringWrapper stringWrapper) {
+		if (interpreter.thisValue() instanceof final StringWrapper stringWrapper) {
 			// a. Let s be value.[[StringData]].
 			// b. Assert: Type(s) is String.
 			// c. Return s.
@@ -794,7 +782,7 @@ public final class StringPrototype extends ObjectValue {
 		}
 
 		// 3. Throw a TypeError exception.
-		throw error(new TypeError(interpreter, "This method requires that 'this' be a String"));
+		throw error(new TypeError(interpreter, "String.prototype.%s method requires that 'this' be a String"));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype-@@iterator")
@@ -804,8 +792,11 @@ public final class StringPrototype extends ObjectValue {
 		@NonCompliant
 		public StringIterator(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 			super(interpreter.intrinsics);
-			final String value = thisStringValue(interpreter, interpreter.thisValue()).value;
-			this.primitiveIterator = value.codePoints().iterator();
+			// 1. Let O be ? RequireObjectCoercible(this value).
+			final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype[Symbol.iterator]");
+			// 2. Let S be ? ToString(O).
+			final String S = O.toStringValue(interpreter).value;
+			this.primitiveIterator = S.codePoints().iterator();
 			if (!primitiveIterator.hasNext()) setCompleted();
 		}
 

@@ -1,12 +1,12 @@
 // prototype method
-Test.expect("321", "123".reverse());
+Test.expect(true, "123".includes('2'));
 
 // String prototype
 let StringPrototype = Object.getPrototypeOf("123");
 Test.expect(Object.getPrototypeOf(""), StringPrototype);
 Test.expect(String.prototype, StringPrototype);
-Test.expect(String.prototype.reverse, "123".reverse)
-Test.expect(String.prototype.reverse, StringPrototype.reverse)
+Test.expect(String.prototype.includes, "123".includes)
+Test.expect(String.prototype.includes, StringPrototype.includes)
 
 // Object prototype
 let ObjectPrototype = Object.getPrototypeOf({});

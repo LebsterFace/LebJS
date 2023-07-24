@@ -146,16 +146,20 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		return new NumberValue(~oldValue);
 	}
 
+	private static long modulo(long x, long y) {
+		final long result = x % y;
+		return result < 0 ? result + y : result;
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toint32")
 	public int toInt32() {
 		// 1. Let number be ? ToNumber(argument).
-		// 2. If number is NaN, +0𝔽, -0𝔽, +∞𝔽, or -∞𝔽, return +0𝔽.
-		if (value.isNaN() || value == 0.0 || value.isInfinite()) return 0;
-		// 3. Let int be the mathematical value whose sign is the sign of number
-		// and whose magnitude is floor(abs(ℝ(number))).
-		long int_ = ((long) Math.floor(Math.abs(value))) * (long) Math.signum(value);
+		// 2. If number is not finite or number is either +0𝔽 or -0𝔽, return +0𝔽.
+		if (!Double.isFinite(value) || value == 0) return 0;
+		// 3. Let int be truncate(ℝ(number)).
+		final long Int = (long) truncate(value);
 		// 4. Let int32bit be int modulo 2^32.
-		long int32bit = int_ % TWO_TO_THE_32;
+		final long int32bit = modulo(Int, TWO_TO_THE_32);
 		// 5. If int32bit ≥ 2^31, return 𝔽(int32bit - 2^32);
 		if (int32bit >= TWO_TO_THE_31) return (int) (int32bit - TWO_TO_THE_32);
 		// otherwise return 𝔽(int32bit).
@@ -181,5 +185,14 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		// 2. If y is NaN, return undefined.
 		if (this.value.isNaN() || other.value.isNaN()) return null;
 		return BooleanValue.of(this.value < other.value);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isintegralnumber")
+	public boolean isIntegralNumber() {
+		// 1. If argument is not a Number, return false.
+		// 2. If argument is not finite, return false.
+		// 3. If truncate(ℝ(argument)) ≠ ℝ(argument), return false.
+		// 4. Return true.
+		return Double.isFinite(value) && truncate(value) == value;
 	}
 }

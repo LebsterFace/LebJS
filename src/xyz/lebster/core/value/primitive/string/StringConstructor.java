@@ -13,8 +13,8 @@ import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-string-constructor")
 @NonStandard
 public class StringConstructor extends PrimitiveConstructor {
-	public StringConstructor(Intrinsics functionPrototype) {
-		super(functionPrototype, Names.String);
+	public StringConstructor(Intrinsics intrinsics) {
+		super(intrinsics, Names.String);
 	}
 
 	@Override

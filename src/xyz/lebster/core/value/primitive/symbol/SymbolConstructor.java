@@ -14,8 +14,8 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol-constructor")
 @NonStandard
 public final class SymbolConstructor extends PrimitiveConstructor {
-	public SymbolConstructor(Intrinsics functionPrototype) {
-		super(functionPrototype, Names.Symbol);
+	public SymbolConstructor(Intrinsics intrinsics) {
+		super(intrinsics, Names.Symbol);
 		put(Names.asyncIterator, SymbolValue.asyncIterator, false, false, false);
 		put(Names.hasInstance, SymbolValue.hasInstance, false, false, false);
 		put(Names.isConcatSpreadable, SymbolValue.isConcatSpreadable, false, false, false);

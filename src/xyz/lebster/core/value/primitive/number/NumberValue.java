@@ -22,11 +22,18 @@ public final class NumberValue extends PrimitiveValue<Double> {
 
 	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;
 	public static final long POSITIVE_ZERO_BITS = 0;
-	public static final NumberValue NaN = new NumberValue(Double.NaN);
-	public static final NumberValue ZERO = new NumberValue(0.0D);
-	public static final NumberValue NEGATIVE_ZERO = new NumberValue(-0.0D);
-	public static final NumberValue ONE = new NumberValue(1.0D);
+	public static final NumberValue EPSILON = new NumberValue(Math.ulp(1.0D));
+	public static final NumberValue MAX_SAFE_INTEGER = new NumberValue(9007199254740991.0D);
+	public static final NumberValue MAX_VALUE = new NumberValue(Double.MAX_VALUE);
 	public static final NumberValue MINUS_ONE = new NumberValue(-1.0D);
+	public static final NumberValue MIN_SAFE_INTEGER = new NumberValue(-9007199254740991.0D);
+	public static final NumberValue MIN_VALUE = new NumberValue(Double.MIN_VALUE);
+	public static final NumberValue NEGATIVE_INFINITY = new NumberValue(Double.NEGATIVE_INFINITY);
+	public static final NumberValue NEGATIVE_ZERO = new NumberValue(-0.0D);
+	public static final NumberValue NaN = new NumberValue(Double.NaN);
+	public static final NumberValue ONE = new NumberValue(1.0D);
+	public static final NumberValue POSITIVE_INFINITY = new NumberValue(Double.POSITIVE_INFINITY);
+	public static final NumberValue ZERO = new NumberValue(0.0D);
 
 	public NumberValue(double num) {
 		super(num);

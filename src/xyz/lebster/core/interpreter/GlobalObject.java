@@ -1,6 +1,7 @@
 package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.NonCompliant;
+import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.value.Names;
@@ -23,13 +24,14 @@ import java.nio.file.Path;
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
+@NonStandard
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-global-object")
 public final class GlobalObject extends ObjectValue {
 	public GlobalObject(Intrinsics intrinsics) {
 		super(intrinsics);
 
 		// 19.1 Value Properties of the Global Object
-		put(Names.Infinity, new NumberValue(Double.POSITIVE_INFINITY), false, false, false);
+		put(Names.Infinity, NumberValue.POSITIVE_INFINITY, false, false, false);
 		put(Names.NaN, NumberValue.NaN, false, false, false);
 		put(Names.globalThis, this);
 		put(Names.undefined, Undefined.instance, false, false, false);
@@ -88,9 +90,9 @@ public final class GlobalObject extends ObjectValue {
 		// 3. Let sign be 1.
 		boolean isPositive = true;
 		// 4. If S is not empty and the first code unit of S is the code unit 0x002D (HYPHEN-MINUS), set sign to -1.
-		if (!S.isEmpty() && S.charAt(0) == 0x002D) isPositive = false;
+		if (!S.isEmpty() && S.charAt(0) == '-') isPositive = false;
 		// 5. If S is not empty and the first code unit of S is the code unit 0x002B (PLUS SIGN) or the code unit 0x002D (HYPHEN-MINUS)
-		if (!S.isEmpty() && (S.charAt(0) == 0x002B || S.charAt(0) == 0x002D))
+		if (!S.isEmpty() && (S.charAt(0) == '+' || S.charAt(0) == '-'))
 			// remove the first code unit from S.
 			S.deleteCharAt(0);
 		// 6. Let R be ℝ(? ToInt32(radix)).

@@ -19,12 +19,12 @@ Test.expect("30", (30).toString(10.9));
 
 // errors
 // must be called with numeric `this`
-Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toString.call(true));
-Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toString.call([]));
-Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toString.call({}));
-Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toString.call(Symbol("foo")));
-Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toString.call("bar"));
-// TODO: Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toString.call(1n));
+Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call(true));
+Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call([]));
+Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call({}));
+Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call(Symbol("foo")));
+Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call("bar"));
+// TODO: Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call(1n));
 
 // radix RangeError
 Test.expectError("RangeError", 'toString() radix argument must be between 2 and 36', () => (0).toString(0));

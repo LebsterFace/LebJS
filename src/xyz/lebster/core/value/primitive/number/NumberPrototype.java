@@ -21,8 +21,6 @@ import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-number-prototype-object")
 public final class NumberPrototype extends ObjectValue {
-	private static final double TEN_TO_THE_TWENTY_ONE = 1000000000000000000000.0D;
-
 	public NumberPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
 		putMethod(intrinsics, Names.toExponential, 1, NumberPrototype::toExponential);
@@ -55,7 +53,7 @@ public final class NumberPrototype extends ObjectValue {
 		final Value<?> fractionDigits = argument(0, arguments);
 
 		// 1. Let x be ? thisNumberValue(this value).
-		final NumberValue x_ = thisNumberValue(interpreter, interpreter.thisValue());
+		final NumberValue x_ = thisNumberValue(interpreter, "toFixed");
 		// 2. Let f be ? ToIntegerOrInfinity(fractionDigits).
 		final int f = toIntegerOrInfinity(interpreter, fractionDigits);
 		// 3. Assert: If fractionDigits is undefined, then f is 0.
@@ -77,9 +75,18 @@ public final class NumberPrototype extends ObjectValue {
 			x = -x;
 		}
 
-		// 10. If x ≥ 10^21, then a. Let m be ! ToString(𝔽(x)).
-		// 11. Else, (String.format used instead)
-		final String m = x >= TEN_TO_THE_TWENTY_ONE ? x_.toStringValue(interpreter).value : String.format("%." + f + "f", x);
+		final String m;
+		// 10. If x ≥ 10^21, then
+		if (x >= Math.pow(10, 21)) {
+			// a. Let m be ! ToString(𝔽(x)).
+			m = x_.stringValueOf();
+		}
+		// 11. Else,
+		else {
+			// (String.format used instead)
+			final String formatString = "%." + f + "f";
+			m = String.format(formatString, x);
+		}
 
 		// 12. Return the string-concatenation of s and m.
 		return new StringValue(s + m);
@@ -90,21 +97,21 @@ public final class NumberPrototype extends ObjectValue {
 		// 21.1.3.7 Number.prototype.valueOf ( )
 
 		// 1. Return ? thisNumberValue(this value).
-		return thisNumberValue(interpreter, interpreter.thisValue());
+		return thisNumberValue(interpreter, "valueOf");
 	}
 
-	private static NumberValue thisNumberValue(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
+	private static NumberValue thisNumberValue(Interpreter interpreter, String methodName) throws AbruptCompletion {
 		// 1. If Type(value) is Number, return value.
-		if (value instanceof final NumberValue numberValue) return numberValue;
+		if (interpreter.thisValue() instanceof final NumberValue numberValue) return numberValue;
 		// 2. If Type(value) is Object and value has a [[NumberData]] internal slot, then
-		if (value instanceof final NumberWrapper numberWrapper) {
+		if (interpreter.thisValue() instanceof final NumberWrapper numberWrapper) {
 			// a. Let n be value.[[NumberData]].
 			// b. Assert: Type(n) is Number.
 			// c. Return n.
 			return numberWrapper.data;
 		}
 		// 3. Throw a TypeError exception.
-		throw error(new TypeError(interpreter, "This method requires that 'this' be a Number"));
+		throw error(new TypeError(interpreter, "Number.prototype.%s requires that 'this' be a Number".formatted(methodName)));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tointegerorinfinity")
@@ -143,12 +150,13 @@ public final class NumberPrototype extends ObjectValue {
 		return Math.toIntExact(Math.min(len, ArrayPrototype.MAX_LENGTH));
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tolocalestring")
 	@NonCompliant
-	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] values) {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tolocalestring")
+	private static StringValue toLocaleString(Interpreter interpreter, Value<?>[] values) throws AbruptCompletion {
 		// 21.1.3.4 Number.prototype.toLocaleString ( [ reserved1 [ , reserved2 ] ] )
 
-		throw new NotImplemented("Number.prototype.toLocaleString");
+		// TODO: Implement `toLocaleString`
+		return toStringMethod(interpreter, values);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.tostring")
@@ -158,11 +166,11 @@ public final class NumberPrototype extends ObjectValue {
 		final Value<?> radix = argument(0, arguments);
 
 		// 1. Let x be ? thisNumberValue(this value).
-		final NumberValue x = thisNumberValue(interpreter, interpreter.thisValue());
+		final NumberValue x = thisNumberValue(interpreter, "toString");
 		// 2. If radix is undefined, let radixMV be 10.
 		// 3. Else, let radixMV be ? ToIntegerOrInfinity(radix).
 		final int radixMV = radix == Undefined.instance ? 10 : toIntegerOrInfinity(interpreter, radix);
-		// 4. If radixMV < 2 or radixMV > 36, throw a RangeError exception.
+		// 4. If radixMV is not in the inclusive interval from 2 to 36, throw a RangeError exception.
 		if (radixMV < 2 || radixMV > 36)
 			throw error(new RangeError(interpreter, "toString() radix argument must be between 2 and 36"));
 		// 5. If radixMV = 10, return ! ToString(x).

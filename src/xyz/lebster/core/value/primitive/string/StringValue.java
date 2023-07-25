@@ -43,15 +43,19 @@ public final class StringValue extends Key<String> {
 
 	@Override
 	public int toIndex() {
+		if (value.equals("0")) return 0;
+		if (value.startsWith("0")) return -1;
 		if (value.length() == 0) return -1;
 
 		int index = 0;
 		for (int i = 0; i < value.length(); i++) {
 			final char c = value.charAt(i);
-			if (c < '0' || c > '9') return -1;
-
-			index *= 10;
-			index += c - '0';
+			if (c >= '0' && c <= '9') {
+				index *= 10;
+				index += c - '0';
+			} else {
+				return -1;
+			}
 		}
 
 		return index;

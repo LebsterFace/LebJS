@@ -97,8 +97,11 @@ public final class Main {
 		}
 
 		stream.print(throwable.getClass().getSimpleName());
-		stream.print(": ");
-		stream.print(throwable.getLocalizedMessage());
+		final String message = throwable.getLocalizedMessage();
+		if (message != null) {
+			stream.print(": ");
+			stream.print(message);
+		}
 		stream.println(ANSI.RESET);
 	}
 }

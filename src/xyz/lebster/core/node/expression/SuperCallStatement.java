@@ -33,7 +33,7 @@ public record SuperCallStatement(ExpressionList arguments, SourceRange range) im
 		// 3. Let func be GetSuperConstructor().
 		final Value<?> func = interpreter.getSuperConstructor();
 		// 4. Let argList be ? ArgumentListEvaluation of Arguments.
-		final Value<?>[] argList = arguments.executeAll(interpreter).toArray(new Value[0]);
+		final Value<?>[] argList = arguments.executeAll(interpreter);
 		// 5. If IsConstructor(func) is false, throw a TypeError exception.
 		if (!(func instanceof final Constructor parentConstructor))
 			throw error(new TypeError(interpreter, "Super constructor was not a function."));

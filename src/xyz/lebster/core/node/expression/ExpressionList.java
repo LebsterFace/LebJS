@@ -36,7 +36,7 @@ public final class ExpressionList implements Representable {
 		}
 	}
 
-	public ArrayList<Value<?>> executeAll(Interpreter interpreter) throws AbruptCompletion {
+	public Value<?>[] executeAll(Interpreter interpreter) throws AbruptCompletion {
 		final ArrayList<Value<?>> result = new ArrayList<>(backingList.size());
 		for (final ExpressionNode node : backingList) {
 			switch (node.type) {
@@ -46,7 +46,7 @@ public final class ExpressionList implements Representable {
 			}
 		}
 
-		return result;
+		return result.toArray(new Value[0]);
 	}
 
 	@Override

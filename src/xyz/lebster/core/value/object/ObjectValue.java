@@ -363,6 +363,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		return putMethod(intrinsics.functionPrototype, key, length, code, true, false, true);
 	}
 
+	// TODO: Setter can return void?
 	public final void putAccessor(Intrinsics intrinsics, Key<?> key, NativeCode getter, NativeCode setter, boolean enumerable, boolean configurable) {
 		final NativeFunction getterFn = getter == null ? null : new NativeFunction(intrinsics, new StringValue("get " + key.toFunctionName()), getter, 0);
 		final NativeFunction setterFn = setter == null ? null : new NativeFunction(intrinsics, new StringValue("set " + key.toFunctionName()), setter, 1);
@@ -430,46 +431,50 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		return getClass().getSimpleName();
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownpropertynames")
-	// TODO: Update to new EnumerableOwnProperties
-	public final ArrayList<Value<?>> enumerableOwnPropertyNames(Interpreter interpreter, boolean keys, boolean values) throws AbruptCompletion {
-		if (!keys && !values) throw new ShouldNotHappen("enumerableOwnPropertyNames called with (false, false)");
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-enumerableownproperties")
+	public final List<Value<?>> enumerableOwnProperties(Interpreter interpreter, boolean keys, boolean values) throws AbruptCompletion {
+		// 7.3.24 EnumerableOwnProperties ( O, kind )
+		if (!keys && !values) throw new ShouldNotHappen("enumerableOwnProperties() called with neither keys nor values");
 
 		// 1. Let ownKeys be ? O.[[OwnPropertyKeys]]().
 		final Iterable<Key<?>> ownKeys = this.ownPropertyKeys();
-		// 2. Let properties be a new empty List.
-		final var properties = new ArrayList<Value<?>>();
+		// 2. Let results be a new empty List.
+		final ArrayList<Value<?>> results = new ArrayList<>();
 		// 3. For each element key of ownKeys, do
 		for (final Key<?> key_ : ownKeys) {
 			// a. If key is a String, then
 			if (!(key_ instanceof final StringValue key)) continue;
-
 			// i. Let desc be ? O.[[GetOwnProperty]](key).
 			final PropertyDescriptor desc = this.getOwnProperty(key);
 			// ii. If desc is not undefined and desc.[[Enumerable]] is true, then
-			if (desc != null && desc.isEnumerable()) {
-				// 1. If kind is key, append key to properties.
-				if (keys & !values) properties.add(key);
-					// 2. Else,
+			if (desc == null || !desc.isEnumerable()) continue;
+			// 1. If kind is key, then
+			if (!values) {
+				// a. Append key to results.
+				results.add(key);
+			}
+			// 2. Else,
+			else {
+				// a. Let value be ? Get(O, key).
+				final Value<?> value = this.get(interpreter, key);
+				// b. If kind is value, then
+				if (!keys) {
+					// i. Append value to results.
+					results.add(value);
+				}
+				// c. Else,
 				else {
-					// a. Let value be ? Get(O, key).
-					final Value<?> value = this.get(interpreter, key);
-					// b. If kind is value, append value to properties.
-					if (!keys) properties.add(value);
-						// c. Else,
-					else {
-						// i. Assert: kind is key+value.
-						// ii. Let entry be CreateArrayFromList(« key, value »).
-						final var entry = new ArrayObject(interpreter, key, value);
-						// iii. Append entry to properties.
-						properties.add(entry);
-					}
+					// i. Assert: kind is key+value.
+					// ii. Let entry be CreateArrayFromList(« key, value »).
+					final var entry = new ArrayObject(interpreter, key, value);
+					// iii. Append entry to results.
+					results.add(entry);
 				}
 			}
 		}
 
-		// 4. Return properties.
-		return properties;
+		// 4. Return results.
+		return results;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-sortindexedproperties")

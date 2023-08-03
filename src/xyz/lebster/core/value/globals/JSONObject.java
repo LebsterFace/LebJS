@@ -142,11 +142,10 @@ public final class JSONObject extends ObjectValue {
 			}
 			// c. Else,
 			else {
-				// TODO: i. Let keys be ? EnumerableOwnProperties(val, key).
-				final var keys = obj.enumerableOwnPropertyNames(interpreter, true, false);
+				// i. Let keys be ? EnumerableOwnProperties(val, key).
+				final var keys = obj.enumerableOwnProperties(interpreter, true, false);
 				// ii. For each String P of keys, do
 				for (final Value<?> V : keys) {
-					// TODO: Enforce this through types
 					if (!(V instanceof final StringValue P)) throw new ShouldNotHappen("Non-string key returned");
 					// 1. Let newElement be ? InternalizeJSONProperty(val, P, reviver).
 					final Value<?> newElement = internalizeJSONProperty(interpreter, obj, P, reviver);
@@ -182,14 +181,8 @@ public final class JSONObject extends ObjectValue {
 	// TODO: More specific parsing errors
 	@SpecificationURL("https://www.ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf")
 	private static final class JSONParser {
-		private int index = 0;
 		private final int[] codepoints;
-
-		private static final class JSONParseError extends Exception {
-			public JSONParseError(String message) {
-				super(message);
-			}
-		}
+		private int index = 0;
 
 		public JSONParser(String sourceText) {
 			this.codepoints = sourceText.codePoints().toArray();
@@ -232,13 +225,13 @@ public final class JSONObject extends ObjectValue {
 					}
 				}
 			} else if (!optional('"')
-				 && !optional('\\')
-				 && !optional('/')
-				 && !optional('b')
-				 && !optional('f')
-				 && !optional('n')
-				 && !optional('r')
-				 && !optional('t')
+					   && !optional('\\')
+					   && !optional('/')
+					   && !optional('b')
+					   && !optional('f')
+					   && !optional('n')
+					   && !optional('r')
+					   && !optional('t')
 			) {
 				throw new JSONParseError("Bad escaped character in JSON");
 			}
@@ -388,6 +381,12 @@ public final class JSONObject extends ObjectValue {
 		private void require(int codepoint) throws JSONParseError {
 			if (!is(codepoint)) throw unexpected();
 			index++;
+		}
+
+		private static final class JSONParseError extends Exception {
+			public JSONParseError(String message) {
+				super(message);
+			}
 		}
 	}
 }

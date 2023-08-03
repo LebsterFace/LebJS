@@ -18,7 +18,7 @@ import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
@@ -159,10 +159,10 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 
 		// 1. Let obj be ? ToObject(O).
 		final ObjectValue obj = O.toObjectValue(interpreter);
-		// 2. Let nameList be ? EnumerableOwnPropertyNames(obj, key).
-		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, true, false);
-		// 3. Return CreateArrayFromList(nameList).
-		return new ArrayObject(interpreter, nameList);
+		// 2. Let keyList be ? EnumerableOwnProperties(obj, key).
+		final List<Value<?>> keyList = obj.enumerableOwnProperties(interpreter, true, false);
+		// 3. Return CreateArrayFromList(keyList).
+		return new ArrayObject(interpreter, keyList);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.values")
@@ -172,10 +172,10 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 
 		// 1. Let obj be ? ToObject(O).
 		final ObjectValue obj = O.toObjectValue(interpreter);
-		// 2. Let nameList be ? EnumerableOwnPropertyNames(obj, value).
-		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, false, true);
-		// 3. Return CreateArrayFromList(nameList).
-		return new ArrayObject(interpreter, nameList);
+		// 2. Let valueList be ? EnumerableOwnProperties(obj, value).
+		final List<Value<?>> valueList = obj.enumerableOwnProperties(interpreter, false, true);
+		// 3. Return CreateArrayFromList(valueList).
+		return new ArrayObject(interpreter, valueList);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.entries")
@@ -185,10 +185,10 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 
 		// 1. Let obj be ? ToObject(O).
 		final ObjectValue obj = O.toObjectValue(interpreter);
-		// 2. Let nameList be ? EnumerableOwnPropertyNames(obj, key+value).
-		final ArrayList<Value<?>> nameList = obj.enumerableOwnPropertyNames(interpreter, true, true);
-		// 3. Return CreateArrayFromList(nameList).
-		return new ArrayObject(interpreter, nameList);
+		// 2. Let entryList be ? EnumerableOwnProperties(obj, key+value).
+		final List<Value<?>> entryList = obj.enumerableOwnProperties(interpreter, true, true);
+		// 3. Return CreateArrayFromList(entryList).
+		return new ArrayObject(interpreter, entryList);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.create")

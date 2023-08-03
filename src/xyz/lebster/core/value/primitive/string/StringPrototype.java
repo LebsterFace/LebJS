@@ -771,18 +771,13 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#thisstringvalue")
 	private static StringValue thisStringValue(Interpreter interpreter, String methodName) throws AbruptCompletion {
-		// 1. If Type(value) is String, return value.
-		if (interpreter.thisValue() instanceof final StringValue stringValue) return stringValue;
-		// 2. If Type(value) is Object and value has a [[StringData]] internal slot, then
-		if (interpreter.thisValue() instanceof final StringWrapper stringWrapper) {
-			// a. Let s be value.[[StringData]].
-			// b. Assert: Type(s) is String.
-			// c. Return s.
-			return stringWrapper.data;
-		}
-
+		final Value<?> value = interpreter.thisValue();
+		// 1. If value is a String, return value.
+		if (value instanceof StringValue stringValue) return stringValue;
+		// 2. If value is an Object and value has a [[StringData]] internal slot, return value.[[StringData]].
+		if (value instanceof StringWrapper stringWrapper) return stringWrapper.data;
 		// 3. Throw a TypeError exception.
-		throw error(new TypeError(interpreter, "String.prototype.%s method requires that 'this' be a String"));
+		throw error(new TypeError(interpreter, "String.prototype.%s requires that 'this' be a String".formatted(methodName)));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype-@@iterator")

@@ -41,20 +41,11 @@ public final class BooleanPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#thisbooleanvalue")
 	private static BooleanValue thisBooleanValue(Interpreter interpreter, String methodName) throws AbruptCompletion {
 		final Value<?> value = interpreter.thisValue();
-
-		// 1. If Type(value) is Boolean, return value.
-		if (value instanceof final BooleanValue result) return result;
-
-		// 2. If Type(value) is Object and value has a [[BooleanData]] internal slot, then
-		if (value instanceof final BooleanWrapper wrapper) {
-			// a. Let b be value.[[BooleanData]].
-			// b. Assert: Type(b) is Boolean.
-			// c. Return b.
-			return wrapper.data;
-		}
-
+		// 1. If value is a Boolean, return value.
+		if (value instanceof BooleanValue booleanValue) return booleanValue;
+		// 2. If value is an Object and value has a [[BooleanData]] internal slot, return value.[[BooleanData]].
+		if (value instanceof BooleanWrapper booleanWrapper) return booleanWrapper.data;
 		// 3. Throw a TypeError exception.
-		final String message = "Boolean.prototype.%s requires that 'this' be a Boolean".formatted(methodName);
-		throw error(new TypeError(interpreter, message));
+		throw error(new TypeError(interpreter, "Boolean.prototype.%s requires that 'this' be a Boolean".formatted(methodName)));
 	}
 }

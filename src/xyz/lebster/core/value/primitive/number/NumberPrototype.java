@@ -101,15 +101,11 @@ public final class NumberPrototype extends ObjectValue {
 	}
 
 	private static NumberValue thisNumberValue(Interpreter interpreter, String methodName) throws AbruptCompletion {
+		final Value<?> value = interpreter.thisValue();
 		// 1. If Type(value) is Number, return value.
-		if (interpreter.thisValue() instanceof final NumberValue numberValue) return numberValue;
-		// 2. If Type(value) is Object and value has a [[NumberData]] internal slot, then
-		if (interpreter.thisValue() instanceof final NumberWrapper numberWrapper) {
-			// a. Let n be value.[[NumberData]].
-			// b. Assert: Type(n) is Number.
-			// c. Return n.
-			return numberWrapper.data;
-		}
+		if (value instanceof NumberValue numberValue) return numberValue;
+		// 2. If Type(value) is Object and value has a [[NumberData]] internal slot, return n.
+		if (value instanceof NumberWrapper numberWrapper) return numberWrapper.data;
 		// 3. Throw a TypeError exception.
 		throw error(new TypeError(interpreter, "Number.prototype.%s requires that 'this' be a Number".formatted(methodName)));
 	}

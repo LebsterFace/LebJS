@@ -1,21 +1,21 @@
 // errors
 // must be called with numeric `this`
-Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toExponential.call(true));
-Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toExponential.call([]));
-Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toExponential.call({}));
-Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toExponential.call(Symbol("foo")));
-Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toExponential.call("bar"));
-// TODO: Test.expectError("TypeError", "This method requires that 'this' be a Number", () => Number.prototype.toExponential.call(1n));
+Test.expectError("TypeError", "Number.prototype.toExponential requires that 'this' be a Number", () => Number.prototype.toExponential.call(true));
+Test.expectError("TypeError", "Number.prototype.toExponential requires that 'this' be a Number", () => Number.prototype.toExponential.call([]));
+Test.expectError("TypeError", "Number.prototype.toExponential requires that 'this' be a Number", () => Number.prototype.toExponential.call({}));
+Test.expectError("TypeError", "Number.prototype.toExponential requires that 'this' be a Number", () => Number.prototype.toExponential.call(Symbol("foo")));
+Test.expectError("TypeError", "Number.prototype.toExponential requires that 'this' be a Number", () => Number.prototype.toExponential.call("bar"));
+// TODO: Test.expectError("TypeError", "Number.prototype.toExponential requires that 'this' be a Number", () => Number.prototype.toExponential.call(1n));
 
 // fraction digits must be coercible to a number
-Test.expectError("TypeError", "Cannot convert symbol to number", () => (0).toExponential(Symbol("foo")));
-// TODO: Test.expectError("TypeError", "Cannot convert BigInt to number", () => (0).toExponential(1n));
+Test.expectError("TypeError", "Cannot convert a Symbol value to a number", () => (0).toExponential(Symbol("foo")));
+// TODO: Test.expectError("TypeError", "Cannot convert a BigInt value to a number", () => (0).toExponential(1n));
 
 // out of range fraction digits
-Test.expectError("RangeError", "Fraction Digits must be an integer no less than 0, and no greater than 100", () => (0).toExponential(-Infinity));
-Test.expectError("RangeError", "Fraction Digits must be an integer no less than 0, and no greater than 100", () => (0).toExponential(-1));
-Test.expectError("RangeError", "Fraction Digits must be an integer no less than 0, and no greater than 100", () => (0).toExponential(101));
-Test.expectError("RangeError", "Fraction Digits must be an integer no less than 0, and no greater than 100", () => (0).toExponential(Infinity));
+Test.expectError("RangeError", "toExponential() argument must be between 0 and 100", () => (0).toExponential(-Infinity));
+Test.expectError("RangeError", "toExponential() argument must be between 0 and 100", () => (0).toExponential(-1));
+Test.expectError("RangeError", "toExponential() argument must be between 0 and 100", () => (0).toExponential(101));
+Test.expectError("RangeError", "toExponential() argument must be between 0 and 100", () => (0).toExponential(Infinity));
 
 // special values
 Test.expect("Infinity", (Infinity).toExponential(6));

@@ -53,11 +53,106 @@ public final class NumberPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.toprecision")
-	private static StringValue toPrecision(Interpreter interpreter, Value<?>[] arguments) {
+	private static StringValue toPrecision(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 21.1.3.5 Number.prototype.toPrecision ( precision )
 		final Value<?> precision = argument(0, arguments);
 
-		throw new NotImplemented("Number.prototype.toPrecision");
+		// 1. Let x be ? thisNumberValue(this value).
+		final NumberValue x_ = thisNumberValue(interpreter, "toPrecision");
+		// 2. If precision is undefined, return ! ToString(x).
+		if (precision == Undefined.instance) return x_.toStringValue(interpreter);
+		// 3. Let p be ? ToIntegerOrInfinity(precision).
+		final int p = toIntegerOrInfinity(interpreter, precision);
+		// 4. If x is not finite, return Number::toString(x, 10).
+		if (!Double.isFinite(x_.value)) return x_.toStringValue(interpreter);
+		// 5. If p < 1 or p > 100, throw a RangeError exception.
+		if (p < 1 || p > 100) throw error(new RangeError(interpreter, "toPrecision() argument must be between 1 and 100"));
+		// 6. Set x to ℝ(x).
+		double x = x_.value;
+		// 7. Let s be the empty String.
+		String s = "";
+		// 8. If x < 0, then
+		if (x < 0) {
+			// a. Set s to the code unit 0x002D (HYPHEN-MINUS).
+			s = "-";
+			// b. Set x to -x.
+			x = -x;
+		}
+
+		String m;
+		int e;
+		// 9. If x = 0, then
+		if (x == 0) {
+			// a. Let m be the String value consisting of p occurrences of the code unit 0x0030 (DIGIT ZERO).
+			m = "0".repeat(p);
+			// b. Let e be 0.
+			e = 0;
+		}
+		// 10. Else,
+		else {
+			// a. Let e and n be integers such that 10^(p - 1) ≤ n < 10^p and for which n × 10^(e - p + 1) - x is as close to zero as possible.
+			// If there are two such sets of e and n, pick the e and n for which n × 10^(e - p + 1) is larger.
+			e = (int) Math.floor(Math.log10(x));
+			final BigInteger n = new BigDecimal(x).movePointLeft(e - p + 1).setScale(0, RoundingMode.HALF_UP).toBigIntegerExact();
+
+			// b. Let m be the String value consisting of the digits of the decimal representation of n (in order, with no leading zeroes).
+			m = n.toString();
+			// c. If e < -6 or e ≥ p, then
+			if (e < -6 || e >= p) {
+				// i. Assert: e ≠ 0.
+				// ii. If p ≠ 1, then
+				if (p != 1) {
+					// 1. Let a be the first code unit of m.
+					final char a = m.charAt(0);
+					// 2. Let b be the other p - 1 code units of m.
+					final String b = m.substring(1);
+					// 3. Set m to the string-concatenation of a, ".", and b.
+					m = a + "." + b;
+				}
+				// iii. If e > 0, then
+				final char c;
+				if (e > 0) {
+					// 1. Let c be the code unit 0x002B (PLUS SIGN).
+					c = '+';
+				}
+				// iv. Else,
+				else {
+					// 1. Assert: e < 0.
+					// 2. Let c be the code unit 0x002D (HYPHEN-MINUS).
+					c = '-';
+					// 3. Set e to -e.
+					e = -e;
+				}
+
+				// v. Let d be the String value consisting of the digits of the decimal representation of e (in order, with no leading zeroes).
+				final String d = Long.toString(e);
+				// vi. Return the string-concatenation of s, m, the code unit 0x0065 (LATIN SMALL LETTER E), c, and d.
+				return new StringValue(s + m + 'e' + c + d);
+			}
+		}
+
+		// 11. If e = p - 1, return the string-concatenation of s and m.
+		if (e == p - 1) return new StringValue(s + m);
+		// 12. If e ≥ 0, then
+		if (e >= 0) {
+			// a. Set m to the string-concatenation of
+			// the first e + 1 code units of m,
+			// the code unit 0x002E (FULL STOP),
+			// and the remaining p - (e + 1) code units of m.
+			m = m.substring(0, e + 1) + '.' + m.substring(e + 1);
+		}
+		// 13. Else,
+		else {
+			// a. Set m to the string-concatenation of
+			// the code unit 0x0030 (DIGIT ZERO),
+			// the code unit 0x002E (FULL STOP),
+			// -(e + 1) occurrences of the code unit 0x0030 (DIGIT ZERO),
+			// and the String m.
+			m = "0." + "0".repeat(-(e + 1)) + m;
+		}
+
+		// 14. Return the string-concatenation of s and m.
+		return new StringValue(s + m);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.toexponential")
@@ -106,7 +201,7 @@ public final class NumberPrototype extends ObjectValue {
 		else {
 			// a. Let n be an integer for which n / 10^f - x is as close to zero as possible.
 			// If there are two such n, pick the larger n.
-			final BigInteger n = new BigDecimal(x).multiply(BigDecimal.TEN.pow(f)).setScale(0, RoundingMode.HALF_UP).toBigIntegerExact();
+			final BigInteger n = new BigDecimal(x).movePointRight(f).setScale(0, RoundingMode.HALF_UP).toBigIntegerExact();
 			// b. If n = 0, let m be "0". Otherwise, let m be the String value consisting of the digits of the decimal representation of n (in order, with no leading zeroes).
 			m = n.toString();
 			// c. If f ≠ 0, then

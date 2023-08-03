@@ -170,21 +170,21 @@ public final class Lexer {
 		return tokens.toArray(new Token[0]);
 	}
 
-	private static boolean isDigit(int c) {
-		return c >= '0' && c <= '9';
+	private static boolean isDecimalDigit(int codepoint) {
+		return codepoint >= '0' && codepoint <= '9';
 	}
 
-	private static boolean isDigit(int ch, int radix) {
+	public static boolean isDigit(int codepoint, int radix) {
 		if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX) {
 			return false;
 		}
 
-		if (ch >= '0' && ch <= '9') {
-			return ch - '0' < radix;
-		} else if (ch >= 'A' && ch <= 'Z') {
-			return ch - 'A' + 10 < radix;
-		} else if (ch >= 'a' && ch <= 'z') {
-			return ch - 'a' + 10 < radix;
+		if (codepoint >= '0' && codepoint <= '9') {
+			return codepoint - '0' < radix;
+		} else if (codepoint >= 'A' && codepoint <= 'Z') {
+			return codepoint - 'A' + 10 < radix;
+		} else if (codepoint >= 'a' && codepoint <= 'z') {
+			return codepoint - 'a' + 10 < radix;
 		} else {
 			return false;
 		}
@@ -212,7 +212,7 @@ public final class Lexer {
 	public static boolean isIdentifierMiddle(int codePoint) {
 		if (codePoint == '\\') {
 			return false;
-		} else if (isAlphabetical(codePoint) || isDigit(codePoint) || codePoint == '_' || codePoint == '$') {
+		} else if (isAlphabetical(codePoint) || isDecimalDigit(codePoint) || codePoint == '_' || codePoint == '$') {
 			return true;
 		} else if (codePoint < 0x80) {
 			// Optimization: the first codepoint with the ID_Continue property after A-Za-z0-9_ is outside the
@@ -379,7 +379,7 @@ public final class Lexer {
 			return tokenizeKeywordOrIdentifier();
 		}
 
-		if (isDigit(codePoint) || (codePoint == '.' && isDigit(peekNext()))) {
+		if (isDecimalDigit(codePoint) || (codePoint == '.' && isDecimalDigit(peekNext()))) {
 			return tokenizeNumericLiteral();
 		}
 
@@ -397,19 +397,6 @@ public final class Lexer {
 	private void consumeLineTerminators() throws SyntaxError {
 		while (isLineTerminator()) {
 			consume();
-		}
-	}
-
-	private boolean handleNumericSeparator(boolean lastWasNumericSeparator) throws SyntaxError {
-		if (codePoint == '_') {
-			if (lastWasNumericSeparator) {
-				throw new SyntaxError("Only one underscore is allowed as numeric separator", position());
-			}
-
-			consume();
-			return true;
-		} else {
-			return false;
 		}
 	}
 
@@ -637,78 +624,89 @@ public final class Lexer {
 	}
 
 	private Token tokenizeNumericLiteral() throws SyntaxError {
-		if (accept("0x")) return numericLiteralRadix(16, "Hexadecimal");
-		if (accept("0b")) return numericLiteralRadix(2, "Binary");
-		if (accept("0o")) return numericLiteralRadix(8, "Octal");
-
-		final StringBuilder builder = new StringBuilder();
 		final SourcePosition start = position();
 
-		boolean inIntegerPart = true;
-		boolean lastWasNumericSeparator = false;
-		while (isDigit(codePoint) || (codePoint == '.' && inIntegerPart) || codePoint == '_') {
-			final boolean isDecimalPoint = codePoint == '.';
-			if (isDecimalPoint) {
-				if (!lastWasNumericSeparator) inIntegerPart = false;
-				else throw new SyntaxError("Numeric separators are not allowed at the end of numeric literals", position());
+		final int radix;
+		if (accept("0x")) radix = 16;
+		else if (accept("0b")) radix = 2;
+		else if (accept("0o")) radix = 8;
+		else radix = 10;
+
+		final StringBuilder builder = new StringBuilder();
+		if (codePoint == '_') throw new SyntaxError("Numeric separators are not allowed at the start of numeric literals", position());
+		collectIntegerDigits(builder, radix);
+
+		if (radix != 10) {
+			if (builder.isEmpty()) {
+				if (radix == 16) throw new SyntaxError("Missing hexadecimal digits after '0x'", position());
+				else if (radix == 2) throw new SyntaxError("Missing binary digits after '0b'", position());
+				else throw new SyntaxError("Missing octal digits after '0o'", position());
+			}
+		} else {
+			if (builder.length() > 1 && builder.charAt(0) == '0') {
+				throw new SyntaxError("Unexpected leading zero", start);
 			}
 
-			lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
-			if (!lastWasNumericSeparator) collect(builder);
+			// Optional: decimal part
+			final boolean isInteger = codePoint != '.';
+			if (!isInteger) {
+				collect(builder);
+				if (codePoint == '_') throw new SyntaxError("Numeric separators are not allowed immediately after '.'", position());
+				collectIntegerDigits(builder, 10);
+			}
 
-			if (isDecimalPoint && codePoint == '_') {
-				throw new SyntaxError("Numeric separators are not allowed immediately after '.'", position());
+			// Optional: exponent
+			final boolean hasExponent = codePoint == 'e' || codePoint == 'E';
+			if (hasExponent) {
+				collect(builder);
+				if (codePoint == '-' || codePoint == '+') collect(builder);
+				if (codePoint == '_') throw new SyntaxError("Numeric separators are not allowed immediately after 'e'", position());
+				if (!collectIntegerDigits(builder, 10)) {
+					throw new SyntaxError("Missing exponent", position());
+				}
+			}
+
+			if (!isInteger || hasExponent) {
+				return new Token(TokenType.NumericLiteral, builder.toString(), position());
 			}
 		}
 
-		// If matches ^0\d
-		if (builder.codePointAt(0) == '0' && builder.length() > 1 && isDigit(builder.codePointAt(1))) {
-			throw new SyntaxError("Unexpected leading zero", start);
-		}
-
-		final boolean hasExponent = codePoint == 'e' || codePoint == 'E';
-		if (hasExponent) {
-			collect(builder);
-			if (codePoint == '-' || codePoint == '+') collect(builder);
-
-			lastWasNumericSeparator = false;
-			while (codePoint == '_' || isDigit(codePoint)) {
-				lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
-				if (!lastWasNumericSeparator) collect(builder);
-			}
-		}
-
-		if (inIntegerPart && !hasExponent) return potentialBigInt(builder.toString(), 10);
-		return new Token(TokenType.NumericLiteral, builder.toString(), position());
+		final TokenType type = accept("n") ? TokenType.BigIntLiteral : TokenType.NumericLiteral;
+		return new Token(type, new BigInteger(builder.toString(), radix).toString(), position());
 	}
 
-	private Token numericLiteralRadix(int radix, String name) throws SyntaxError {
-		final StringBuilder builder = new StringBuilder();
-		boolean isEmpty = true;
+	private boolean collectIntegerDigits(StringBuilder builder, int radix) throws SyntaxError {
 		boolean lastWasNumericSeparator = false;
-		while (codePoint == '_' || isDigit(codePoint) || isAlphabetical(codePoint)) {
-			lastWasNumericSeparator = handleNumericSeparator(lastWasNumericSeparator);
-			if (!lastWasNumericSeparator) {
-				if (!isDigit(codePoint, radix)) {
-					throw new SyntaxError("Invalid digit %s in %s numeric literal".formatted(quoteCodePoint(codePoint), name.toLowerCase()), position());
+		boolean consumedAnything = false;
+
+		while (isDigit(codePoint, radix) || codePoint == '_') {
+			if (codePoint == '_') {
+				if (lastWasNumericSeparator) {
+					throw new SyntaxError("Only one underscore is allowed as numeric separator", position());
 				}
 
-				isEmpty = false;
+				consume();
+				lastWasNumericSeparator = true;
+				continue;
+			} else {
+				lastWasNumericSeparator = false;
+			}
+
+			if (isDigit(codePoint, radix)) {
 				collect(builder);
+				if (!consumedAnything) consumedAnything = true;
 			}
 		}
 
-		if (isEmpty) throw new SyntaxError(name + " numeric literal requires at least one digit", position());
-		return potentialBigInt(builder.toString(), radix);
+		if (lastWasNumericSeparator) {
+			throw new SyntaxError("Numeric separators are not allowed at the end of numeric literals", position());
+		}
+
+		return consumedAnything;
 	}
 
 	private String quoteCodePoint(int ch) {
 		return StringEscapeUtils.quote(codePoint == -1 ? "[-1]" : Character.toString(ch), false);
-	}
-
-	private Token potentialBigInt(String integerString, int radix) {
-		final TokenType type = accept("n") ? TokenType.BigIntLiteral : TokenType.NumericLiteral;
-		return new Token(type, new BigInteger(integerString, radix).toString(), position());
 	}
 
 	private Token tokenizeKeywordOrIdentifier() throws SyntaxError {

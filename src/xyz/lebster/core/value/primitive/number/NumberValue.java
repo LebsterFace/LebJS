@@ -1,6 +1,9 @@
 package xyz.lebster.core.value.primitive.number;
 
-import xyz.lebster.core.*;
+import xyz.lebster.core.ANSI;
+import xyz.lebster.core.NonStandard;
+import xyz.lebster.core.Ryu;
+import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
@@ -8,6 +11,8 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
+
+import java.math.BigInteger;
 
 public final class NumberValue extends PrimitiveValue<Double> {
 	private static final String DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -41,6 +46,10 @@ public final class NumberValue extends PrimitiveValue<Double> {
 
 	public NumberValue(int num) {
 		super((double) num);
+	}
+
+	public NumberValue(BigInteger bigInteger) {
+		super(bigInteger.doubleValue());
 	}
 
 	public static boolean isNegativeZero(double d) {

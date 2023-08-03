@@ -4,6 +4,7 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
+import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
@@ -81,20 +82,18 @@ public final class GlobalObject extends ObjectValue {
 		final Value<?> string = argument(0, arguments);
 		final Value<?> radix = argument(1, arguments);
 
-		if (arguments.length == 0) return NumberValue.NaN;
-
 		// 1. Let inputString be ? ToString(string).
 		final String inputString = string.toStringValue(interpreter).value;
 		// 2. Let S be ! TrimString(inputString, start).
-		final StringBuilder S = new StringBuilder(inputString.stripLeading());
+		String S = inputString.stripLeading();
 		// 3. Let sign be 1.
-		boolean isPositive = true;
 		// 4. If S is not empty and the first code unit of S is the code unit 0x002D (HYPHEN-MINUS), set sign to -1.
-		if (!S.isEmpty() && S.charAt(0) == '-') isPositive = false;
-		// 5. If S is not empty and the first code unit of S is the code unit 0x002B (PLUS SIGN) or the code unit 0x002D (HYPHEN-MINUS)
-		if (!S.isEmpty() && (S.charAt(0) == '+' || S.charAt(0) == '-'))
-			// remove the first code unit from S.
-			S.deleteCharAt(0);
+		final boolean isPositive = !S.startsWith("-");
+		// 5. If S is not empty and the first code unit of S is either the code unit 0x002B (PLUS SIGN) or the code unit 0x002D (HYPHEN-MINUS),
+		if (S.startsWith("+") || S.startsWith("-")) {
+			// set S to the substring of S from index 1.
+			S = S.substring(1);
+		}
 		// 6. Let R be ℝ(? ToInt32(radix)).
 		int R = radix.toNumberValue(interpreter).toInt32();
 		// 7. Let stripPrefix be true.
@@ -105,27 +104,28 @@ public final class GlobalObject extends ObjectValue {
 			if (R < 2 || R > 36) return NumberValue.NaN;
 			// b. If R ≠ 16, set stripPrefix to false.
 			if (R != 16) stripPrefix = false;
-		} else {
-			// 9. Else, a. Set R to 10.
+		}
+		// 9. Else,
+		else {
+			// a. Set R to 10.
 			R = 10;
 		}
-
 		// 10. If stripPrefix is true, then
 		if (stripPrefix) {
 			// a. If the length of S is at least 2 and the first two code units of S are either "0x" or "0X", then
-			if (S.length() >= 2 && S.charAt(0) == '0' && (S.charAt(1) == 'X' || S.charAt(1) == 'x')) {
-				// i. Remove the first two code units from S.
-				S.delete(0, 2);
+			if (S.startsWith("0x") || S.startsWith("0X")) {
+				// i. Set S to the substring of S from index 2.
+				S = S.substring(2);
 				// ii. Set R to 16.
 				R = 16;
 			}
 		}
 
-		// 11. If S contains a code unit that is not a radix-R digit, let end be the index within S of the first
-		// such code unit; otherwise, let end be the length of S.
+		// 11. If S contains a code unit that is not a radix-R digit,
+		// let end be the index within S of the first such code unit; otherwise, let end be the length of S.
 		int end = 0;
 		while (end < S.length()) {
-			if (Character.digit(S.charAt(end), R) == -1) break;
+			if (!Lexer.isDigit(S.charAt(end), R)) break;
 			end++;
 		}
 
@@ -135,9 +135,9 @@ public final class GlobalObject extends ObjectValue {
 		if (Z.isEmpty()) return NumberValue.NaN;
 
 		// 14. Let mathInt be the integer value that is represented by Z in radix-R notation, using the letters
-		// A-Z and a-z for digits with values 10 through 35. (However, if R is 10 and Z contains more than 20
+		// A through Z and a through z for digits with values 10 through 35. (However, if R = 10 and Z contains more than 20
 		// significant digits, every significant digit after the 20th may be replaced by a 0 digit, at the option
-		// of the implementation; and if R is not 2, 4, 8, 10, 16, or 32, then mathInt may be an
+		// of the implementation; and if R is not one of 2, 4, 8, 10, 16, or 32, then mathInt may be an
 		// implementation-approximated integer representing the integer value denoted by Z in radix-R notation.)
 		final BigInteger mathInt = new BigInteger(Z, R);
 
@@ -150,7 +150,7 @@ public final class GlobalObject extends ObjectValue {
 		}
 
 		// 16. Return 𝔽(sign × mathInt).
-		return new NumberValue((isPositive ? mathInt : mathInt.negate()).doubleValue());
+		return new NumberValue(isPositive ? mathInt : mathInt.negate());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parsefloat-string")

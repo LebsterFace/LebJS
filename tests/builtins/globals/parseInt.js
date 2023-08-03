@@ -11,6 +11,7 @@ Test.expect(15, parseInt('15e2', 10));
 Test.expect(15, parseInt('15px', 10));
 Test.expect(15, parseInt('12', 13));
 
+Test.expect(NaN, parseInt("ａ", 16));
 Test.expect(NaN, parseInt('Hello', 8));
 Test.expect(NaN, parseInt('546', 2));
 

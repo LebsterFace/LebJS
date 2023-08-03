@@ -1,6 +1,7 @@
 package xyz.lebster.core.value.primitive.number;
 
 import xyz.lebster.core.NonCompliant;
+import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.exception.ShouldNotHappen;
@@ -15,6 +16,10 @@ import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
@@ -62,9 +67,9 @@ public final class NumberPrototype extends ObjectValue {
 		// 5. If f < 0 or f > 100, throw a RangeError exception.
 		if (f < 0 || f > 100) throw error(new RangeError(interpreter, "toFixed() digits argument must be between 0 and 100"));
 		// 6. If x is not finite, return Number::toString(x, 10).
-		if (x_.value.isInfinite()) return x_.toStringValue(interpreter);
-		// 7. Set x to ℝ(x).
 		double x = x_.value;
+		if (!Double.isFinite(x)) return x_.toStringValue(interpreter);
+		// 7. Set x to ℝ(x).
 		// 8. Let s be the empty String.
 		String s = "";
 		// 9. If x < 0, then
@@ -75,7 +80,7 @@ public final class NumberPrototype extends ObjectValue {
 			x = -x;
 		}
 
-		final String m;
+		String m;
 		// 10. If x ≥ 10^21, then
 		if (x >= Math.pow(10, 21)) {
 			// a. Let m be ! ToString(𝔽(x)).
@@ -83,9 +88,31 @@ public final class NumberPrototype extends ObjectValue {
 		}
 		// 11. Else,
 		else {
-			// (String.format used instead)
-			final String formatString = "%." + f + "f";
-			m = String.format(formatString, x);
+			// a. Let n be an integer for which n / 10^f - x is as close to zero as possible.
+			// If there are two such n, pick the larger n.
+			final BigInteger n = new BigDecimal(x).multiply(BigDecimal.TEN.pow(f)).setScale(0, RoundingMode.HALF_UP).toBigIntegerExact();
+			// b. If n = 0, let m be "0". Otherwise, let m be the String value consisting of the digits of the decimal representation of n (in order, with no leading zeroes).
+			m = n.toString();
+			// c. If f ≠ 0, then
+			if (f != 0) {
+				// i. Let k be the length of m.
+				int k = m.length();
+				// ii. If k ≤ f, then
+				if (k <= f) {
+					// 1. Let z be the String value consisting of f + 1 - k occurrences of the code unit 0x0030 (DIGIT ZERO).
+					final String z = "0".repeat(f + 1 - k);
+					// 2. Set m to the string-concatenation of z and m.
+					m = z + m;
+					// 3. Set k to f + 1.
+					k = f + 1;
+				}
+				// iii. Let a be the first k - f code units of m.
+				final String a = m.substring(0, k - f);
+				// iv. Let b be the other f code units of m.
+				final String b = m.substring(k - f);
+				// v. Set m to the string-concatenation of a, ".", and b.
+				m = a + "." + b;
+			}
 		}
 
 		// 12. Return the string-concatenation of s and m.

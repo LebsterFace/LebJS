@@ -8,6 +8,11 @@ Test.expect("12.816", 12.81646112.toFixed(3));
 Test.expect("84.2300", 84.23.toFixed(4));
 Test.expect("3.00003", 3.00003.toFixed(5));
 Test.expect("0.0001", 0.00006.toFixed(4));
+Test.expect("1000000000000000128", (1000000000000000100).toFixed());
+Test.expect("1000000000000000128", (1000000000000000128).toFixed());
+for (let f = 1; f <= 100; f++) {
+    Test.expect(`1.${'0'.repeat(f)}`, (1).toFixed(f));
+}
 
 // Numbers >= 1e+21
 Test.expect("1e+21", 1e21.toFixed(5));

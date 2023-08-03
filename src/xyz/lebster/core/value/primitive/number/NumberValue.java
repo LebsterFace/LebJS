@@ -12,6 +12,7 @@ import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public final class NumberValue extends PrimitiveValue<Double> {
@@ -72,9 +73,21 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		return value.doubleValue() == y.value.doubleValue();
 	}
 
+	public String toExactString() {
+		if (Double.isFinite(value)) return new BigDecimal(value).toPlainString();
+		return Double.toString(value);
+	}
+
+	public String toPlainString() {
+		return Ryu.doubleToString(value, false);
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-tostring")
 	public String stringValueOf(int radix) {
-		if (radix == 10) return Ryu.doubleToString(this.value);
+		if (radix == 10) {
+			final boolean scientificNotation = Math.abs(value) >= 1e21 || Math.abs(value) < 1e-6;
+			return Ryu.doubleToString(value, scientificNotation);
+		}
 
 		// Doesn't always produce identical output to other engines, but should be good enough for the foreseeable future.
 		double number = this.value;

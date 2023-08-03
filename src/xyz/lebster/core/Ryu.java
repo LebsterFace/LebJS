@@ -24,7 +24,7 @@ public class Ryu {
 	private static final int MANTISSA_BITS = 52;
 	private static final int EXPONENT_BITS = 11;
 
-	public static String doubleToString(double value) {
+	public static String doubleToString(double value, boolean scientificNotation) {
 		final long bits = Double.doubleToLongBits(value);
 
 		// Step 1: Decode the floating point number, and unify normalized and subnormal cases.
@@ -48,7 +48,6 @@ public class Ryu {
 			return "0";
 		}
 
-		final boolean scientificNotation = Math.abs(value) >= Math.pow(10, 21) || Math.abs(value) < Math.pow(10, -6);
 		final int offset = (1 << EXPONENT_BITS - 1) - 1; // Compute the offset used by the IEEE format.
 
 		// Unify normalized and subnormal cases.

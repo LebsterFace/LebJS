@@ -18,56 +18,56 @@ public record RelationalExpression(Expression left, Expression right, Relational
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-relational-operators")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> left_value = left.execute(interpreter);
-		final Value<?> right_value = right.execute(interpreter);
+		final Value<?> x = left.execute(interpreter);
+		final Value<?> y = right.execute(interpreter);
 
 		return switch (op) {
 			case LessThan -> {
-				// 5. Let r be ? IsLessThan(left_value, right_value, true).
-				final BooleanValue r = isLessThan(interpreter, left_value, right_value, true);
+				// 5. Let r be ? IsLessThan(x, y, true).
+				final BooleanValue r = isLessThan(interpreter, x, y, true);
 				// 6. If r is undefined, return false. Otherwise, return r.
 				yield r == null ? BooleanValue.FALSE : r;
 			}
 
 			case GreaterThan -> {
-				// 5. Let r be ? IsLessThan(rval, lval, false).
-				final BooleanValue r = isLessThan(interpreter, right_value, left_value, false);
+				// 5. Let r be ? IsLessThan(y, x, false).
+				final BooleanValue r = isLessThan(interpreter, y, x, false);
 				// 6. If r is undefined, return false. Otherwise, return r.
 				yield r == null ? BooleanValue.FALSE : r;
 			}
 
 			case LessThanEquals -> {
-				// 5. Let r be ? IsLessThan(rval, lval, false).
-				final BooleanValue r = isLessThan(interpreter, right_value, left_value, false);
+				// 5. Let r be ? IsLessThan(y, x, false).
+				final BooleanValue r = isLessThan(interpreter, y, x, false);
 				// 6. If r is true or undefined, return false. Otherwise, return true.
 				//    (If r is false, return true. Otherwise, return false.)
 				yield BooleanValue.of(r == BooleanValue.FALSE);
 			}
 
 			case GreaterThanEquals -> {
-				// 5. Let r be ? IsLessThan(lval, rval, true).
-				final BooleanValue r = isLessThan(interpreter, left_value, right_value, true);
+				// 5. Let r be ? IsLessThan(x, y, true).
+				final BooleanValue r = isLessThan(interpreter, x, y, true);
 				// 6. If r is true or undefined, return false. Otherwise, return true.
 				//    (If r is false, return true. Otherwise, return false.)
 				yield BooleanValue.of(r == BooleanValue.FALSE);
 			}
 
 			case In -> {
-				// 5. If Type(rval) is not Object, throw a TypeError exception.
-				if (!(right_value instanceof final ObjectValue object)) {
+				// 5. If Type(y) is not Object, throw a TypeError exception.
+				if (!(y instanceof final ObjectValue object)) {
 					final var representation = new StringRepresentation();
 					representation.append("Cannot use `in` operator to search for `");
-					left_value.display(representation);
+					x.display(representation);
 					representation.append("` in ");
-					right_value.display(representation);
+					y.display(representation);
 					throw error(new TypeError(interpreter, representation.toString()));
 				}
 
-				// 6. Return ? HasProperty(rval, ? ToPropertyKey(lval)).
-				yield BooleanValue.of(object.hasProperty(left_value.toPropertyKey(interpreter)));
+				// 6. Return ? HasProperty(y, ? ToPropertyKey(x)).
+				yield BooleanValue.of(object.hasProperty(x.toPropertyKey(interpreter)));
 			}
 
-			case InstanceOf -> instanceofOperator(interpreter, left_value, right_value);
+			case InstanceOf -> instanceofOperator(interpreter, x, y);
 		};
 	}
 

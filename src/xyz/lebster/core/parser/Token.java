@@ -86,8 +86,8 @@ public final class Token {
 	}
 
 	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
-	// TOOD: Confirm this is accurate
 	Associativity associativity() {
+		// TOOD: Confirm this is accurate
 		return switch (type) {
 			case Period, LBracket, LParen, OptionalChain, Star, Slash, Percent, Plus, Minus, LeftShift, RightShift,
 				UnsignedRightShift, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf, LooseEqual,

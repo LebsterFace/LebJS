@@ -30,6 +30,7 @@ public final class TestObject extends ObjectValue {
 	}
 
 	private static Undefined parse(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// Test.parse(sourceText: string): void
 		if (arguments.length != 1)
 			throw new ShouldNotHappen("Test.parse should be called with only one argument");
 		if (!(arguments[0] instanceof final StringValue sourceTextSV))

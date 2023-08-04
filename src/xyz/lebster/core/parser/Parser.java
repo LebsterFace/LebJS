@@ -41,6 +41,10 @@ public final class Parser {
 		this.state = new ParserState(Lexer.tokenize(sourceText));
 	}
 
+	public static Program parse(String sourceText) throws SyntaxError {
+		return new Parser(sourceText).parse();
+	}
+
 	private void save() {
 		this.savedStack.add(state.copy());
 	}
@@ -57,10 +61,6 @@ public final class Parser {
 
 	private Program parse() throws SyntaxError {
 		return populateAppendableNode(new Program(), EOF);
-	}
-
-	public static Program parse(String sourceText) throws SyntaxError {
-		return new Parser(sourceText).parse();
 	}
 
 	private <T extends AppendableNode> T populateAppendableNode(T root, TokenType end) throws SyntaxError {

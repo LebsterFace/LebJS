@@ -19,6 +19,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Objects;
 
 import static xyz.lebster.core.value.primitive.bigint.BigIntValue.stringToBigInt;
@@ -122,8 +123,8 @@ public abstract class Value<JType> implements Displayable {
 			// j. If nx is +∞𝔽 or ny is -∞𝔽, return false.
 			if ((nx instanceof final NumberValue X && X.value > 0 && X.value.isInfinite()) || (ny instanceof final NumberValue Y && Y.value < 0 && Y.value.isInfinite())) return BooleanValue.FALSE;
 			// k. If ℝ(nx) < ℝ(ny), return true; otherwise return false.
-			final BigDecimal rNX = nx instanceof final NumberValue X ? new BigDecimal(X.value) : new BigDecimal(((BigIntValue) nx).value);
-			final BigDecimal rNY = ny instanceof final NumberValue Y ? new BigDecimal(Y.value) : new BigDecimal(((BigIntValue) ny).value);
+			final BigDecimal rNX = nx instanceof final NumberValue X ? new BigDecimal(X.value) : new BigDecimal((BigInteger) nx.value);
+			final BigDecimal rNY = ny instanceof final NumberValue Y ? new BigDecimal(Y.value) : new BigDecimal((BigInteger) ny.value);
 			return BooleanValue.of(rNX.compareTo(rNY) < 0);
 		}
 	}

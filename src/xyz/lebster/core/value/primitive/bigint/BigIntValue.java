@@ -160,6 +160,7 @@ public final class BigIntValue extends NumericValue<BigInteger> {
 		return new BigIntValue(value.pow(exponent.value.intValueExact()));
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-bigint-leftShift")
 	private static BigInteger leftShift(BigInteger x, BigInteger y) {
 		// 1. If y < 0ℤ, then
 		if (y.compareTo(BigInteger.ZERO) < 0) {
@@ -171,7 +172,6 @@ public final class BigIntValue extends NumericValue<BigInteger> {
 		return x.multiply(BigInteger.TWO.pow(y.intValueExact()));
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-bigint-leftShift")
 	public BigIntValue leftShift(BigIntValue y) {
 		return new BigIntValue(leftShift(value, y.value));
 	}
@@ -195,9 +195,9 @@ public final class BigIntValue extends NumericValue<BigInteger> {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-bigint-signedRightShift")
-	public BigIntValue signedRightShift(BigIntValue other) {
+	public BigIntValue signedRightShift(BigIntValue y) {
 		// 1. Return BigInt::leftShift(x, -y).
-		return new BigIntValue(leftShift(this.value, other.value.negate()));
+		return new BigIntValue(leftShift(value, y.value.negate()));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-bigint-subtract")

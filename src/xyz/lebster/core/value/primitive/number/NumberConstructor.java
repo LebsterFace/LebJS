@@ -8,7 +8,9 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
+import xyz.lebster.core.value.primitive.NumericValue;
 import xyz.lebster.core.value.primitive.PrimitiveConstructor;
+import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
@@ -109,10 +111,11 @@ public final class NumberConstructor extends PrimitiveConstructor {
 		NumberValue n;
 		if (arguments.length > 0) {
 			// a. Let prim be ? ToNumeric(value).
-			final NumberValue prim = value.toNumeric(interpreter);
-			// TODO: b. If prim is a BigInt, let n be 𝔽(ℝ(prim)).
+			final NumericValue<?> prim = value.toNumeric(interpreter);
+			// b. If prim is a BigInt, let n be 𝔽(ℝ(prim)).
+			if (prim instanceof final BigIntValue B) n = new NumberValue(B.value.doubleValue());
 			// c. Otherwise, let n be prim.
-			n = prim;
+			else n = (NumberValue) prim;
 		}
 		// 2. Else,
 		else {

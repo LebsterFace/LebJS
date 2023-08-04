@@ -7,4 +7,4 @@ Test.expectError("TypeError", "Number.prototype.valueOf requires that 'this' be 
 Test.expectError("TypeError", "Number.prototype.valueOf requires that 'this' be a Number", () => Number.prototype.valueOf.call({}));
 Test.expectError("TypeError", "Number.prototype.valueOf requires that 'this' be a Number", () => Number.prototype.valueOf.call(Symbol("foo")));
 Test.expectError("TypeError", "Number.prototype.valueOf requires that 'this' be a Number", () => Number.prototype.valueOf.call("bar"));
-// TODO: Test.expectError("TypeError", "Number.prototype.valueOf requires that 'this' be a Number", () => Number.prototype.valueOf.call(1n));
+Test.expectError("TypeError", "Number.prototype.valueOf requires that 'this' be a Number", () => Number.prototype.valueOf.call(1n));

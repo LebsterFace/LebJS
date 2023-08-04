@@ -8,6 +8,7 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
+import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -44,6 +45,11 @@ public final class Undefined extends PrimitiveValue<Void> {
 	@Override
 	public ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion {
 		throw error(new TypeError(interpreter, "Cannot convert undefined to object"));
+	}
+
+	@Override
+	public BigIntValue toBigIntValue(Interpreter interpreter) throws AbruptCompletion {
+		throw error(new TypeError(interpreter, "Cannot convert undefined to a BigInt"));
 	}
 
 	@Override

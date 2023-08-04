@@ -4,6 +4,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 public final class Names {
 	public static final StringValue Array = new StringValue("Array");
+	public static final StringValue BigInt = new StringValue("BigInt");
 	public static final StringValue Boolean = new StringValue("Boolean");
 	public static final StringValue DEG_PER_RAD = new StringValue("DEG_PER_RAD");
 	public static final StringValue E = new StringValue("E");

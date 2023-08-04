@@ -12,10 +12,12 @@ import xyz.lebster.core.node.expression.ClassExpression.ClassFieldNode;
 import xyz.lebster.core.node.expression.ClassExpression.ClassMethodNode;
 import xyz.lebster.core.node.expression.ObjectExpression.*;
 import xyz.lebster.core.node.expression.UpdateExpression.UpdateOp;
+import xyz.lebster.core.node.expression.literal.BigIntLiteral;
 import xyz.lebster.core.node.expression.literal.NumericLiteral;
 import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.node.expression.literal.*;
 import xyz.lebster.core.node.statement.*;
+import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -848,7 +850,6 @@ public final class Parser {
 		return switch (state.token.type) {
 			case Await -> throw new ParserNotImplemented(position(), "`await` expressions");
 			case Async -> throw new ParserNotImplemented(position(), "`async` functions");
-			case BigIntLiteral -> throw new ParserNotImplemented(position(), "BigIntLiterals");
 			case Super -> throw new ParserNotImplemented(position(), "Super property access");
 
 			case Class -> parseClassExpression();
@@ -861,6 +862,7 @@ public final class Parser {
 			case RegexpPattern -> parseRegexpLiteral();
 			case StringLiteral -> state.consume().asStringLiteral();
 			case NumericLiteral -> parseNumericLiteral();
+			case BigIntLiteral -> parseBigIntLiteral();
 
 			case Function -> {
 				state.require(Function);
@@ -895,6 +897,10 @@ public final class Parser {
 	private NumericLiteral parseNumericLiteral() throws SyntaxError {
 		final double value = Double.parseDouble(state.require(NumericLiteral));
 		return new NumericLiteral(new NumberValue(value));
+	}
+
+	private BigIntLiteral parseBigIntLiteral() throws SyntaxError {
+		return new BigIntLiteral(new BigIntValue(state.require(BigIntLiteral)));
 	}
 
 	private RegExpLiteral parseRegexpLiteral() throws SyntaxError {

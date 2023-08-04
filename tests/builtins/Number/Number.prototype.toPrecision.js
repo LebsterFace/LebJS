@@ -5,11 +5,11 @@ Test.expectError("TypeError", "Number.prototype.toPrecision requires that 'this'
 Test.expectError("TypeError", "Number.prototype.toPrecision requires that 'this' be a Number", () => Number.prototype.toPrecision.call({}));
 Test.expectError("TypeError", "Number.prototype.toPrecision requires that 'this' be a Number", () => Number.prototype.toPrecision.call(Symbol("foo")));
 Test.expectError("TypeError", "Number.prototype.toPrecision requires that 'this' be a Number", () => Number.prototype.toPrecision.call("bar"));
-// TODO: Test.expectError("TypeError", "Number.prototype.toPrecision requires that 'this' be a Number", () => Number.prototype.toPrecision.call(1n));
+Test.expectError("TypeError", "Number.prototype.toPrecision requires that 'this' be a Number", () => Number.prototype.toPrecision.call(1n));
 
 // precision must be coercible to a number
 Test.expectError("TypeError", "Cannot convert a Symbol value to a number", () => (0).toPrecision(Symbol("foo")));
-// TODO: Test.expectError("TypeError", "Cannot convert a BigInt value to a number", () => (0).toPrecision(1n));
+Test.expectError("TypeError", "Cannot convert a BigInt value to a number", () => (0).toPrecision(1n));
 
 // out of range precision
 Test.expectError("RangeError", "toPrecision() argument must be between 1 and 100", () => (0).toPrecision(-Infinity));

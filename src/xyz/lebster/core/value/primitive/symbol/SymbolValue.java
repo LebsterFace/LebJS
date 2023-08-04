@@ -9,6 +9,7 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -120,6 +121,11 @@ public final class SymbolValue extends Key<Void> {
 	}
 
 	@Override
+	public BigIntValue toBigIntValue(Interpreter interpreter) throws AbruptCompletion {
+		throw error(new TypeError(interpreter, "Cannot convert %s to a BigInt".formatted(symbolDescriptiveString())));
+	}
+
+	@Override
 	public String typeOf() {
 		return "symbol";
 	}
@@ -130,7 +136,7 @@ public final class SymbolValue extends Key<Void> {
 	}
 
 	public String symbolDescriptiveString() {
-		return "Symbol(" + (description != null ? description.value : "") + ")";
+		return "Symbol(" + (description == null ? "" : description.value) + ")";
 	}
 
 	@Override

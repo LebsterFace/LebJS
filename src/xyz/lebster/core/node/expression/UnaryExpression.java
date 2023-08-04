@@ -3,6 +3,7 @@ package xyz.lebster.core.node.expression;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
@@ -11,18 +12,20 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.NumericValue;
+import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-unary-operators")
-public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op) implements Expression {
+public record UnaryExpression(Expression expression, UnaryOp op) implements Expression {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return switch (op) {
-			case UnaryPlus -> expression.execute(interpreter).toNumberValue(interpreter);
-			case UnaryMinus -> expression.execute(interpreter).toNumberValue(interpreter).unaryMinus();
 			case LogicalNot -> expression.execute(interpreter).toBooleanValue(interpreter).not();
+			case UnaryPlus -> expression.execute(interpreter).toNumberValue(interpreter);
+			case UnaryMinus -> unaryMinusOperator(interpreter);
 			case Typeof -> typeofOperator(interpreter);
 			case Void -> voidOperator(interpreter);
 			case Delete -> deleteOperator(interpreter);
@@ -32,16 +35,44 @@ public record UnaryExpression(Expression expression, UnaryExpression.UnaryOp op)
 		};
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-bitwise-not-operator")
-	private Value<?> bitwiseNotOperator(Interpreter interpreter) throws AbruptCompletion {
-		//  1. Let expr be ? Evaluation of UnaryExpression.
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-unary-minus-operator")
+	private NumericValue<?> unaryMinusOperator(Interpreter interpreter) throws AbruptCompletion {
+		// 1. Let expr be ? Evaluation of UnaryExpression.
 		final Value<?> expr = expression.execute(interpreter);
-		//  2. Let oldValue be ? ToNumeric(? GetValue(expr)).
-		final NumberValue oldValue = expr.toNumeric(interpreter);
-		//  3. If oldValue is a Number, then return Number::bitwiseNOT(oldValue).
-		return oldValue.bitwiseNOT();
-		//  TODO: 4. Else, Assert: oldValue is a BigInt.
-		//  b. Return BigInt::bitwiseNOT(oldValue).
+		// 2. Let oldValue be ? ToNumeric(? GetValue(expr)).
+		final NumericValue<?> oldValue = expr.toNumeric(interpreter);
+		// 3. If oldValue is a Number, then
+		if (oldValue instanceof final NumberValue N) {
+			// a. Return Number::unaryMinus(oldValue).
+			return N.unaryMinus();
+		}
+		// 4. Else,
+		else {
+			// a. Assert: oldValue is a BigInt.
+			if (!(oldValue instanceof final BigIntValue B)) throw new ShouldNotHappen("Invalid numeric value");
+			// b. Return BigInt::unaryMinus(oldValue).
+			return B.unaryMinus();
+		}
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-bitwise-not-operator")
+	private NumericValue<?> bitwiseNotOperator(Interpreter interpreter) throws AbruptCompletion {
+		// 1. Let expr be ? Evaluation of UnaryExpression.
+		final Value<?> expr = expression.execute(interpreter);
+		// 2. Let oldValue be ? ToNumeric(? GetValue(expr)).
+		final NumericValue<?> oldValue = expr.toNumeric(interpreter);
+		// 3. If oldValue is a Number, then
+		if (oldValue instanceof final NumberValue N) {
+			// a. Return Number::bitwiseNOT(oldValue).
+			return N.bitwiseNOT();
+		}
+		// 4. Else,
+		else {
+			// a. Assert: oldValue is a BigInt.
+			if (!(oldValue instanceof final BigIntValue B)) throw new ShouldNotHappen("Invalid numeric value");
+			// b. Return BigInt::bitwiseNOT(oldValue).
+			return B.bitwiseNOT();
+		}
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-typeof-operator")

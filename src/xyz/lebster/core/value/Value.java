@@ -1,8 +1,8 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
@@ -10,13 +10,18 @@ import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.NumericValue;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
+import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
+import java.math.BigDecimal;
 import java.util.Objects;
+
+import static xyz.lebster.core.value.primitive.bigint.BigIntValue.stringToBigInt;
 
 public abstract class Value<JType> implements Displayable {
 	public final JType value;
@@ -27,10 +32,9 @@ public abstract class Value<JType> implements Displayable {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-islessthan")
 	public static BooleanValue isLessThan(Interpreter interpreter, Value<?> x, Value<?> y, boolean leftFirst) throws AbruptCompletion {
-		// 1. If the LeftFirst flag is true, then
+		// 1. If LeftFirst is true, then
 		PrimitiveValue<?> px;
 		PrimitiveValue<?> py;
-
 		if (leftFirst) {
 			// a. Let px be ? ToPrimitive(x, number).
 			px = x.toPrimitive(interpreter, Value.PreferredType.Number);
@@ -47,45 +51,80 @@ public abstract class Value<JType> implements Displayable {
 		}
 
 
-		// 3. If Type(px) is String and Type(py) is String, then
+		// 3. If px is a String and py is a String, then
 		if (px instanceof final StringValue string_px && py instanceof final StringValue string_py) {
-
-			// a. If IsStringPrefix(py, px) is true, return false.
-			if (isStringPrefix(string_py.value, string_px.value)) return BooleanValue.FALSE;
-			// b. If IsStringPrefix(px, py) is true, return true.
-			if (isStringPrefix(string_px.value, string_py.value)) return BooleanValue.TRUE;
-
-			// c. Let k be the smallest non-negative integer such that the code unit at index k
-			//    within px is different from the code unit at index k within py.
-			//    (There must be such a k, for neither String is a prefix of the other.)
-			int k = 0;
-			while (k < string_px.value.length()) {
-				if (string_px.value.charAt(k) != string_py.value.charAt(k)) {
-					break;
-				}
-
-				k++;
+			// a. Let lx be the length of px.
+			final int lx = string_px.value.length();
+			// b. Let ly be the length of py.
+			final int ly = string_py.value.length();
+			// c. For each integer i such that 0 ≤ i < min(lx, ly), in ascending order, do
+			for (int i = 0; i < Math.min(lx, ly); i++) {
+				// i. Let cx be the numeric value of the code unit at index i within px.
+				final int cx = string_px.value.charAt(i);
+				// ii. Let cy be the numeric value of the code unit at index i within py.
+				final int cy = string_py.value.charAt(i);
+				// iii. If cx < cy, return true.
+				if (cx < cy) return BooleanValue.TRUE;
+				// iv. If cx > cy, return false.
+				if (cx > cy) return BooleanValue.FALSE;
 			}
 
-			// d. Let m be the integer that is the numeric value of the code unit at index k within px.
-			int m = string_px.value.charAt(k);
-			// e. Let n be the integer that is the numeric value of the code unit at index k within py.
-			int n = string_py.value.charAt(k);
-			// f. If m < n, return true. Otherwise, return false.
-			return BooleanValue.of(m < n);
+			// d. If lx < ly, return true. Otherwise, return false.
+			return BooleanValue.of(lx < ly);
 		}
 		// 4. Else,
 		else {
-			// FIXME: BigInt for this entire block
-
+			// a. If px is a BigInt and py is a String, then
+			if (px instanceof final BigIntValue bigint_px && py instanceof final StringValue string_py) {
+				// i. Let ny be StringToBigInt(py).
+				final BigIntValue ny = stringToBigInt(string_py.value);
+				// ii. If ny is undefined, return undefined.
+				if (ny == null) return null;
+				// iii. Return BigInt::lessThan(px, ny).
+				return bigint_px.lessThan(ny);
+			}
+			// b. If px is a String and py is a BigInt, then
+			if (px instanceof final StringValue string_px && py instanceof final BigIntValue bigint_py) {
+				// i. Let nx be StringToBigInt(px).
+				final BigIntValue nx = stringToBigInt(string_px.value);
+				// ii. If nx is undefined, return undefined.
+				if (nx == null) return null;
+				// iii. Return BigInt::lessThan(nx, py).
+				return nx.lessThan(bigint_py);
+			}
 			// c. NOTE: Because px and py are primitive values, evaluation order is not important.
 			// d. Let nx be ? ToNumeric(px).
-			final NumberValue nx = px.toNumeric(interpreter);
+			final NumericValue<?> nx = px.toNumeric(interpreter);
 			// e. Let ny be ? ToNumeric(py).
-			final NumberValue ny = py.toNumeric(interpreter);
-
-			// 1. Return Number::lessThan(nx, ny).
-			return nx.lessThan(ny);
+			final NumericValue<?> ny = py.toNumeric(interpreter);
+			// f. If Type(nx) is Type(ny), then
+			if (nx.sameType(ny)) {
+				// i. If nx is a Number, then
+				if (nx instanceof final NumberValue N) {
+					// 1. Return Number::lessThan(nx, ny).
+					return N.lessThan((NumberValue) ny);
+				}
+				// ii. Else,
+				else {
+					// 1. Assert: nx is a BigInt.
+					if (!(nx instanceof final BigIntValue B)) throw new ShouldNotHappen("Invalid numeric value");
+					// 2. Return BigInt::lessThan(nx, ny).
+					return B.lessThan((BigIntValue) ny);
+				}
+			}
+			// g. Assert: nx is a BigInt and ny is a Number, or nx is a Number and ny is a BigInt.
+			if (!(nx instanceof BigIntValue && ny instanceof NumberValue || nx instanceof NumberValue && ny instanceof BigIntValue))
+				throw new ShouldNotHappen("Assertion failed");
+			// h. If nx or ny is NaN, return undefined.
+			if ((nx instanceof final NumberValue X && X.value.isNaN()) || (ny instanceof final NumberValue Y && Y.value.isNaN())) return null;
+			// i. If nx is -∞𝔽 or ny is +∞𝔽, return true.
+			if ((nx instanceof final NumberValue X && X.value < 0 && X.value.isInfinite()) || (ny instanceof final NumberValue Y && Y.value > 0 && Y.value.isInfinite())) return BooleanValue.TRUE;
+			// j. If nx is +∞𝔽 or ny is -∞𝔽, return false.
+			if ((nx instanceof final NumberValue X && X.value > 0 && X.value.isInfinite()) || (ny instanceof final NumberValue Y && Y.value < 0 && Y.value.isInfinite())) return BooleanValue.FALSE;
+			// k. If ℝ(nx) < ℝ(ny), return true; otherwise return false.
+			final BigDecimal rNX = nx instanceof final NumberValue X ? new BigDecimal(X.value) : new BigDecimal(((BigIntValue) nx).value);
+			final BigDecimal rNY = ny instanceof final NumberValue Y ? new BigDecimal(Y.value) : new BigDecimal(((BigIntValue) ny).value);
+			return BooleanValue.of(rNX.compareTo(rNY) < 0);
 		}
 	}
 
@@ -126,11 +165,11 @@ public abstract class Value<JType> implements Displayable {
 	public abstract ObjectValue toObjectValue(Interpreter interpreter) throws AbruptCompletion;
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tonumeric")
-	@NonCompliant
-	public NumberValue toNumeric(Interpreter interpreter) throws AbruptCompletion {
+	public NumericValue<?> toNumeric(Interpreter interpreter) throws AbruptCompletion {
 		// 1. Let primValue be ? ToPrimitive(value, number).
 		final PrimitiveValue<?> primValue = toPrimitive(interpreter, PreferredType.Number);
-		// TODO: 2. If primValue is a BigInt, return primValue.
+		// 2. If primValue is a BigInt, return primValue.
+		if (primValue instanceof final BigIntValue B) return B;
 		// 3. Return ? ToNumber(primValue).
 		return primValue.toNumberValue(interpreter);
 	}

@@ -44,6 +44,7 @@ public final class GlobalObject extends ObjectValue {
 
 		// 19.3 Constructor Properties of the Global Object
 		put(Names.Array, intrinsics.arrayConstructor);
+		put(Names.BigInt, intrinsics.bigIntConstructor);
 		put(Names.Boolean, intrinsics.booleanConstructor);
 		put(Names.Error, intrinsics.errorConstructor);
 		put(Names.Function, intrinsics.functionConstructor);

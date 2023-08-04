@@ -4,18 +4,24 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.Ryu;
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.range.RangeError;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.primitive.PrimitiveValue;
+import xyz.lebster.core.value.primitive.NumericValue;
+import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public final class NumberValue extends PrimitiveValue<Double> {
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+
+public final class NumberValue extends NumericValue<Double> {
 	private static final String DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 	public static final long TWO_TO_THE_31 = 2147483648L;
@@ -157,6 +163,11 @@ public final class NumberValue extends PrimitiveValue<Double> {
 	}
 
 	@Override
+	public BigIntValue toBigIntValue(Interpreter interpreter) throws AbruptCompletion {
+		throw error(new TypeError(interpreter, "Cannot convert %s to a BigInt".formatted(stringValueOf(10))));
+	}
+
+	@Override
 	public String typeOf() {
 		return "number";
 	}
@@ -232,5 +243,84 @@ public final class NumberValue extends PrimitiveValue<Double> {
 		// 3. If truncate(ℝ(argument)) ≠ ℝ(argument), return false.
 		// 4. Return true.
 		return Double.isFinite(value) && truncate(value) == value;
+	}
+
+	public BigIntValue numberToBigInt(Interpreter interpreter) throws AbruptCompletion {
+		// 1. If IsIntegralNumber(number) is false, throw a RangeError exception.
+		if (!isIntegralNumber()) throw error(new RangeError(interpreter, "%s cannot be converted to BigInt because it is not an integer".formatted(stringValueOf(10))));
+		// 2. Return ℤ(ℝ(number)).
+		return new BigIntValue(new BigDecimal(value).toBigIntegerExact());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-add")
+	public NumberValue add(NumberValue y) {
+		return new NumberValue(value + y.value);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-bitwiseAND")
+	public NumberValue bitwiseAND(NumberValue y) {
+		return new NumberValue(toInt32() & y.toInt32());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-bitwiseOR")
+	public NumberValue bitwiseOR(NumberValue y) {
+		return new NumberValue(toInt32() | y.toInt32());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-bitwiseXOR")
+	public NumberValue bitwiseXOR(NumberValue y) {
+		return new NumberValue(toInt32() ^ y.toInt32());
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-divide")
+	public NumberValue divide(NumberValue y) {
+		return new NumberValue(value / y.value);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-exponentiate")
+	public NumberValue exponentiate(NumberValue y) {
+		return new NumberValue(Math.pow(value, y.value));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-leftShift")
+	public NumberValue leftShift(NumberValue y) {
+		return new NumberValue(toInt32() << (y.toUint32() % 32));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-multiply")
+	public NumberValue multiply(NumberValue y) {
+		return new NumberValue(value * y.value);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-remainder")
+	public NumberValue remainder(NumberValue y) {
+		return new NumberValue(value % y.value);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-signedRightShift")
+	public NumberValue signedRightShift(NumberValue y) {
+		return new NumberValue(toInt32() >> (y.toUint32() % 32));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-subtract")
+	public NumberValue subtract(NumberValue y) {
+		return new NumberValue(value - y.value);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-unsignedRightShift")
+	public NumberValue unsignedRightShift(NumberValue y) {
+		// (NaN|0|+-Infinity) >>> x = 0
+		if (Double.isNaN(value) || value == 0.0 || Double.isInfinite(value))
+			return NumberValue.ZERO;
+
+		final int left_int32 = (int) ((long) (double) value % NumberValue.TWO_TO_THE_32);
+
+		/// x >>> (NaN|0|+-Infinity) = uint32(x)
+		if (Double.isNaN(y.value) || y.value == 0.0 || Double.isInfinite(y.value))
+			return new NumberValue(left_int32 & UINT32_LIMIT);
+
+		final long right_uint32 = (long) (double) y.value % NumberValue.TWO_TO_THE_32;
+		final long shiftCount = right_uint32 % 32;
+		return new NumberValue((left_int32 >>> shiftCount) & UINT32_LIMIT);
 	}
 }

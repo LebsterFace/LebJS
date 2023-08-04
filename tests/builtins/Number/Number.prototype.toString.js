@@ -24,7 +24,7 @@ Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be
 Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call({}));
 Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call(Symbol("foo")));
 Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call("bar"));
-// TODO: Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call(1n));
+Test.expectError("TypeError", "Number.prototype.toString requires that 'this' be a Number", () => Number.prototype.toString.call(1n));
 
 // radix RangeError
 Test.expectError("RangeError", 'toString() radix argument must be between 2 and 36', () => (0).toString(0));

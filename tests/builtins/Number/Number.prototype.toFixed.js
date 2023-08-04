@@ -34,7 +34,7 @@ Test.expectError("TypeError", "Number.prototype.toFixed requires that 'this' be 
 Test.expectError("TypeError", "Number.prototype.toFixed requires that 'this' be a Number", () => Number.prototype.toFixed.call({}));
 Test.expectError("TypeError", "Number.prototype.toFixed requires that 'this' be a Number", () => Number.prototype.toFixed.call(Symbol("foo")));
 Test.expectError("TypeError", "Number.prototype.toFixed requires that 'this' be a Number", () => Number.prototype.toFixed.call("bar"));
-// TODO: Test.expectError("TypeError", "Number.prototype.toFixed requires that 'this' be a Number", () => Number.prototype.toFixed.call(1n));
+Test.expectError("TypeError", "Number.prototype.toFixed requires that 'this' be a Number", () => Number.prototype.toFixed.call(1n));
 
 // fixed digits RangeError
 Test.expectError("RangeError", "toFixed() digits argument must be between 0 and 100", () => (0).toFixed(-Infinity));

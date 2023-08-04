@@ -25,6 +25,8 @@ import xyz.lebster.core.value.map.MapPrototype;
 import xyz.lebster.core.value.object.ObjectConstructor;
 import xyz.lebster.core.value.object.ObjectPrototype;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.bigint.BigIntConstructor;
+import xyz.lebster.core.value.primitive.bigint.BigIntPrototype;
 import xyz.lebster.core.value.primitive.boolean_.BooleanConstructor;
 import xyz.lebster.core.value.primitive.boolean_.BooleanPrototype;
 import xyz.lebster.core.value.primitive.number.NumberConstructor;
@@ -43,6 +45,8 @@ import xyz.lebster.core.value.shadowrealm.ShadowRealmPrototype;
 public final class Intrinsics {
 	public final ArrayConstructor arrayConstructor;
 	public final ArrayPrototype arrayPrototype;
+	public final BigIntConstructor bigIntConstructor;
+	public final BigIntPrototype bigIntPrototype;
 	public final BooleanConstructor booleanConstructor;
 	public final BooleanPrototype booleanPrototype;
 	public final FunctionConstructor functionConstructor;
@@ -88,6 +92,7 @@ public final class Intrinsics {
 		linkPrototypeAndConstructor(objectConstructor = new ObjectConstructor(this), objectPrototype);
 
 		linkPrototypeAndConstructor(arrayConstructor = new ArrayConstructor(this), arrayPrototype = new ArrayPrototype(this));
+		linkPrototypeAndConstructor(bigIntConstructor = new BigIntConstructor(this), bigIntPrototype = new BigIntPrototype(this));
 		linkPrototypeAndConstructor(booleanConstructor = new BooleanConstructor(this), booleanPrototype = new BooleanPrototype(this));
 		linkPrototypeAndConstructor(errorConstructor = new ErrorConstructor(this), errorPrototype = new ErrorPrototype(this));
 		linkPrototypeAndConstructor(mapConstructor = new MapConstructor(this), mapPrototype = new MapPrototype(this));
@@ -99,8 +104,8 @@ public final class Intrinsics {
 		linkPrototypeAndConstructor(shadowRealmConstructor = new ShadowRealmConstructor(this), shadowRealmPrototype = new ShadowRealmPrototype(this));
 		linkPrototypeAndConstructor(stringConstructor = new StringConstructor(this), stringPrototype = new StringPrototype(this));
 		linkPrototypeAndConstructor(symbolConstructor = new SymbolConstructor(this), symbolPrototype = new SymbolPrototype(this));
-		linkPrototypeAndConstructor(typeErrorConstructor = new TypeErrorConstructor(this), typeErrorPrototype = new TypeErrorPrototype(this));
 		linkPrototypeAndConstructor(syntaxErrorConstructor = new SyntaxErrorConstructor(this), syntaxErrorPrototype = new SyntaxErrorPrototype(this));
+		linkPrototypeAndConstructor(typeErrorConstructor = new TypeErrorConstructor(this), typeErrorPrototype = new TypeErrorPrototype(this));
 
 		mathObject = new MathObject(this);
 		testObject = new TestObject(this);

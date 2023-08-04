@@ -5,6 +5,7 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
+import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -48,6 +49,11 @@ public final class BooleanValue extends PrimitiveValue<Boolean> {
 	@Override
 	public BooleanWrapper toObjectValue(Interpreter interpreter) {
 		return new BooleanWrapper(interpreter.intrinsics, this);
+	}
+
+	@Override
+	public BigIntValue toBigIntValue(Interpreter interpreter) {
+		return this.value ? BigIntValue.ONE : BigIntValue.ZERO;
 	}
 
 	public BooleanValue not() {

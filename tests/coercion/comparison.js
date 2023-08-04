@@ -14,15 +14,15 @@ Test.expect(true, "3" < 5);
 Test.expect(false, "hello" < 5);
 Test.expect(false, 5 < "hello");
 
-// Test.expect(false, "5" < 3n);
-// Test.expect(true, "3" < 5n);
+Test.expect(false, "5" < 3n);
+Test.expect(true, "3" < 5n);
 
 Test.expect(false, 5 < 3);
 Test.expect(false, 3 < 3);
 Test.expect(true, 3 < 5);
 
-// Test.expect(false, 5n < 3);
-// Test.expect(true, 3 < 5n);
+Test.expect(false, 5n < 3);
+Test.expect(true, 3 < 5n);
 
 Test.expect(false, true < false);
 Test.expect(true, false < true);
@@ -52,15 +52,15 @@ Test.expect(false, "3" > 5);
 Test.expect(false, "hello" > 5);
 Test.expect(false, 5 > "hello");
 
-// Test.expect(true, "5" > 3n);
-// Test.expect(false, "3" > 5n);
+Test.expect(true, "5" > 3n);
+Test.expect(false, "3" > 5n);
 
 Test.expect(true, 5 > 3);
 Test.expect(false, 3 > 3);
 Test.expect(false, 3 > 5);
 
-// Test.expect(true, 5n > 3);
-// Test.expect(false, 3 > 5n);
+Test.expect(true, 5n > 3);
+Test.expect(false, 3 > 5n);
 
 Test.expect(true, true > false);
 Test.expect(false, false > true);
@@ -94,9 +94,9 @@ Test.expect(false, 5 <= 3);
 Test.expect(true, 3 <= 3);
 Test.expect(true, 3 <= 5);
 
-// Test.expect(false, 5n <= 3);
-// Test.expect(true, 3 <= 3n);
-// Test.expect(true, 3 <= 5n);
+Test.expect(false, 5n <= 3);
+Test.expect(true, 3 <= 3n);
+Test.expect(true, 3 <= 5n);
 
 Test.expect(false, true <= false);
 Test.expect(true, true <= true);
@@ -131,9 +131,9 @@ Test.expect(true, 5 >= 3);
 Test.expect(true, 3 >= 3);
 Test.expect(false, 3 >= 5);
 
-// Test.expect(true, 5n >= 3);
-// Test.expect(true, 3 >= 3n);
-// Test.expect(false, 3 >= 5n);
+Test.expect(true, 5n >= 3);
+Test.expect(true, 3 >= 3n);
+Test.expect(false, 3 >= 5n);
 
 Test.expect(true, true >= false);
 Test.expect(true, true >= true);

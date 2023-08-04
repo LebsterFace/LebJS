@@ -3,14 +3,19 @@ package xyz.lebster.core.value.primitive.string;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.StringEscapeUtils;
+import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.parser.Lexer;
+import xyz.lebster.core.value.error.syntax.SyntaxErrorObject;
 import xyz.lebster.core.value.object.Key;
+import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 
 import java.util.PrimitiveIterator;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public final class StringValue extends Key<String> {
 	public static final StringValue EMPTY = new StringValue("");
@@ -45,7 +50,7 @@ public final class StringValue extends Key<String> {
 	public int toIndex() {
 		if (value.equals("0")) return 0;
 		if (value.startsWith("0")) return -1;
-		if (value.length() == 0) return -1;
+		if (value.isEmpty()) return -1;
 
 		int index = 0;
 		for (int i = 0; i < value.length(); i++) {
@@ -123,12 +128,22 @@ public final class StringValue extends Key<String> {
 
 	@Override
 	public BooleanValue toBooleanValue(Interpreter interpreter) {
-		return BooleanValue.of(value.length() > 0);
+		return BooleanValue.of(!value.isEmpty());
 	}
 
 	@Override
 	public StringWrapper toObjectValue(Interpreter interpreter) {
 		return new StringWrapper(interpreter.intrinsics, this);
+	}
+
+	@Override
+	public BigIntValue toBigIntValue(Interpreter interpreter) throws AbruptCompletion {
+		// 1. Let n be StringToBigInt(prim).
+		final BigIntValue n = BigIntValue.stringToBigInt(value);
+		// 2. If n is undefined, throw a SyntaxError exception.
+		if (n == null) throw error(new SyntaxErrorObject(interpreter, "Cannot convert %s to a BigInt".formatted(StringEscapeUtils.quote(value, false))));
+		// 3. Return n.
+		return n;
 	}
 
 	@Override

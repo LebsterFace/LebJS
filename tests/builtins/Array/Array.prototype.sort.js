@@ -37,10 +37,10 @@
     Test.equals(12, arr.length);
 
     // undefined compare function
-    arr = ["2", Infinity, null, null, , undefined, /* FIXME: 5n, */, undefined, null, 54, "5"];
+    arr = ["2", Infinity, null, null, , undefined, 5n, , undefined, null, 54, "5"];
     Test.equals([
         "2",
-        // FIXME: 5n,
+        5n,
         "5",
         54,
         Infinity,
@@ -52,7 +52,7 @@
         ,
         ,
     ], arr.sort(undefined));
-    Test.equals(/* FIXME: 12*/ 11, arr.length);
+    Test.equals(12, arr.length);
 
     // numeric data with compare function to sort numerically
     arr = [50, 500, 5, Infinity, -Infinity, 0, 10, -10, 1, -1, 5, 0, 15, Infinity];

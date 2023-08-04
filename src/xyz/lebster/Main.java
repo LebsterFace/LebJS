@@ -60,7 +60,7 @@ public final class Main {
 		while (scanner.hasNextLine()) {
 			final String sourceText = scanner.nextLine();
 			final Value<?> lastValue = Parser.parse(sourceText).execute(interpreter);
-			System.out.println(lastValue.toDisplayString());
+			System.out.println(lastValue.toDisplayString(false));
 			interpreter.globalObject.put(new StringValue("$"), lastValue);
 			System.out.print("#[END-OF-OUTPUT]#");
 		}

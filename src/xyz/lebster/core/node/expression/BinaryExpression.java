@@ -4,7 +4,7 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
@@ -16,7 +16,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import static java.math.BigInteger.ZERO;
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
-public record BinaryExpression(Expression left, Expression right, BinaryOp op) implements Expression {
+public record BinaryExpression(SourceRange range, Expression left, Expression right, BinaryOp op) implements Expression {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-applystringornumericbinaryoperator")
 	public static Value<?> applyOperator(Interpreter interpreter, Value<?> left_value, BinaryOp op, Value<?> right_value) throws AbruptCompletion {
 		// 1. If opText is +, then
@@ -111,15 +111,6 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 	}
 
 	@Override
-	public void represent(StringRepresentation representation) {
-		left.represent(representation);
-		representation.append(' ');
-		representation.append(op.str);
-		representation.append(' ');
-		right.represent(representation);
-	}
-
-	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-evaluatestringornumericbinaryexpression")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> left_value = left.execute(interpreter);
@@ -128,23 +119,8 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 	}
 
 	public enum BinaryOp {
-		Add("+"),
-		Subtract("-"),
-		Multiply("*"),
-		Divide("/"),
-		Exponentiate("**"),
-		Remainder("%"),
-		LeftShift("<<"),
-		SignedRightShift(">>"),
-		UnsignedRightShift(">>>"),
-		BitwiseAND("&"),
-		BitwiseXOR("^"),
-		BitwiseOR("|");
-
-		private final String str;
-
-		BinaryOp(String str) {
-			this.str = str;
-		}
+		Add, Subtract, Multiply, Divide, Exponentiate, Remainder,
+		LeftShift, SignedRightShift, UnsignedRightShift,
+		BitwiseAND, BitwiseXOR, BitwiseOR
 	}
 }

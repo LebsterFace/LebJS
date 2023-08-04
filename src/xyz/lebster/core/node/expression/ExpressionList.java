@@ -3,15 +3,12 @@ package xyz.lebster.core.node.expression;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.Representable;
 import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Value;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
-public final class ExpressionList implements Representable {
+public final class ExpressionList {
 	private final ArrayList<ExpressionNode> backingList;
 	private final boolean canHaveEmpty;
 
@@ -47,25 +44,6 @@ public final class ExpressionList implements Representable {
 		}
 
 		return result.toArray(new Value[0]);
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		final Iterator<ExpressionNode> iterator = backingList.iterator();
-		while (iterator.hasNext()) {
-			final ExpressionNode element = iterator.next();
-			switch (element.type) {
-				case SPREAD -> {
-					representation.append("...");
-					element.expression.represent(representation);
-				}
-				case SINGLE -> element.expression.represent(representation);
-				case EMPTY -> representation.append(' ');
-			}
-
-			if (iterator.hasNext())
-				representation.append(", ");
-		}
 	}
 
 	public boolean isEmpty() {

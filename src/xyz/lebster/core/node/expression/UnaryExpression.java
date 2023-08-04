@@ -7,7 +7,7 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
-import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
@@ -21,7 +21,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import java.math.BigInteger;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-unary-operators")
-public record UnaryExpression(Expression expression, UnaryOp op) implements Expression {
+public record UnaryExpression(SourceRange range, Expression expression, UnaryOp op) implements Expression {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		return switch (op) {
@@ -111,22 +111,6 @@ public record UnaryExpression(Expression expression, UnaryOp op) implements Expr
 		final ObjectValue obj = memberExpression.base().execute(interpreter).toObjectValue(interpreter);
 		final Value<?> propertyName = memberExpression.property().execute(interpreter);
 		return BooleanValue.of(obj.delete(propertyName.toPropertyKey(interpreter)));
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append(switch (op) {
-			case UnaryMinus -> '-';
-			case LogicalNot -> '!';
-			case UnaryPlus -> '+';
-			case Delete -> "delete ";
-			case Void -> "void ";
-			case Typeof -> "typeof ";
-			case BitwiseNot -> '~';
-			case Await -> "await ";
-		});
-
-		expression.represent(representation);
 	}
 
 	public enum UnaryOp { Delete, Void, Typeof, UnaryPlus, UnaryMinus, BitwiseNot, LogicalNot, Await }

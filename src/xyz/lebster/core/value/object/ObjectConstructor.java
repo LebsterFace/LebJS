@@ -191,8 +191,8 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		return new ArrayObject(interpreter, entryList);
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.create")
 	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.create")
 	private static Value<?> create(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// Object.create ( O, Properties )
 		final Value<?> O = argument(0, arguments);

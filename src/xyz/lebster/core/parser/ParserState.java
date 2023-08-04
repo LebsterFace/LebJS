@@ -1,11 +1,15 @@
 package xyz.lebster.core.parser;
 
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.SourcePosition;
 import xyz.lebster.core.node.expression.ObjectExpression;
-import xyz.lebster.core.node.expression.literal.StringLiteral;
+import xyz.lebster.core.node.expression.literal.PrimitiveLiteral;
+import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.HashMap;
+
+import static xyz.lebster.core.parser.TokenType.*;
 
 public final class ParserState {
 	public final Token[] tokens;
@@ -27,11 +31,12 @@ public final class ParserState {
 	}
 
 	public SyntaxError expected(TokenType type) {
-		return new SyntaxError("Unexpected token %s. Expected %s".formatted(token, type), token.position);
+		return expected(StringEscapeUtils.quote(Lexer.valueForSymbol(type), false));
 	}
 
 	public SyntaxError expected(String value) {
-		return new SyntaxError("Unexpected token %s. Expected '%s'".formatted(token, value), token.position);
+		if (token.type == EOF) return new SyntaxError("Unexpected end of input, expected %s".formatted(value), token.start);
+		return new SyntaxError("Unexpected token %s, expected %s".formatted(token, value), token.start);
 	}
 
 	public SyntaxError unexpected() {
@@ -39,7 +44,8 @@ public final class ParserState {
 	}
 
 	public SyntaxError unexpected(Token unexpectedToken) {
-		return new SyntaxError("Unexpected token " + unexpectedToken, unexpectedToken.position);
+		if (unexpectedToken.type == EOF) return new SyntaxError("Unexpected end of input", unexpectedToken.start);
+		return new SyntaxError("Unexpected token " + unexpectedToken, unexpectedToken.start);
 	}
 
 	Token consume() {
@@ -52,12 +58,6 @@ public final class ParserState {
 	String require(TokenType type) throws SyntaxError {
 		if (token.type != type) throw expected(type);
 		return consume().value;
-	}
-
-	void requireIdentifier(String value) throws SyntaxError {
-		if (token.type != TokenType.Identifier) throw expected(TokenType.Identifier);
-		if (!token.value.equals(value)) throw expected(value);
-		consume();
 	}
 
 	Token accept(TokenType type) {
@@ -82,7 +82,7 @@ public final class ParserState {
 		return false;
 	}
 
-	StringLiteral optionalStringLiteral(TokenType type) {
+	PrimitiveLiteral<StringValue> optionalStringLiteral(TokenType type) {
 		final Token token = accept(type);
 		if (token == null) return null;
 		return token.asStringLiteral();

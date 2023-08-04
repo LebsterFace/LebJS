@@ -1,13 +1,15 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.interpreter.StringRepresentation;
+
+import xyz.lebster.core.ANSI;
 
 public interface Displayable {
-	void display(StringRepresentation representation);
+	void display(StringBuilder builder);
 
-	default String toDisplayString() {
-		final var representation = new StringRepresentation();
-		this.display(representation);
-		return representation.toString();
+	default String toDisplayString(boolean stripFormatting) {
+		final StringBuilder builder = new StringBuilder();
+		this.display(builder);
+		final String result = builder.toString();
+		return stripFormatting ? ANSI.stripFormatting(result) : result;
 	}
 }

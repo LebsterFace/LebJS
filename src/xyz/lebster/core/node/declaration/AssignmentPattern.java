@@ -2,10 +2,8 @@ package xyz.lebster.core.node.declaration;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Assignable;
 import xyz.lebster.core.node.Declarable;
-import xyz.lebster.core.node.Representable;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
@@ -14,16 +12,7 @@ import xyz.lebster.core.value.globals.Undefined;
  * A container for an assignment target and a default expression
  * Used to avoid storing defaultExpression on AssignmentTarget for the sake of IdentifierExpression
  */
-public record AssignmentPattern(AssignmentTarget assignmentTarget, Expression defaultExpression) implements Assignable, Declarable, Representable {
-	@Override
-	public void represent(StringRepresentation representation) {
-		assignmentTarget.represent(representation);
-		if (defaultExpression != null) {
-			representation.append(" = ");
-			defaultExpression.represent(representation);
-		}
-	}
-
+public record AssignmentPattern(AssignmentTarget assignmentTarget, Expression defaultExpression) implements Assignable, Declarable {
 	@Override
 	public Value<?> assign(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 		if (value == Undefined.instance && defaultExpression != null) {

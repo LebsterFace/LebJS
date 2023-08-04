@@ -1,6 +1,5 @@
 package xyz.lebster.core.value.primitive.string;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
@@ -416,7 +415,7 @@ public final class StringPrototype extends ObjectValue {
 		final int n = toIntegerOrInfinity(interpreter, count);
 		// 4. If n < 0 or n is +∞, throw a RangeError exception.
 		if (n < 0 || n == Integer.MAX_VALUE)
-			throw error(new RangeError(interpreter, "Invalid count value: " + ANSI.stripFormatting(count.toDisplayString())));
+			throw error(new RangeError(interpreter, "Invalid count value: %s".formatted(count.toDisplayString(true))));
 		// 5. If n is 0, return the empty String.
 		if (n == 0) return StringValue.EMPTY;
 		// 6. Return the String value that is made from n copies of S appended together.

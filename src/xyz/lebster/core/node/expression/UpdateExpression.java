@@ -5,7 +5,7 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
-import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.primitive.NumericValue;
 import xyz.lebster.core.value.primitive.bigint.BigIntValue;
@@ -14,7 +14,7 @@ import xyz.lebster.core.value.primitive.number.NumberValue;
 import java.math.BigInteger;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-update-expressions")
-public record UpdateExpression(LeftHandSideExpression expression, UpdateOp op) implements Expression {
+public record UpdateExpression(SourceRange range, LeftHandSideExpression expression, UpdateOp op) implements Expression {
 	public static final String invalidPostLHS = "Invalid left-hand side expression in postfix operation";
 	public static final String invalidPreLHS = "Invalid left-hand side expression in prefix operation";
 
@@ -43,21 +43,6 @@ public record UpdateExpression(LeftHandSideExpression expression, UpdateOp op) i
 		});
 
 		throw new ShouldNotHappen("Invalid numeric value");
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		switch (op) {
-			case PreDecrement -> representation.append("--");
-			case PreIncrement -> representation.append("++");
-		}
-
-		expression.represent(representation);
-
-		switch (op) {
-			case PostDecrement -> representation.append("--");
-			case PostIncrement -> representation.append("++");
-		}
 	}
 
 	public enum UpdateOp { PostIncrement, PostDecrement, PreIncrement, PreDecrement }

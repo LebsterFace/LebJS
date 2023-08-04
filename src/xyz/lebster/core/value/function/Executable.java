@@ -6,7 +6,6 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.Environment;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.interpreter.environment.FunctionEnvironment;
@@ -47,8 +46,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	}
 
 	public static AbruptCompletion notCallable(Interpreter interpreter, Value<?> value) {
-		final String message = ANSI.stripFormatting(value.toDisplayString()) + " is not a function";
-		return error(new TypeError(interpreter, message));
+		return error(new TypeError(interpreter, "%s is not a function".formatted(value.toDisplayString(true))));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isanonymousfunctiondefinition")
@@ -115,14 +113,14 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 	}
 
 	@Override
-	public final void display(StringRepresentation representation) {
-		representation.append(ANSI.MAGENTA);
-		representation.append("[Function: ");
-		representation.append(ANSI.BRIGHT_MAGENTA);
-		representation.append(this.name.value.isEmpty() ? "(anonymous)" : this.name.value);
-		representation.append(ANSI.MAGENTA);
-		representation.append(']');
-		representation.append(ANSI.RESET);
+	public final void display(StringBuilder builder) {
+		builder.append(ANSI.MAGENTA);
+		builder.append("[Function: ");
+		builder.append(ANSI.BRIGHT_MAGENTA);
+		builder.append(this.name.value.isEmpty() ? "(anonymous)" : this.name.value);
+		builder.append(ANSI.MAGENTA);
+		builder.append(']');
+		builder.append(ANSI.RESET);
 	}
 
 	@Override

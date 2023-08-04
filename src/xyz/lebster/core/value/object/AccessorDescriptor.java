@@ -3,7 +3,6 @@ package xyz.lebster.core.value.object;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Displayable;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
@@ -87,11 +86,11 @@ public final class AccessorDescriptor implements PropertyDescriptor, Displayable
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
-		representation.append(ANSI.CYAN);
-		representation.append("[Getter");
-		if (setter != null) representation.append("/Setter");
-		representation.append(']');
-		representation.append(ANSI.RESET);
+	public void display(StringBuilder builder) {
+		builder.append(ANSI.CYAN);
+		builder.append("[Getter");
+		if (setter != null) builder.append("/Setter");
+		builder.append(']');
+		builder.append(ANSI.RESET);
 	}
 }

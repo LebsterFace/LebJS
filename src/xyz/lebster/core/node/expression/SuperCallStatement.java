@@ -5,7 +5,6 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.FunctionEnvironment;
 import xyz.lebster.core.interpreter.environment.ThisEnvironment;
 import xyz.lebster.core.node.SourceRange;
@@ -53,13 +52,5 @@ public record SuperCallStatement(ExpressionList arguments, SourceRange range) im
 		// FIXME: 11. Perform ? InitializeInstanceElements(result, F).
 		// 12. Return result.
 		return result;
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append("super");
-		representation.append('(');
-		arguments.represent(representation);
-		representation.append(')');
 	}
 }

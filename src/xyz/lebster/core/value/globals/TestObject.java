@@ -140,17 +140,12 @@ public final class TestObject extends ObjectValue {
 	}
 
 	private static ShouldNotHappen assertionFailed(Value<?> expected, Value<?> received) {
-		System.out.println(
-			ANSI.BRIGHT_MAGENTA + "Expected: " +
-			ANSI.CYAN + expected.getClass().getSimpleName() + " " +
-			ANSI.RESET + expected.toDisplayString() + ANSI.RESET +
-			"\n" +
-			ANSI.BRIGHT_MAGENTA + "Received: " +
-			ANSI.CYAN + received.getClass().getSimpleName() + " " +
-			ANSI.RESET + received.toDisplayString() + ANSI.RESET
-		);
-
+		System.out.printf("%sExpected: %s\n%sReceived: %s%n", ANSI.BRIGHT_MAGENTA, displayExplicit(expected), ANSI.BRIGHT_MAGENTA, displayExplicit(received));
 		return new ShouldNotHappen("Assertion failed.");
+	}
+
+	private static String displayExplicit(Value<?> value) {
+		return "%s%s %s%s%s".formatted(ANSI.CYAN, value.getClass().getSimpleName(), ANSI.RESET, value.toDisplayString(false), ANSI.RESET);
 	}
 
 	private static Undefined fail(Interpreter interpreter, Value<?>[] values) {

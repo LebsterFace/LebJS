@@ -1,13 +1,9 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.Representable;
 import xyz.lebster.core.node.SourceRange;
-import xyz.lebster.core.node.expression.literal.StringLiteral;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.Function;
@@ -17,7 +13,6 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-initializer")
 public final class ObjectExpression implements Expression {
@@ -35,32 +30,8 @@ public final class ObjectExpression implements Expression {
 		return result;
 	}
 
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append("{ ");
-
-		for (final Iterator<ObjectEntryNode> iterator = entries.iterator(); iterator.hasNext(); ) {
-			final ObjectEntryNode entry = iterator.next();
-			entry.represent(representation);
-			if (iterator.hasNext()) representation.append(',');
-			representation.append(' ');
-		}
-
-		representation.append('}');
-	}
-
-	public interface ObjectEntryNode extends Representable {
+	public interface ObjectEntryNode {
 		void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion;
-	}
-
-	private static void displayKey(Expression key, boolean computed, StringRepresentation representation) {
-		if (computed) {
-			representation.append('[');
-			key.represent(representation);
-			representation.append("]");
-		} else {
-			((StringLiteral) key).value().displayForObjectKey(representation);
-		}
 	}
 
 	@Override
@@ -74,21 +45,6 @@ public final class ObjectExpression implements Expression {
 			final Key<?> executedKey = this.key.execute(interpreter).toPropertyKey(interpreter);
 			final Value<?> executedValue = Executable.namedEvaluation(interpreter, value, executedKey);
 			result.put(executedKey, executedValue, true, true, true);
-		}
-
-		@Override
-		public void represent(StringRepresentation representation) {
-			displayKey(key, computed, representation);
-			if (method) {
-				if (!(value instanceof final FunctionExpression function))
-					throw new ShouldNotHappen("Method EntryNode had non-function value");
-				function.representCall(representation);
-				representation.append(' ');
-				function.body().represent(representation);
-			} else {
-				representation.append(": ");
-				value.represent(representation);
-			}
 		}
 	}
 
@@ -106,26 +62,12 @@ public final class ObjectExpression implements Expression {
 			else descriptor.setSetter(function);
 			if (existing == null) result.value.put(key, descriptor);
 		}
-
-		@Override
-		public void represent(StringRepresentation representation) {
-			representation.append(getter ? "get " : "set ");
-			displayKey(name, computed, representation);
-			value.representCall(representation);
-			representation.append(' ');
-			value.body().represent(representation);
-		}
 	}
 
 	public record ShorthandNode(StringValue key) implements ObjectEntryNode {
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
 			result.put(key, interpreter.getBinding(key).getValue(interpreter), true, true, true);
-		}
-
-		@Override
-		public void represent(StringRepresentation representation) {
-			representation.append(key.value);
 		}
 	}
 
@@ -138,12 +80,6 @@ public final class ObjectExpression implements Expression {
 					result.put(entry.getKey(), value.get(interpreter, entry.getKey()));
 				}
 			}
-		}
-
-		@Override
-		public void represent(StringRepresentation representation) {
-			representation.append("...");
-			name.represent(representation);
 		}
 	}
 }

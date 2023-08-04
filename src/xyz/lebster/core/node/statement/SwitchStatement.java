@@ -1,16 +1,15 @@
 package xyz.lebster.core.node.statement;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 
 @NonCompliant
-public record SwitchStatement(Expression discriminant, SwitchCase... cases) implements Statement {
+public record SwitchStatement(SourceRange range, Expression discriminant, SwitchCase... cases) implements Statement {
 	@Override
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> value = discriminant.execute(interpreter);
@@ -47,13 +46,5 @@ public record SwitchStatement(Expression discriminant, SwitchCase... cases) impl
 		}
 
 		return defaultCase;
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append(ANSI.BACKGROUND_BRIGHT_YELLOW);
-		representation.append("[SwitchStatement];");
-		representation.append(ANSI.RESET);
-		representation.append('\n');
 	}
 }

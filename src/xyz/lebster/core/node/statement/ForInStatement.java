@@ -3,9 +3,9 @@ package xyz.lebster.core.node.statement;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.node.Assignable;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
@@ -14,7 +14,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.ArrayList;
 
-public record ForInStatement(Assignable left, Expression right, Statement body) implements Statement {
+public record ForInStatement(SourceRange range, Assignable left, Expression right, Statement body) implements Statement {
 	@Override
 	@NonCompliant
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
@@ -44,15 +44,5 @@ public record ForInStatement(Assignable left, Expression right, Statement body) 
 		}
 
 		return lastValue;
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append("for (");
-		left.represent(representation);
-		representation.append(" in ");
-		right.represent(representation);
-		representation.append(") ");
-		body.represent(representation);
 	}
 }

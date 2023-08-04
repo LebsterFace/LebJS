@@ -24,16 +24,15 @@ public final class IteratorHelper {
 	@NonCompliant
 	public static IteratorRecord getIterator(Interpreter interpreter, Expression expression) throws AbruptCompletion {
 		final ObjectValue objectValue = expression.execute(interpreter).toObjectValue(interpreter);
-		final String representation = ANSI.stripFormatting(expression.toRepresentationString());
-		return getObjectIterator(interpreter, objectValue, representation);
+		final String sourceText = expression.range().getText();
+		return getObjectIterator(interpreter, objectValue, sourceText);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
 	@NonCompliant
 	public static IteratorRecord getIterator(Interpreter interpreter, Value<?> obj) throws AbruptCompletion {
 		final ObjectValue objectValue = obj.toObjectValue(interpreter);
-		final String display = ANSI.stripFormatting(objectValue.toDisplayString());
-		return getObjectIterator(interpreter, objectValue, display);
+		return getObjectIterator(interpreter, objectValue, objectValue.toDisplayString(true));
 	}
 
 	private static IteratorRecord getObjectIterator(Interpreter interpreter, ObjectValue objectValue, String display) throws AbruptCompletion {
@@ -95,9 +94,7 @@ public final class IteratorHelper {
 
 			// 3. If result is not an Object, throw a TypeError exception.
 			if (!(result instanceof final ObjectValue next)) {
-				final String representation = ANSI.stripFormatting(result.toDisplayString());
-				throw error(new TypeError(interpreter,
-					"%s%s().next() returned a non-object value (%s)".formatted(errorString, methodName, representation)));
+				throw error(new TypeError(interpreter, "%s%s().next() returned a non-object value (%s)".formatted(errorString, methodName, result.toDisplayString(true))));
 			}
 
 			// 4. Return result.

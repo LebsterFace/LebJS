@@ -2,7 +2,6 @@ package xyz.lebster.core.value;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.ShouldNotHappen;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.object.*;
 
@@ -12,34 +11,34 @@ import java.util.Map.Entry;
 
 interface DisplayNode extends Displayable {
 	@Override
-	default void display(StringRepresentation representation) {
-		final var firstAttempt = new StringRepresentation();
+	default void display(StringBuilder builder) {
+		final var firstAttempt = new StringBuilder();
 		display(firstAttempt, true);
 		if (firstAttempt.length() >= 72) {
-			display(representation, false);
+			display(builder, false);
 		} else {
-			representation.append(firstAttempt);
+			builder.append(firstAttempt);
 		}
 	}
 
-	void display(StringRepresentation representation, boolean singleLine);
+	void display(StringBuilder builder, boolean singleLine);
 }
 
 record DisplayableNode(Displayable displayable) implements DisplayNode {
 	@Override
-	public void display(StringRepresentation representation, boolean singleLine) {
-		displayable.display(representation);
+	public void display(StringBuilder builder, boolean singleLine) {
+		displayable.display(builder);
 	}
 }
 
 record ReferenceNode(int id) implements DisplayNode {
 	@Override
-	public void display(StringRepresentation representation, boolean singleLine) {
-		representation.append(ANSI.BRIGHT_CYAN);
-		representation.append("[Circular *");
-		representation.append(id);
-		representation.append(']');
-		representation.append(ANSI.RESET);
+	public void display(StringBuilder builder, boolean singleLine) {
+		builder.append(ANSI.BRIGHT_CYAN);
+		builder.append("[Circular *");
+		builder.append(id);
+		builder.append(']');
+		builder.append(ANSI.RESET);
 	}
 }
 
@@ -56,10 +55,10 @@ final class ObjectNode implements DisplayNode {
 		this.id = -1;
 	}
 
-	private static void displayEmpty(StringRepresentation representation, int emptyCount) {
-		representation.append(ANSI.BRIGHT_BLACK);
-		representation.append(emptyCount == 1 ? "empty" : "empty x " + emptyCount);
-		representation.append(ANSI.RESET);
+	private static void displayEmpty(StringBuilder builder, int emptyCount) {
+		builder.append(ANSI.BRIGHT_BLACK);
+		builder.append(emptyCount == 1 ? "empty" : "empty x " + emptyCount);
+		builder.append(ANSI.RESET);
 	}
 
 	private static boolean hidePrefix(ObjectValue value) {
@@ -68,48 +67,62 @@ final class ObjectNode implements DisplayNode {
 			   value.getClass() == ArrayObject.class;
 	}
 
-	private static void appendDelimiter(StringRepresentation representation, boolean singleLine, boolean more) {
-		if (more) representation.append(',');
-		if (singleLine) representation.append(' ');
-		else representation.append('\n');
+	private static void appendDelimiter(StringBuilder builder, boolean singleLine, boolean more) {
+		if (more) builder.append(',');
+		if (singleLine) builder.append(' ');
+		else builder.append('\n');
+	}
+
+	private int currentIndent = 0;
+
+	public void indent() {
+		currentIndent++;
+	}
+
+	public void unindent() {
+		currentIndent--;
+	}
+
+	public void appendIndent(StringBuilder builder) {
+		builder.append("\t".repeat(currentIndent));
 	}
 
 	@Override
-	public void display(StringRepresentation representation, boolean singleLine) {
+	public void display(StringBuilder builder, boolean singleLine) {
 		final boolean isArray = value.getClass() == ArrayObject.class;
 		final var valuesIt = values.iterator();
 		final var propertiesIt = properties.entrySet().iterator();
 
 		if (this.id != -1) {
-			representation.append(ANSI.BRIGHT_CYAN);
-			representation.append("<ref *");
-			representation.append(this.id);
-			representation.append('>');
-			representation.append(ANSI.RESET);
-			representation.append(' ');
+			builder.append(ANSI.BRIGHT_CYAN);
+			builder.append("<ref *");
+			builder.append(this.id);
+			builder.append('>');
+			builder.append(ANSI.RESET);
+			builder.append(' ');
 		}
 
 		if (!hidePrefix(value)) {
-			if (value.getPrototype() == null) representation.append("[");
-			value.displayPrefix(representation);
+			if (value.getPrototype() == null) builder.append("[");
+			value.displayPrefix(builder);
 			if (value.getPrototype() == null) {
-				representation.append(": ");
-				representation.append(ANSI.RESET);
-				representation.append(ANSI.BOLD);
-				representation.append("null");
-				representation.append(ANSI.RESET);
-				representation.append(" prototype]");
+				builder.append(": ");
+				builder.append(ANSI.RESET);
+				builder.append(ANSI.BOLD);
+				builder.append("null");
+				builder.append(ANSI.RESET);
+				builder.append(" prototype]");
 			}
-			representation.append(' ');
+			builder.append(' ');
 		}
 
-		representation.append(isArray ? '[' : '{');
+		builder.append(isArray ? '[' : '{');
 
 		if (singleLine) {
-			representation.append(' ');
+			builder.append(' ');
 		} else {
-			representation.indent();
-			representation.append('\n');
+			indent();
+			builder.append('\n');
 		}
 
 		int emptyCount = 0;
@@ -121,39 +134,39 @@ final class ObjectNode implements DisplayNode {
 			}
 
 			if (emptyCount > 0) {
-				if (!singleLine) representation.appendIndent();
-				displayEmpty(representation, emptyCount);
-				appendDelimiter(representation, singleLine, true);
+				if (!singleLine) appendIndent(builder);
+				displayEmpty(builder, emptyCount);
+				appendDelimiter(builder, singleLine, true);
 				emptyCount = 0;
 			}
 
-			if (!singleLine) representation.appendIndent();
-			next.display(representation);
-			appendDelimiter(representation, singleLine, valuesIt.hasNext() || propertiesIt.hasNext());
+			if (!singleLine) appendIndent(builder);
+			next.display(builder);
+			appendDelimiter(builder, singleLine, valuesIt.hasNext() || propertiesIt.hasNext());
 		}
 
 		if (emptyCount > 0) {
-			if (!singleLine) representation.appendIndent();
-			displayEmpty(representation, emptyCount);
-			appendDelimiter(representation, singleLine, propertiesIt.hasNext());
+			if (!singleLine) appendIndent(builder);
+			displayEmpty(builder, emptyCount);
+			appendDelimiter(builder, singleLine, propertiesIt.hasNext());
 		}
 
 		while (propertiesIt.hasNext()) {
 			final var entry = propertiesIt.next();
-			if (!singleLine) representation.appendIndent();
-			entry.getKey().displayForObjectKey(representation);
-			representation.append(ANSI.RESET);
-			representation.append(": ");
-			entry.getValue().display(representation);
-			appendDelimiter(representation, singleLine, propertiesIt.hasNext());
+			if (!singleLine) appendIndent(builder);
+			entry.getKey().displayForObjectKey(builder);
+			builder.append(ANSI.RESET);
+			builder.append(": ");
+			entry.getValue().display(builder);
+			appendDelimiter(builder, singleLine, propertiesIt.hasNext());
 		}
 
 		if (!singleLine) {
-			representation.unindent();
-			representation.appendIndent();
+			unindent();
+			appendIndent(builder);
 		}
 
-		representation.append(isArray ? ']' : '}');
+		builder.append(isArray ? ']' : '}');
 	}
 }
 
@@ -164,13 +177,13 @@ public final class JSONDisplayer {
 	private JSONDisplayer() {
 	}
 
-	public static void display(StringRepresentation representation, ObjectValue object) {
-		display(representation, object, false);
+	public static void display(StringBuilder builder, ObjectValue object) {
+		display(builder, object, false);
 	}
 
-	public static void display(StringRepresentation representation, ObjectValue object, boolean forceJSON) {
+	public static void display(StringBuilder builder, ObjectValue object, boolean forceJSON) {
 		final DisplayNode rootNode = new JSONDisplayer().buildTreeFromValue(object, forceJSON);
-		rootNode.display(representation);
+		rootNode.display(builder);
 	}
 
 	private DisplayNode buildTreeFromValue(Value<?> current, boolean forceJSON) {

@@ -1,6 +1,5 @@
 package xyz.lebster.core.value.map;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
@@ -98,7 +97,7 @@ public final class MapConstructor extends BuiltinConstructor<MapObject, MapProto
 			if (!(nextItem instanceof final ObjectValue nextObject)) {
 				// i. Let error be ThrowCompletion(a newly created TypeError object).
 				// FIXME: ii. Return ? IteratorClose(iteratorRecord, error).
-				final String message = "Iterator value %s is not an entry object".formatted(ANSI.stripFormatting(nextItem.toDisplayString()));
+				final String message = "Iterator value %s is not an entry object".formatted(nextItem.toDisplayString(true));
 				throw error(new TypeError(interpreter, message));
 			}
 

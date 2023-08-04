@@ -4,14 +4,13 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.Assignable;
 import xyz.lebster.core.node.Declarable;
-import xyz.lebster.core.node.Representable;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-public interface AssignmentTarget extends Assignable, Declarable, Representable {
+public interface AssignmentTarget extends Assignable, Declarable {
 	default Value<?> assign(Interpreter interpreter, Expression expression) throws AbruptCompletion {
 		return this.assign(interpreter, getValue(interpreter, expression));
 	}

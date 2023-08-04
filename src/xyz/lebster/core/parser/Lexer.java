@@ -1,134 +1,149 @@
 package xyz.lebster.core.parser;
 
 import xyz.lebster.core.StringEscapeUtils;
+import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.SourcePosition;
 
 import java.math.BigInteger;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
+import static xyz.lebster.core.parser.TokenType.Class;
+import static xyz.lebster.core.parser.TokenType.Enum;
+import static xyz.lebster.core.parser.TokenType.Void;
+import static xyz.lebster.core.parser.TokenType.*;
 
 public final class Lexer {
 	private static final HashMap<String, TokenType> keywords = new HashMap<>();
 	private static final List<HashMap<String, TokenType>> symbols = new ArrayList<>();
 
 	static {
-		keywords.put("async", TokenType.Async);
-		keywords.put("await", TokenType.Await);
-		keywords.put("break", TokenType.Break);
-		keywords.put("case", TokenType.Case);
-		keywords.put("catch", TokenType.Catch);
-		keywords.put("class", TokenType.Class);
-		keywords.put("const", TokenType.Const);
-		keywords.put("continue", TokenType.Continue);
-		keywords.put("debugger", TokenType.Debugger);
-		keywords.put("default", TokenType.Default);
-		keywords.put("delete", TokenType.Delete);
-		keywords.put("do", TokenType.Do);
-		keywords.put("else", TokenType.Else);
-		keywords.put("enum", TokenType.Enum);
-		keywords.put("export", TokenType.Export);
-		keywords.put("extends", TokenType.Extends);
-		keywords.put("false", TokenType.False);
-		keywords.put("finally", TokenType.Finally);
-		keywords.put("for", TokenType.For);
-		keywords.put("function", TokenType.Function);
-		keywords.put("if", TokenType.If);
-		keywords.put("import", TokenType.Import);
-		keywords.put("in", TokenType.In);
-		keywords.put("instanceof", TokenType.InstanceOf);
-		keywords.put("let", TokenType.Let);
-		keywords.put("new", TokenType.New);
-		keywords.put("null", TokenType.Null);
-		keywords.put("return", TokenType.Return);
-		keywords.put("static", TokenType.Static);
-		keywords.put("super", TokenType.Super);
-		keywords.put("switch", TokenType.Switch);
-		keywords.put("this", TokenType.This);
-		keywords.put("throw", TokenType.Throw);
-		keywords.put("true", TokenType.True);
-		keywords.put("try", TokenType.Try);
-		keywords.put("typeof", TokenType.Typeof);
-		keywords.put("var", TokenType.Var);
-		keywords.put("void", TokenType.Void);
-		keywords.put("while", TokenType.While);
-		keywords.put("yield", TokenType.Yield);
+		keywords.put("async", Async);
+		keywords.put("await", Await);
+		keywords.put("break", Break);
+		keywords.put("case", Case);
+		keywords.put("catch", Catch);
+		keywords.put("class", Class);
+		keywords.put("const", Const);
+		keywords.put("continue", Continue);
+		keywords.put("debugger", Debugger);
+		keywords.put("default", Default);
+		keywords.put("delete", Delete);
+		keywords.put("do", Do);
+		keywords.put("else", Else);
+		keywords.put("enum", Enum);
+		keywords.put("export", Export);
+		keywords.put("extends", Extends);
+		keywords.put("false", False);
+		keywords.put("finally", Finally);
+		keywords.put("for", For);
+		keywords.put("function", Function);
+		keywords.put("if", If);
+		keywords.put("import", Import);
+		keywords.put("in", In);
+		keywords.put("instanceof", InstanceOf);
+		keywords.put("let", Let);
+		keywords.put("new", New);
+		keywords.put("null", Null);
+		keywords.put("return", Return);
+		keywords.put("static", Static);
+		keywords.put("super", Super);
+		keywords.put("switch", Switch);
+		keywords.put("this", This);
+		keywords.put("throw", Throw);
+		keywords.put("true", True);
+		keywords.put("try", Try);
+		keywords.put("typeof", Typeof);
+		keywords.put("var", Var);
+		keywords.put("void", Void);
+		keywords.put("while", While);
+		keywords.put("yield", Yield);
 		// TODO: get / set keywords
 
 		final HashMap<String, TokenType> symbols_length_4 = new HashMap<>();
-		symbols_length_4.put(">>>=", TokenType.UnsignedRightShiftEquals);
+		symbols_length_4.put(">>>=", UnsignedRightShiftEquals);
 
 		final HashMap<String, TokenType> symbols_length_3 = new HashMap<>();
-		symbols_length_3.put("||=", TokenType.LogicalOrEquals);
-		symbols_length_3.put(">>>", TokenType.UnsignedRightShift);
-		symbols_length_3.put(">>=", TokenType.RightShiftEquals);
-		symbols_length_3.put("===", TokenType.StrictEqual);
-		symbols_length_3.put("<<=", TokenType.LeftShiftEquals);
-		symbols_length_3.put("&&=", TokenType.LogicalAndEquals);
-		symbols_length_3.put("**=", TokenType.ExponentEquals);
-		symbols_length_3.put("??=", TokenType.NullishCoalescingEquals);
-		symbols_length_3.put("!==", TokenType.StrictNotEqual);
-		symbols_length_3.put("...", TokenType.DotDotDot);
+		symbols_length_3.put("||=", LogicalOrEquals);
+		symbols_length_3.put(">>>", UnsignedRightShift);
+		symbols_length_3.put(">>=", RightShiftEquals);
+		symbols_length_3.put("===", StrictEqual);
+		symbols_length_3.put("<<=", LeftShiftEquals);
+		symbols_length_3.put("&&=", LogicalAndEquals);
+		symbols_length_3.put("**=", ExponentEquals);
+		symbols_length_3.put("??=", NullishCoalescingEquals);
+		symbols_length_3.put("!==", StrictNotEqual);
+		symbols_length_3.put("...", DotDotDot);
 
 		final HashMap<String, TokenType> symbols_length_2 = new HashMap<>();
-		symbols_length_2.put("||", TokenType.LogicalOr);
-		symbols_length_2.put("|=", TokenType.PipeEquals);
-		symbols_length_2.put(">>", TokenType.RightShift);
-		symbols_length_2.put(">=", TokenType.GreaterThanEqual);
-		symbols_length_2.put("=>", TokenType.Arrow);
-		symbols_length_2.put("==", TokenType.LooseEqual);
-		symbols_length_2.put("<=", TokenType.LessThanEqual);
-		symbols_length_2.put("<<", TokenType.LeftShift);
-		symbols_length_2.put("+=", TokenType.PlusEquals);
-		symbols_length_2.put("++", TokenType.PlusPlus);
-		symbols_length_2.put("^=", TokenType.CaretEquals);
-		symbols_length_2.put("%=", TokenType.PercentEquals);
-		symbols_length_2.put("&=", TokenType.AmpersandEquals);
-		symbols_length_2.put("&&", TokenType.LogicalAnd);
-		symbols_length_2.put("/=", TokenType.DivideEquals);
-		symbols_length_2.put("*=", TokenType.MultiplyEquals);
-		symbols_length_2.put("**", TokenType.Exponent);
-		symbols_length_2.put("?.", TokenType.OptionalChain);
-		symbols_length_2.put("??", TokenType.NullishCoalescing);
-		symbols_length_2.put("!=", TokenType.NotEqual);
-		symbols_length_2.put("-=", TokenType.MinusEquals);
-		symbols_length_2.put("--", TokenType.MinusMinus);
+		symbols_length_2.put("||", LogicalOr);
+		symbols_length_2.put("|=", PipeEquals);
+		symbols_length_2.put(">>", RightShift);
+		symbols_length_2.put(">=", GreaterThanEqual);
+		symbols_length_2.put("=>", Arrow);
+		symbols_length_2.put("==", LooseEqual);
+		symbols_length_2.put("<=", LessThanEqual);
+		symbols_length_2.put("<<", LeftShift);
+		symbols_length_2.put("+=", PlusEquals);
+		symbols_length_2.put("++", PlusPlus);
+		symbols_length_2.put("^=", CaretEquals);
+		symbols_length_2.put("%=", PercentEquals);
+		symbols_length_2.put("&=", AmpersandEquals);
+		symbols_length_2.put("&&", LogicalAnd);
+		symbols_length_2.put("/=", DivideEquals);
+		symbols_length_2.put("*=", MultiplyEquals);
+		symbols_length_2.put("**", Exponent);
+		symbols_length_2.put("?.", OptionalChain);
+		symbols_length_2.put("??", NullishCoalescing);
+		symbols_length_2.put("!=", NotEqual);
+		symbols_length_2.put("-=", MinusEquals);
+		symbols_length_2.put("--", MinusMinus);
 
 		final HashMap<String, TokenType> symbols_length_1 = new HashMap<>();
-		symbols_length_1.put("~", TokenType.Tilde);
-		symbols_length_1.put("|", TokenType.Pipe);
-		symbols_length_1.put(">", TokenType.GreaterThan);
-		symbols_length_1.put("=", TokenType.Equals);
-		symbols_length_1.put("<", TokenType.LessThan);
-		symbols_length_1.put("+", TokenType.Plus);
-		symbols_length_1.put("^", TokenType.Caret);
-		symbols_length_1.put("%", TokenType.Percent);
-		symbols_length_1.put("&", TokenType.Ampersand);
-		symbols_length_1.put("/", TokenType.Slash);
-		symbols_length_1.put("*", TokenType.Star);
-		symbols_length_1.put("}", TokenType.RBrace);
-		symbols_length_1.put("{", TokenType.LBrace);
-		symbols_length_1.put("]", TokenType.RBracket);
-		symbols_length_1.put("[", TokenType.LBracket);
-		symbols_length_1.put(")", TokenType.RParen);
-		symbols_length_1.put("(", TokenType.LParen);
-		symbols_length_1.put(".", TokenType.Period);
-		symbols_length_1.put("!", TokenType.Bang);
-		symbols_length_1.put("?", TokenType.QuestionMark);
-		symbols_length_1.put(";", TokenType.Semicolon);
-		symbols_length_1.put(",", TokenType.Comma);
-		symbols_length_1.put("-", TokenType.Minus);
-		symbols_length_1.put(":", TokenType.Colon);
-		symbols_length_1.put("\\", TokenType.Backslash);
-		symbols_length_1.put("@", TokenType.At);
-		symbols_length_1.put("#", TokenType.Hashtag);
+		symbols_length_1.put("~", Tilde);
+		symbols_length_1.put("|", Pipe);
+		symbols_length_1.put(">", GreaterThan);
+		symbols_length_1.put("=", Equals);
+		symbols_length_1.put("<", LessThan);
+		symbols_length_1.put("+", Plus);
+		symbols_length_1.put("^", Caret);
+		symbols_length_1.put("%", Percent);
+		symbols_length_1.put("&", Ampersand);
+		symbols_length_1.put("/", Slash);
+		symbols_length_1.put("*", Star);
+		symbols_length_1.put("}", RBrace);
+		symbols_length_1.put("{", LBrace);
+		symbols_length_1.put("]", RBracket);
+		symbols_length_1.put("[", LBracket);
+		symbols_length_1.put(")", RParen);
+		symbols_length_1.put("(", LParen);
+		symbols_length_1.put(".", Period);
+		symbols_length_1.put("!", Bang);
+		symbols_length_1.put("?", QuestionMark);
+		symbols_length_1.put(";", Semicolon);
+		symbols_length_1.put(",", Comma);
+		symbols_length_1.put("-", Minus);
+		symbols_length_1.put(":", Colon);
+		symbols_length_1.put("\\", Backslash);
+		symbols_length_1.put("@", At);
+		symbols_length_1.put("#", Hashtag);
 
 		symbols.add(symbols_length_1);
 		symbols.add(symbols_length_2);
 		symbols.add(symbols_length_3);
 		symbols.add(symbols_length_4);
+	}
+
+	public static String valueForSymbol(TokenType type) {
+		for (final var map : symbols) {
+			for (final var entry : map.entrySet()) {
+				if (Objects.equals(type, entry.getValue())) {
+					return entry.getKey();
+				}
+			}
+		}
+
+		throw new ShouldNotHappen("TokenType %s has no corresponding value.".formatted(type));
 	}
 
 	private final String sourceText;
@@ -156,9 +171,9 @@ public final class Lexer {
 
 			instance.lastTokenType = next.type;
 			if (!instance.templateLiteralStates.isEmpty() && instance.templateLiteralStates.getFirst().inExpression) {
-				if (next.type == TokenType.LBrace) {
+				if (next.type == LBrace) {
 					instance.templateLiteralStates.getFirst().bracketCount++;
-				} else if (next.type == TokenType.RBrace) {
+				} else if (next.type == RBrace) {
 					instance.templateLiteralStates.getFirst().bracketCount--;
 				}
 			}
@@ -166,7 +181,7 @@ public final class Lexer {
 			tokens.add(next);
 		}
 
-		tokens.add(new Token(TokenType.EOF, null));
+		tokens.add(new Token(instance.position(), EOF));
 		return tokens.toArray(new Token[0]);
 	}
 
@@ -304,66 +319,72 @@ public final class Lexer {
 
 	private boolean slashMeansDivision() {
 		final boolean isAcceptedType =
-			lastTokenType == TokenType.BigIntLiteral
-			|| lastTokenType == TokenType.True
-			|| lastTokenType == TokenType.False
-			|| lastTokenType == TokenType.RBrace
-			|| lastTokenType == TokenType.RBracket
-			|| lastTokenType == TokenType.Identifier
-			|| lastTokenType == TokenType.In
-			|| lastTokenType == TokenType.InstanceOf
-			|| lastTokenType == TokenType.MinusMinus
-			|| lastTokenType == TokenType.Null
-			|| lastTokenType == TokenType.NumericLiteral
-			|| lastTokenType == TokenType.RParen
-			|| lastTokenType == TokenType.PlusPlus
-			|| lastTokenType == TokenType.PrivateIdentifier
-			|| lastTokenType == TokenType.RegexpPattern
-			|| lastTokenType == TokenType.StringLiteral
-			|| lastTokenType == TokenType.TemplateExpressionEnd
-			|| lastTokenType == TokenType.This;
+			lastTokenType == BigIntLiteral
+			|| lastTokenType == True
+			|| lastTokenType == False
+			|| lastTokenType == RBrace
+			|| lastTokenType == RBracket
+			|| lastTokenType == Identifier
+			|| lastTokenType == In
+			|| lastTokenType == InstanceOf
+			|| lastTokenType == MinusMinus
+			|| lastTokenType == Null
+			|| lastTokenType == NumericLiteral
+			|| lastTokenType == RParen
+			|| lastTokenType == PlusPlus
+			|| lastTokenType == PrivateIdentifier
+			|| lastTokenType == RegexpPattern
+			|| lastTokenType == StringLiteral
+			|| lastTokenType == TemplateExpressionEnd
+			|| lastTokenType == This;
 		return lastTokenType != null && isAcceptedType;
 	}
 
 	public Token next() throws SyntaxError {
-		if (lastTokenType == TokenType.RegexpPattern) {
+		if (lastTokenType == RegexpPattern) {
+			final SourcePosition start = position();
 			final StringBuilder regexpFlags = new StringBuilder();
 			while (anyOf("dgimsuy")) {
 				collect(regexpFlags);
 			}
 
-			return new Token(TokenType.RegexpFlags, regexpFlags.toString(), position());
-		} else if (lastTokenType == TokenType.NumericLiteral && isIdentifierStart(codePoint)) {
+			return new Token(start, RegexpFlags, regexpFlags.toString());
+		} else if (lastTokenType == NumericLiteral && isIdentifierStart(codePoint)) {
 			throw new SyntaxError("Identifier starts immediately after numeric literal", position());
 		}
 
-		final boolean inTemplateLiteral = !templateLiteralStates.isEmpty();
-
-		if (!inTemplateLiteral || templateLiteralStates.getFirst().inExpression) {
+		if (notInTemplateSpan()) {
 			consumeWhitespace();
 			consumeComment();
 			consumeWhitespace();
 		}
 
+		final SourcePosition start = position();
 		if (accept("`")) {
-			return tokenizeTemplateLiteralStart(inTemplateLiteral);
+			if (notInTemplateSpan()) {
+				templateLiteralStates.push(new TemplateLiteralState());
+				return new Token(start, TemplateStart);
+			} else {
+				templateLiteralStates.pop();
+				return new Token(start, TemplateEnd);
+			}
 		}
 
-		if (inTemplateLiteral && currentTemplateLiteralIsEnding()) {
-			return tokenizeTemplateLiteralEnd();
+		if (inTemplateLiteral() && currentTemplateLiteralIsEnding()) {
+			return tokenizeTemplateLiteralEnd(start);
 		}
 
-		if (inTemplateLiteral && !templateLiteralStates.getFirst().inExpression) {
+		if (inTemplateLiteral() && !templateLiteralStates.getFirst().inExpression) {
 			if (!hasNext()) {
 				throw new SyntaxError("Unterminated template literal", position());
 			}
 
 			if (accept("${")) {
 				templateLiteralStates.getFirst().inExpression = true;
-				return new Token(TokenType.TemplateExpressionStart, position());
+				return new Token(start, TemplateExpressionStart);
+			} else {
+				return tokenizeTemplateLiteralSpan(start);
 			}
-
-			return tokenizeTemplateLiteralSpan();
 		}
 
 		if (!hasNext()) {
@@ -372,26 +393,34 @@ public final class Lexer {
 
 		if (isLineTerminator()) {
 			consumeLineTerminators();
-			return new Token(TokenType.LineTerminator, position());
+			return new Token(start, LineTerminator);
 		}
 
 		if (isIdentifierStart(codePoint)) {
-			return tokenizeKeywordOrIdentifier();
+			return tokenizeKeywordOrIdentifier(start);
 		}
 
 		if (isDecimalDigit(codePoint) || (codePoint == '.' && isDecimalDigit(peekNext()))) {
-			return tokenizeNumericLiteral();
+			return tokenizeNumericLiteral(start);
 		}
 
 		if (codePoint == '"' || codePoint == '\'') {
-			return tokenizeStringLiteral();
+			return tokenizeStringLiteral(start);
 		}
 
 		if (codePoint == '/' && !slashMeansDivision()) {
-			return consumeRegexpLiteral();
+			return consumeRegexpLiteral(start);
 		}
 
-		return tokenizeSymbol();
+		return tokenizeSymbol(start);
+	}
+
+	private boolean notInTemplateSpan() {
+		return !inTemplateLiteral() || templateLiteralStates.getFirst().inExpression;
+	}
+
+	private boolean inTemplateLiteral() {
+		return !templateLiteralStates.isEmpty();
 	}
 
 	private void consumeLineTerminators() throws SyntaxError {
@@ -400,7 +429,7 @@ public final class Lexer {
 		}
 	}
 
-	private Token consumeRegexpLiteral() throws SyntaxError {
+	private Token consumeRegexpLiteral(SourcePosition start) throws SyntaxError {
 		final StringBuilder builder = new StringBuilder();
 		consume();
 
@@ -430,7 +459,7 @@ public final class Lexer {
 			}
 		}
 
-		return new Token(TokenType.RegexpPattern, builder.toString(), position());
+		return new Token(start, RegexpPattern, builder.toString());
 	}
 
 	private boolean hasNext() {
@@ -457,7 +486,7 @@ public final class Lexer {
 		}
 	}
 
-	private Token tokenizeTemplateLiteralSpan() throws SyntaxError {
+	private Token tokenizeTemplateLiteralSpan(SourcePosition start) throws SyntaxError {
 		final StringBuilder builder = new StringBuilder();
 		boolean escaped = false;
 		while (hasNext() && (escaped || !peek("${"))) {
@@ -478,33 +507,23 @@ public final class Lexer {
 			}
 		}
 
-		if (!hasNext() && !templateLiteralStates.isEmpty()) {
+		if (!hasNext() && inTemplateLiteral()) {
 			throw new SyntaxError("Unterminated template literal", position());
 		}
 
-		return new Token(TokenType.TemplateSpan, builder.toString(), position());
+		return new Token(start, TemplateSpan, builder.toString());
 	}
 
 	private boolean currentTemplateLiteralIsEnding() {
 		return templateLiteralStates.getFirst().inExpression && templateLiteralStates.getFirst().bracketCount == 0 && accept("}");
 	}
 
-	private Token tokenizeTemplateLiteralEnd() {
+	private Token tokenizeTemplateLiteralEnd(SourcePosition start) {
 		templateLiteralStates.getFirst().inExpression = false;
-		return new Token(TokenType.TemplateExpressionEnd, position());
+		return new Token(start, TemplateExpressionEnd);
 	}
 
-	private Token tokenizeTemplateLiteralStart(boolean inTemplateLiteral) {
-		if (!inTemplateLiteral || templateLiteralStates.getFirst().inExpression) {
-			templateLiteralStates.push(new TemplateLiteralState());
-			return new Token(TokenType.TemplateStart, position());
-		} else {
-			templateLiteralStates.pop();
-			return new Token(TokenType.TemplateEnd, position());
-		}
-	}
-
-	private Token tokenizeStringLiteral() throws SyntaxError {
+	private Token tokenizeStringLiteral(SourcePosition start) throws SyntaxError {
 		final StringBuilder builder = new StringBuilder();
 		final int stringType = codePoint;
 		consume();
@@ -546,7 +565,7 @@ public final class Lexer {
 		}
 
 		consume();
-		return new Token(TokenType.StringLiteral, builder.toString(), position());
+		return new Token(start, StringLiteral, builder.toString());
 	}
 
 	private void consumeLineContinuation() throws SyntaxError {
@@ -623,9 +642,7 @@ public final class Lexer {
 		return (char) c;
 	}
 
-	private Token tokenizeNumericLiteral() throws SyntaxError {
-		final SourcePosition start = position();
-
+	private Token tokenizeNumericLiteral(SourcePosition start) throws SyntaxError {
 		final int radix;
 		if (accept("0x") || accept("0X")) radix = 16;
 		else if (accept("0b") || accept("0B")) radix = 2;
@@ -667,12 +684,12 @@ public final class Lexer {
 			}
 
 			if (!isInteger || hasExponent) {
-				return new Token(TokenType.NumericLiteral, builder.toString(), position());
+				return new Token(start, NumericLiteral, builder.toString());
 			}
 		}
 
-		final TokenType type = accept("n") ? TokenType.BigIntLiteral : TokenType.NumericLiteral;
-		return new Token(type, new BigInteger(builder.toString(), radix).toString(), position());
+		final TokenType type = accept("n") ? BigIntLiteral : NumericLiteral;
+		return new Token(start, type, new BigInteger(builder.toString(), radix).toString());
 	}
 
 	private boolean collectIntegerDigits(StringBuilder builder, int radix) throws SyntaxError {
@@ -709,22 +726,22 @@ public final class Lexer {
 		return StringEscapeUtils.quote(codePoint == -1 ? "[-1]" : Character.toString(ch), false);
 	}
 
-	private Token tokenizeKeywordOrIdentifier() throws SyntaxError {
-		final var builder = new StringBuilder();
+	private Token tokenizeKeywordOrIdentifier(SourcePosition start) throws SyntaxError {
+		final StringBuilder builder = new StringBuilder();
 		while (isIdentifierMiddle(codePoint)) collect(builder);
 		final String value = builder.toString();
-		final TokenType type = keywords.getOrDefault(value, TokenType.Identifier);
-		return new Token(type, value, position());
+		final TokenType type = keywords.getOrDefault(value, Identifier);
+		return new Token(start, type, value);
 	}
 
-	private Token tokenizeSymbol() throws SyntaxError {
+	private Token tokenizeSymbol(SourcePosition start) throws SyntaxError {
 		for (int i = 4; i >= 1; i--) {
 			final HashMap<String, TokenType> symbolSize = symbols.get(i - 1);
 			final String key = next(i);
 			final TokenType value = symbolSize.get(key);
 			if (value != null) {
 				consume(i);
-				return new Token(value, key, position());
+				return new Token(start, value);
 			}
 		}
 
@@ -732,7 +749,7 @@ public final class Lexer {
 	}
 
 	private SourcePosition position() {
-		return new SourcePosition(sourceText, index - 1);
+		return new SourcePosition(sourceText, index);
 	}
 
 	private static final class TemplateLiteralState {

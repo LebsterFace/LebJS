@@ -4,14 +4,14 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
-import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.LeftHandSideExpression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-public record IdentifierExpression(StringValue name) implements AssignmentTarget, LeftHandSideExpression {
-	public IdentifierExpression(String name) {
-		this(new StringValue(name));
+public record IdentifierExpression(SourceRange range, StringValue name) implements AssignmentTarget, LeftHandSideExpression {
+	public IdentifierExpression(SourceRange range, String name) {
+		this(range, new StringValue(name));
 	}
 
 	@Override
@@ -23,11 +23,6 @@ public record IdentifierExpression(StringValue name) implements AssignmentTarget
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getidentifierreference")
 	public Reference toReference(Interpreter interpreter) {
 		return interpreter.getBinding(name);
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append(name.value);
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package xyz.lebster.core.value.error;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -23,14 +22,14 @@ public class ErrorObject extends ObjectValue implements HasBuiltinTag {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
-		representation.append(ANSI.BRIGHT_CYAN);
-		representation.append("[");
-		representation.append(getName());
-		representation.append(": ");
-		representation.append(message);
-		representation.append("]");
-		representation.append(ANSI.RESET);
+	public void display(StringBuilder builder) {
+		builder.append(ANSI.BRIGHT_CYAN);
+		builder.append("[");
+		builder.append(getName());
+		builder.append(": ");
+		builder.append(message);
+		builder.append("]");
+		builder.append(ANSI.RESET);
 	}
 
 	protected String getName() {

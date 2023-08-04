@@ -3,7 +3,7 @@ package xyz.lebster.core.node.expression;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
@@ -14,7 +14,7 @@ import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.Value.isLessThan;
 
-public record RelationalExpression(Expression left, Expression right, RelationalOp op) implements Expression {
+public record RelationalExpression(SourceRange range, Expression left, Expression right, RelationalOp op) implements Expression {
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-relational-operators")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
@@ -55,12 +55,12 @@ public record RelationalExpression(Expression left, Expression right, Relational
 			case In -> {
 				// 5. If Type(y) is not Object, throw a TypeError exception.
 				if (!(y instanceof final ObjectValue object)) {
-					final var representation = new StringRepresentation();
-					representation.append("Cannot use `in` operator to search for `");
-					x.display(representation);
-					representation.append("` in ");
-					y.display(representation);
-					throw error(new TypeError(interpreter, representation.toString()));
+					final StringBuilder builder = new StringBuilder();
+					builder.append("Cannot use `in` operator to search for `");
+					x.display(builder);
+					builder.append("` in ");
+					y.display(builder);
+					throw error(new TypeError(interpreter, builder.toString()));
 				}
 
 				// 6. Return ? HasProperty(y, ? ToPropertyKey(x)).
@@ -86,22 +86,6 @@ public record RelationalExpression(Expression left, Expression right, Relational
 		final Executable targetFn = Executable.getExecutable(interpreter, target);
 		// 5. Return ? OrdinaryHasInstance(target, V).
 		return Executable.ordinaryHasInstance(interpreter, targetFn, V);
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		left.represent(representation);
-		representation.append(' ');
-		representation.append(switch (op) {
-			case LessThan -> '<';
-			case GreaterThan -> '>';
-			case LessThanEquals -> "<=";
-			case GreaterThanEquals -> ">=";
-			case InstanceOf -> "instanceof";
-			case In -> "in";
-		});
-		representation.append(' ');
-		right.represent(representation);
 	}
 
 	public enum RelationalOp {

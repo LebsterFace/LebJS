@@ -2,7 +2,6 @@ package xyz.lebster.core.value.primitive;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
@@ -37,7 +36,7 @@ public abstract class PrimitiveWrapper<T extends PrimitiveValue<?>, P extends Ob
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
-		data.display(representation);
+	public void display(StringBuilder builder) {
+		data.display(builder);
 	}
 }

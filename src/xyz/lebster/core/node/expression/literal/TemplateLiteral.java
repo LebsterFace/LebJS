@@ -2,25 +2,13 @@ package xyz.lebster.core.node.expression.literal;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
-import xyz.lebster.core.node.Representable;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class TemplateLiteral implements Expression {
-	private final List<TemplateLiteralNode> backingList = new ArrayList<>();
-
-	public void expressionNode(Expression expression) {
-		this.backingList.add(new TemplateLiteralExpressionNode(expression));
-	}
-
-	public void spanNode(String string) {
-		this.backingList.add(new TemplateLiteralSpanNode(string));
-	}
-
+public record TemplateLiteral(SourceRange range, List<TemplateLiteralNode> backingList) implements Expression {
 	@Override
 	public StringValue execute(Interpreter interpreter) throws AbruptCompletion {
 		final StringBuilder builder = new StringBuilder();
@@ -31,42 +19,21 @@ public class TemplateLiteral implements Expression {
 		return new StringValue(builder.toString());
 	}
 
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append('`');
-		for (final TemplateLiteralNode node : this.backingList) {
-			node.represent(representation);
-		}
-		representation.append('`');
-	}
-
-	private sealed interface TemplateLiteralNode extends Representable {
+	public sealed interface TemplateLiteralNode {
 		void append(Interpreter interpreter, StringBuilder builder) throws AbruptCompletion;
 	}
 
-	private record TemplateLiteralSpanNode(String string) implements TemplateLiteralNode {
+	public record TemplateLiteralSpanNode(String string) implements TemplateLiteralNode {
 		@Override
 		public void append(Interpreter interpreter, StringBuilder builder) {
 			builder.append(string);
 		}
-
-		@Override
-		public void represent(StringRepresentation representation) {
-			representation.append(string);
-		}
 	}
 
-	private record TemplateLiteralExpressionNode(Expression expression) implements TemplateLiteralNode {
+	public record TemplateLiteralExpressionNode(Expression expression) implements TemplateLiteralNode {
 		@Override
 		public void append(Interpreter interpreter, StringBuilder builder) throws AbruptCompletion {
 			builder.append(expression.execute(interpreter).toStringValue(interpreter).value);
-		}
-
-		@Override
-		public void represent(StringRepresentation representation) {
-			representation.append("${");
-			expression.represent(representation);
-			representation.append('}');
 		}
 	}
 }

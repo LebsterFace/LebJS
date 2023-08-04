@@ -3,7 +3,6 @@ package xyz.lebster.core.value.globals;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
@@ -32,10 +31,10 @@ public final class Null extends PrimitiveValue<Void> {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
-		representation.append(ANSI.BRIGHT_WHITE);
-		representation.append("null");
-		representation.append(ANSI.RESET);
+	public void display(StringBuilder builder) {
+		builder.append(ANSI.BRIGHT_WHITE);
+		builder.append("null");
+		builder.append(ANSI.RESET);
 	}
 
 	@Override

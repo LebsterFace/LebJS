@@ -4,7 +4,6 @@ import xyz.lebster.core.ANSI;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -79,11 +78,11 @@ public final class BigIntValue extends NumericValue<BigInteger> {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
-		representation.append(ANSI.BRIGHT_CYAN);
-		representation.append(value.toString());
-		representation.append('n');
-		representation.append(ANSI.RESET);
+	public void display(StringBuilder builder) {
+		builder.append(ANSI.BRIGHT_CYAN);
+		builder.append(value.toString());
+		builder.append('n');
+		builder.append(ANSI.RESET);
 	}
 
 	@Override

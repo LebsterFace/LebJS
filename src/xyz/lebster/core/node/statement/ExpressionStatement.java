@@ -2,7 +2,7 @@ package xyz.lebster.core.node.statement;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Value;
 
@@ -13,8 +13,7 @@ public record ExpressionStatement(Expression expression) implements Statement {
 	}
 
 	@Override
-	public void represent(StringRepresentation representation) {
-		expression.represent(representation);
-		representation.append(";");
+	public SourceRange range() {
+		return expression.range();
 	}
 }

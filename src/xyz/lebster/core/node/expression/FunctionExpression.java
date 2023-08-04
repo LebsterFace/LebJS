@@ -2,18 +2,18 @@ package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.DeclarativeEnvironment;
 import xyz.lebster.core.interpreter.environment.Environment;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.FunctionParameters;
-import xyz.lebster.core.node.expression.literal.StringLiteral;
+import xyz.lebster.core.node.SourceRange;
+import xyz.lebster.core.node.expression.literal.PrimitiveLiteral;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.function.Function;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-public record FunctionExpression(BlockStatement body, StringLiteral name, FunctionParameters parameters) implements FunctionNode, Expression {
+public record FunctionExpression(SourceRange range, BlockStatement body, PrimitiveLiteral<StringValue> name, FunctionParameters parameters) implements FunctionNode, Expression {
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-runtime-semantics-instantiateordinaryfunctionexpression")
 	public Function execute(Interpreter interpreter) {
@@ -39,13 +39,5 @@ public record FunctionExpression(BlockStatement body, StringLiteral name, Functi
 			// 12. Return closure.
 			return closure;
 		}
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append("function ");
-		representCall(representation);
-		representation.append(' ');
-		body.represent(representation);
 	}
 }

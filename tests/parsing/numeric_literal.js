@@ -21,8 +21,8 @@ Test.expectError("SyntaxError", "Missing hexadecimal digits after '0x'", () => T
 Test.expectError("SyntaxError", "Missing hexadecimal digits after '0x'", () => Test.parse("0xｄｅａｄｃ０ｄｅ"));
 Test.expectError("SyntaxError", "Missing octal digits after '0o'", () => Test.parse("0o"));
 Test.expectError("SyntaxError", "Missing octal digits after '0o'", () => Test.parse("0o７７７"));
-Test.expectError("SyntaxError", 'Unexpected token "2"', () => Test.parse("0b102"));
-Test.expectError("SyntaxError", 'Unexpected token "8"', () => Test.parse("0o778"));
+Test.expectError("SyntaxError", "Unexpected token '2'", () => Test.parse("0b102"));
+Test.expectError("SyntaxError", "Unexpected token '8'", () => Test.parse("0o778"));
 
 // Numeric separator
 Test.expectError("SyntaxError", "Numeric separators are not allowed immediately after 'e'", () => Test.parse("1.23e_1"));

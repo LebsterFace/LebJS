@@ -6,7 +6,6 @@ import xyz.lebster.core.Ryu;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
@@ -141,10 +140,10 @@ public final class NumberValue extends NumericValue<Double> {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
-		representation.append(ANSI.BRIGHT_YELLOW);
-		representation.append(stringValueOf(10));
-		representation.append(ANSI.RESET);
+	public void display(StringBuilder builder) {
+		builder.append(ANSI.BRIGHT_YELLOW);
+		builder.append(stringValueOf(10));
+		builder.append(ANSI.RESET);
 	}
 
 	@Override

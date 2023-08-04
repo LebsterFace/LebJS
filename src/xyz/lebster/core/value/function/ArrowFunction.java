@@ -17,27 +17,27 @@ public final class ArrowFunction extends Executable {
 	public ArrowFunction(Intrinsics intrinsics, ArrowFunctionExpression expression, ExecutionContext context) {
 		// TODO: Automatic function names for arrow & non-arrow functions
 		//		e.g. ' let k = () => {} ' should be given the name 'k'
-		super(intrinsics.functionPrototype, Names.EMPTY, expression.parameters.expectedArgumentCount());
+		super(intrinsics.functionPrototype, Names.EMPTY, expression.parameters().expectedArgumentCount());
 		this.expression = expression;
 		this.context = context;
 	}
 
 	@Override
 	public StringValue toStringMethod() {
-		return new StringValue(expression.toRepresentationString());
+		return new StringValue(expression.range().getText());
 	}
 
 	private Value<?> executeCode(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
 		final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 
 		try {
-			expression.parameters.declareArguments(interpreter, passedArguments);
+			expression.parameters().declareArguments(interpreter, passedArguments);
 
-			if (expression.hasFullBody) {
-				expression.body.executeWithoutNewContext(interpreter);
+			if (expression.hasFullBody()) {
+				expression.body().executeWithoutNewContext(interpreter);
 				return Undefined.instance;
 			} else {
-				return expression.implicitReturn.execute(interpreter);
+				return expression.implicitReturn().execute(interpreter);
 			}
 		} catch (AbruptCompletion e) {
 			if (e.type != AbruptCompletion.Type.Return) throw e;

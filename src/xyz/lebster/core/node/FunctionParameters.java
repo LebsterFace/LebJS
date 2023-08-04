@@ -3,7 +3,6 @@ package xyz.lebster.core.node;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.declaration.AssignmentPattern;
 import xyz.lebster.core.node.declaration.AssignmentTarget;
 import xyz.lebster.core.node.declaration.Kind;
@@ -17,7 +16,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public final class FunctionParameters implements Iterable<AssignmentPattern>, Representable {
+public final class FunctionParameters implements Iterable<AssignmentPattern> {
 	private final List<AssignmentPattern> formalParameters = new ArrayList<>();
 	public AssignmentTarget rest;
 
@@ -36,17 +35,6 @@ public final class FunctionParameters implements Iterable<AssignmentPattern>, Re
 
 	public void add(AssignmentTarget target) {
 		this.formalParameters.add(new AssignmentPattern(target, null));
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		if (formalParameters.size() > 0) {
-			formalParameters.get(0).represent(representation);
-			for (int i = 1; i < formalParameters.size(); i++) {
-				representation.append(", ");
-				formalParameters.get(i).represent(representation);
-			}
-		}
 	}
 
 	public void declareArguments(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {

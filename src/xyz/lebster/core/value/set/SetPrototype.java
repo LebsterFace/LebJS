@@ -1,6 +1,5 @@
 package xyz.lebster.core.value.set;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
@@ -609,7 +608,7 @@ public final class SetPrototype extends ObjectValue {
 			// 4. If IsCallable(nextMethod) is false, throw a TypeError exception.
 			final Executable nextMethod = Executable.getExecutable(interpreter, nextMethod_);
 			// 5. Return a new Iterator Record { [[Iterator]]: keysIter, [[NextMethod]]: nextMethod, [[Done]]: false }.
-			return new IteratorRecord(keysIter, nextMethod, ANSI.stripFormatting(keysIter.toDisplayString()), "keys");
+			return new IteratorRecord(keysIter, nextMethod, keysIter.toDisplayString(true), "keys");
 		}
 	}
 

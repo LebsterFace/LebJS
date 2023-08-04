@@ -6,14 +6,13 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.interpreter.environment.Environment;
 import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.interpreter.environment.FunctionEnvironment;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.FunctionParameters;
 import xyz.lebster.core.node.SourceRange;
-import xyz.lebster.core.node.expression.literal.StringLiteral;
+import xyz.lebster.core.node.expression.literal.PrimitiveLiteral;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
@@ -70,53 +69,20 @@ public record ClassExpression(
 		return constructorFunction;
 	}
 
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append("class ");
-		if (this.className != null) {
-			representation.append(className);
-			representation.append(' ');
-		}
-		representation.append('{');
-		representation.indent();
-		representation.append('\n');
-		constructor.represent(representation);
-		for (ClassMethodNode method : methods) {
-			representation.append('\n');
-			method.represent(representation);
-		}
-		representation.unindent();
-		representation.append('\n');
-		representation.append('}');
-	}
-
 	public record ClassMethodNode(Expression name, boolean computedName, FunctionParameters parameters, BlockStatement body, SourceRange range) implements FunctionNode {
 		@Override
 		public ClassMethod execute(Interpreter interpreter) throws AbruptCompletion {
 			return new ClassMethod(interpreter, name.execute(interpreter).toStringValue(interpreter), this);
 		}
-
-		@Override
-		public void represent(StringRepresentation representation) {
-			representCall(representation);
-			representation.append(' ');
-			body().represent(representation);
-		}
 	}
 
 	public record ClassConstructorNode(String className, FunctionParameters parameters, BlockStatement body, boolean isDerived, SourceRange range) implements FunctionNode {
-		private static final StringLiteral name = new StringLiteral(Names.constructor);
+		// FIXME
+		private static final PrimitiveLiteral<StringValue> name = new PrimitiveLiteral<>(null, Names.constructor);
 
 		@Override
 		public ClassConstructor execute(Interpreter interpreter) {
 			return new ClassConstructor(interpreter.intrinsics, interpreter.environment(), this, isDerived, className);
-		}
-
-		@Override
-		public void represent(StringRepresentation representation) {
-			representCall(representation);
-			representation.append(' ');
-			body.represent(representation);
 		}
 
 		@Override
@@ -152,7 +118,7 @@ public record ClassExpression(
 
 		@Override
 		public StringValue toStringMethod() {
-			return new StringValue(code.toRepresentationString());
+			return new StringValue(code.range.getText());
 		}
 
 		@NonCompliant
@@ -207,7 +173,7 @@ public record ClassExpression(
 
 		@Override
 		public StringValue toStringMethod() {
-			return new StringValue(code.toRepresentationString());
+			return new StringValue(code.range.getText());
 		}
 
 		@Override

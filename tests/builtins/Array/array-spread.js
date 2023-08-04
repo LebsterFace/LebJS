@@ -16,7 +16,7 @@ test([ 5, ...odds, ...evens ], "513572468");
 // cannot spread number in array
 Test.expectError("TypeError", "1 is not iterable", () => [...1]);
 // cannot spread object in array
-Test.expectError("TypeError", "{ } is not iterable", () => [...{}]);
+Test.expectError("TypeError", "{ } is not iterable", () => [...{ }]);
 
 // basic functionality
 Test.equals([1, 2, 3, 4], [1, ...[2, 3], 4]);

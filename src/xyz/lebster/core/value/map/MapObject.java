@@ -2,7 +2,6 @@ package xyz.lebster.core.value.map;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Displayable;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -46,11 +45,11 @@ public final class MapObject extends ObjectValue {
 	}
 
 	@Override
-	public void displayPrefix(StringRepresentation representation) {
-		representation.append("Map");
-		representation.append('(');
-		getSize().display(representation);
-		representation.append(')');
+	public void displayPrefix(StringBuilder builder) {
+		builder.append("Map");
+		builder.append('(');
+		getSize().display(builder);
+		builder.append(')');
 	}
 
 	public static final class MapEntry implements Displayable {
@@ -63,10 +62,10 @@ public final class MapObject extends ObjectValue {
 		}
 
 		@Override
-		public void display(StringRepresentation representation) {
-			key.display(representation);
-			representation.append(" => ");
-			value.display(representation);
+		public void display(StringBuilder builder) {
+			key.display(builder);
+			builder.append(" => ");
+			value.display(builder);
 		}
 	}
 }

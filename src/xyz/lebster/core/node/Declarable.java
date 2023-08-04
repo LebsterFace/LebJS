@@ -5,6 +5,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.declaration.Kind;
 import xyz.lebster.core.value.Value;
 
-public interface Declarable extends Representable {
+public interface Declarable {
 	void declare(Interpreter interpreter, Kind kind, Value<?> value) throws AbruptCompletion;
 }

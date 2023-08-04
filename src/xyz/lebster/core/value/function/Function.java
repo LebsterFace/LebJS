@@ -25,7 +25,7 @@ public final class Function extends Constructor {
 
 	@Override
 	public StringValue toStringMethod() {
-		return new StringValue(code.toRepresentationString());
+		return new StringValue(code.range().getText());
 	}
 
 	@Override

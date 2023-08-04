@@ -5,7 +5,6 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.value.error.syntax.SyntaxErrorObject;
 import xyz.lebster.core.value.object.Key;
@@ -72,18 +71,18 @@ public final class StringValue extends Key<String> {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
-		representation.append(ANSI.GREEN);
-		representation.append(StringEscapeUtils.quote(value, false));
-		representation.append(ANSI.RESET);
+	public void display(StringBuilder builder) {
+		builder.append(ANSI.GREEN);
+		builder.append(StringEscapeUtils.quote(value, false));
+		builder.append(ANSI.RESET);
 	}
 
 	@Override
-	public void displayForObjectKey(StringRepresentation representation) {
+	public void displayForObjectKey(StringBuilder builder) {
 		if (this.isValidIdentifier()) {
-			representation.append(value);
+			builder.append(value);
 		} else {
-			this.display(representation);
+			this.display(builder);
 		}
 	}
 
@@ -105,8 +104,8 @@ public final class StringValue extends Key<String> {
 	}
 
 	@Override
-	public void displayForConsoleLog(StringRepresentation representation) {
-		representation.append(this.value);
+	public void displayForConsoleLog(StringBuilder builder) {
+		builder.append(this.value);
 	}
 
 	@Override

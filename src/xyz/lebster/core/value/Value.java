@@ -5,7 +5,6 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.Key;
@@ -136,8 +135,8 @@ public abstract class Value<JType> implements Displayable {
 		return q.indexOf(p) == 0;
 	}
 
-	public void displayForConsoleLog(StringRepresentation representation) {
-		this.display(representation);
+	public void displayForConsoleLog(StringBuilder builder) {
+		this.display(builder);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")

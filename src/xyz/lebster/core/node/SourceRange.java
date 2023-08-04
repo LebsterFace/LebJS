@@ -1,11 +1,11 @@
 package xyz.lebster.core.node;
 
-public record SourceRange(String sourceText, SourcePosition start, SourcePosition end) {
-	public SourceRange(String sourceText, int startIndex, int endIndex) {
-		this(sourceText, new SourcePosition(sourceText, startIndex), new SourcePosition(sourceText, endIndex));
+public record SourceRange(String sourceText, int startIndex, int endIndex) {
+	public SourceRange(String sourceText, SourcePosition start, SourcePosition end) {
+		this(sourceText, start.index, end.index);
 	}
 
 	public String getText() {
-		return sourceText.substring(start.index, end.index);
+		return sourceText.substring(startIndex, endIndex);
 	}
 }

@@ -4,7 +4,6 @@ import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
 import xyz.lebster.core.parser.Token;
@@ -49,18 +48,18 @@ public final class REPL {
 				} else if (input.startsWith(".inspect ")) {
 					final Value<?> lastValue = Parser.parse(input.substring(".inspect ".length())).execute(interpreter);
 					if (lastValue instanceof final ObjectValue obj) {
-						final var representation = new StringRepresentation();
-						JSONDisplayer.display(representation, obj, true);
-						System.out.println(representation);
+						final StringBuilder builder = new StringBuilder();
+						JSONDisplayer.display(builder, obj, true);
+						System.out.println(builder);
 					} else {
-						System.out.println(lastValue.toDisplayString());
+						System.out.println(lastValue.toDisplayString(false));
 					}
 				} else {
 					final Value<?> lastValue = Parser.parse(input).execute(interpreter);
 					interpreter.globalObject.set(interpreter, new StringValue("$"), lastValue);
 					interpreter.globalObject.set(interpreter, new StringValue("$" + result), lastValue);
 					result += 1;
-					System.out.println(lastValue.toDisplayString());
+					System.out.println(lastValue.toDisplayString(false));
 				}
 			} catch (Throwable e) {
 				Main.handleError(e, System.out, options.hideStackTrace());

@@ -6,7 +6,6 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -35,12 +34,12 @@ public final class ConsoleObject extends ObjectValue {
 		// If args is empty, return.
 		if (data.length == 0) return Undefined.instance;
 
-		final var representation = new StringRepresentation();
-		representation.append(ANSI.RESET);
+		final StringBuilder builder = new StringBuilder();
+		builder.append(ANSI.RESET);
 		for (final Value<?> arg : data)
-			arg.displayForConsoleLog(representation);
-		representation.append(ANSI.RESET);
-		System.out.print(representation);
+			arg.displayForConsoleLog(builder);
+		builder.append(ANSI.RESET);
+		System.out.print(builder);
 		return Undefined.instance;
 	}
 
@@ -62,9 +61,9 @@ public final class ConsoleObject extends ObjectValue {
 	@NonStandard
 	private Undefined logger(LogLevel logLevel, Value<?>[] args) {
 		if (args.length == 0) return Undefined.instance;
-		final var representation = new StringRepresentation();
+		final StringBuilder builder = new StringBuilder();
 
-		representation.append(switch (logLevel) {
+		builder.append(switch (logLevel) {
 			case Log -> ANSI.RESET;
 			case Info -> ANSI.BRIGHT_BLUE;
 			case Warn -> ANSI.BRIGHT_YELLOW;
@@ -72,12 +71,12 @@ public final class ConsoleObject extends ObjectValue {
 		});
 
 		for (final Value<?> arg : args) {
-			arg.displayForConsoleLog(representation);
-			representation.append(' ');
+			arg.displayForConsoleLog(builder);
+			builder.append(' ');
 		}
 
-		representation.append(ANSI.RESET);
-		System.out.println(representation);
+		builder.append(ANSI.RESET);
+		System.out.println(builder);
 		return Undefined.instance;
 	}
 

@@ -2,7 +2,6 @@ package xyz.lebster.core.value.set;
 
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Displayable;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -47,10 +46,10 @@ public final class SetObject extends ObjectValue {
 	}
 
 	@Override
-	public void displayPrefix(StringRepresentation representation) {
-		representation.append("Set");
-		representation.append('(');
-		getSize().display(representation);
-		representation.append(')');
+	public void displayPrefix(StringBuilder builder) {
+		builder.append("Set");
+		builder.append('(');
+		getSize().display(builder);
+		builder.append(')');
 	}
 }

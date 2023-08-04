@@ -3,7 +3,6 @@ package xyz.lebster.core.value.globals;
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -53,10 +52,10 @@ public final class Undefined extends PrimitiveValue<Void> {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
-		representation.append(ANSI.BRIGHT_BLACK);
-		representation.append("undefined");
-		representation.append(ANSI.RESET);
+	public void display(StringBuilder builder) {
+		builder.append(ANSI.BRIGHT_BLACK);
+		builder.append("undefined");
+		builder.append(ANSI.RESET);
 	}
 
 	@Override

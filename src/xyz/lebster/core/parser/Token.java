@@ -5,13 +5,14 @@ import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.SourcePosition;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.AssignmentExpression.AssignmentOp;
 import xyz.lebster.core.node.expression.BinaryExpression.BinaryOp;
 import xyz.lebster.core.node.expression.EqualityExpression.EqualityOp;
 import xyz.lebster.core.node.expression.LogicalExpression.LogicOp;
 import xyz.lebster.core.node.expression.RelationalExpression.RelationalOp;
 import xyz.lebster.core.node.expression.UpdateExpression.UpdateOp;
-import xyz.lebster.core.node.expression.literal.StringLiteral;
+import xyz.lebster.core.node.expression.literal.PrimitiveLiteral;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.Set;
@@ -32,26 +33,25 @@ import static xyz.lebster.core.parser.TokenType.Void;
 import static xyz.lebster.core.parser.TokenType.*;
 
 public final class Token {
+	public final SourcePosition start;
 	public final TokenType type;
-	public final SourcePosition position;
 	final String value;
 
-	public Token(TokenType type, String value, SourcePosition position) {
+	public Token(SourcePosition start, TokenType type, String value) {
 		this.type = type;
 		this.value = value;
-		this.position = position;
+		this.start = start;
 	}
 
-	public Token(TokenType type, SourcePosition position) {
+	public Token(SourcePosition start, TokenType type) {
 		this.type = type;
+		this.start = start;
 		this.value = null;
-		this.position = position;
 	}
 
 	@Override
 	public String toString() {
-		if (value == null) return String.valueOf(type);
-		return "%s (%s)".formatted(StringEscapeUtils.quote(value, true), type);
+		return StringEscapeUtils.quote(value == null ? Lexer.valueForSymbol(type) : value, false);
 	}
 
 	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
@@ -368,7 +368,13 @@ public final class Token {
 		};
 	}
 
-	StringLiteral asStringLiteral() {
-		return new StringLiteral(new StringValue(value));
+	PrimitiveLiteral<StringValue> asStringLiteral() {
+		if (value == null) throw new ShouldNotHappen("Attempting to convert constant token to string literal");
+		return new PrimitiveLiteral<>(range(), new StringValue(value));
+	}
+
+	public SourceRange range() {
+		if (value == null) throw new ShouldNotHappen("Attempting to get range() of constant token");
+		return new SourceRange(start.sourceText, start.index, start.index + value.length());
 	}
 }

@@ -4,36 +4,22 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 
-public record EqualityExpression(Expression left, Expression right, EqualityOp op) implements Expression {
+public record EqualityExpression(SourceRange range, Expression left, Expression right, EqualityOp op) implements Expression {
 	@Override
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-equality-operators-runtime-semantics-evaluation")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final Value<?> left_value = left.execute(interpreter);
-		final Value<?> right_value = right.execute(interpreter);
+		final Value<?> x = left.execute(interpreter);
+		final Value<?> y = right.execute(interpreter);
 
 		return BooleanValue.of(switch (op) {
-			case StrictEquals -> left_value.isStrictlyEqual(right_value);
-			case StrictNotEquals -> !left_value.isStrictlyEqual(right_value);
+			case StrictEquals -> x.isStrictlyEqual(y);
+			case StrictNotEquals -> !x.isStrictlyEqual(y);
 			default -> throw new NotImplemented("EqualityOp: " + op);
 		});
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		left.represent(representation);
-		representation.append(' ');
-		representation.append(switch (op) {
-			case StrictEquals -> "===";
-			case StrictNotEquals -> "!==";
-			case LooseEquals -> "==";
-			case LooseNotEquals -> "!=";
-		});
-		representation.append(' ');
-		right.represent(representation);
 	}
 
 	public enum EqualityOp {

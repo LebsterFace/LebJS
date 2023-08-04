@@ -8,7 +8,6 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.*;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.array.ArrayPrototype;
@@ -263,7 +262,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		if (property.isWritable()) {
 			property.set(interpreter, this, value);
 		} else {
-			throw error(new TypeError(interpreter, "Cannot assign to read-only property " + ANSI.stripFormatting(key.toDisplayString())));
+			throw error(new TypeError(interpreter, "Cannot assign to read-only property %s".formatted(key.toDisplayString(true))));
 		}
 	}
 
@@ -275,7 +274,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		if (func.isNullish()) return null;
 		// 3. If IsCallable(func) is false, throw a TypeError exception.
 		if (!(func instanceof final Executable func_executable))
-			throw error(new TypeError(interpreter, "Property %s is not a function".formatted(P.toDisplayString())));
+			throw error(new TypeError(interpreter, "Property %s is not a function".formatted(P.toDisplayString(true))));
 		// 4. Return func.
 		return func_executable;
 	}
@@ -284,11 +283,11 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		final PropertyDescriptor property = this.getProperty(key);
 		if (property == null) {
 			if (interpreter.isCheckedMode()) {
-				final var representation = new StringRepresentation();
-				representation.append("Property ");
-				key.displayForObjectKey(representation);
-				representation.append(" does not exist on object.");
-				throw error(new CheckedError(interpreter, representation.toString()));
+				final StringBuilder builder = new StringBuilder();
+				builder.append("Property ");
+				key.displayForObjectKey(builder);
+				builder.append(" does not exist on object.");
+				throw error(new CheckedError(interpreter, builder.toString()));
 			} else {
 				return Undefined.instance;
 			}
@@ -304,7 +303,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		boolean success = this.delete(P);
 		// 2. If success is false, throw a TypeError exception.
 		if (!success) {
-			throw error(new TypeError(interpreter, "Cannot assign to read only property '" + P.toDisplayString() + "' of object"));
+			throw error(new TypeError(interpreter, "Property %s is non-configurable and can't be deleted".formatted(P.toDisplayString(true))));
 		}
 		// 3. Return unused.
 	}
@@ -399,9 +398,9 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
+	public void display(StringBuilder builder) {
 		if (displayAsJSON()) {
-			JSONDisplayer.display(representation, this);
+			JSONDisplayer.display(builder, this);
 		} else {
 			throw new NotImplemented("display() for " + getClass().getSimpleName());
 		}
@@ -419,10 +418,10 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		return Collections.emptyList();
 	}
 
-	public void displayPrefix(StringRepresentation representation) {
-		representation.append(ANSI.CYAN);
-		representation.append(getName());
-		representation.append(ANSI.RESET);
+	public void displayPrefix(StringBuilder builder) {
+		builder.append(ANSI.CYAN);
+		builder.append(getName());
+		builder.append(ANSI.RESET);
 	}
 
 	private String getName() {

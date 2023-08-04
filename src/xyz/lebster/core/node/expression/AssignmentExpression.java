@@ -5,8 +5,8 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Reference;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.node.Assignable;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.declaration.AssignmentTarget;
 import xyz.lebster.core.node.declaration.IdentifierExpression;
 import xyz.lebster.core.value.Value;
@@ -17,7 +17,7 @@ import static xyz.lebster.core.node.expression.BinaryExpression.BinaryOp.*;
 import static xyz.lebster.core.node.expression.LogicalExpression.LogicOp.*;
 import static xyz.lebster.core.value.function.Executable.isAnonymousFunctionDefinition;
 
-public record AssignmentExpression(Assignable left, Expression right, AssignmentOp op) implements Expression {
+public record AssignmentExpression(SourceRange range, Assignable left, Expression right, AssignmentOp op) implements Expression {
 	public static final String invalidLHS = "Invalid left-hand side in assignment";
 
 	private static Value<?> applyOperator(Interpreter interpreter, Value<?> left_value, AssignmentOp op, Value<?> right_value) throws AbruptCompletion {
@@ -130,37 +130,22 @@ public record AssignmentExpression(Assignable left, Expression right, Assignment
 		return result;
 	}
 
-	@Override
-	public void represent(StringRepresentation representation) {
-		left.represent(representation);
-		representation.append(' ');
-		representation.append(op.str);
-		representation.append(' ');
-		right.represent(representation);
-	}
-
 	public enum AssignmentOp {
-		Assign("="),
-		LogicalAndAssign("&&="),
-		LogicalOrAssign("||="),
-		NullishCoalesceAssign("??="),
-		MultiplyAssign("*="),
-		DivideAssign("/="),
-		RemainderAssign("%="),
-		PlusAssign("+="),
-		MinusAssign("-="),
-		LeftShiftAssign("<<="),
-		RightShiftAssign(">>="),
-		UnsignedRightShiftAssign(">>>="),
-		BitwiseAndAssign("&="),
-		BitwiseExclusiveOrAssign("^="),
-		BitwiseOrAssign("|="),
-		ExponentAssign("**=");
-
-		private final String str;
-
-		AssignmentOp(String s) {
-			this.str = s;
-		}
+		Assign,
+		LogicalAndAssign,
+		LogicalOrAssign,
+		NullishCoalesceAssign,
+		MultiplyAssign,
+		DivideAssign,
+		RemainderAssign,
+		PlusAssign,
+		MinusAssign,
+		LeftShiftAssign,
+		RightShiftAssign,
+		UnsignedRightShiftAssign,
+		BitwiseAndAssign,
+		BitwiseExclusiveOrAssign,
+		BitwiseOrAssign,
+		ExponentAssign
 	}
 }

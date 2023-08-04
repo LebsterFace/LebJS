@@ -4,7 +4,6 @@ import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.Key;
@@ -131,8 +130,8 @@ public final class SymbolValue extends Key<Void> {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
-		representation.append(this.symbolDescriptiveString());
+	public void display(StringBuilder builder) {
+		builder.append(symbolDescriptiveString());
 	}
 
 	public String symbolDescriptiveString() {

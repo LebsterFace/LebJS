@@ -3,7 +3,6 @@ package xyz.lebster.core.value.object;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
@@ -70,7 +69,7 @@ public final class DataDescriptor implements PropertyDescriptor {
 	}
 
 	@Override
-	public void display(StringRepresentation representation) {
+	public void display(StringBuilder builder) {
 		throw new ShouldNotHappen("DataDescriptor#display is handled by JSONDisplayer");
 	}
 

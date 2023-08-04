@@ -4,21 +4,15 @@ import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.interpreter.StringRepresentation;
+import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.value.Value;
 
-public final class ContinueStatement implements Statement {
+public record ContinueStatement(SourceRange range) implements Statement {
 	@Override
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-continue-statement-runtime-semantics-evaluation")
 	@NonCompliant
-	// FIXME: Follow spec (labels)
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-continue-statement-runtime-semantics-evaluation")
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
+		// FIXME: Follow spec (labels)
 		throw new AbruptCompletion(null, AbruptCompletion.Type.Continue);
-	}
-
-	@Override
-	public void represent(StringRepresentation representation) {
-		representation.append("continue;");
-		representation.append('\n');
 	}
 }

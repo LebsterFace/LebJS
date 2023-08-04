@@ -627,9 +627,9 @@ public final class Lexer {
 		final SourcePosition start = position();
 
 		final int radix;
-		if (accept("0x")) radix = 16;
-		else if (accept("0b")) radix = 2;
-		else if (accept("0o")) radix = 8;
+		if (accept("0x") || accept("0X")) radix = 16;
+		else if (accept("0b") || accept("0B")) radix = 2;
+		else if (accept("0o") || accept("0O")) radix = 8;
 		else radix = 10;
 
 		final StringBuilder builder = new StringBuilder();

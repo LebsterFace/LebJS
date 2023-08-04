@@ -172,10 +172,6 @@ public final class NumberValue extends NumericValue<Double> {
 		return "number";
 	}
 
-	public NumberValue unaryMinus() {
-		return new NumberValue(-value);
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#eqn-truncate")
 	public static double truncate(double x) {
 		// The mathematical function truncate(x) removes the fractional part of x by rounding towards zero
@@ -184,15 +180,6 @@ public final class NumberValue extends NumericValue<Double> {
 		} else {
 			return Math.floor(x);
 		}
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-bitwiseNOT")
-	public NumberValue bitwiseNOT() {
-		// 1. Let oldValue be ! ToInt32(x).
-		final int oldValue = toInt32();
-		// 2. Return the result of applying bitwise complement to oldValue.
-		// The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
-		return new NumberValue(~oldValue);
 	}
 
 	private static long modulo(long x, long y) {
@@ -252,75 +239,4 @@ public final class NumberValue extends NumericValue<Double> {
 		return new BigIntValue(new BigDecimal(value).toBigIntegerExact());
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-add")
-	public NumberValue add(NumberValue y) {
-		return new NumberValue(value + y.value);
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-bitwiseAND")
-	public NumberValue bitwiseAND(NumberValue y) {
-		return new NumberValue(toInt32() & y.toInt32());
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-bitwiseOR")
-	public NumberValue bitwiseOR(NumberValue y) {
-		return new NumberValue(toInt32() | y.toInt32());
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-bitwiseXOR")
-	public NumberValue bitwiseXOR(NumberValue y) {
-		return new NumberValue(toInt32() ^ y.toInt32());
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-divide")
-	public NumberValue divide(NumberValue y) {
-		return new NumberValue(value / y.value);
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-exponentiate")
-	public NumberValue exponentiate(NumberValue y) {
-		return new NumberValue(Math.pow(value, y.value));
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-leftShift")
-	public NumberValue leftShift(NumberValue y) {
-		return new NumberValue(toInt32() << (y.toUint32() % 32));
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-multiply")
-	public NumberValue multiply(NumberValue y) {
-		return new NumberValue(value * y.value);
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-remainder")
-	public NumberValue remainder(NumberValue y) {
-		return new NumberValue(value % y.value);
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-signedRightShift")
-	public NumberValue signedRightShift(NumberValue y) {
-		return new NumberValue(toInt32() >> (y.toUint32() % 32));
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-subtract")
-	public NumberValue subtract(NumberValue y) {
-		return new NumberValue(value - y.value);
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-unsignedRightShift")
-	public NumberValue unsignedRightShift(NumberValue y) {
-		// (NaN|0|+-Infinity) >>> x = 0
-		if (Double.isNaN(value) || value == 0.0 || Double.isInfinite(value))
-			return NumberValue.ZERO;
-
-		final int left_int32 = (int) ((long) (double) value % NumberValue.TWO_TO_THE_32);
-
-		/// x >>> (NaN|0|+-Infinity) = uint32(x)
-		if (Double.isNaN(y.value) || y.value == 0.0 || Double.isInfinite(y.value))
-			return new NumberValue(left_int32 & UINT32_LIMIT);
-
-		final long right_uint32 = (long) (double) y.value % NumberValue.TWO_TO_THE_32;
-		final long shiftCount = right_uint32 % 32;
-		return new NumberValue((left_int32 >>> shiftCount) & UINT32_LIMIT);
-	}
 }

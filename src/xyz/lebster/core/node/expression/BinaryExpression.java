@@ -6,12 +6,14 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.StringRepresentation;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.primitive.NumericValue;
 import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import static java.math.BigInteger.ZERO;
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public record BinaryExpression(Expression left, Expression right, BinaryOp op) implements Expression {
@@ -48,35 +50,62 @@ public record BinaryExpression(Expression left, Expression right, BinaryOp op) i
 		if (left_num.getClass() != right_num.getClass())
 			throw error(new TypeError(interpreter, "Cannot mix BigInt and other types, use explicit conversions"));
 
-		if (left_num instanceof BigIntValue x && right_num instanceof final BigIntValue y) return switch (op) {
-			case Add -> x.add(y);
-			case BitwiseAND -> x.bitwiseAND(y);
-			case BitwiseOR -> x.bitwiseOR(y);
-			case BitwiseXOR -> x.bitwiseXOR(y);
-			case Divide -> x.divide(interpreter, y);
-			case Exponentiate -> x.exponentiate(interpreter, y);
-			case LeftShift -> x.leftShift(y);
-			case Multiply -> x.multiply(y);
-			case Remainder -> x.remainder(interpreter, y);
-			case SignedRightShift -> x.signedRightShift(y);
-			case Subtract -> x.subtract(y);
-			case UnsignedRightShift -> x.unsignedRightShift(interpreter, y);
-		};
+		if (left_num instanceof BigIntValue x && right_num instanceof final BigIntValue y) return new BigIntValue(switch (op) {
+			case Add -> x.value.add(y.value);
+			case BitwiseAND -> x.value.and(y.value);
+			case BitwiseOR -> x.value.or(y.value);
+			case BitwiseXOR -> x.value.xor(y.value);
+			case Multiply -> x.value.multiply(y.value);
+			case Subtract -> x.value.subtract(y.value);
 
-		if (left_num instanceof NumberValue x && right_num instanceof final NumberValue y) return switch (op) {
-			case Add -> x.add(y);
-			case BitwiseAND -> x.bitwiseAND(y);
-			case BitwiseOR -> x.bitwiseOR(y);
-			case BitwiseXOR -> x.bitwiseXOR(y);
-			case Divide -> x.divide(y);
-			case Exponentiate -> x.exponentiate(y);
-			case LeftShift -> x.leftShift(y);
-			case Multiply -> x.multiply(y);
-			case Remainder -> x.remainder(y);
-			case SignedRightShift -> x.signedRightShift(y);
-			case Subtract -> x.subtract(y);
-			case UnsignedRightShift -> x.unsignedRightShift(y);
-		};
+			case LeftShift -> BigIntValue.leftShift(x.value, y.value);
+			case SignedRightShift -> BigIntValue.leftShift(x.value, y.value.negate());
+			case UnsignedRightShift -> throw error(new TypeError(interpreter, "BigInts have no unsigned right shift, use >> instead"));
+
+			case Divide -> {
+				if (y.value.compareTo(ZERO) == 0) throw error(new RangeError(interpreter, "Division by zero"));
+				yield x.value.divide(y.value);
+			}
+
+			case Exponentiate -> {
+				if (y.value.compareTo(ZERO) < 0) throw error(new RangeError(interpreter, "BigInt negative exponent"));
+				yield x.value.pow(y.value.intValueExact());
+			}
+
+			case Remainder -> {
+				if (y.value.compareTo(ZERO) == 0) throw error(new RangeError(interpreter, "Division by zero"));
+				yield x.value.remainder(y.value);
+			}
+		});
+
+		if (left_num instanceof NumberValue x && right_num instanceof final NumberValue y) return new NumberValue(switch (op) {
+			case Add -> x.value + y.value;
+			case Divide -> x.value / y.value;
+			case Exponentiate -> Math.pow(x.value, y.value);
+			case Multiply -> x.value * y.value;
+			case Remainder -> x.value % y.value;
+			case Subtract -> x.value - y.value;
+
+			case BitwiseAND -> (double) (x.toInt32() & y.toInt32());
+			case BitwiseOR -> (double) (x.toInt32() | y.toInt32());
+			case BitwiseXOR -> (double) (x.toInt32() ^ y.toInt32());
+			case LeftShift -> (double) (x.toInt32() << (y.toUint32() % 32));
+			case SignedRightShift -> (double) (x.toInt32() >> (y.toUint32() % 32));
+			case UnsignedRightShift -> {
+				// (NaN|0|+-Infinity) >>> x = 0
+				if (Double.isNaN(x.value) || x.value == 0.0 || Double.isInfinite(x.value)) yield 0.0D;
+
+				final int left_int32 = (int) ((long) (double) x.value % NumberValue.TWO_TO_THE_32);
+				// x >>> (NaN|0|+-Infinity) = uint32(x)
+				if (Double.isNaN(y.value) || y.value == 0.0 || Double.isInfinite(y.value)) {
+					yield (double) (left_int32 & NumberValue.UINT32_LIMIT);
+				}
+
+				final long right_uint32 = (long) (double) y.value % NumberValue.TWO_TO_THE_32;
+				final long shiftCount = right_uint32 % 32;
+				yield (double) ((left_int32 >>> shiftCount) & NumberValue.UINT32_LIMIT);
+			}
+		});
 
 		throw new ShouldNotHappen("Attempting to mix BigInts and Numbers");
 	}

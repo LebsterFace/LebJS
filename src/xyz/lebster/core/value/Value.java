@@ -82,7 +82,7 @@ public abstract class Value<JType> implements Displayable {
 				// ii. If ny is undefined, return undefined.
 				if (ny == null) return null;
 				// iii. Return BigInt::lessThan(px, ny).
-				return bigint_px.lessThan(ny);
+				return BooleanValue.of(bigint_px.value.compareTo(ny.value) < 0);
 			}
 			// b. If px is a String and py is a BigInt, then
 			if (px instanceof final StringValue string_px && py instanceof final BigIntValue bigint_py) {
@@ -91,7 +91,7 @@ public abstract class Value<JType> implements Displayable {
 				// ii. If nx is undefined, return undefined.
 				if (nx == null) return null;
 				// iii. Return BigInt::lessThan(nx, py).
-				return nx.lessThan(bigint_py);
+				return BooleanValue.of(nx.value.compareTo(bigint_py.value) < 0);
 			}
 			// c. NOTE: Because px and py are primitive values, evaluation order is not important.
 			// d. Let nx be ? ToNumeric(px).
@@ -110,7 +110,7 @@ public abstract class Value<JType> implements Displayable {
 					// 1. Assert: nx is a BigInt.
 					if (!(nx instanceof final BigIntValue B)) throw new ShouldNotHappen("Invalid numeric value");
 					// 2. Return BigInt::lessThan(nx, ny).
-					return B.lessThan((BigIntValue) ny);
+					return BooleanValue.of(B.value.compareTo(((BigIntValue) ny).value) < 0);
 				}
 			}
 			// g. Assert: nx is a BigInt and ny is a Number, or nx is a Number and ny is a BigInt.

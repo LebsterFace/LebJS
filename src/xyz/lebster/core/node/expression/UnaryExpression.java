@@ -18,6 +18,8 @@ import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import java.math.BigInteger;
+
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-unary-operators")
 public record UnaryExpression(Expression expression, UnaryOp op) implements Expression {
 	@Override
@@ -44,14 +46,14 @@ public record UnaryExpression(Expression expression, UnaryOp op) implements Expr
 		// 3. If oldValue is a Number, then
 		if (oldValue instanceof final NumberValue N) {
 			// a. Return Number::unaryMinus(oldValue).
-			return N.unaryMinus();
+			return new NumberValue(-N.value);
 		}
 		// 4. Else,
 		else {
 			// a. Assert: oldValue is a BigInt.
 			if (!(oldValue instanceof final BigIntValue B)) throw new ShouldNotHappen("Invalid numeric value");
 			// b. Return BigInt::unaryMinus(oldValue).
-			return B.unaryMinus();
+			return new BigIntValue(B.value.negate());
 		}
 	}
 
@@ -64,14 +66,14 @@ public record UnaryExpression(Expression expression, UnaryOp op) implements Expr
 		// 3. If oldValue is a Number, then
 		if (oldValue instanceof final NumberValue N) {
 			// a. Return Number::bitwiseNOT(oldValue).
-			return N.bitwiseNOT();
+			return new NumberValue(~N.toInt32());
 		}
 		// 4. Else,
 		else {
 			// a. Assert: oldValue is a BigInt.
 			if (!(oldValue instanceof final BigIntValue B)) throw new ShouldNotHappen("Invalid numeric value");
 			// b. Return BigInt::bitwiseNOT(oldValue).
-			return B.bitwiseNOT();
+			return new BigIntValue(B.value.negate().subtract(BigInteger.ONE));
 		}
 	}
 

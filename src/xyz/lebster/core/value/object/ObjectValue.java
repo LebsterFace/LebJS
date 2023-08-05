@@ -400,7 +400,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	@Override
 	public void display(StringBuilder builder) {
 		if (displayAsJSON()) {
-			JSONDisplayer.display(builder, this);
+			JSONDisplayer.display(builder, this, false);
 		} else {
 			throw new NotImplemented("display() for " + getClass().getSimpleName());
 		}

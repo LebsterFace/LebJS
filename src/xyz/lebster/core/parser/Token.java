@@ -4,7 +4,6 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
-import xyz.lebster.core.node.SourcePosition;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.AssignmentExpression.AssignmentOp;
 import xyz.lebster.core.node.expression.BinaryExpression.BinaryOp;
@@ -32,26 +31,28 @@ import static xyz.lebster.core.parser.TokenType.UnsignedRightShift;
 import static xyz.lebster.core.parser.TokenType.Void;
 import static xyz.lebster.core.parser.TokenType.*;
 
-public final class Token {
-	public final SourcePosition start;
-	public final TokenType type;
-	final String value;
-
-	public Token(SourcePosition start, TokenType type, String value) {
-		this.type = type;
-		this.value = value;
-		this.start = start;
-	}
-
-	public Token(SourcePosition start, TokenType type) {
-		this.type = type;
-		this.start = start;
-		this.value = null;
+/**
+ * Represents one token of some source text.<br>
+ * - {@link TokenType#StringLiteral String literal} / {@link TokenType#TemplateSpan Template span} tokens store their "cooked" text<br>
+ * - {@link TokenType#NumericLiteral Numeric literal} / {@link TokenType#BigIntLiteral BigInt} tokens store their base-10 value
+ * @param range Range which this token occupies
+ * @param type Type of token
+ * @param value Conceptual value which this token represents.
+ */
+public record Token(SourceRange range, TokenType type, String value) {
+	public Token(SourceRange range, TokenType type) {
+		this(range, type, range.getText());
 	}
 
 	@Override
 	public String toString() {
-		return StringEscapeUtils.quote(value == null ? Lexer.valueForSymbol(type) : value, false);
+		if (type == EOF) return "[EOF]";
+		return StringEscapeUtils.quote(value, false);
+	}
+
+	PrimitiveLiteral<StringValue> asStringLiteral() {
+		if (type == EOF) throw new ShouldNotHappen("Attempting to convert EOF token to string literal");
+		return new PrimitiveLiteral<>(range, new StringValue(value));
 	}
 
 	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
@@ -127,11 +128,11 @@ public final class Token {
 			   || type == Identifier
 			   || type == If
 			   || type == Import
-			   || type == TokenType.In
+			   || type == In
 			   || type == InstanceOf
 			   || type == Let
 			   || type == New
-			   || type == Null
+			   || type == NullLiteral
 			   || type == Return
 			   || type == Static
 			   || type == Super
@@ -188,7 +189,7 @@ public final class Token {
 			   || type == LParen
 			   || type == NaN
 			   || type == New
-			   || type == Null
+			   || type == NullLiteral
 			   || type == BigIntLiteral
 			   || type == NumericLiteral
 			   || type == RegexpPattern
@@ -213,7 +214,7 @@ public final class Token {
 			   || type == ExponentEquals
 			   || type == GreaterThan
 			   || type == GreaterThanEqual
-			   || type == TokenType.In
+			   || type == In
 			   || type == InstanceOf
 			   || type == LBracket
 			   || type == LParen
@@ -366,15 +367,5 @@ public final class Token {
 			case ExponentEquals -> ExponentAssign;
 			default -> throw state.unexpected();
 		};
-	}
-
-	PrimitiveLiteral<StringValue> asStringLiteral() {
-		if (value == null) throw new ShouldNotHappen("Attempting to convert constant token to string literal");
-		return new PrimitiveLiteral<>(range(), new StringValue(value));
-	}
-
-	public SourceRange range() {
-		if (value == null) throw new ShouldNotHappen("Attempting to get range() of constant token");
-		return new SourceRange(start.sourceText, start.index, start.index + value.length());
 	}
 }

@@ -83,12 +83,12 @@ public final class REPL {
 		int indent = 0;
 
 		do {
-			if (result.length() != 0) result.append('\n');
+			if (!result.isEmpty()) result.append('\n');
 			final String line = readLine(indent);
 			if (line == null) return null;
 			final Token[] tokens = Lexer.tokenize(line);
 			for (final Token token : tokens) {
-				switch (token.type) {
+				switch (token.type()) {
 					case LParen, LBrace, LBracket -> indent++;
 					case RParen, RBrace, RBracket -> indent--;
 				}

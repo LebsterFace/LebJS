@@ -30,13 +30,17 @@ public final class ParserState {
 		this.index = index;
 	}
 
+	public Token previousToken() {
+		return tokens[index - 1];
+	}
+
 	public SyntaxError expected(TokenType type) {
 		return expected(StringEscapeUtils.quote(Lexer.valueForSymbol(type), false));
 	}
 
 	public SyntaxError expected(String value) {
-		if (token.type == EOF) return new SyntaxError("Unexpected end of input, expected %s".formatted(value), token.start);
-		return new SyntaxError("Unexpected token %s, expected %s".formatted(token, value), token.start);
+		if (token.type() == EOF) return new SyntaxError("Unexpected end of input, expected %s".formatted(value), token.range().start());
+		return new SyntaxError("Unexpected token %s, expected %s".formatted(token, value), token.range().start());
 	}
 
 	public SyntaxError unexpected() {
@@ -44,8 +48,8 @@ public final class ParserState {
 	}
 
 	public SyntaxError unexpected(Token unexpectedToken) {
-		if (unexpectedToken.type == EOF) return new SyntaxError("Unexpected end of input", unexpectedToken.start);
-		return new SyntaxError("Unexpected token " + unexpectedToken, unexpectedToken.start);
+		if (unexpectedToken.type() == EOF) return new SyntaxError("Unexpected end of input", unexpectedToken.range().start());
+		return new SyntaxError("Unexpected token " + unexpectedToken, unexpectedToken.range().start());
 	}
 
 	Token consume() {
@@ -56,16 +60,16 @@ public final class ParserState {
 	}
 
 	String require(TokenType type) throws SyntaxError {
-		if (token.type != type) throw expected(type);
-		return consume().value;
+		if (token.type() != type) throw expected(type);
+		return consume().value();
 	}
 
 	Token accept(TokenType type) {
-		return token.type == type ? consume() : null;
+		return token.type() == type ? consume() : null;
 	}
 
 	boolean optional(TokenType type) {
-		if (token.type == type) {
+		if (token.type() == type) {
 			consume();
 			return true;
 		}
@@ -74,7 +78,7 @@ public final class ParserState {
 	}
 
 	boolean optional(TokenType type, String value) {
-		if (token.type == type && token.value.equals(value)) {
+		if (token.type() == type && token.value().equals(value)) {
 			consume();
 			return true;
 		}
@@ -99,7 +103,7 @@ public final class ParserState {
 
 	boolean is(TokenType... types) {
 		for (final TokenType type : types) {
-			if (token.type == type)
+			if (token.type() == type)
 				return true;
 		}
 
@@ -107,15 +111,11 @@ public final class ParserState {
 	}
 
 	boolean is(TokenType type) {
-		return token.type == type;
+		return token.type() == type;
 	}
 
 	boolean is(TokenType type, String value) {
-		return token.type == type && token.value.equals(value);
-	}
-
-	void consumeAll(TokenType t) {
-		while (token.type == t) consume();
+		return token.type() == type && token.value().equals(value);
 	}
 
 	public ParserState copy() {

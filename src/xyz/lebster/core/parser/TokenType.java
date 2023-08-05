@@ -68,7 +68,7 @@ public enum TokenType {
 	NaN,
 	New,
 	NotEqual,
-	Null,
+	NullLiteral,
 	NullishCoalescing,
 	NullishCoalescingEquals,
 	NumericLiteral,

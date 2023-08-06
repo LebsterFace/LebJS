@@ -90,7 +90,7 @@ public final class StringValue extends Key<String> {
 		final PrimitiveIterator.OfInt iterator = value.codePoints().iterator();
 		if (iterator.hasNext() && Lexer.isIdentifierStart(iterator.next())) {
 			while (iterator.hasNext()) {
-				if (Lexer.isIdentifierMiddle(iterator.next())) {
+				if (Lexer.isIdentifierPart(iterator.next())) {
 					continue;
 				}
 

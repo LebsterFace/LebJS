@@ -229,7 +229,7 @@ public final class Lexer {
 		}
 	}
 
-	public static boolean isIdentifierMiddle(int codePoint) {
+	public static boolean isIdentifierPart(int codePoint) {
 		if (codePoint == '\\') {
 			return false;
 		} else if (isAlphabetical(codePoint) || isDecimalDigit(codePoint) || codePoint == '_' || codePoint == '$') {
@@ -341,11 +341,17 @@ public final class Lexer {
 		return lastTokenType != null && isAcceptedType;
 	}
 
+	private static final int[] REGEXP_FLAGS = new int[] { 'd', 'g', 'i', 'm', 's', 'u', 'v', 'y' };
 	public Token next() throws SyntaxError {
 		if (lastTokenType == RegexpPattern) {
+			final Set<Integer> flags = new HashSet<>();
 			final int startIndex = index;
-			while (anyOf("dgimsuy")) {
-				consume();
+			while (hasNext() && isIdentifierPart(codePoint)) {
+				if (flags.contains(codePoint))
+					throw new SyntaxError("Duplicate flag %s in regular expression literal".formatted(quoteCodePoint(codePoint)), position());
+				if (Arrays.binarySearch(REGEXP_FLAGS, codePoint) < 0)
+					throw new SyntaxError("Invalid regular expression flag %s".formatted(quoteCodePoint(codePoint)), position());
+				flags.add(consume());
 			}
 
 			return new Token(range(startIndex), RegexpFlags);
@@ -409,7 +415,7 @@ public final class Lexer {
 		}
 
 		if (codePoint == '/' && !slashMeansDivision()) {
-			return consumeRegexpLiteral(startIndex);
+			return tokenizeRegexpLiteral(startIndex);
 		}
 
 		return tokenizeSymbol(startIndex);
@@ -429,30 +435,62 @@ public final class Lexer {
 		}
 	}
 
-	private Token consumeRegexpLiteral(int startIndex) throws SyntaxError {
+	private Token tokenizeRegexpLiteral(int startIndex) throws SyntaxError {
+		final StringBuilder builder = new StringBuilder();
 		consume();
 
-		boolean inCharacterClass = false;
+		boolean isClosed = false;
 		boolean escaped = false;
+		int characterClassStart = -1;
 		while (hasNext()) {
+			if (isLineTerminator()) {
+				throw new SyntaxError("Regular expression literal may not contain line terminator", position());
+			}
+
 			if (escaped) {
 				escaped = false;
-			} else if (inCharacterClass) {
-				if (codePoint == ']') {
-					inCharacterClass = false;
-				}
-			} else if (codePoint == '[') {
-				inCharacterClass = true;
-			} else if (codePoint == '\\') {
+				collect(builder);
+				continue;
+			}
+
+			if (characterClassStart != -1) {
+				if (codePoint == ']') characterClassStart = -1;
+				collect(builder);
+				continue;
+			}
+
+			if (codePoint == '[') {
+				characterClassStart = index;
+				collect(builder);
+				continue;
+			}
+
+			if (codePoint == '\\') {
 				escaped = true;
-			} else if (codePoint == '/') {
+				collect(builder);
+				continue;
+			}
+
+			if (codePoint == '/') {
+				isClosed = true;
+				consume();
 				break;
 			}
 
-			consume();
+			collect(builder);
 		}
 
-		return new Token(range(startIndex), RegexpPattern);
+		if (characterClassStart != -1)
+			throw new SyntaxError("Unclosed character class", position(characterClassStart));
+
+		if (!isClosed)
+			throw new SyntaxError("Unterminated regular expression literal", position(startIndex));
+
+		return new Token(range(startIndex), RegexpPattern, builder.toString());
+	}
+
+	private void collect(StringBuilder builder) throws SyntaxError {
+		builder.appendCodePoint(consume());
 	}
 
 	private boolean hasNext() {
@@ -496,7 +534,7 @@ public final class Lexer {
 			} else if (codePoint == '`') {
 				break;
 			} else {
-				builder.appendCodePoint(consume());
+				collect(builder);
 			}
 		}
 
@@ -554,7 +592,7 @@ public final class Lexer {
 				throw new SyntaxError("Unterminated string literal", position());
 			}
 
-			builder.appendCodePoint(consume());
+			collect(builder);
 		}
 
 		consume();
@@ -660,7 +698,7 @@ public final class Lexer {
 			// Optional: decimal part
 			final boolean isInteger = codePoint != '.';
 			if (!isInteger) {
-				builder.appendCodePoint(consume());
+				collect(builder);
 				if (codePoint == '_') throw new SyntaxError("Numeric separators are not allowed immediately after '.'", position());
 				collectIntegerDigits(builder, 10);
 			}
@@ -668,8 +706,8 @@ public final class Lexer {
 			// Optional: exponent
 			final boolean hasExponent = codePoint == 'e' || codePoint == 'E';
 			if (hasExponent) {
-				builder.appendCodePoint(consume());
-				if (codePoint == '-' || codePoint == '+') builder.appendCodePoint(consume());
+				collect(builder);
+				if (codePoint == '-' || codePoint == '+') collect(builder);
 				if (codePoint == '_') throw new SyntaxError("Numeric separators are not allowed immediately after 'e'", position());
 				if (!collectIntegerDigits(builder, 10)) {
 					throw new SyntaxError("Missing exponent", position());
@@ -703,7 +741,7 @@ public final class Lexer {
 			}
 
 			if (isDigit(codePoint, radix)) {
-				builder.appendCodePoint(consume());
+				collect(builder);
 				if (!consumedAnything) consumedAnything = true;
 			}
 		}
@@ -715,13 +753,13 @@ public final class Lexer {
 		return consumedAnything;
 	}
 
-	private String quoteCodePoint(int ch) {
-		return StringEscapeUtils.quote(codePoint == -1 ? "[-1]" : Character.toString(ch), false);
+	private String quoteCodePoint(int codePoint) {
+		return StringEscapeUtils.quote(codePoint == -1 ? "[-1]" : Character.toString(codePoint), false);
 	}
 
 	private Token tokenizeKeywordOrIdentifier(int startIndex) throws SyntaxError {
 		final StringBuilder builder = new StringBuilder();
-		while (isIdentifierMiddle(codePoint)) builder.appendCodePoint(consume());
+		while (isIdentifierPart(codePoint)) collect(builder);
 		final TokenType type = keywords.getOrDefault(builder.toString(), Identifier);
 		return new Token(range(startIndex), type);
 	}
@@ -742,6 +780,10 @@ public final class Lexer {
 
 	private SourcePosition position() {
 		return new SourcePosition(sourceText, index);
+	}
+
+	private SourcePosition position(int startIndex) {
+		return new SourcePosition(sourceText, startIndex);
 	}
 
 	private SourceRange range(int startIndex) {

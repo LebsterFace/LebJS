@@ -59,8 +59,7 @@ Test.expect(false, o.hasOwnProperty(Symbol("fake")));
 // Using hasOwnProperty as a property name
 {
     const foo = {
-        // FIXME: Use method here
-        hasOwnProperty: () => {
+        hasOwnProperty() {
             return false;
         },
         bar: 'Here be dragons',

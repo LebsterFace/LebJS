@@ -1,16 +1,20 @@
+// length is 0
+Test.expect(0, Array.prototype.reverse.length);
+
+// basic functionality
 // Odd length array
 let array = [1, 2, 3];
-Test.equals(array.reverse(), [3, 2, 1]);
-Test.equals(array, [3, 2, 1]);
+Test.equals([3, 2, 1], array.reverse());
+Test.equals([3, 2, 1], array);
 
 // Even length array
 array = [1, 2];
-Test.equals(array.reverse(), [2, 1]);
-Test.equals(array, [2, 1]);
+Test.equals([2, 1], array.reverse());
+Test.equals([2, 1], array);
 
 // Empty array
 array = [];
-Test.equals(array.reverse(), []);
-Test.equals(array, []);
+Test.equals([], array.reverse());
+Test.equals([], array);
 
 // TODO: tests for sparse arrays / non-configurable elements

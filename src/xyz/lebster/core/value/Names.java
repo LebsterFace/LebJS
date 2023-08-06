@@ -234,7 +234,6 @@ public final class Names {
 	public static final StringValue toLocaleString = new StringValue("toLocaleString");
 	public static final StringValue toLocaleUpperCase = new StringValue("toLocaleUpperCase");
 	public static final StringValue toLowerCase = new StringValue("toLowerCase");
-	public static final StringValue toPlainString = new StringValue("toPlainString");
 	public static final StringValue toPrecision = new StringValue("toPrecision");
 	public static final StringValue toPrimitive = new StringValue("toPrimitive");
 	public static final StringValue toReversed = new StringValue("toReversed");

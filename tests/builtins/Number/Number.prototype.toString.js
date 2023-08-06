@@ -12,6 +12,7 @@ Test.expect("358000", (358000).toString());
 Test.expect("2147483648", (2147483648).toString());
 Test.expect("4294967295", (4294967295).toString());
 Test.expect("18014398509481984", (18014398509481984).toString());
+Test.expect('5e-324', Number.MIN_VALUE.toString());
 
 // decimal radix gets converted to int
 Test.expect("30", (30).toString(10.1));

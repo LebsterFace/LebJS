@@ -2,7 +2,7 @@ package xyz.lebster.core.value.primitive.number;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
-import xyz.lebster.core.Ryu;
+import xyz.lebster.core.NumberToJSON;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -83,16 +83,9 @@ public final class NumberValue extends NumericValue<Double> {
 		return Double.toString(value);
 	}
 
-	public String toPlainString() {
-		return Ryu.doubleToString(value, false);
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-tostring")
 	public String stringValueOf(int radix) {
-		if (radix == 10) {
-			final boolean scientificNotation = Math.abs(value) >= 1e21 || Math.abs(value) < 1e-6;
-			return Ryu.doubleToString(value, scientificNotation);
-		}
+		if (radix == 10) return NumberToJSON.serializeNumber(value);
 
 		// Doesn't always produce identical output to other engines, but should be good enough for the foreseeable future.
 		double number = this.value;
@@ -128,7 +121,13 @@ public final class NumberValue extends NumericValue<Double> {
 				decimalPart -= integral;
 			}
 
-			Ryu.removeTrailingZeroes(characters);
+			while (characters.charAt(characters.length() - 1) == '0') {
+				characters.deleteCharAt(characters.length() - 1);
+			}
+
+			if (characters.charAt(characters.length() - 1) == '.') {
+				characters.deleteCharAt(characters.length() - 1);
+			}
 		}
 
 		return characters.toString();

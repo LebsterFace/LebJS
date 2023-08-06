@@ -37,19 +37,12 @@ public final class NumberPrototype extends ObjectValue {
 
 		// Non-standard
 		putMethod(intrinsics, Names.toExactString, 0, NumberPrototype::toExactString);
-		putMethod(intrinsics, Names.toPlainString, 0, NumberPrototype::toPlainString);
 	}
 
 	@NonStandard
 	private static StringValue toExactString(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		final NumberValue x = thisNumberValue(interpreter, "toExactString");
 		return new StringValue(x.toExactString());
-	}
-
-	@NonStandard
-	private static StringValue toPlainString(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final NumberValue x = thisNumberValue(interpreter, "toPlainString");
-		return new StringValue(x.toPlainString());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-number.prototype.toprecision")

@@ -15,8 +15,6 @@ public final class ArrowFunction extends Executable {
 	private final ArrowFunctionExpression expression;
 
 	public ArrowFunction(Intrinsics intrinsics, ArrowFunctionExpression expression, ExecutionContext context) {
-		// TODO: Automatic function names for arrow & non-arrow functions
-		//		e.g. ' let k = () => {} ' should be given the name 'k'
 		super(intrinsics.functionPrototype, Names.EMPTY, expression.parameters().expectedArgumentCount());
 		this.expression = expression;
 		this.context = context;

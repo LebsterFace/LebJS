@@ -2,11 +2,17 @@ package xyz.lebster.core.value.regexp;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
-import xyz.lebster.core.interpreter.Intrinsics;
+import xyz.lebster.core.StringEscapeUtils;
+import xyz.lebster.core.interpreter.AbruptCompletion;
+import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.HasBuiltinTag;
+import xyz.lebster.core.value.error.syntax.SyntaxErrorObject;
 import xyz.lebster.core.value.object.ObjectValue;
 
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 @NonCompliant
 public final class RegExpObject extends ObjectValue implements HasBuiltinTag {
@@ -14,8 +20,8 @@ public final class RegExpObject extends ObjectValue implements HasBuiltinTag {
 	public final String source;
 	public final String flags;
 
-	public RegExpObject(Intrinsics intrinsics, String source, String flags) {
-		super(intrinsics.regExpPrototype);
+	public RegExpObject(Interpreter interpreter, String source, String flags) throws AbruptCompletion {
+		super(interpreter.intrinsics.regExpPrototype);
 		// TODO: Other flags
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#advanced_searching_with_flags
 		int bitfield = 0;
@@ -28,7 +34,12 @@ public final class RegExpObject extends ObjectValue implements HasBuiltinTag {
 		// y - Perform a "sticky" search that matches starting at the current position in the target string.
 		this.source = source;
 		this.flags = flags;
-		this.pattern = Pattern.compile(sourceForPattern(), bitfield);
+		try {
+			this.pattern = Pattern.compile(sourceForPattern(), bitfield);
+		} catch (PatternSyntaxException e) {
+			final String message = "Invalid regular expression %s: %s".formatted(StringEscapeUtils.quote(e.getPattern(), false), e.getDescription());
+			throw error(new SyntaxErrorObject(interpreter, message));
+		}
 	}
 
 	/**

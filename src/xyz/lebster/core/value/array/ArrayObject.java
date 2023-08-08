@@ -9,6 +9,7 @@ import xyz.lebster.core.value.Displayable;
 import xyz.lebster.core.value.HasBuiltinTag;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
+import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.DataDescriptor;
 import xyz.lebster.core.value.object.Key;
@@ -23,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Iterable<PropertyDescriptor> {
@@ -54,17 +56,19 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage/#sec-arraysetlength")
 	public Undefined arraySetLength(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final var newLength = argument(0, arguments);
+		final Value<?> value = argument(0, arguments);
 
-		final int newLen = (int) Math.floor(newLength.toNumberValue(interpreter).value);
-		if (newLen == arrayValues.size()) return Undefined.instance;
+		final long newLen = value.toNumberValue(interpreter).toUint32();
+		final NumberValue numberLen = value.toNumberValue(interpreter);
+		if (newLen != numberLen.value)
+			throw error(new RangeError(interpreter, "Invalid array length"));
 
 		if (newLen > arrayValues.size()) {
-			final int delta = newLen - arrayValues.size();
+			final long delta = newLen - arrayValues.size();
 			for (int i = 0; i < delta; i++)
 				arrayValues.add(null);
-		} else {
-			arrayValues.subList(newLen, arrayValues.size()).clear();
+		} else if (newLen < arrayValues.size()) {
+			arrayValues.subList(Math.toIntExact(newLen), arrayValues.size()).clear();
 		}
 
 		return Undefined.instance;

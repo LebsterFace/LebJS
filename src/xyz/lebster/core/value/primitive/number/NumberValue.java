@@ -210,7 +210,7 @@ public final class NumberValue extends NumericValue<Double> {
 		long int_ = ((long) Math.floor(Math.abs(value))) * (long) Math.signum(value);
 		// 4. Let int32bit be int modulo 2^32.
 		// 5. Return 𝔽(int32bit).
-		return int_ % TWO_TO_THE_32;
+		return modulo(int_, TWO_TO_THE_32);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-lessThan")

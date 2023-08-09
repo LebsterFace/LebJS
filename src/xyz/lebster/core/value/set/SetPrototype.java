@@ -1,9 +1,7 @@
 package xyz.lebster.core.value.set;
 
-import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
@@ -67,7 +65,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		final SetObject S = requireSetData(interpreter, "add()");
+		final SetObject S = requireSetData(interpreter, "add");
 
 		// 3. Let entries be the List that is S.[[SetData]].
 		final ArrayList<Value<?>> entries = S.setData;
@@ -93,7 +91,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		final SetObject S = requireSetData(interpreter, "clear()");
+		final SetObject S = requireSetData(interpreter, "clear");
 		// 3. Let entries be the List that is S.[[SetData]].
 		final ArrayList<Value<?>> entries = S.setData;
 		// 4. For each element e of entries, do: replace the element of entries whose value is e with an element whose value is empty.
@@ -109,7 +107,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		final SetObject S = requireSetData(interpreter, "delete()");
+		final SetObject S = requireSetData(interpreter, "delete");
 		// 3. Let entries be the List that is S.[[SetData]].
 		final ArrayList<Value<?>> entries = S.setData;
 		// 4. For each element e of entries, do
@@ -129,10 +127,13 @@ public final class SetPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.entries")
-	private static Value<?> entries(Interpreter interpreter, Value<?>[] arguments) {
+	private static Value<?> entries(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 24.2.3.5 Set.prototype.entries ( )
 
-		throw new NotImplemented("Set.prototype.entries");
+		// 1. Let S be the `this` value.
+		final SetObject S = requireSetData(interpreter, "entries");
+		// 2. Return ? CreateSetIterator(S, key+value).
+		return new SetIterator(interpreter, S, false);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.foreach")
@@ -143,7 +144,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		final SetObject S = requireSetData(interpreter, "forEach()");
+		final SetObject S = requireSetData(interpreter, "forEach");
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable callbackfn = Executable.getExecutable(interpreter, callbackfn_);
 		// 4. Let entries be the List that is S.[[SetData]].
@@ -179,7 +180,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		final SetObject S = requireSetData(interpreter, "has()");
+		final SetObject S = requireSetData(interpreter, "has");
 		// 3. Let entries be the List that is S.[[SetData]].
 		final ArrayList<Value<?>> entries = S.setData;
 		// 4. For each element e of entries, do
@@ -192,20 +193,14 @@ public final class SetPrototype extends ObjectValue {
 		return BooleanValue.FALSE;
 	}
 
-	@NonCompliant
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createsetiterator")
-	private static Generator createSetIterator(Interpreter interpreter, SetObject set, SetIteratorKind kind) throws AbruptCompletion {
-		return new SetIterator(interpreter, set, kind);
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.values")
 	private static Value<?> values(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 24.2.3.10 Set.prototype.values ( )
 
 		// 1. Let S be the `this` value.
-		final SetObject S = requireSetData(interpreter, "values()");
+		final SetObject S = requireSetData(interpreter, "values");
 		// 2. Return ? CreateSetIterator(S, value).
-		return createSetIterator(interpreter, S, SetIteratorKind.Value);
+		return new SetIterator(interpreter, S, true);
 	}
 
 	@Proposal
@@ -216,7 +211,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "union()");
+		final SetObject O = requireSetData(interpreter, "union");
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other);
 		// 4. Let keysIter be ? GetKeysIterator(otherRec).
@@ -299,7 +294,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "intersection()");
+		final SetObject O = requireSetData(interpreter, "intersection");
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other);
 		// 4. Let resultSetData be a new empty List.
@@ -375,7 +370,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "difference()");
+		final SetObject O = requireSetData(interpreter, "difference");
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other);
 		// 4. Let resultSetData be a copy of O.[[SetData]].
@@ -438,7 +433,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "symmetricDifference()");
+		final SetObject O = requireSetData(interpreter, "symmetricDifference");
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other);
 		// 4. Let keysIter be ? GetKeysIterator(otherRec).
@@ -486,7 +481,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "isSubsetOf()");
+		final SetObject O = requireSetData(interpreter, "isSubsetOf");
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other);
 		// 4. Let thisSize be the number of elements in O.[[SetData]].
@@ -513,7 +508,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "isSupersetOf()");
+		final SetObject O = requireSetData(interpreter, "isSupersetOf");
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other);
 		// 4. Let thisSize be the number of elements in O.[[SetData]].
@@ -549,7 +544,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "isDisjointFrom()");
+		final SetObject O = requireSetData(interpreter, "isDisjointFrom");
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other);
 		// 4. Let thisSize be the number of elements in O.[[SetData]].
@@ -591,8 +586,6 @@ public final class SetPrototype extends ObjectValue {
 		return BooleanValue.TRUE;
 	}
 
-	private enum SetIteratorKind { KeyValue, Value }
-
 	@Proposal
 	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set-records")
 	private record SetRecord(ObjectValue set, int size, Executable has, Executable keys) {
@@ -612,16 +605,17 @@ public final class SetPrototype extends ObjectValue {
 		}
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createsetiterator")
 	private static class SetIterator extends Generator {
-		private final SetIteratorKind kind;
+		private final boolean valuesOnly;
 		private final ArrayList<Value<?>> entries;
 		private int index;
 
-		private SetIterator(Interpreter interpreter, SetObject set, SetIteratorKind kind) {
+		private SetIterator(Interpreter interpreter, SetObject set, boolean valuesOnly) {
 			super(interpreter.intrinsics);
 			this.index = 0;
 			this.entries = set.setData;
-			this.kind = kind;
+			this.valuesOnly = valuesOnly;
 		}
 
 		@Override
@@ -635,8 +629,7 @@ public final class SetPrototype extends ObjectValue {
 				final Value<?> value = entries.get(index);
 				index = index + 1;
 				if (value == null) continue;
-				if (kind == SetIteratorKind.KeyValue) return new ArrayObject(interpreter, value, value);
-				return value;
+				return valuesOnly ? value : new ArrayObject(interpreter, value, value);
 			}
 		}
 	}

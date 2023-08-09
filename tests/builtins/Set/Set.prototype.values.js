@@ -13,20 +13,27 @@ Test.expect(0, Set.prototype.values.length);
     Test.equals({ value: undefined, done: true }, it.next());
 }
 
-// keys is an alias for values
-// length
-Test.expect(0, Set.prototype.keys.length);
+// aliases
+Test.expect(Set.prototype.values, Set.prototype.keys);
+Test.expect(Set.prototype.values, Set.prototype[Symbol.iterator]);
 
 // basic functionality
 {
     const a = new Set([1, 2, 3]);
-    const it = a.keys();
+    const keys_it = a.keys();
+    const it = a[Symbol.iterator]();
+    Test.equals({ value: 1, done: false }, keys_it.next());
     Test.equals({ value: 1, done: false }, it.next());
+    Test.equals({ value: 2, done: false }, keys_it.next());
     Test.equals({ value: 2, done: false }, it.next());
+    Test.equals({ value: 3, done: false }, keys_it.next());
     Test.equals({ value: 3, done: false }, it.next());
     Test.equals({ value: undefined, done: true }, it.next());
+    Test.equals({ value: undefined, done: true }, keys_it.next());
     Test.equals({ value: undefined, done: true }, it.next());
+    Test.equals({ value: undefined, done: true }, keys_it.next());
     Test.equals({ value: undefined, done: true }, it.next());
+    Test.equals({ value: undefined, done: true }, keys_it.next());
 }
 
 // elements added after iteration start are still visited

@@ -1,6 +1,5 @@
 package xyz.lebster.core.value;
 
-import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -70,19 +69,7 @@ public final class IteratorHelper {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iterator-records")
-	public static final class IteratorRecord {
-		private final ObjectValue iteratorObject;
-		private final Executable nextMethod;
-		private final String errorString;
-		private final String methodName;
-
-		public IteratorRecord(ObjectValue iteratorObject, Executable nextMethod, String display, String methodName) {
-			this.iteratorObject = iteratorObject;
-			this.nextMethod = nextMethod;
-			this.errorString = display;
-			this.methodName = methodName;
-		}
-
+	public record IteratorRecord(ObjectValue iteratorObject, Executable nextMethod, String errorString, String methodName) {
 		@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratornext")
 		public ObjectValue next(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
 			// 1. If value is not present, then
@@ -104,13 +91,12 @@ public final class IteratorHelper {
 		@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorstep")
 		public ObjectValue step(Interpreter interpreter) throws AbruptCompletion {
 			// 1. Let result be ? IteratorNext(iteratorRecord).
-			final var result = next(interpreter, null);
+			final ObjectValue result = next(interpreter, null);
 			// 2. Let done be ? IteratorComplete(result).
-			final var done = iteratorComplete(interpreter, result);
+			final boolean done = iteratorComplete(interpreter, result);
 			// 3. If done is true, return false.
-			if (done) return null;
 			// 4. Return result.
-			return result;
+			return done ? null : result;
 		}
 
 		public void collect(Interpreter interpreter, List<Value<?>> result) throws AbruptCompletion {

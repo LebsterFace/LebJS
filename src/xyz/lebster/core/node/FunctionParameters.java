@@ -5,36 +5,20 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.declaration.AssignmentPattern;
 import xyz.lebster.core.node.declaration.AssignmentTarget;
+import xyz.lebster.core.node.declaration.IdentifierExpression;
 import xyz.lebster.core.node.declaration.Kind;
-import xyz.lebster.core.node.expression.Expression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.globals.Undefined;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public final class FunctionParameters implements Iterable<AssignmentPattern> {
-	private final List<AssignmentPattern> formalParameters = new ArrayList<>();
-	public AssignmentTarget rest;
-
-	public FunctionParameters() {
-	}
-
-	public FunctionParameters(AssignmentTarget... assignmentTargets) {
-		for (final AssignmentTarget p : assignmentTargets) {
-			this.add(p);
-		}
-	}
-
-	public void addWithDefault(AssignmentTarget target, Expression defaultExpression) {
-		this.formalParameters.add(new AssignmentPattern(target, defaultExpression));
-	}
-
-	public void add(AssignmentTarget target) {
-		this.formalParameters.add(new AssignmentPattern(target, null));
+public record FunctionParameters(List<AssignmentPattern> formalParameters, AssignmentTarget rest) implements Iterable<AssignmentPattern> {
+	public FunctionParameters(IdentifierExpression identifier) {
+		this(Collections.singletonList(new AssignmentPattern(identifier, null)), null);
 	}
 
 	public void declareArguments(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {

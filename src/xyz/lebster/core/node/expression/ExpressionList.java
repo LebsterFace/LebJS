@@ -8,13 +8,9 @@ import xyz.lebster.core.value.Value;
 
 import java.util.ArrayList;
 
-public final class ExpressionList {
-	private final ArrayList<ExpressionNode> backingList;
-	private final boolean canHaveEmpty;
-
+public record ExpressionList(boolean canHaveEmpty, ArrayList<ExpressionNode> backingList) {
 	public ExpressionList(boolean canHaveEmpty) {
-		this.canHaveEmpty = canHaveEmpty;
-		this.backingList = new ArrayList<>();
+		this(canHaveEmpty, new ArrayList<>());
 	}
 
 	public void addSingleExpression(Expression expression) {

@@ -603,14 +603,16 @@ public final class Parser {
 	private FunctionParameters parseFunctionParameters(boolean expectLParen) throws SyntaxError {
 		if (expectLParen) state.require(LParen);
 
-		final FunctionParameters result = new FunctionParameters();
+		final List<AssignmentPattern> formalParameters = new ArrayList<>();
+		AssignmentTarget rest = null;
+
 		consumeAllLineTerminators();
 		while (!state.is(RParen)) {
 			consumeAllLineTerminators();
 			if (state.optional(DotDotDot)) {
 				// Note: Rest parameter may not have a default initializer
 				consumeAllLineTerminators();
-				result.rest = parseAssignmentTarget(false);
+				rest = parseAssignmentTarget(false);
 				consumeAllLineTerminators();
 				if (state.optional(Comma)) throw new SyntaxError("Rest parameter must be last formal parameter", position());
 				break;
@@ -619,9 +621,9 @@ public final class Parser {
 				consumeAllLineTerminators();
 				if (state.optional(Equals)) {
 					final Expression defaultExpression = parseSpecAssignmentExpression();
-					result.addWithDefault(target, defaultExpression);
+					formalParameters.add(new AssignmentPattern(target, defaultExpression));
 				} else {
-					result.add(target);
+					formalParameters.add(new AssignmentPattern(target, null));
 				}
 			}
 
@@ -630,7 +632,7 @@ public final class Parser {
 		}
 
 		state.require(RParen);
-		return result;
+		return new FunctionParameters(formalParameters, rest);
 	}
 
 	private FunctionDeclaration parseFunctionDeclaration() throws SyntaxError {

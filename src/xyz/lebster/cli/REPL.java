@@ -14,13 +14,9 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.Scanner;
 
-public final class REPL {
-	private final CLArguments.ExecutionOptions options;
-	private final Scanner scanner = new Scanner(System.in);
-	private final Interpreter interpreter = new Interpreter();
-
+public record REPL(CLArguments.ExecutionOptions options, Scanner scanner, Interpreter interpreter) {
 	public REPL(CLArguments.ExecutionOptions options) {
-		this.options = options;
+		this(options, new Scanner(System.in), new Interpreter());
 	}
 
 	public void run() {

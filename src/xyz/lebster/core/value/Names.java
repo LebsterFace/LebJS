@@ -241,6 +241,7 @@ public final class Names {
 	public static final StringValue toExactString = new StringValue("toExactString");
 	public static final StringValue toExponential = new StringValue("toExponential");
 	public static final StringValue toFixed = new StringValue("toFixed");
+	public static final StringValue toJSON = new StringValue("toJSON");
 	public static final StringValue toLocaleLowerCase = new StringValue("toLocaleLowerCase");
 	public static final StringValue toLocaleString = new StringValue("toLocaleString");
 	public static final StringValue toLocaleUpperCase = new StringValue("toLocaleUpperCase");

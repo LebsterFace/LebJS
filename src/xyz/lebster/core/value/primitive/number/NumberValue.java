@@ -180,7 +180,7 @@ public final class NumberValue extends NumericValue<Double> {
 		}
 	}
 
-	private static long modulo(long x, long y) {
+	public static long modulo(long x, long y) {
 		final long result = x % y;
 		return result < 0 ? result + y : result;
 	}

@@ -1,19 +1,19 @@
 // basic functionality
 Test.expect(2, JSON.parse.length);
-
-Test.equals(5, JSON.parse("5"));
-Test.equals(null, JSON.parse("null"));
-Test.equals(true, JSON.parse("true"));
-Test.equals(false, JSON.parse("false"));
-Test.equals("test", JSON.parse('"test"'));
+Test.expect(5, JSON.parse("5"));
+Test.expect(null, JSON.parse("null"));
+Test.expect(true, JSON.parse("true"));
+Test.expect(false, JSON.parse("false"));
+Test.expect("test", JSON.parse('"test"'));
 Test.equals([1, 2, "foo"], JSON.parse('[1,2,"foo"]'));
 Test.equals({ foo: 1, bar: "baz" }, JSON.parse('{"foo":1,"bar":"baz"}'));
 
 // negative zero
-for (const testCase of ["-0", " \n-0", "-0  \t", "\n\t -0\n   ", "-0.0"]) {
-	Test.expect(-0.0, JSON.parse(testCase));
-}
-
+Test.expect(-0.0, JSON.parse("-0"));
+Test.expect(-0.0, JSON.parse(" \n-0"));
+Test.expect(-0.0, JSON.parse("-0  \t"));
+Test.expect(-0.0, JSON.parse("\n\t -0\n   "));
+Test.expect(-0.0, JSON.parse("-0.0"));
 Test.expect(0, JSON.parse(-0));
 Test.expect(1644452550.6489999294281, JSON.parse("1644452550.6489999294281"));
 Test.expect(1234567890123, JSON.parse("1234567890123"));
@@ -33,6 +33,24 @@ Test.expect(9008199254740994, JSON.parse("9008199254740994"));
 Test.expect(18446744073709551615, JSON.parse("18446744073709551615"));
 Test.expect(18446744073709551616, JSON.parse("18446744073709551616"));
 Test.expect(18446744073709551617, JSON.parse("18446744073709551617"));
+
+const string = `{"var1":10,"var2":"hello","var3":{"nested":5}}`;
+
+Test.equals({ var1: 20, var2: "hello", var3: { nested: 10 } }, JSON.parse(string, (key, value) => {
+	if (typeof value === "number") {
+		return value * 2;
+	} else {
+		return value;
+	}
+}));
+
+Test.equals({ var2: "hello", var3: {} }, JSON.parse(string, (key, value) => {
+	if (typeof value === "number") {
+		return undefined;
+	} else {
+		return value;
+	}
+}));
 
 Test.equals(-0.1, JSON.parse("-0.1"));
 Test.equals(" ", JSON.parse("\" \""));

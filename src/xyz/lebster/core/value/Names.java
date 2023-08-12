@@ -185,6 +185,7 @@ public final class Names {
 	public static final StringValue name = new StringValue("name");
 	public static final StringValue next = new StringValue("next");
 	public static final StringValue normalize = new StringValue("normalize");
+	public static final StringValue null_ = new StringValue("null");
 	public static final StringValue number = new StringValue("number");
 	public static final StringValue of = new StringValue("of");
 	public static final StringValue padEnd = new StringValue("padEnd");

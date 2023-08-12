@@ -16,27 +16,27 @@ public abstract class PrimitiveWrapper<T extends PrimitiveValue<?>, P extends Ob
 	}
 
 	@Override
-	public StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
+	public final StringValue toStringValue(Interpreter interpreter) throws AbruptCompletion {
 		return data.toStringValue(interpreter);
 	}
 
 	@Override
-	public NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion {
+	public final NumberValue toNumberValue(Interpreter interpreter) throws AbruptCompletion {
 		return data.toNumberValue(interpreter);
 	}
 
 	@Override
-	public BooleanValue toBooleanValue(Interpreter interpreter) throws AbruptCompletion {
+	public final BooleanValue toBooleanValue(Interpreter interpreter) throws AbruptCompletion {
 		return data.toBooleanValue(interpreter);
 	}
 
 	@Override
-	public boolean displayAsJSON() {
+	public final boolean displayAsJSON() {
 		return false;
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
+	public final void display(StringBuilder builder) {
 		data.display(builder);
 	}
 }

@@ -354,30 +354,30 @@ public final class StringPrototype extends ObjectValue {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.padend")
 	private static StringValue padEnd(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 22.1.3.15 String.prototype.padEnd ( maxLength [ , fillString ] )
+		// 22.1.3.16 String.prototype.padEnd ( maxLength [ , fillString ] )
 		final Value<?> maxLength = argument(0, arguments);
 		final Value<?> fillString = argument(1, arguments);
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.padEnd");
-		// 2. Return ? StringPad(O, maxLength, fillString, end).
-		return stringPad(interpreter, O, maxLength, fillString, false);
+		// 2. Return ? StringPaddingBuiltinsImpl(O, maxLength, fillString, end).
+		return stringPaddingBuiltinsImpl(interpreter, O, maxLength, fillString, false);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.padstart")
 	private static StringValue padStart(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 22.1.3.16 String.prototype.padStart ( maxLength [ , fillString ] )
+		// 22.1.3.17 String.prototype.padStart ( maxLength [ , fillString ] )
 		final Value<?> maxLength = argument(0, arguments);
 		final Value<?> fillString = argument(1, arguments);
 
 		// 1. Let O be ? RequireObjectCoercible(this value).
 		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.padStart");
-		// 2. Return ? StringPad(O, maxLength, fillString, start).
-		return stringPad(interpreter, O, maxLength, fillString, true);
+		// 2. Return ? StringPaddingBuiltinsImpl(O, maxLength, fillString, start).
+		return stringPaddingBuiltinsImpl(interpreter, O, maxLength, fillString, true);
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-stringpad")
-	private static StringValue stringPad(Interpreter interpreter, Value<?> O, Value<?> maxLength, Value<?> fillString, boolean start) throws AbruptCompletion {
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-stringpaddingbuiltinsimpl")
+	private static StringValue stringPaddingBuiltinsImpl(Interpreter interpreter, Value<?> O, Value<?> maxLength, Value<?> fillString_, boolean start) throws AbruptCompletion {
 		// 1. Let S be ? ToString(O).
 		final StringValue S = O.toStringValue(interpreter);
 		// 2. Let intMaxLength be ℝ(? ToLength(maxLength)).
@@ -386,20 +386,28 @@ public final class StringPrototype extends ObjectValue {
 		final int stringLength = S.value.length();
 		// 4. If intMaxLength ≤ stringLength, return S.
 		if (intMaxLength <= stringLength) return S;
-		// 5. If fillString is undefined, let filler be the String value consisting solely of the code unit 0x0020 (SPACE).
-		final String filler = fillString == Undefined.instance ? " "
-			// 6. Else, let filler be ? ToString(fillString).
-			: fillString.toStringValue(interpreter).value;
-		// 7. If filler is the empty String, return S.
-		if (filler.isEmpty()) return S;
-		// 8. Let fillLen be intMaxLength - stringLength.
-		final int fillLen = intMaxLength - stringLength;
-		// 9. Let truncatedStringFiller be the String value consisting of repeated concatenations of `filler` truncated to length `fillLen`.
-		final String truncatedStringFiller = filler.repeat((fillLen / filler.length()) + 1).substring(0, fillLen);
-		// 10. If placement is start, return the string-concatenation of truncatedStringFiller and S.
-		if (start) return new StringValue(truncatedStringFiller + S.value);
-		// 11. Else, return the string-concatenation of S and truncatedStringFiller.
-		return new StringValue(S.value + truncatedStringFiller);
+		// 5. If fillString is undefined, set fillString to the String value consisting solely of the code unit 0x0020 (SPACE).
+		// 6. Else, set fillString to ? ToString(fillString).
+		final String fillString = fillString_ == Undefined.instance ? " " : fillString_.toStringValue(interpreter).value;
+		// 7. Return StringPad(S, intMaxLength, fillString, placement).
+		return new StringValue(stringPad(S.value, intMaxLength, fillString, start));
+	}
+
+	public static String stringPad(String S, int maxLength, String fillString, boolean start) {
+		// 1. Let stringLength be the length of S.
+		final int stringLength = S.length();
+		// 2. If maxLength ≤ stringLength, return S.
+		if (maxLength <= stringLength) return S;
+		// 3. If fillString is the empty String, return S.
+		if (fillString.isEmpty()) return S;
+		// 4. Let fillLen be maxLength - stringLength.
+		final int fillLen = maxLength - stringLength;
+		// 5. Let truncatedStringFiller be the String value consisting of repeated concatenations of fillString truncated to length fillLen.
+		final String truncatedStringFiller = fillString.repeat((fillLen / fillString.length()) + 1).substring(0, fillLen);
+		// 6. If placement is start, return the string-concatenation of truncatedStringFiller and S.
+		if (start) return truncatedStringFiller + S;
+		// 7. Else, return the string-concatenation of S and truncatedStringFiller.
+		else return S + truncatedStringFiller;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.repeat")

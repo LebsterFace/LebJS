@@ -286,8 +286,11 @@ public final class Lexer {
 	}
 
 	private int peekNext() throws SyntaxError {
-		if (!hasNext()) throw new SyntaxError("Unexpected end of input", position());
-		return codePoints[index + 1];
+		if (index + 1 < codePoints.length) {
+			return codePoints[index + 1];
+		} else {
+			throw new SyntaxError("Unexpected end of input", position());
+		}
 	}
 
 	private boolean peek(String compare) {

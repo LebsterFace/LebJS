@@ -149,7 +149,7 @@ public final class JSONObject extends ObjectValue {
 					// 4. Else,
 					else {
 						// TODO: a. Perform ? CreateDataProperty(val, prop, newElement).
-						obj.put(prop, newElement);
+						obj.set(interpreter, prop, newElement);
 					}
 					// 5. Set I to I + 1.
 				}

@@ -139,10 +139,13 @@ public final class NumberValue extends NumericValue<Double> {
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
-		builder.append(ANSI.BRIGHT_YELLOW);
-		builder.append(stringValueOf(10));
-		builder.append(ANSI.RESET);
+	protected String displayColor() {
+		return ANSI.BRIGHT_YELLOW;
+	}
+
+	@Override
+	protected String rawDisplayString() {
+		return stringValueOf(10);
 	}
 
 	@Override

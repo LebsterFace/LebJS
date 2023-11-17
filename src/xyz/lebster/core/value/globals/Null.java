@@ -32,10 +32,13 @@ public final class Null extends PrimitiveValue<Void> {
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
-		builder.append(ANSI.BRIGHT_WHITE);
-		builder.append("null");
-		builder.append(ANSI.RESET);
+	protected String displayColor() {
+		return ANSI.BRIGHT_WHITE;
+	}
+
+	@Override
+	protected String rawDisplayString() {
+		return "null";
 	}
 
 	@Override

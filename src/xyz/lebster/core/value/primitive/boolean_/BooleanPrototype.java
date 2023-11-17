@@ -35,7 +35,7 @@ public final class BooleanPrototype extends ObjectValue {
 		// 1. Let b be ? thisBooleanValue(this value).
 		final BooleanValue b = thisBooleanValue(interpreter, "toString");
 		// 2. If b is true, return "true"; else return "false".
-		return b.stringValue;
+		return b.value ? Names.true_ : Names.false_;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#thisbooleanvalue")

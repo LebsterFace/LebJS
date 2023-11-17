@@ -78,11 +78,13 @@ public final class BigIntValue extends NumericValue<BigInteger> {
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
-		builder.append(ANSI.BRIGHT_CYAN);
-		builder.append(value.toString());
-		builder.append('n');
-		builder.append(ANSI.RESET);
+	protected String displayColor() {
+		return ANSI.BRIGHT_CYAN;
+	}
+
+	@Override
+	protected String rawDisplayString() {
+		return value.toString() + "n";
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package xyz.lebster.core.value.primitive.symbol;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.NonStandard;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -130,8 +131,13 @@ public final class SymbolValue extends Key<Void> {
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
-		builder.append(symbolDescriptiveString());
+	protected String displayColor() {
+		return ANSI.WHITE;
+	}
+
+	@Override
+	protected String rawDisplayString() {
+		return symbolDescriptiveString();
 	}
 
 	public String symbolDescriptiveString() {

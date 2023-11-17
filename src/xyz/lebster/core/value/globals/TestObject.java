@@ -13,6 +13,7 @@ import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
+import xyz.lebster.core.value.primitive.PrimitiveWrapper;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import static xyz.lebster.core.value.function.NativeFunction.argument;
@@ -119,6 +120,13 @@ public final class TestObject extends ObjectValue {
 				if (!expected.hasOwnProperty(recievedKey)) return false;
 			}
 
+			return true;
+		} else if (
+			a instanceof final PrimitiveWrapper<?,?> expected &&
+			b instanceof final PrimitiveWrapper<?,?> received &&
+			equals(interpreter, expected.getPrototype(), received.getPrototype()) &&
+			equals(interpreter, expected.data, received.data)
+		) {
 			return true;
 		} else {
 			return a.equals(b);

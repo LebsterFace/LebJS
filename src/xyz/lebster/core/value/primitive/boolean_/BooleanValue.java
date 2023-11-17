@@ -2,21 +2,17 @@ package xyz.lebster.core.value.primitive.boolean_;
 
 import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.primitive.PrimitiveValue;
 import xyz.lebster.core.value.primitive.bigint.BigIntValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 public final class BooleanValue extends PrimitiveValue<Boolean> {
-	public static final BooleanValue TRUE = new BooleanValue(Boolean.TRUE, Names.true_);
-	public static final BooleanValue FALSE = new BooleanValue(Boolean.FALSE, Names.false_);
+	public static final BooleanValue TRUE = new BooleanValue(Boolean.TRUE);
+	public static final BooleanValue FALSE = new BooleanValue(Boolean.FALSE);
 
-	public final StringValue stringValue;
-
-	private BooleanValue(boolean value, StringValue stringValue) {
+	private BooleanValue(boolean value) {
 		super(value);
-		this.stringValue = stringValue;
 	}
 
 	public static BooleanValue of(boolean b) {
@@ -24,10 +20,13 @@ public final class BooleanValue extends PrimitiveValue<Boolean> {
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
-		builder.append(ANSI.BRIGHT_YELLOW);
-		builder.append(value);
-		builder.append(ANSI.RESET);
+	protected String displayColor() {
+		return ANSI.BRIGHT_YELLOW;
+	}
+
+	@Override
+	protected String rawDisplayString() {
+		return value.toString();
 	}
 
 	@Override

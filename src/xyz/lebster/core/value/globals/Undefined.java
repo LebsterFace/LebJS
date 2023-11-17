@@ -52,10 +52,13 @@ public final class Undefined extends PrimitiveValue<Void> {
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
-		builder.append(ANSI.BRIGHT_BLACK);
-		builder.append("undefined");
-		builder.append(ANSI.RESET);
+	protected String displayColor() {
+		return ANSI.BRIGHT_BLACK;
+	}
+
+	@Override
+	protected String rawDisplayString() {
+		return "undefined";
 	}
 
 	@Override

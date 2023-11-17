@@ -1,5 +1,6 @@
 package xyz.lebster.core.value.primitive;
 
+import xyz.lebster.core.ANSI;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.value.object.ObjectValue;
@@ -37,6 +38,12 @@ public abstract class PrimitiveWrapper<T extends PrimitiveValue<?>, P extends Ob
 
 	@Override
 	public final void display(StringBuilder builder) {
-		data.display(builder);
+		builder.append(data.displayColor());
+		builder.append('[');
+		builder.append(getClass().getSimpleName());
+		builder.append(": ");
+		builder.append(data.rawDisplayString());
+		builder.append(']');
+		builder.append(ANSI.RESET);
 	}
 }

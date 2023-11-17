@@ -71,10 +71,13 @@ public final class StringValue extends Key<String> {
 	}
 
 	@Override
-	public void display(StringBuilder builder) {
-		builder.append(ANSI.GREEN);
-		builder.append(StringEscapeUtils.quote(value, false));
-		builder.append(ANSI.RESET);
+	protected String displayColor() {
+		return ANSI.GREEN;
+	}
+
+	@Override
+	protected String rawDisplayString() {
+		return StringEscapeUtils.quote(value, false);
 	}
 
 	@Override

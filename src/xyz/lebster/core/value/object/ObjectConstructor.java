@@ -22,6 +22,7 @@ import java.util.List;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
+import static xyz.lebster.core.value.function.NativeFunction.argumentRest;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
 public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, ObjectPrototype> {
@@ -244,8 +245,40 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.assign")
-	private static Value<?> assign(Interpreter interpreter, Value<?>[] arguments) {
-		throw new NotImplemented("Object.assign");
+	private static ObjectValue assign(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.1.2.1 Object.assign ( target, ...sources )
+		final Value<?> target = argument(0, arguments);
+		final Value<?>[] sources = argumentRest(1, arguments);
+
+		// 1. Let to be ? ToObject(target).
+		final ObjectValue to = target.toObjectValue(interpreter);
+		// 2. If only one argument was passed, return to.
+		if (arguments.length == 1) return to;
+
+		// 3. For each element nextSource of sources, do
+		for (final Value<?> nextSource : sources) {
+			// a. If nextSource is neither undefined nor null, then
+			if (nextSource.isNullish()) continue;
+			// i. Let from be ! ToObject(nextSource).
+			final ObjectValue from = nextSource.toObjectValue(interpreter);
+			// ii. Let keys be ? from.[[OwnPropertyKeys]]().
+			final Iterable<Key<?>> keys = from.ownPropertyKeys();
+			// iii. For each element nextKey of keys, do
+			for (final Key<?> nextKey : keys) {
+				// 1. Let desc be ? from.[[GetOwnProperty]](nextKey).
+				final PropertyDescriptor desc = from.getOwnProperty(nextKey);
+				// 2. If desc is not undefined and desc.[[Enumerable]] is true, then
+				if (desc != null && desc.isEnumerable()) {
+					// a. Let propValue be ? Get(from, nextKey).
+					final Value<?> propValue = from.get(interpreter, nextKey);
+					// b. Perform ? Set(to, nextKey, propValue, true).
+					to.set(interpreter, nextKey, propValue/*, true */);
+				}
+			}
+		}
+
+		// 4. Return to.
+		return to;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.defineproperties")

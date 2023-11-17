@@ -6,7 +6,7 @@ public final class Names {
 	public static final StringValue Array = new StringValue("Array");
 	public static final StringValue BigInt = new StringValue("BigInt");
 	public static final StringValue Boolean = new StringValue("Boolean");
-	public static final StringValue DEG_PER_RAD = new StringValue("DEG_PER_RAD");
+	public static final StringValue DEG_TO_RAD = new StringValue("DEG_TO_RAD");
 	public static final StringValue E = new StringValue("E");
 	public static final StringValue EPSILON = new StringValue("EPSILON");
 	public static final StringValue Error = new StringValue("Error");
@@ -29,7 +29,7 @@ public final class Names {
 	public static final StringValue Object = new StringValue("Object");
 	public static final StringValue PI = new StringValue("PI");
 	public static final StringValue POSITIVE_INFINITY = new StringValue("POSITIVE_INFINITY");
-	public static final StringValue RAD_PER_DEG = new StringValue("RAD_PER_DEG");
+	public static final StringValue RAD_TO_DEG = new StringValue("RAD_TO_DEG");
 	public static final StringValue RangeError = new StringValue("RangeError");
 	public static final StringValue ReferenceError = new StringValue("ReferenceError");
 	public static final StringValue RegExp = new StringValue("RegExp");
@@ -108,7 +108,6 @@ public final class Names {
 	public static final StringValue exp = new StringValue("exp");
 	public static final StringValue expect = new StringValue("expect");
 	public static final StringValue expectError = new StringValue("expectError");
-	public static final StringValue expectSyntaxError = new StringValue("expectSyntaxError");
 	public static final StringValue expm1 = new StringValue("expm1");
 	public static final StringValue fail = new StringValue("fail");
 	public static final StringValue false_ = new StringValue("false");

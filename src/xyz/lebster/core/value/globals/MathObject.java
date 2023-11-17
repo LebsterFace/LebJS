@@ -23,8 +23,8 @@ import static xyz.lebster.core.value.primitive.number.NumberValue.isPositiveZero
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-math-object")
 public final class MathObject extends ObjectValue {
-	private static final double RAD_PER_DEG = 180 / Math.PI;
-	private static final double DEG_PER_RAD = Math.PI / 180;
+	private static final double RAD_TO_DEG = 180 / Math.PI;
+	private static final double DEG_TO_RAD = Math.PI / 180;
 
 	public MathObject(Intrinsics intrinsics) {
 		super(intrinsics);
@@ -39,8 +39,8 @@ public final class MathObject extends ObjectValue {
 		addConstant(Names.PI, Math.PI); // π, the ratio of the circumference of a circle to its diameter
 		addConstant(Names.SQRT1_2, Math.sqrt(0.5)); // the square root of ½
 		addConstant(Names.SQRT2, Math.sqrt(2)); // the square root of 2
-		addConstant(Names.RAD_PER_DEG, RAD_PER_DEG);
-		addConstant(Names.DEG_PER_RAD, DEG_PER_RAD);
+		addConstant(Names.RAD_TO_DEG, RAD_TO_DEG);
+		addConstant(Names.DEG_TO_RAD, DEG_TO_RAD);
 
 		// 21.3.2 Function Properties of the Math Object
 
@@ -106,7 +106,7 @@ public final class MathObject extends ObjectValue {
 		// 1. If radians is one of NaN, +∞, -∞, return radians.
 		if (Double.isNaN(radians) || Double.isInfinite(radians)) return new NumberValue(radians);
 		// 2. Let degrees be (radians × Math.RAD_PER_DEG).
-		final double degrees = radians * RAD_PER_DEG;
+		final double degrees = radians * RAD_TO_DEG;
 		// 3. Return degrees.
 		return new NumberValue(degrees);
 	}
@@ -120,7 +120,7 @@ public final class MathObject extends ObjectValue {
 		// 1. If degrees is one of NaN, +∞, -∞, return degrees.
 		if (Double.isNaN(degrees) || Double.isInfinite(degrees)) return new NumberValue(degrees);
 		// 2. Let radians be (degrees × Math.DEG_PER_RAD).
-		final double radians = degrees * DEG_PER_RAD;
+		final double radians = degrees * DEG_TO_RAD;
 		// 3. Return radians.
 		return new NumberValue(radians);
 	}

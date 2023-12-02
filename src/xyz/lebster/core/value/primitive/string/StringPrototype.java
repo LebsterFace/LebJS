@@ -40,16 +40,8 @@ public final class StringPrototype extends ObjectValue {
 	public StringPrototype(Intrinsics intrinsics) {
 		super(intrinsics);
 
-		putMethod(intrinsics, Names.slice, 2, StringPrototype::slice);
+		putMethod(intrinsics, Names.at, 1, StringPrototype::at);
 		putMethod(intrinsics, Names.charAt, 1, StringPrototype::charAt);
-		putMethod(intrinsics, Names.trim, 0, StringPrototype::trim);
-		putMethod(intrinsics, Names.trimStart, 0, StringPrototype::trimStart);
-		putMethod(intrinsics, Names.trimEnd, 0, StringPrototype::trimEnd);
-		putMethod(intrinsics, Names.toUpperCase, 0, StringPrototype::toUpperCase);
-		putMethod(intrinsics, Names.toLowerCase, 0, StringPrototype::toLowerCase);
-		putMethod(intrinsics, Names.valueOf, 0, StringPrototype::valueOf);
-		putMethod(intrinsics, Names.toString, 0, StringPrototype::toStringMethod);
-		putMethod(intrinsics, SymbolValue.iterator, 0, StringIterator::new);
 		putMethod(intrinsics, Names.charCodeAt, 1, StringPrototype::charCodeAt);
 		putMethod(intrinsics, Names.codePointAt, 1, StringPrototype::codePointAt);
 		putMethod(intrinsics, Names.concat, 0, StringPrototype::concat);
@@ -67,11 +59,41 @@ public final class StringPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.replace, 2, StringPrototype::replace);
 		putMethod(intrinsics, Names.replaceAll, 2, StringPrototype::replaceAll);
 		putMethod(intrinsics, Names.search, 1, StringPrototype::search);
+		putMethod(intrinsics, Names.slice, 2, StringPrototype::slice);
 		putMethod(intrinsics, Names.split, 2, StringPrototype::split);
 		putMethod(intrinsics, Names.startsWith, 1, StringPrototype::startsWith);
 		putMethod(intrinsics, Names.substring, 2, StringPrototype::substring);
 		putMethod(intrinsics, Names.toLocaleLowerCase, 0, StringPrototype::toLocaleLowerCase);
 		putMethod(intrinsics, Names.toLocaleUpperCase, 0, StringPrototype::toLocaleUpperCase);
+		putMethod(intrinsics, Names.toLowerCase, 0, StringPrototype::toLowerCase);
+		putMethod(intrinsics, Names.toString, 0, StringPrototype::toStringMethod);
+		putMethod(intrinsics, Names.toUpperCase, 0, StringPrototype::toUpperCase);
+		putMethod(intrinsics, Names.trim, 0, StringPrototype::trim);
+		putMethod(intrinsics, Names.trimEnd, 0, StringPrototype::trimEnd);
+		putMethod(intrinsics, Names.trimStart, 0, StringPrototype::trimStart);
+		putMethod(intrinsics, Names.valueOf, 0, StringPrototype::valueOf);
+		putMethod(intrinsics, SymbolValue.iterator, 0, StringIterator::new);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.at")
+	private static Value<?> at(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 22.1.3.1 String.prototype.at ( index )
+		final Value<?> index = argument(0, arguments);
+
+		// 1. Let O be ? RequireObjectCoercible(this value).
+		final Value<?> O = requireObjectCoercible(interpreter, interpreter.thisValue(), "String.prototype.at");
+		// 2. Let S be ? ToString(O).
+		final String S = O.toStringValue(interpreter).value;
+		// 3. Let len be the length of S.
+		final int len = S.length();
+		// 4. Let relativeIndex be ? ToIntegerOrInfinity(index).
+		final int relativeIndex = toIntegerOrInfinity(interpreter, index);
+		// If relativeIndex ≥ 0, then Let k be relativeIndex. Else, Let k be len + relativeIndex.
+		final int k = relativeIndex >= 0 ? relativeIndex : len + relativeIndex;
+		// 7. If k < 0 or k ≥ len, return undefined.
+		if (k < 0 || k >= len) return Undefined.instance;
+		// 8. Return the substring of S from k to k + 1.
+		return new StringValue(S.substring(k, k + 1));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.charcodeat")

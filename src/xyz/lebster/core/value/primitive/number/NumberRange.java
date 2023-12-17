@@ -2,11 +2,10 @@ package xyz.lebster.core.value.primitive.number;
 
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.value.Generator;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.iterator.IteratorObject;
 
-public final class NumberRange extends Generator {
+public final class NumberRange extends IteratorObject {
 	private final boolean isValid;
 	private final boolean isDecreasing;
 
@@ -43,10 +42,7 @@ public final class NumberRange extends Generator {
 
 	@Override
 	public Value<?> next(Interpreter interpreter, Value<?>[] arguments) {
-		if (done()) {
-			setCompleted();
-			return Undefined.instance;
-		}
+		if (done()) return setCompleted();
 
 		final NumberValue result = new NumberValue(current);
 		current += step;

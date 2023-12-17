@@ -12,6 +12,7 @@ public final class Names {
 	public static final StringValue Error = new StringValue("Error");
 	public static final StringValue Function = new StringValue("Function");
 	public static final StringValue Infinity = new StringValue("Infinity");
+	public static final StringValue Iterator = new StringValue("Iterator");
 	public static final StringValue JSON = new StringValue("JSON");
 	public static final StringValue LN10 = new StringValue("LN10");
 	public static final StringValue LN2 = new StringValue("LN2");
@@ -96,6 +97,7 @@ public final class Names {
 	public static final StringValue difference = new StringValue("difference");
 	public static final StringValue done = new StringValue("done");
 	public static final StringValue dotAll = new StringValue("dotAll");
+	public static final StringValue drop = new StringValue("drop");
 	public static final StringValue endsWith = new StringValue("endsWith");
 	public static final StringValue entries = new StringValue("entries");
 	public static final StringValue enumerable = new StringValue("enumerable");
@@ -234,9 +236,11 @@ public final class Names {
 	public static final StringValue stringify = new StringValue("stringify");
 	public static final StringValue substring = new StringValue("substring");
 	public static final StringValue symmetricDifference = new StringValue("symmetricDifference");
+	public static final StringValue take = new StringValue("take");
 	public static final StringValue tan = new StringValue("tan");
 	public static final StringValue tanh = new StringValue("tanh");
 	public static final StringValue test = new StringValue("test");
+	public static final StringValue toArray = new StringValue("toArray");
 	public static final StringValue toExactString = new StringValue("toExactString");
 	public static final StringValue toExponential = new StringValue("toExponential");
 	public static final StringValue toFixed = new StringValue("toFixed");

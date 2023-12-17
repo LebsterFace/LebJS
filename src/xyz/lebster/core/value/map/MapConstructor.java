@@ -7,7 +7,6 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.BuiltinConstructor;
-import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
@@ -21,8 +20,9 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import java.util.ArrayList;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
-import static xyz.lebster.core.value.IteratorHelper.iteratorValue;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
+import static xyz.lebster.core.value.iterator.IteratorPrototype.getIterator;
+import static xyz.lebster.core.value.iterator.IteratorPrototype.iteratorValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-map-constructor")
 public final class MapConstructor extends BuiltinConstructor<MapObject, MapPrototype> {
@@ -84,7 +84,7 @@ public final class MapConstructor extends BuiltinConstructor<MapObject, MapProto
 		// 24.1.1.2 AddEntriesFromIterable ( target, iterable, adder )
 
 		// 1. Let iteratorRecord be ? GetIterator(iterable, sync).
-		final var iteratorRecord = IteratorHelper.getIterator(interpreter, iterable);
+		final var iteratorRecord = getIterator(interpreter, iterable);
 		// 2. Repeat,
 		while (true) {
 			// a. Let next be ? IteratorStep(iteratorRecord).

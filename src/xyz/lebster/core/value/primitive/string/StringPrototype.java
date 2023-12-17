@@ -6,7 +6,6 @@ import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.value.Generator;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
@@ -14,6 +13,7 @@ import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.iterator.IteratorObject;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
@@ -810,7 +810,7 @@ public final class StringPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype-@@iterator")
-	private static class StringIterator extends Generator {
+	private static class StringIterator extends IteratorObject {
 		private final PrimitiveIterator.OfInt primitiveIterator;
 
 		@NonCompliant
@@ -826,10 +826,7 @@ public final class StringPrototype extends ObjectValue {
 
 		@Override
 		public Value<?> next(Interpreter interpreter, Value<?>[] arguments) {
-			if (!primitiveIterator.hasNext()) {
-				setCompleted();
-				return Undefined.instance;
-			}
+			if (!primitiveIterator.hasNext()) return setCompleted();
 
 			return new StringValue(new String(new int[] { primitiveIterator.nextInt() }, 0, 1));
 		}

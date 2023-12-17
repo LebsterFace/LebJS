@@ -5,14 +5,14 @@ import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.value.Generator;
-import xyz.lebster.core.value.IteratorHelper.IteratorRecord;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.iterator.IteratorObject;
+import xyz.lebster.core.value.iterator.IteratorRecord;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
-import static xyz.lebster.core.value.IteratorHelper.iteratorValue;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
+import static xyz.lebster.core.value.iterator.IteratorPrototype.iteratorValue;
 import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-set-prototype-object")
@@ -601,12 +601,12 @@ public final class SetPrototype extends ObjectValue {
 			// 4. If IsCallable(nextMethod) is false, throw a TypeError exception.
 			final Executable nextMethod = Executable.getExecutable(interpreter, nextMethod_);
 			// 5. Return a new Iterator Record { [[Iterator]]: keysIter, [[NextMethod]]: nextMethod, [[Done]]: false }.
-			return new IteratorRecord(keysIter, nextMethod, keysIter.toDisplayString(true), "keys");
+			return new IteratorRecord(keysIter, nextMethod);
 		}
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createsetiterator")
-	private static class SetIterator extends Generator {
+	private static class SetIterator extends IteratorObject {
 		private final boolean valuesOnly;
 		private final ArrayList<Value<?>> entries;
 		private int index;
@@ -621,10 +621,7 @@ public final class SetPrototype extends ObjectValue {
 		@Override
 		public Value<?> next(Interpreter interpreter, Value<?>[] arguments) {
 			while (true) {
-				if (index >= entries.size()) {
-					setCompleted();
-					return Undefined.instance;
-				}
+				if (index >= entries.size()) return setCompleted();
 
 				final Value<?> value = entries.get(index);
 				index = index + 1;

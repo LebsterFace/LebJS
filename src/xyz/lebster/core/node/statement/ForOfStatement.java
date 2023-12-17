@@ -7,23 +7,25 @@ import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.node.Assignable;
 import xyz.lebster.core.node.SourceRange;
 import xyz.lebster.core.node.expression.Expression;
-import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.iterator.IteratorRecord;
+
+import static xyz.lebster.core.value.iterator.IteratorPrototype.*;
 
 public record ForOfStatement(SourceRange range, Assignable left, Expression right, Statement body) implements Statement {
 	@Override
 	@NonCompliant
 	public Value<?> execute(Interpreter interpreter) throws AbruptCompletion {
-		final IteratorHelper.IteratorRecord iterator = IteratorHelper.getIterator(interpreter, right);
+		final IteratorRecord iterator = getIterator(interpreter, right);
 
 		Value<?> lastValue = Undefined.instance;
 		var iterResult = iterator.next(interpreter, null);
-		while (!IteratorHelper.iteratorComplete(interpreter, iterResult)) {
+		while (!iteratorComplete(interpreter, iterResult)) {
 			final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 
 			try {
-				left.assign(interpreter, IteratorHelper.iteratorValue(interpreter, iterResult));
+				left.assign(interpreter, iteratorValue(interpreter, iterResult));
 				try {
 					lastValue = body.execute(interpreter);
 				} catch (AbruptCompletion completion) {

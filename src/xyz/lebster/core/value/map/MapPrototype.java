@@ -6,7 +6,6 @@ import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
-import xyz.lebster.core.value.Generator;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
@@ -14,6 +13,7 @@ import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.iterator.IteratorObject;
 import xyz.lebster.core.value.map.MapObject.MapEntry;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
@@ -225,7 +225,7 @@ public final class MapPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createmapiterator")
-	private static final class MapIterator extends Generator {
+	private static final class MapIterator extends IteratorObject {
 		private final ArrayList<MapEntry> mapData;
 		private final boolean keys;
 		private final boolean values;
@@ -243,10 +243,7 @@ public final class MapPrototype extends ObjectValue {
 		@Override
 		public Value<?> next(Interpreter interpreter, Value<?>[] arguments) {
 			while (true) {
-				if (index >= mapData.size()) {
-					setCompleted();
-					return Undefined.instance;
-				}
+				if (index >= mapData.size()) return setCompleted();
 
 				final MapEntry entry = mapData.get(index);
 				index += 1;

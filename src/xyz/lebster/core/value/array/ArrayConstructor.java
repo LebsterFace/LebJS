@@ -7,7 +7,6 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.BuiltinConstructor;
-import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.range.RangeError;
@@ -22,11 +21,12 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
-import static xyz.lebster.core.value.IteratorHelper.iteratorValue;
 import static xyz.lebster.core.value.array.ArrayPrototype.isArray;
 import static xyz.lebster.core.value.array.ArrayPrototype.lengthOfArrayLike;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentInt;
+import static xyz.lebster.core.value.iterator.IteratorPrototype.getIterator;
+import static xyz.lebster.core.value.iterator.IteratorPrototype.iteratorValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-array-constructor")
 public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayPrototype> {
@@ -76,7 +76,7 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 				arrayCreate(interpreter, 0, interpreter.intrinsics.arrayPrototype);
 
 			// c. Let iteratorRecord be ? GetIterator(items, sync, usingIterator).
-			final var iteratorRecord = IteratorHelper.getIterator(interpreter, items);
+			final var iteratorRecord = getIterator(interpreter, items);
 			// d. Let k be 0.
 			long k = 0;
 			// e. Repeat,

@@ -3,10 +3,11 @@ package xyz.lebster.core.node.expression;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Value;
 
 import java.util.ArrayList;
+
+import static xyz.lebster.core.value.iterator.IteratorPrototype.getIterator;
 
 public record ExpressionList(boolean canHaveEmpty, ArrayList<ExpressionNode> backingList) {
 	public ExpressionList(boolean canHaveEmpty) {
@@ -35,7 +36,7 @@ public record ExpressionList(boolean canHaveEmpty, ArrayList<ExpressionNode> bac
 			switch (node.type) {
 				case SINGLE -> result.add(node.expression.execute(interpreter));
 				case EMPTY -> result.add(null);
-				case SPREAD -> IteratorHelper.getIterator(interpreter, node.expression).collect(interpreter, result);
+				case SPREAD -> getIterator(interpreter, node.expression).collect(interpreter, result);
 			}
 		}
 

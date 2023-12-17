@@ -2,22 +2,23 @@ package xyz.lebster.core.node.declaration;
 
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.object.ObjectValue;
 
 import java.util.ArrayList;
 
+import static xyz.lebster.core.value.iterator.IteratorPrototype.*;
+
 public record ArrayDestructuring(AssignmentTarget restTarget, AssignmentPattern... children) implements AssignmentTarget {
 	@Override
 	public Value<?> assign(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
-		final var iterator = IteratorHelper.getIterator(interpreter, value);
+		final var iterator = getIterator(interpreter, value);
 
 		ObjectValue iterResult = iterator.next(interpreter, null);
 		for (final var child : children) {
 			if (child != null) {
-				final Value<?> v = IteratorHelper.iteratorValue(interpreter, iterResult);
+				final Value<?> v = iteratorValue(interpreter, iterResult);
 				child.assign(interpreter, v);
 			}
 
@@ -26,8 +27,8 @@ public record ArrayDestructuring(AssignmentTarget restTarget, AssignmentPattern.
 
 		if (restTarget != null) {
 			final ArrayList<Value<?>> restValues = new ArrayList<>();
-			while (!IteratorHelper.iteratorComplete(interpreter, iterResult)) {
-				restValues.add(IteratorHelper.iteratorValue(interpreter, iterResult));
+			while (!iteratorComplete(interpreter, iterResult)) {
+				restValues.add(iteratorValue(interpreter, iterResult));
 				iterResult = iterator.next(interpreter, null);
 			}
 
@@ -39,12 +40,12 @@ public record ArrayDestructuring(AssignmentTarget restTarget, AssignmentPattern.
 
 	@Override
 	public void declare(Interpreter interpreter, Kind kind, Value<?> value) throws AbruptCompletion {
-		final var iterator = IteratorHelper.getIterator(interpreter, value);
+		final var iterator = getIterator(interpreter, value);
 
 		ObjectValue iterResult = iterator.next(interpreter, null);
 		for (final var child : children) {
 			if (child != null) {
-				final Value<?> v = IteratorHelper.iteratorValue(interpreter, iterResult);
+				final Value<?> v = iteratorValue(interpreter, iterResult);
 				child.declare(interpreter, kind, v);
 			}
 
@@ -53,8 +54,8 @@ public record ArrayDestructuring(AssignmentTarget restTarget, AssignmentPattern.
 
 		if (restTarget != null) {
 			final ArrayList<Value<?>> restValues = new ArrayList<>();
-			while (!IteratorHelper.iteratorComplete(interpreter, iterResult)) {
-				restValues.add(IteratorHelper.iteratorValue(interpreter, iterResult));
+			while (!iteratorComplete(interpreter, iterResult)) {
+				restValues.add(iteratorValue(interpreter, iterResult));
 				iterResult = iterator.next(interpreter, null);
 			}
 

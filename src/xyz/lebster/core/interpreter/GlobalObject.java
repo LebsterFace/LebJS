@@ -48,6 +48,7 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.Boolean, intrinsics.booleanConstructor);
 		put(Names.Error, intrinsics.errorConstructor);
 		put(Names.Function, intrinsics.functionConstructor);
+		put(Names.Iterator, intrinsics.iteratorConstructor);
 		put(Names.Map, intrinsics.mapConstructor);
 		put(Names.Number, intrinsics.numberConstructor);
 		put(Names.Object, intrinsics.objectConstructor);

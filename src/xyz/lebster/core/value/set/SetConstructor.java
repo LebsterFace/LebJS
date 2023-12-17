@@ -5,7 +5,6 @@ import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.BuiltinConstructor;
-import xyz.lebster.core.value.IteratorHelper;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
@@ -16,6 +15,8 @@ import java.util.ArrayList;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
+import static xyz.lebster.core.value.iterator.IteratorPrototype.getIterator;
+import static xyz.lebster.core.value.iterator.IteratorPrototype.iteratorValue;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-set-constructor")
 public class SetConstructor extends BuiltinConstructor<SetObject, SetPrototype> {
@@ -48,7 +49,7 @@ public class SetConstructor extends BuiltinConstructor<SetObject, SetPrototype> 
 		// 6. If IsCallable(adder) is false, throw a TypeError exception.
 		final Executable adder = Executable.getExecutable(interpreter, potential_adder);
 		// 7. Let iteratorRecord be ? GetIterator(iterable).
-		final var iteratorRecord = IteratorHelper.getIterator(interpreter, iterable);
+		final var iteratorRecord = getIterator(interpreter, iterable);
 		// 8. Repeat,
 		while (true) {
 			// a. Let next be ? IteratorStep(iteratorRecord).
@@ -56,7 +57,7 @@ public class SetConstructor extends BuiltinConstructor<SetObject, SetPrototype> 
 			// b. If next is false, return set.
 			if (next == null) return set;
 			// c. Let nextValue be ? IteratorValue(next).
-			final Value<?> nextValue = IteratorHelper.iteratorValue(interpreter, next);
+			final Value<?> nextValue = iteratorValue(interpreter, next);
 			// d. Let status be Completion(Call(adder, set, « nextValue »)).
 			final Value<?> status = adder.call(interpreter, set, nextValue);
 			// FIXME: e. IfAbruptCloseIterator(status, iteratorRecord).

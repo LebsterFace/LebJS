@@ -307,8 +307,17 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.hasown")
-	private static Value<?> hasOwn(Interpreter interpreter, Value<?>[] arguments) {
-		throw new NotImplemented("Object.hasOwn");
+	private static BooleanValue hasOwn(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.1.2.14 Object.hasOwn ( O, P )
+		final Value<?> O = argument(0, arguments);
+		final Value<?> P = argument(1, arguments);
+
+		// 1. Let obj be ? ToObject(O).
+		final ObjectValue obj = O.toObjectValue(interpreter);
+		// 2. Let key be ? ToPropertyKey(P).
+		final Key<?> key = P.toPropertyKey(interpreter);
+		// 3. Return ? HasOwnProperty(obj, key).
+		return BooleanValue.of(obj.hasOwnProperty(key));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.isextensible")
@@ -329,11 +338,6 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.preventextensions")
 	private static Value<?> preventExtensions(Interpreter interpreter, Value<?>[] arguments) {
 		throw new NotImplemented("Object.preventExtensions");
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.prototype")
-	private static Value<?> prototype(Interpreter interpreter, Value<?>[] arguments) {
-		throw new NotImplemented("Object.prototype");
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.seal")

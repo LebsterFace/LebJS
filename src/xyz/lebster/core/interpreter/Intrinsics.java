@@ -16,10 +16,7 @@ import xyz.lebster.core.value.error.type.TypeErrorPrototype;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionConstructor;
 import xyz.lebster.core.value.function.FunctionPrototype;
-import xyz.lebster.core.value.globals.ConsoleObject;
-import xyz.lebster.core.value.globals.JSONObject;
-import xyz.lebster.core.value.globals.MathObject;
-import xyz.lebster.core.value.globals.TestObject;
+import xyz.lebster.core.value.globals.*;
 import xyz.lebster.core.value.iterator.IteratorConstructor;
 import xyz.lebster.core.value.iterator.IteratorPrototype;
 import xyz.lebster.core.value.map.MapConstructor;
@@ -84,6 +81,7 @@ public final class Intrinsics {
 	public final SyntaxErrorPrototype syntaxErrorPrototype;
 
 	public final TestObject testObject;
+	public final FileSystemObject fileSystemObject;
 	public final ConsoleObject consoleObject;
 	public final MathObject mathObject;
 	public final JSONObject jsonObject;
@@ -114,6 +112,7 @@ public final class Intrinsics {
 
 		mathObject = new MathObject(this);
 		testObject = new TestObject(this);
+		fileSystemObject = new FileSystemObject(this);
 		consoleObject = new ConsoleObject(this);
 		jsonObject = new JSONObject(this);
 	}

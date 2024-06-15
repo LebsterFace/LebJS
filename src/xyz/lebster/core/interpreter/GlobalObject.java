@@ -7,22 +7,14 @@ import xyz.lebster.core.interpreter.environment.ExecutionContext;
 import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
-import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 
 @NonStandard
@@ -68,10 +60,9 @@ public final class GlobalObject extends ObjectValue {
 		// Non-Standard properties
 		put(Names.ShadowRealm, intrinsics.shadowRealmConstructor);
 		put(Names.Test, intrinsics.testObject);
+		put(Names.fs, intrinsics.fileSystemObject);
 		put(Names.console, intrinsics.consoleObject);
-		putMethod(intrinsics, Names.cwd, 2, GlobalObject::cwd);
 		putMethod(intrinsics, Names.isStrictMode, 0, GlobalObject::isStrictMode);
-		putMethod(intrinsics, Names.readFile, 2, GlobalObject::readFile);
 	}
 
 	private static BooleanValue isStrictMode(Interpreter interpreter, Value<?>[] arguments) {
@@ -182,42 +173,6 @@ public final class GlobalObject extends ObjectValue {
 			return interpreter.runtimeParse(sourceText).execute(interpreter);
 		} finally {
 			interpreter.exitExecutionContext(context);
-		}
-	}
-
-	private static StringValue readFile(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// readFile(path: string, encoding: Charset): string
-		if (arguments.length != 2) throw error(new TypeError(interpreter, "readFile requires 2 arguments: path and charset"));
-		final Value<?> pathArgument = argument(0, arguments);
-		if (!(pathArgument instanceof final StringValue path))
-			throw error(new TypeError(interpreter, pathArgument.toStringValue(interpreter).value + " is not a string"));
-		final Value<?> charsetArgument = argument(1, arguments);
-		if (!(charsetArgument instanceof final StringValue charsetString))
-			throw error(new TypeError(interpreter, charsetArgument.toStringValue(interpreter).value + " is not a string"));
-
-		Charset charset;
-		try {
-			charset = Charset.forName(charsetString.value);
-		} catch (IllegalCharsetNameException e) {
-			throw error(new TypeError(interpreter, "Illegal charset name: " + charsetArgument.toStringValue(interpreter).value));
-		} catch (UnsupportedCharsetException e) {
-			throw error(new TypeError(interpreter, "Unsupported charset: " + e.getCharsetName()));
-		}
-
-		try {
-			final String s = Files.readString(Path.of(path.value), charset);
-			return new StringValue(s);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static StringValue cwd(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// cwd(): string
-		if (arguments.length != 0) {
-			throw error(new TypeError(interpreter, "cwd() called with >0 arguments"));
-		} else {
-			return new StringValue(System.getProperty("user.dir"));
 		}
 	}
 }

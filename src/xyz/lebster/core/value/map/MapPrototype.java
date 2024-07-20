@@ -9,7 +9,6 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
-import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.NativeFunction;
 import xyz.lebster.core.value.globals.Undefined;
@@ -40,15 +39,15 @@ public final class MapPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.has, 1, MapPrototype::has);
 		putMethod(intrinsics, Names.keys, 0, MapPrototype::keys);
 		putMethod(intrinsics, Names.set, 2, MapPrototype::setMethod);
-		putAccessor(intrinsics, Names.size, ($, __) -> requireMapData($, "size").getSize(), null, false, true);
+		putAccessor(intrinsics, Names.size, ($, __) -> requireMapData($).getSize(), null, false, true);
 		putMethod(intrinsics, Names.values, 0, MapPrototype::values);
 		put(SymbolValue.iterator, entries);
 		put(SymbolValue.toStringTag, Names.Map, false, false, true);
 	}
 
-	private static MapObject requireMapData(Interpreter interpreter, String methodName) throws AbruptCompletion {
+	private static MapObject requireMapData(Interpreter interpreter) throws AbruptCompletion {
 		if (interpreter.thisValue() instanceof final MapObject M) return M;
-		throw error(new TypeError(interpreter, "Map.prototype.%s requires that 'this' be a Map.".formatted(methodName)));
+		throw error(interpreter.incompatibleReceiver("Map.prototype", "a Map"));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-map.prototype.clear")
@@ -57,7 +56,7 @@ public final class MapPrototype extends ObjectValue {
 
 		// 1. Let M be the `this` value.
 		// 2. Perform ? RequireInternalSlot(M, [[MapData]]).
-		final MapObject M = requireMapData(interpreter, "clear");
+		final MapObject M = requireMapData(interpreter);
 		// 3. For each Record { [[Key]], [[Value]] } p of M.[[MapData]], do
 		// a. Set p.[[Key]] to empty.
 		// b. Set p.[[Value]] to empty.
@@ -74,7 +73,7 @@ public final class MapPrototype extends ObjectValue {
 
 		// 1. Let M be the `this` value.
 		// 2. Perform ? RequireInternalSlot(M, [[MapData]]).
-		final MapObject M = requireMapData(interpreter, "clear");
+		final MapObject M = requireMapData(interpreter);
 		// 3. For each Record { [[Key]], [[Value]] } p of M.[[MapData]], do
 		for (int i = 0; i < M.mapData.size(); i++) {
 			MapEntry p = M.mapData.get(i);
@@ -98,7 +97,7 @@ public final class MapPrototype extends ObjectValue {
 		// 24.1.3.4 Map.prototype.entries ( )
 
 		// 1. Let M be the `this` value.
-		final MapObject M = requireMapData(interpreter, "entries");
+		final MapObject M = requireMapData(interpreter);
 		// 2. Return ? CreateMapIterator(M, key+value).
 		return new MapIterator(interpreter, M, true, true);
 	}
@@ -111,7 +110,7 @@ public final class MapPrototype extends ObjectValue {
 
 		// 1. Let M be the `this` value.
 		// 2. Perform ? RequireInternalSlot(M, [[MapData]]).
-		final MapObject M = requireMapData(interpreter, "clear");
+		final MapObject M = requireMapData(interpreter);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable callbackfn = Executable.getExecutable(interpreter, callbackfn_);
 		// 4. Let entries be M.[[MapData]].
@@ -143,7 +142,7 @@ public final class MapPrototype extends ObjectValue {
 
 		// 1. Let M be the `this` value.
 		// 2. Perform ? RequireInternalSlot(M, [[MapData]]).
-		final MapObject M = requireMapData(interpreter, "clear");
+		final MapObject M = requireMapData(interpreter);
 		// 3. For each Record { [[Key]], [[Value]] } p of M.[[MapData]], do
 		for (final MapEntry p : M.mapData) {
 			// a. If p.[[Key]] is not empty and SameValueZero(p.[[Key]], key) is true, return p.[[Value]].
@@ -162,7 +161,7 @@ public final class MapPrototype extends ObjectValue {
 
 		// 1. Let M be the `this` value.
 		// 2. Perform ? RequireInternalSlot(M, [[MapData]]).
-		final MapObject M = requireMapData(interpreter, "clear");
+		final MapObject M = requireMapData(interpreter);
 		// 3. For each Record { [[Key]], [[Value]] } p of M.[[MapData]], do
 		for (final MapEntry p : M.mapData) {
 			// a. If p.[[Key]] is not empty and SameValueZero(p.[[Key]], key) is true, return true.
@@ -179,7 +178,7 @@ public final class MapPrototype extends ObjectValue {
 		// 24.1.3.8 Map.prototype.keys ( )
 
 		// 1. Let M be the `this` value.
-		final MapObject M = requireMapData(interpreter, "keys");
+		final MapObject M = requireMapData(interpreter);
 		// 2. Return ? CreateMapIterator(M, key).
 		return new MapIterator(interpreter, M, true, false);
 	}
@@ -192,7 +191,7 @@ public final class MapPrototype extends ObjectValue {
 
 		// 1. Let M be the `this` value.
 		// 2. Perform ? RequireInternalSlot(M, [[MapData]]).
-		final MapObject M = requireMapData(interpreter, "set");
+		final MapObject M = requireMapData(interpreter);
 		// 3. For each Record { [[Key]], [[Value]] } p of M.[[MapData]], do
 		for (final MapEntry p : M.mapData) {
 			// a. If p.[[Key]] is not empty and SameValueZero(p.[[Key]], key) is true, then
@@ -219,7 +218,7 @@ public final class MapPrototype extends ObjectValue {
 		// 24.1.3.11 Map.prototype.values ( )
 
 		// 1. Let M be the `this` value.
-		final MapObject M = requireMapData(interpreter, "values");
+		final MapObject M = requireMapData(interpreter);
 		// 2. Return ? CreateMapIterator(M, value).
 		return new MapIterator(interpreter, M, false, true);
 	}

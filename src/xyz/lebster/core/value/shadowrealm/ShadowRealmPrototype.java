@@ -28,9 +28,8 @@ public final class ShadowRealmPrototype extends ObjectValue {
 	private static Value<?> evaluate(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// ShadowRealm.prototype.evaluate(sourceText: string): unknown
 
-		if (!(interpreter.thisValue() instanceof final ShadowRealm shadowRealm)) {
-			throw error(new TypeError(interpreter, "ShadowRealm.prototype.evaluate requires that 'this' be a ShadowRealm"));
-		}
+		if (!(interpreter.thisValue() instanceof final ShadowRealm shadowRealm))
+			throw error(interpreter.incompatibleReceiver("ShadowRealm.prototype", "a ShadowRealm"));
 
 		if (arguments.length == 0) return Undefined.instance;
 
@@ -47,7 +46,7 @@ public final class ShadowRealmPrototype extends ObjectValue {
 		// ShadowRealm.prototype.declare<T>(name: string, value: T): T
 
 		if (!(interpreter.thisValue() instanceof final ShadowRealm shadowRealm))
-			throw error(new TypeError(interpreter, "ShadowRealm.prototype.declare requires that `this` be a ShadowRealm"));
+			throw error(interpreter.incompatibleReceiver("ShadowRealm.prototype", "a ShadowRealm"));
 		if (arguments.length < 1)
 			throw error(new TypeError(interpreter, "Missing variable name"));
 

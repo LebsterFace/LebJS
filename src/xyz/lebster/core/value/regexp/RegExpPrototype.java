@@ -10,7 +10,6 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
-import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -49,7 +48,7 @@ public class RegExpPrototype extends ObjectValue {
 		final Value<?> R = interpreter.thisValue();
 		// 2. If R is not an Object, throw a TypeError exception.
 		if (!(R instanceof final RegExpObject re))
-			throw error(new TypeError(interpreter, "RegExp.prototype.flags requires that 'this' be an object."));
+			throw error(interpreter.incompatibleReceiver("RegExp.prototype", "a RegExp"));
 		// 3. Let codeUnits be a new empty List.
 		final StringBuilder codeUnits = new StringBuilder();
 		// 4. Let hasIndices be ToBoolean(? Get(R, "hasIndices")).
@@ -97,7 +96,7 @@ public class RegExpPrototype extends ObjectValue {
 		//     a. If SameValue(R, %RegExp.prototype%) is true, return undefined.
 		//     b. Otherwise, throw a TypeError exception.
 		if (!(R instanceof final RegExpObject re))
-			throw error(new TypeError(interpreter, "RegExp.prototype.%s requires that 'this' be a RegExp.".formatted(methodName)));
+			throw error(interpreter.incompatibleReceiver("RegExp.prototype", "a RegExp"));
 		// 3. Let flags be R.[[OriginalFlags]].
 		final String flags = re.flags;
 		// 4. If flags contains codeUnit, return true.
@@ -193,7 +192,7 @@ public class RegExpPrototype extends ObjectValue {
 		final Value<?> R = interpreter.thisValue();
 		// 2. If R is not an Object, throw a TypeError exception.
 		if (!(R instanceof final RegExpObject re))
-			throw error(new TypeError(interpreter, "RegExp.prototype.source requires that 'this' be a RegExp."));
+			throw error(interpreter.incompatibleReceiver("RegExp.prototype", "a RegExp"));
 		// 4. Assert: R has an [[OriginalFlags]] internal slot.
 		// 5. Let src be R.[[OriginalSource]].
 		final String src = re.source;
@@ -245,7 +244,7 @@ public class RegExpPrototype extends ObjectValue {
 		final Value<?> R = interpreter.thisValue();
 		// 2. If R is not an Object, throw a TypeError exception.
 		if (!(R instanceof final ObjectValue object))
-			throw error(new TypeError(interpreter, "RegExp.prototype.toString requires that 'this' be an object."));
+			throw error(interpreter.incompatibleReceiver("RegExp.prototype", "an object"));
 		// 3. Let pattern be ? ToString(? Get(R, "source")).
 		final String pattern = object.get(interpreter, Names.source).toStringValue(interpreter).value;
 		// 4. Let flags be ? ToString(? Get(R, "flags")).

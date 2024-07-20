@@ -1,6 +1,7 @@
 package xyz.lebster.core.interpreter;
 
 import xyz.lebster.core.SpecificationURL;
+import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.ShouldNotHappen;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.environment.*;
@@ -11,6 +12,7 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.reference.ReferenceError;
 import xyz.lebster.core.value.error.syntax.SyntaxErrorObject;
+import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -18,6 +20,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 import java.util.ArrayDeque;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
+import static xyz.lebster.core.value.primitive.string.StringValue.isValidIdentifier;
 
 public final class Interpreter {
 	private static final int MAX_CALLSTACK_SIZE = 256;
@@ -51,7 +54,7 @@ public final class Interpreter {
 	}
 
 	public void exitExecutionContext(ExecutionContext context) {
-		if (executionContextStack.size() == 0 || executionContextStack.getFirst() != context) {
+		if (executionContextStack.isEmpty() || executionContextStack.getFirst() != context) {
 			throw new ShouldNotHappen("Attempting to exit from an invalid ExecutionContext");
 		}
 
@@ -165,6 +168,34 @@ public final class Interpreter {
 		// 1. If env is the value null, then
 		// a. Return the Reference Record { base: unresolvable, referencedName: name }.
 		return new Reference(null, name);
+	}
+
+	public TypeError incompatibleReceiver(String prefix, String requirement) {
+		FunctionEnvironment environment = null;
+		Environment env = environment();
+		while (env != null) {
+			if (env instanceof final FunctionEnvironment functionEnvironment) {
+				environment = functionEnvironment;
+				break;
+			}
+			env = env.parent();
+		}
+
+		if (environment == null) throw new ShouldNotHappen("Not in a method");
+		String methodName;
+
+		final String functionName = environment.functionObject.name.value;
+		// FIXME: Awful. Super hacky!
+		if (functionName.startsWith("[Symbol.") && functionName.endsWith("]")) {
+			final String wellKnownName = functionName.substring("[Symbol.".length(), functionName.length() - 1);
+			methodName = prefix + " [ @@" + wellKnownName + " ]";
+		} else if (isValidIdentifier(functionName)) {
+			methodName = prefix + "." + functionName;
+		} else {
+			methodName = prefix + "[" + StringEscapeUtils.quote(functionName, false) + "]";
+		}
+
+		return new TypeError(this, "%s requires that 'this' be %s.".formatted(methodName, requirement));
 	}
 
 	private enum Mode { Normal, Strict, Checked }

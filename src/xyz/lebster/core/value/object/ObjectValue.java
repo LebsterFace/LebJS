@@ -364,8 +364,12 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 
 	// TODO: Setter can return void?
 	public final void putAccessor(Intrinsics intrinsics, Key<?> key, NativeCode getter, NativeCode setter, boolean enumerable, boolean configurable) {
-		final NativeFunction getterFn = getter == null ? null : new NativeFunction(intrinsics, new StringValue("get " + key.toFunctionName()), getter, 0);
-		final NativeFunction setterFn = setter == null ? null : new NativeFunction(intrinsics, new StringValue("set " + key.toFunctionName()), setter, 1);
+		final String name = getter == null && setter == null ? null :
+			key.toFunctionName().value;
+		final NativeFunction getterFn = getter == null ? null :
+			new NativeFunction(intrinsics, new StringValue("get " + name), getter, 0);
+		final NativeFunction setterFn = setter == null ? null :
+			new NativeFunction(intrinsics, new StringValue("set " + name), setter, 1);
 
 		value.put(key, new AccessorDescriptor(getterFn, setterFn, enumerable, configurable));
 	}

@@ -6,7 +6,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -27,7 +26,7 @@ public final class SymbolPrototype extends ObjectValue {
 	private static Value<?> getDescription(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 1. Let s be the `this` value.
 		// 2. Let sym be ? thisSymbolValue(s).
-		final SymbolValue sym = thisSymbolValue(interpreter, ".description");
+		final SymbolValue sym = thisSymbolValue(interpreter);
 		// 3. Return sym.[[Description]].
 		return sym.description;
 	}
@@ -37,7 +36,7 @@ public final class SymbolPrototype extends ObjectValue {
 		// 20.4.3.4 Symbol.prototype.valueOf ( )
 
 		// 1. Return ? thisSymbolValue(this value).
-		return thisSymbolValue(interpreter, ".valueOf");
+		return thisSymbolValue(interpreter);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype-@@toprimitive")
@@ -45,7 +44,7 @@ public final class SymbolPrototype extends ObjectValue {
 		// 20.4.3.5 Symbol.prototype [ @@toPrimitive ] ( hint )
 
 		// 1. Return ? thisSymbolValue(this value).
-		return thisSymbolValue(interpreter, " [ @@toPrimitive ]");
+		return thisSymbolValue(interpreter);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-symbol.prototype.tostring")
@@ -53,18 +52,18 @@ public final class SymbolPrototype extends ObjectValue {
 		// 20.4.3.3 Symbol.prototype.toString ( )
 
 		// 1. Let sym be ? thisSymbolValue(this value).
-		final SymbolValue sym = thisSymbolValue(interpreter, ".toString");
+		final SymbolValue sym = thisSymbolValue(interpreter);
 		// 2. Return SymbolDescriptiveString(sym).
 		return new StringValue(sym.symbolDescriptiveString());
 	}
 
-	private static SymbolValue thisSymbolValue(Interpreter interpreter, String methodName) throws AbruptCompletion {
+	private static SymbolValue thisSymbolValue(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> value = interpreter.thisValue();
 		// 1. If Type(value) is Symbol, return value.
 		if (value instanceof SymbolValue symbolValue) return symbolValue;
 		// 2. If Type(value) is Object and value has a [[SymbolData]] internal slot, then
 		if (value instanceof SymbolWrapper symbolWrapper) return symbolWrapper.data;
 		// 3. Throw a TypeError exception.
-		throw error(new TypeError(interpreter, "Symbol.prototype%s requires that 'this' be a Symbol".formatted(methodName)));
+		throw error(interpreter.incompatibleReceiver("Symbol.prototype", "a Symbol"));
 	}
 }

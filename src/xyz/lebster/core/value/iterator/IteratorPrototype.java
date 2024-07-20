@@ -119,9 +119,9 @@ public final class IteratorPrototype extends ObjectValue {
 		return iterResult.get(interpreter, Names.value);
 	}
 
-	private static ObjectValue requireIteratorLike(Interpreter interpreter, String methodName) throws AbruptCompletion {
+	private static ObjectValue requireIteratorLike(Interpreter interpreter) throws AbruptCompletion {
 		if (interpreter.thisValue() instanceof final ObjectValue obj) return obj;
-		throw error(new TypeError(interpreter, "Iterator.prototype.%s requires that 'this' be an object.".formatted(methodName)));
+		throw error(interpreter.incompatibleReceiver("Iterator.prototype", "an object"));
 	}
 
 	@SpecificationURL("https://tc39.es/proposal-iterator-helpers#sec-iteratorprototype.map")
@@ -131,7 +131,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
-		final ObjectValue O = requireIteratorLike(interpreter, "map");
+		final ObjectValue O = requireIteratorLike(interpreter);
 		// 3. If IsCallable(mapper) is false, throw a TypeError exception.
 		final Executable mapper = Executable.getExecutable(interpreter, mapper_);
 		// 4. Let iterated be ? GetIteratorDirect(O).
@@ -173,7 +173,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
-		final ObjectValue O = requireIteratorLike(interpreter, "filter");
+		final ObjectValue O = requireIteratorLike(interpreter);
 		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
 		final Executable predicate = Executable.getExecutable(interpreter, predicate_);
 		// 4. Let iterated be ? GetIteratorDirect(O).
@@ -222,7 +222,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
-		final ObjectValue O = requireIteratorLike(interpreter, "take");
+		final ObjectValue O = requireIteratorLike(interpreter);
 		// 3. Let numLimit be ? ToNumber(limit).
 		final NumberValue numLimit = limit.toNumberValue(interpreter);
 		// 4. If numLimit is NaN, throw a RangeError exception.
@@ -276,7 +276,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
-		final ObjectValue O = requireIteratorLike(interpreter, "drop");
+		final ObjectValue O = requireIteratorLike(interpreter);
 		// 3. Let numLimit be ? ToNumber(limit).
 		final NumberValue numLimit = limit.toNumberValue(interpreter);
 		// 4. If numLimit is NaN, throw a RangeError exception.
@@ -341,7 +341,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
-		final ObjectValue O = requireIteratorLike(interpreter, "reduce");
+		final ObjectValue O = requireIteratorLike(interpreter);
 		// 3. If IsCallable(reducer) is false, throw a TypeError exception.
 		final Executable reducer = Executable.getExecutable(interpreter, reducer_);
 		// 4. Let iterated be ? GetIteratorDirect(O).
@@ -390,7 +390,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
-		final ObjectValue O = requireIteratorLike(interpreter, "toArray");
+		final ObjectValue O = requireIteratorLike(interpreter);
 		// 3. Let iterated be ? GetIteratorDirect(O).
 		final IteratorRecord iterated = getIteratorDirect(interpreter, O);
 		// 4. Let items be a new empty List.
@@ -415,7 +415,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
-		final ObjectValue O = requireIteratorLike(interpreter, "forEach");
+		final ObjectValue O = requireIteratorLike(interpreter);
 		// 3. If IsCallable(fn) is false, throw a TypeError exception.
 		final Executable fn = Executable.getExecutable(interpreter, fn_);
 		// 4. Let iterated be ? GetIteratorDirect(O).
@@ -445,7 +445,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
-		final ObjectValue O = requireIteratorLike(interpreter, "some");
+		final ObjectValue O = requireIteratorLike(interpreter);
 		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
 		final Executable predicate = Executable.getExecutable(interpreter, predicate_);
 		// 4. Let iterated be ? GetIteratorDirect(O).
@@ -477,7 +477,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
-		final ObjectValue O = requireIteratorLike(interpreter, "every");
+		final ObjectValue O = requireIteratorLike(interpreter);
 		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
 		final Executable predicate = Executable.getExecutable(interpreter, predicate_);
 		// 4. Let iterated be ? GetIteratorDirect(O).
@@ -509,7 +509,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
-		final ObjectValue O = requireIteratorLike(interpreter, "find");
+		final ObjectValue O = requireIteratorLike(interpreter);
 		// 3. If IsCallable(predicate) is false, throw a TypeError exception.
 		final Executable predicate = Executable.getExecutable(interpreter, predicate_);
 		// 4. Let iterated be ? GetIteratorDirect(O).

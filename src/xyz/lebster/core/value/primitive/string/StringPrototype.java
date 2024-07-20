@@ -787,7 +787,7 @@ public final class StringPrototype extends ObjectValue {
 		// 22.1.3.33 String.prototype.valueOf ( )
 
 		// 1. Return ? thisStringValue(this value).
-		return thisStringValue(interpreter, "valueOf");
+		return thisStringValue(interpreter);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype.tostring")
@@ -795,18 +795,18 @@ public final class StringPrototype extends ObjectValue {
 		// 22.1.3.28 String.prototype.toString ( )
 
 		// 1. Return ? thisStringValue(this value).
-		return thisStringValue(interpreter, "toString");
+		return thisStringValue(interpreter);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#thisstringvalue")
-	private static StringValue thisStringValue(Interpreter interpreter, String methodName) throws AbruptCompletion {
+	private static StringValue thisStringValue(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> value = interpreter.thisValue();
 		// 1. If value is a String, return value.
 		if (value instanceof StringValue stringValue) return stringValue;
 		// 2. If value is an Object and value has a [[StringData]] internal slot, return value.[[StringData]].
 		if (value instanceof StringWrapper stringWrapper) return stringWrapper.data;
 		// 3. Throw a TypeError exception.
-		throw error(new TypeError(interpreter, "String.prototype.%s requires that 'this' be a String".formatted(methodName)));
+		throw error(interpreter.incompatibleReceiver("String.prototype", "a String"));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-string.prototype-@@iterator")

@@ -6,7 +6,6 @@ import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
-import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -27,7 +26,7 @@ public class ErrorPrototype extends ObjectValue {
 		// 1. Let O be the `this` value.
 		// 2. If O is not an Object, throw a TypeError exception.
 		if (!(interpreter.thisValue() instanceof final ObjectValue O))
-			throw error(new TypeError(interpreter, "Error.prototype.toString requires that 'this' be an Object"));
+			throw error(interpreter.incompatibleReceiver("Error.prototype", "an object"));
 
 		// 3. Let name be ? Get(O, "name").
 		final Value<?> nameProperty = O.get(interpreter, Names.name);

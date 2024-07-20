@@ -82,15 +82,15 @@ public final class StringValue extends Key<String> {
 
 	@Override
 	public void displayForObjectKey(StringBuilder builder) {
-		if (this.isValidIdentifier()) {
+		if (isValidIdentifier(value)) {
 			builder.append(value);
 		} else {
-			this.display(builder);
+			display(builder);
 		}
 	}
 
-	private boolean isValidIdentifier() {
-		final PrimitiveIterator.OfInt iterator = value.codePoints().iterator();
+	public static boolean isValidIdentifier(String string) {
+		final PrimitiveIterator.OfInt iterator = string.codePoints().iterator();
 		if (iterator.hasNext() && Lexer.isIdentifierStart(iterator.next())) {
 			while (iterator.hasNext()) {
 				if (Lexer.isIdentifierPart(iterator.next())) {

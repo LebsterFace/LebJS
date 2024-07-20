@@ -12,7 +12,6 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.error.range.RangeError;
-import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
@@ -41,7 +40,7 @@ public final class NumberPrototype extends ObjectValue {
 
 	@NonStandard
 	private static StringValue toExactString(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		final NumberValue x = thisNumberValue(interpreter, "toExactString");
+		final NumberValue x = thisNumberValue(interpreter);
 		return new StringValue(x.toExactString());
 	}
 
@@ -51,7 +50,7 @@ public final class NumberPrototype extends ObjectValue {
 		final Value<?> precision = argument(0, arguments);
 
 		// 1. Let x be ? thisNumberValue(this value).
-		final NumberValue x_ = thisNumberValue(interpreter, "toPrecision");
+		final NumberValue x_ = thisNumberValue(interpreter);
 		// 2. If precision is undefined, return ! ToString(x).
 		if (precision == Undefined.instance) return x_.toStringValue(interpreter);
 		// 3. Let p be ? ToIntegerOrInfinity(precision).
@@ -162,7 +161,7 @@ public final class NumberPrototype extends ObjectValue {
 		final Value<?> fractionDigits = argument(0, arguments);
 
 		// 1. Let x be ? thisNumberValue(this value).
-		final NumberValue x_ = thisNumberValue(interpreter, "toFixed");
+		final NumberValue x_ = thisNumberValue(interpreter);
 		// 2. Let f be ? ToIntegerOrInfinity(fractionDigits).
 		final int f = toIntegerOrInfinity(interpreter, fractionDigits);
 		// 3. Assert: If fractionDigits is undefined, then f is 0.
@@ -228,17 +227,17 @@ public final class NumberPrototype extends ObjectValue {
 		// 21.1.3.7 Number.prototype.valueOf ( )
 
 		// 1. Return ? thisNumberValue(this value).
-		return thisNumberValue(interpreter, "valueOf");
+		return thisNumberValue(interpreter);
 	}
 
-	private static NumberValue thisNumberValue(Interpreter interpreter, String methodName) throws AbruptCompletion {
+	private static NumberValue thisNumberValue(Interpreter interpreter) throws AbruptCompletion {
 		final Value<?> value = interpreter.thisValue();
 		// 1. If Type(value) is Number, return value.
 		if (value instanceof NumberValue numberValue) return numberValue;
 		// 2. If Type(value) is Object and value has a [[NumberData]] internal slot, return n.
 		if (value instanceof NumberWrapper numberWrapper) return numberWrapper.data;
 		// 3. Throw a TypeError exception.
-		throw error(new TypeError(interpreter, "Number.prototype.%s requires that 'this' be a Number".formatted(methodName)));
+		throw error(interpreter.incompatibleReceiver("Number.prototype", "a Number"));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-tointegerorinfinity")
@@ -292,7 +291,7 @@ public final class NumberPrototype extends ObjectValue {
 		final Value<?> radix = argument(0, arguments);
 
 		// 1. Let x be ? thisNumberValue(this value).
-		final NumberValue x = thisNumberValue(interpreter, "toString");
+		final NumberValue x = thisNumberValue(interpreter);
 		// 2. If radix is undefined, let radixMV be 10.
 		// 3. Else, let radixMV be ? ToIntegerOrInfinity(radix).
 		final int radixMV = radix == Undefined.instance ? 10 : toIntegerOrInfinity(interpreter, radix);

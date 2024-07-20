@@ -52,16 +52,16 @@ public final class SetPrototype extends ObjectValue {
 		put(Names.keys, values); // https://tc39.es/ecma262/multipage#sec-set.prototype.keys
 
 		put(SymbolValue.toStringTag, Names.Set, false, false, true);
-		putAccessor(intrinsics, Names.size, ($, __) -> requireSetData($, "size").getSize(), null, false, true);
+		putAccessor(intrinsics, Names.size, ($, __) -> requireSetData($).getSize(), null, false, true);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set-records")
 	private record SetRecord(ObjectValue setObject, int size, Executable has, Executable keys) {
 	}
 
-	private static SetObject requireSetData(Interpreter interpreter, String methodName) throws AbruptCompletion {
+	private static SetObject requireSetData(Interpreter interpreter) throws AbruptCompletion {
 		if (interpreter.thisValue() instanceof final SetObject S) return S;
-		throw error(new TypeError(interpreter, "Set.prototype.%s requires that 'this' be a Set.".formatted(methodName)));
+		throw error(interpreter.incompatibleReceiver("Set.prototype", "a Set"));
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getsetrecord")
@@ -102,7 +102,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		final SetObject S = requireSetData(interpreter, "add");
+		final SetObject S = requireSetData(interpreter);
 
 		// 3. Let entries be the List that is S.[[SetData]].
 		final ArrayList<Value<?>> entries = S.setData;
@@ -128,7 +128,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		final SetObject S = requireSetData(interpreter, "clear");
+		final SetObject S = requireSetData(interpreter);
 		// 3. Let entries be the List that is S.[[SetData]].
 		final ArrayList<Value<?>> entries = S.setData;
 		// 4. For each element e of entries, do: replace the element of entries whose value is e with an element whose value is empty.
@@ -144,7 +144,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		final SetObject S = requireSetData(interpreter, "delete");
+		final SetObject S = requireSetData(interpreter);
 		// 3. Let entries be the List that is S.[[SetData]].
 		final ArrayList<Value<?>> entries = S.setData;
 		// 4. For each element e of entries, do
@@ -168,7 +168,7 @@ public final class SetPrototype extends ObjectValue {
 		// 24.2.3.5 Set.prototype.entries ( )
 
 		// 1. Let S be the `this` value.
-		final SetObject S = requireSetData(interpreter, "entries");
+		final SetObject S = requireSetData(interpreter);
 		// 2. Return ? CreateSetIterator(S, key+value).
 		return new SetIterator(interpreter, S, false);
 	}
@@ -181,7 +181,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		final SetObject S = requireSetData(interpreter, "forEach");
+		final SetObject S = requireSetData(interpreter);
 		// 3. If IsCallable(callbackfn) is false, throw a TypeError exception.
 		final Executable callbackfn = Executable.getExecutable(interpreter, callbackfn_);
 		// 4. Let entries be the List that is S.[[SetData]].
@@ -217,7 +217,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let S be the `this` value.
 		// 2. Perform ? RequireInternalSlot(S, [[SetData]]).
-		final SetObject S = requireSetData(interpreter, "has");
+		final SetObject S = requireSetData(interpreter);
 		// 3. Let entries be the List that is S.[[SetData]].
 		final ArrayList<Value<?>> entries = S.setData;
 		// 4. For each element e of entries, do
@@ -235,7 +235,7 @@ public final class SetPrototype extends ObjectValue {
 		// 24.2.3.10 Set.prototype.values ( )
 
 		// 1. Let S be the `this` value.
-		final SetObject S = requireSetData(interpreter, "values");
+		final SetObject S = requireSetData(interpreter);
 		// 2. Return ? CreateSetIterator(S, value).
 		return new SetIterator(interpreter, S, true);
 	}
@@ -268,7 +268,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "difference");
+		final SetObject O = requireSetData(interpreter);
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other, "difference");
 		// 4. Let resultSetData be a copy of O.[[SetData]].
@@ -334,7 +334,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "intersection");
+		final SetObject O = requireSetData(interpreter);
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other, "intersection");
 		// 4. Let resultSetData be a new empty List.
@@ -414,7 +414,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "isDisjointFrom");
+		final SetObject O = requireSetData(interpreter);
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other, "isDisjointFrom");
 		// 4. If SetDataSize(O.[[SetData]]) ≤ otherRec.[[Size]], then
@@ -475,7 +475,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "isDisjointFrom");
+		final SetObject O = requireSetData(interpreter);
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other, "isDisjointFrom");
 		// 4. If SetDataSize(O.[[SetData]]) > otherRec.[[Size]], return false.
@@ -513,7 +513,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "isSupersetOf");
+		final SetObject O = requireSetData(interpreter);
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final var otherRec = getSetRecord(interpreter, other, "isSupersetOf");
 		// 4. If SetDataSize(O.[[SetData]]) < otherRec.[[Size]], return false.
@@ -548,7 +548,7 @@ public final class SetPrototype extends ObjectValue {
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "symmetricDifference");
+		final SetObject O = requireSetData(interpreter);
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final SetRecord otherRec = getSetRecord(interpreter, other, "symmetricDifference");
 		// 4. Let keysIter be ? GetIteratorFromMethod(otherRec.[[SetObject]], otherRec.[[Keys]]).
@@ -595,7 +595,7 @@ public final class SetPrototype extends ObjectValue {
 		final Value<?> other = argument(0, arguments);
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final var O = requireSetData(interpreter, "union");
+		final var O = requireSetData(interpreter);
 		// 3. Let otherRec be ? GetSetRecord(other).
 		final var otherRec = getSetRecord(interpreter, other, "union");
 		// 4. Let keysIter be ? GetIteratorFromMethod(otherRec.[[SetObject]], otherRec.[[Keys]]).

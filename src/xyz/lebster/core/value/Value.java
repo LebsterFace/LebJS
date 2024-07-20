@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 import static xyz.lebster.core.value.primitive.bigint.BigIntValue.stringToBigInt;
+import static xyz.lebster.core.value.primitive.number.NumberValue.isNegativeZero;
 
 public abstract class Value<JType> implements Displayable {
 	public final JType value;
@@ -128,11 +129,12 @@ public abstract class Value<JType> implements Displayable {
 		}
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-isstringprefix")
-	private static boolean isStringPrefix(String p, String q) {
-		// 1. If ! StringIndexOf(q, p, 0) is 0, return true.
-		// 2. Else, return false.
-		return q.indexOf(p) == 0;
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-canonicalizekeyedcollectionkey")
+	public Value<?> canonicalizeKeyedCollectionKey() {
+		// 1. If key is -0𝔽, return +0𝔽.
+		if (isNegativeZero(this)) return NumberValue.ZERO;
+		// 2. Return key.
+		return this;
 	}
 
 	public void displayForConsoleLog(StringBuilder builder) {

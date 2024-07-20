@@ -18,19 +18,25 @@ public final class SetObject extends ObjectValue {
 		this.setData = setData;
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-get-set.prototype.size")
-	NumberValue getSize() {
-		// 3. Let entries be the List that is S.[[SetData]].
-		// 4. Let count be 0.
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-setdatasize")
+	public int size() {
+		// 1. Let count be 0.
 		int count = 0;
-		// 5. For each element e of entries, do
+		// 2. For each element e of setData, do
 		for (final Value<?> e : setData) {
-			// a. If e is not empty, set count to count + 1.
-			if (e != null) count += 1;
+			// a. If e is not EMPTY, set count to count + 1.
+			if (e != null) count = count + 1;
 		}
 
-		// 6. Return 𝔽(count).
-		return new NumberValue(count);
+		// 3. Return count.
+		return count;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-get-set.prototype.size")
+	NumberValue getSize() {
+		// 3. Let size be SetDataSize(S.[[SetData]]).
+		// 4. Return 𝔽(size).
+		return new NumberValue(size());
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package xyz.lebster.core.value.set;
 
-import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -8,6 +7,7 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
+import xyz.lebster.core.value.error.range.RangeError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.globals.Undefined;
@@ -23,8 +23,9 @@ import java.util.Collections;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
-import static xyz.lebster.core.value.iterator.IteratorPrototype.iteratorValue;
+import static xyz.lebster.core.value.iterator.IteratorPrototype.getIteratorFromMethod;
 import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
+import static xyz.lebster.core.value.primitive.number.NumberValue.isNegativeZero;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-properties-of-the-set-prototype-object")
 public final class SetPrototype extends ObjectValue {
@@ -34,16 +35,17 @@ public final class SetPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.add, 1, SetPrototype::add);
 		putMethod(intrinsics, Names.clear, 0, SetPrototype::clear);
 		putMethod(intrinsics, Names.delete, 1, SetPrototype::delete);
+		putMethod(intrinsics, Names.difference, 1, SetPrototype::difference);
 		putMethod(intrinsics, Names.entries, 0, SetPrototype::entries);
 		putMethod(intrinsics, Names.forEach, 1, SetPrototype::forEach);
 		putMethod(intrinsics, Names.has, 1, SetPrototype::has);
-		putMethod(intrinsics, Names.union, 1, SetPrototype::union);
 		putMethod(intrinsics, Names.intersection, 1, SetPrototype::intersection);
-		putMethod(intrinsics, Names.difference, 1, SetPrototype::difference);
-		putMethod(intrinsics, Names.symmetricDifference, 1, SetPrototype::symmetricDifference);
+		putMethod(intrinsics, Names.isDisjointFrom, 1, SetPrototype::isDisjointFrom);
 		putMethod(intrinsics, Names.isSubsetOf, 1, SetPrototype::isSubsetOf);
 		putMethod(intrinsics, Names.isSupersetOf, 1, SetPrototype::isSupersetOf);
-		putMethod(intrinsics, Names.isDisjointFrom, 1, SetPrototype::isDisjointFrom);
+		putMethod(intrinsics, Names.symmetricDifference, 1, SetPrototype::symmetricDifference);
+		putMethod(intrinsics, Names.union, 1, SetPrototype::union);
+		putMethod(intrinsics, Names.values, 0, SetPrototype::values);
 
 		final var values = putMethod(intrinsics, Names.values, 0, SetPrototype::values);
 		put(SymbolValue.iterator, values); // https://tc39.es/ecma262/multipage#sec-set.prototype-@@iterator
@@ -53,9 +55,44 @@ public final class SetPrototype extends ObjectValue {
 		putAccessor(intrinsics, Names.size, ($, __) -> requireSetData($, "size").getSize(), null, false, true);
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set-records")
+	private record SetRecord(ObjectValue setObject, int size, Executable has, Executable keys) {
+	}
+
 	private static SetObject requireSetData(Interpreter interpreter, String methodName) throws AbruptCompletion {
 		if (interpreter.thisValue() instanceof final SetObject S) return S;
 		throw error(new TypeError(interpreter, "Set.prototype.%s requires that 'this' be a Set.".formatted(methodName)));
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getsetrecord")
+	private static SetRecord getSetRecord(Interpreter interpreter, Value<?> obj_, String methodName) throws AbruptCompletion {
+		// 24.2.1.2 GetSetRecord ( obj )
+		// 1. If obj is not an Object, throw a TypeError exception.
+		if (!(obj_ instanceof final ObjectValue obj))
+			throw error(new TypeError(interpreter, "Set.prototype.%s argument must be an object".formatted(methodName)));
+		// 2. Let rawSize be ? Get(obj, "size").
+		final Value<?> rawSize = obj.get(interpreter, Names.size);
+		// 3. Let numSize be ? ToNumber(rawSize).
+		final NumberValue numSize = rawSize.toNumberValue(interpreter);
+		// 4. NOTE: If rawSize is undefined, then numSize will be NaN.
+		// 5. If numSize is NaN, throw a TypeError exception.
+		if (numSize.value.isNaN())
+			throw error(new TypeError(interpreter, "The .size property is NaN"));
+		// 6. Let intSize be ! ToIntegerOrInfinity(numSize).
+		final int intSize = toIntegerOrInfinity(interpreter, numSize);
+		// 7. If intSize < 0, throw a RangeError exception.
+		if (intSize < 0)
+			throw error(new RangeError(interpreter, "The .size property is negative"));
+		// 8. Let has be ? Get(obj, "has").
+		final Value<?> has_ = obj.get(interpreter, Names.has);
+		// 9. If IsCallable(has) is false, throw a TypeError exception.
+		final Executable has = Executable.getExecutable(interpreter, has_);
+		// 10. Let keys be ? Get(obj, "keys").
+		final Value<?> keys_ = obj.get(interpreter, Names.keys);
+		// 11. If IsCallable(keys) is false, throw a TypeError exception.
+		final Executable keys = Executable.getExecutable(interpreter, keys_);
+		// 12. Return a new Set Record { [[SetObject]]: obj, [[Size]]: intSize, [[Has]]: has, [[Keys]]: keys }.
+		return new SetRecord(obj, intSize, has, keys);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.add")
@@ -78,7 +115,7 @@ public final class SetPrototype extends ObjectValue {
 		}
 
 		// 5. If value is -0𝔽, set value to +0𝔽.
-		if (NumberValue.isNegativeZero(value)) value = NumberValue.ZERO;
+		if (isNegativeZero(value)) value = NumberValue.ZERO;
 		// 6. Append value to entries.
 		entries.add(value);
 		// 7. Return S.
@@ -127,7 +164,7 @@ public final class SetPrototype extends ObjectValue {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.entries")
-	private static Value<?> entries(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+	private static SetIterator entries(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 24.2.3.5 Set.prototype.entries ( )
 
 		// 1. Let S be the `this` value.
@@ -203,406 +240,390 @@ public final class SetPrototype extends ObjectValue {
 		return new SetIterator(interpreter, S, true);
 	}
 
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.union")
-	public static SetObject union(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 1 Set.prototype.union ( other )
-		final Value<?> other = argument(0, arguments);
-
-		// 1. Let O be the `this` value.
-		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "union");
-		// 3. Let otherRec be ? GetSetRecord(other).
-		final SetRecord otherRec = getSetRecord(interpreter, other);
-		// 4. Let keysIter be ? GetKeysIterator(otherRec).
-		final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
-		// 5. Let resultSetData be a copy of O.[[SetData]].
-		final ArrayList<Value<?>> resultSetData = new ArrayList<>(O.setData);
-		// 6. Let next be true.
-		// 7. Repeat, while next is not false,
-		ObjectValue next;
-		do {
-			// a. Set next to ? IteratorStep(keysIter).
-			next = keysIter.step(interpreter);
-			// b. If next is not false, then
-			if (next != null) {
-				// i. Let nextValue be ? IteratorValue(next).
-				Value<?> nextValue = iteratorValue(interpreter, next);
-				// ii. If nextValue is -0𝔽, set nextValue to +0𝔽.
-				if (NumberValue.isNegativeZero(nextValue)) nextValue = NumberValue.ZERO;
-				// iii. If SetDataHas(resultSetData, nextValue) is false, then
-				if (!setDataHas(resultSetData, nextValue)) {
-					// 1. Append nextValue to resultSetData.
-					resultSetData.add(nextValue);
-				}
-			}
-		} while (next != null);
-
-		// 8. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
-		// 9. Set result.[[SetData]] to resultSetData.
-		// 10. Return result.
-		return new SetObject(interpreter.intrinsics, resultSetData);
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-setdataindex")
+	private static int setDataIndex(ArrayList<Value<?>> setData, Value<?> value) {
+		// 1. Set value to CanonicalizeKeyedCollectionKey(value).
+		// 2. Let size be the number of elements in setData.
+		// 3. Let index be 0.
+		// 4. Repeat, while index < size,
+		// a. Let e be setData[index].
+		// b. If e is not EMPTY and e is value, then
+		// i. Return index.
+		// c. Set index to index + 1.
+		// 5. Return NOT-FOUND.
+		return setData.indexOf(value.canonicalizeKeyedCollectionKey());
 	}
 
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-setdatahas")
-	private static boolean setDataHas(ArrayList<Value<?>> resultSetData, Value<?> value) {
-		// 1. For each element e of resultSetData, do
-		for (final Value<?> e : resultSetData) {
-			// a. If e is not empty and SameValueZero(e, value) is true, return true.
-			if (e != null && e.sameValueZero(value)) return true;
-		}
-
-		// 2. Return false.
-		return false;
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-setdatahas")
+	private static boolean setDataHas(ArrayList<Value<?>> setData, Value<?> value) {
+		// 1. If SetDataIndex(setData, value) is NOT-FOUND, return false.
+		// 2. Return true.
+		return setData.contains(value.canonicalizeKeyedCollectionKey());
 	}
 
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-getsetrecord")
-	private static SetRecord getSetRecord(Interpreter interpreter, Value<?> value) throws AbruptCompletion {
-		// 1. If obj is not an Object, throw a TypeError exception.
-		if (!(value instanceof final ObjectValue obj)) {
-			throw error(new TypeError(interpreter, "Not an object"));
-		}
-
-		// 2. Let rawSize be ? Get(obj, "size").
-		final Value<?> rawSize = obj.get(interpreter, Names.size);
-		// 3. Let numSize be ? ToNumber(rawSize).
-		final NumberValue numSize = rawSize.toNumberValue(interpreter);
-		// 4. NOTE: If rawSize is undefined, then numSize will be NaN.
-		// 5. If numSize is NaN, throw a TypeError exception.
-		if (numSize.value.isNaN())
-			throw error(new TypeError(interpreter, "Size must not be NaN"));
-		// 6. Let intSize be ! ToIntegerOrInfinity(numSize).
-		final int intSize = toIntegerOrInfinity(interpreter, numSize);
-		// 7. Let has be ? Get(obj, "has").
-		final Value<?> has_ = obj.get(interpreter, Names.has);
-		// 8. If IsCallable(has) is false, throw a TypeError exception.
-		final Executable has = Executable.getExecutable(interpreter, has_);
-		// 9. Let keys be ? Get(obj, "keys").
-		final Value<?> keys_ = obj.get(interpreter, Names.keys);
-		// 10. If IsCallable(keys) is false, throw a TypeError exception.
-		final Executable keys = Executable.getExecutable(interpreter, keys_);
-		// 11. Return a new Set Record { [[Set]]: obj, [[Size]]: intSize, [[Has]]: has, [[Keys]]: keys }.
-		return new SetRecord(obj, intSize, has, keys);
-	}
-
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.intersection")
-	public static SetObject intersection(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 2 Set.prototype.intersection ( other )
-		final Value<?> other = argument(0, arguments);
-
-		// 1. Let O be the `this` value.
-		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "intersection");
-		// 3. Let otherRec be ? GetSetRecord(other).
-		final SetRecord otherRec = getSetRecord(interpreter, other);
-		// 4. Let resultSetData be a new empty List.
-		final ArrayList<Value<?>> resultSetData = new ArrayList<>();
-		// 5. Let thisSize be the number of elements in O.[[SetData]].
-		final int thisSize = O.setData.size();
-		// 6. If thisSize ≤ otherRec.[[Size]], then
-		if (thisSize <= otherRec.size()) {
-			// a. For each element e of O.[[SetData]], do
-			for (final Value<?> e : O.setData) {
-				// i. If e is not empty, then
-				if (e != null) {
-					// 1. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[Set]], « e »)).
-					final boolean inOther = otherRec.has().call(interpreter, otherRec.set, e).isTruthy(interpreter);
-					// 2. If inOther is true, then
-					if (inOther) {
-						// a. Append e to resultSetData.
-						resultSetData.add(e);
-					}
-				}
-			}
-		}
-		// 7. Else,
-		else {
-			// a. Let keysIter be ? GetKeysIterator(otherRec).
-			final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
-			// b. Let next be true.
-			// c. Repeat, while next is not false,
-			ObjectValue next;
-			do {
-				// i. Set next to ? IteratorStep(keysIter).
-				next = keysIter.step(interpreter);
-				// ii. If next is not false, then
-				if (next != null) {
-					// 1. Let nextValue be ? IteratorValue(next).
-					Value<?> nextValue = iteratorValue(interpreter, next);
-					// 2. If nextValue is -0𝔽, set nextValue to +0𝔽.
-					if (NumberValue.isNegativeZero(nextValue)) nextValue = NumberValue.ZERO;
-					// 3. NOTE: Because other is an arbitrary object, it is possible for its "keys" iterator to produce the same value more than once.
-					// 4. Let alreadyInResult be SetDataHas(resultSetData, nextValue).
-					final boolean alreadyInResult = setDataHas(resultSetData, nextValue);
-					// 5. Let inThis be SetDataHas(O.[[SetData]], nextValue).
-					final boolean inThis = setDataHas(O.setData, nextValue);
-					// 6. If alreadyInResult is false and inThis is true, then
-					if (!alreadyInResult && inThis) {
-						// a. Append nextValue to resultSetData.
-						resultSetData.add(nextValue);
-					}
-				}
-			} while (next != null);
-			// d. NOTE: It is possible for resultSetData not to be a subset of O.[[SetData]] at this point because
-			// arbitrary code may have been executed by the iterator, including code which modifies O.[[SetData]].
-			// e. Sort the elements of resultSetData so that
-			resultSetData.sort((Value<?> a, Value<?> b) -> {
-				// all elements which are also in O.[[SetData]] are ordered as they are in O.[[SetData]],
-				if (O.setData.contains(a)) return -1;
-				// and any additional elements are moved to the end of the list in the same order as they were before sorting resultSetData.
-				return 1;
-			});
-		}
-
-		// 8. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
-		// 9. Set result.[[SetData]] to resultSetData.
-		// 10. Return result.
-		return new SetObject(interpreter.intrinsics, resultSetData);
-	}
-
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.difference")
-	public static SetObject difference(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 3 Set.prototype.difference ( other )
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.difference")
+	private static SetObject difference(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 24.2.4.5 Set.prototype.difference ( other )
 		final Value<?> other = argument(0, arguments);
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
 		final SetObject O = requireSetData(interpreter, "difference");
 		// 3. Let otherRec be ? GetSetRecord(other).
-		final SetRecord otherRec = getSetRecord(interpreter, other);
+		final SetRecord otherRec = getSetRecord(interpreter, other, "difference");
 		// 4. Let resultSetData be a copy of O.[[SetData]].
 		final ArrayList<Value<?>> resultSetData = new ArrayList<>(O.setData);
-		// 5. Let thisSize be the number of elements in O.[[SetData]].
-		final int thisSize = O.setData.size();
-		// 6. If thisSize ≤ otherRec.[[Size]], then
-		if (thisSize <= otherRec.size()) {
-			// a. For each element e of resultSetData, do
-			for (int i = resultSetData.size() - 1; i >= 0; i--) {
-				final Value<?> e = resultSetData.get(i);
-				// i. If e is not empty, then
+		// 5. If SetDataSize(O.[[SetData]]) ≤ otherRec.[[Size]], then
+		if (O.size() <= otherRec.size()) {
+			// a. Let thisSize be the number of elements in O.[[SetData]].
+			final int thisSize = O.setData.size();
+			// b. Let index be 0.
+			// c. Repeat, while index < thisSize,
+			for (int index = 0; index < thisSize; index = index + 1) {
+				// i. Let e be resultSetData[index].
+				final Value<?> e = resultSetData.get(index);
+				// ii. If e is not EMPTY, then
 				if (e != null) {
-					// 1. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[Set]], « e »)).
-					final boolean inOther = otherRec.has().call(interpreter, otherRec.set(), e).isTruthy(interpreter);
+					// 1. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[SetObject]], « e »)).
+					final boolean inOther = otherRec.has().call(interpreter, otherRec.setObject(), e).isTruthy(interpreter);
 					// 2. If inOther is true, then
 					if (inOther) {
-						// a. Remove e from resultSetData.
-						resultSetData.remove(i);
+						// a. Set resultSetData[index] to EMPTY.
+						resultSetData.set(index, null);
 					}
+				}
+				// iii. Set index to index + 1.
+			}
+		}
+		// 6. Else,
+		else {
+			// a. Let keysIter be ? GetIteratorFromMethod(otherRec.[[SetObject]], otherRec.[[Keys]]).
+			final IteratorRecord keysIter = getIteratorFromMethod(interpreter, otherRec.setObject(), otherRec.keys());
+			// b. Let next be NOT-STARTED.
+			Value<?> next;
+			// c. Repeat, while next is not DONE,
+			do {
+				// i. Set next to ? IteratorStepValue(keysIter).
+				next = keysIter.stepValue(interpreter);
+				// ii. If next is not DONE, then
+				if (next != null) {
+					// 1. Set next to CanonicalizeKeyedCollectionKey(next).
+					next = next.canonicalizeKeyedCollectionKey();
+					// 2. Let valueIndex be SetDataIndex(resultSetData, next).
+					final int valueIndex = setDataIndex(resultSetData, next);
+					// 3. If valueIndex is not NOT-FOUND, then
+					if (valueIndex != -1) {
+						// a. Set resultSetData[valueIndex] to EMPTY.
+						resultSetData.set(valueIndex, null);
+					}
+				}
+
+			} while (next != null);
+		}
+
+		// 7. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
+		// 8. Set result.[[SetData]] to resultSetData.
+		// 9. Return result.
+		return new SetObject(interpreter.intrinsics, resultSetData);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.intersection")
+	private static SetObject intersection(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 24.2.4.9 Set.prototype.intersection ( other )
+		final Value<?> other = argument(0, arguments);
+
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "intersection");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final SetRecord otherRec = getSetRecord(interpreter, other, "intersection");
+		// 4. Let resultSetData be a new empty List.
+		final ArrayList<Value<?>> resultSetData = new ArrayList<>();
+		// 5. If SetDataSize(O.[[SetData]]) ≤ otherRec.[[Size]], then
+		if (O.size() <= otherRec.size()) {
+			// a. Let thisSize be the number of elements in O.[[SetData]].
+			int thisSize = O.setData.size();
+			// b. Let index be 0.
+			int index = 0;
+			// c. Repeat, while index < thisSize,
+			while (index < thisSize) {
+				// i. Let e be O.[[SetData]][index].
+				final Value<?> e = O.setData.get(index);
+				// ii. Set index to index + 1.
+				index++;
+				// iii. If e is not EMPTY, then
+				if (e != null) {
+					// 1. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[SetObject]], « e »)).
+					final boolean inOther = otherRec.has().call(interpreter, otherRec.setObject(), e).isTruthy(interpreter);
+					// 2. If inOther is true, then
+					if (inOther) {
+						// a. NOTE: It is possible for earlier calls to otherRec.[[Has]] to remove and re-add an element of O.[[SetData]],
+						// which can cause the same element to be visited twice during this iteration.
+						// b. If SetDataHas(resultSetData, e) is false, then
+						if (!setDataHas(resultSetData, e)) {
+							// i. Append e to resultSetData.
+							resultSetData.add(e);
+						}
+					}
+					// 3. NOTE: The number of elements in O.[[SetData]] may have increased during execution of otherRec.[[Has]].
+					// 4. Set thisSize to the number of elements in O.[[SetData]].
+					thisSize = O.setData.size();
 				}
 			}
 		}
-		// 7. Else,
+		// 6. Else,
 		else {
-			// a. Let keysIter be ? GetKeysIterator(otherRec).
-			final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
-			// b. Let next be true.
-			ObjectValue next;
-			// c. Repeat, while next is not false,
+			// a. Let keysIter be ? GetIteratorFromMethod(otherRec.[[SetObject]], otherRec.[[Keys]]).
+			final IteratorRecord keysIter = getIteratorFromMethod(interpreter, otherRec.setObject(), otherRec.keys());
+			// b. Let next be NOT-STARTED.
+			Value<?> next;
+			// c. Repeat, while next is not DONE,
 			do {
-				// i. Set next to ? IteratorStep(keysIter).
-				next = keysIter.step(interpreter);
-				// ii. If next is not false, then
+				// i. Set next to ? IteratorStepValue(keysIter).
+				next = keysIter.stepValue(interpreter);
+				// ii. If next is not DONE, then
 				if (next != null) {
-					// 1. Let nextValue be ? IteratorValue(next).
-					Value<?> nextValue = iteratorValue(interpreter, next);
-					// 2. If nextValue is -0𝔽, set nextValue to +0𝔽.
-					if (NumberValue.isNegativeZero(nextValue)) nextValue = NumberValue.ZERO;
-					// 3. If SetDataHas(resultSetData, nextValue) is true, then
-					if (setDataHas(resultSetData, nextValue)) {
-						// a. Remove nextValue from resultSetData.
-						resultSetData.remove(nextValue);
+					// 1. Set next to CanonicalizeKeyedCollectionKey(next).
+					next = next.canonicalizeKeyedCollectionKey();
+					// 2. Let inThis be SetDataHas(O.[[SetData]], next).
+					final boolean inThis = setDataHas(O.setData, next);
+					// 3. If inThis is true, then
+					if (inThis) {
+						// a. NOTE: Because other is an arbitrary object, it is possible for its
+						// "keys" iterator to produce the same value more than once.
+						// b. If SetDataHas(resultSetData, next) is false, then
+						if (!setDataHas(resultSetData, next)) {
+							// i. Append next to resultSetData.
+							resultSetData.add(next);
+						}
 					}
 				}
 			} while (next != null);
 		}
 
-		// 8. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
-		// 9. Set result.[[SetData]] to resultSetData.
-		// 10. Return result.
+		// 7. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
+		// 8. Set result.[[SetData]] to resultSetData.
+		// 9. Return result.
 		return new SetObject(interpreter.intrinsics, resultSetData);
 	}
 
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.symmetricdifference")
-	public static SetObject symmetricDifference(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 4 Set.prototype.symmetricDifference ( other )
-		final Value<?> other = argument(0, arguments);
-
-		// 1. Let O be the `this` value.
-		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "symmetricDifference");
-		// 3. Let otherRec be ? GetSetRecord(other).
-		final SetRecord otherRec = getSetRecord(interpreter, other);
-		// 4. Let keysIter be ? GetKeysIterator(otherRec).
-		final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
-		// 5. Let resultSetData be a copy of O.[[SetData]].
-		final ArrayList<Value<?>> resultSetData = new ArrayList<>(O.setData);
-		// 6. Let next be true.
-		ObjectValue next;
-		// 7. Repeat, while next is not false,
-		do {
-			// a. Set next to ? IteratorStep(keysIter).
-			next = keysIter.step(interpreter);
-			// b. If next is not false, then
-			if (next != null) {
-				// i. Let nextValue be ? IteratorValue(next).
-				Value<?> nextValue = iteratorValue(interpreter, next);
-				// ii. If nextValue is -0𝔽, set nextValue to +0𝔽.
-				if (NumberValue.isNegativeZero(nextValue)) nextValue = NumberValue.ZERO;
-				// iii. Let inResult be SetDataHas(resultSetData, nextValue).
-				final boolean inResult = setDataHas(resultSetData, nextValue);
-				// iv. If SetDataHas(O.[[SetData]], nextValue) is true, then
-				if (setDataHas(O.setData, nextValue)) {
-					// 1. If inResult is true, remove nextValue from resultSetData.
-					if (inResult) resultSetData.remove(nextValue);
-				}
-				// v. Else,
-				else {
-					// 1. If inResult is false, append nextValue to resultSetData.
-					if (!inResult) resultSetData.add(nextValue);
-				}
-			}
-		} while (next != null);
-
-		// 8. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
-		// 9. Set result.[[SetData]] to resultSetData.
-		// 10. Return result.
-		return new SetObject(interpreter.intrinsics, resultSetData);
-	}
-
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.issubsetof")
-	public static BooleanValue isSubsetOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 5 Set.prototype.isSubsetOf ( other )
-		final Value<?> other = argument(0, arguments);
-
-		// 1. Let O be the `this` value.
-		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "isSubsetOf");
-		// 3. Let otherRec be ? GetSetRecord(other).
-		final SetRecord otherRec = getSetRecord(interpreter, other);
-		// 4. Let thisSize be the number of elements in O.[[SetData]].
-		final int thisSize = O.setData.size();
-		// 5. If thisSize > otherRec.[[Size]], return false.
-		if (thisSize > otherRec.size()) return BooleanValue.FALSE;
-		// 6. For each element e of O.[[SetData]], do
-		for (final Value<?> e : O.setData) {
-			// a. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[Set]], « e »)).
-			final boolean inOther = otherRec.has().call(interpreter, otherRec.set(), e).isTruthy(interpreter);
-			// b. If inOther is false, return false.
-			if (!inOther) return BooleanValue.FALSE;
-		}
-
-		// 7. Return true.
-		return BooleanValue.TRUE;
-	}
-
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.issupersetof")
-	public static BooleanValue isSupersetOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 6 Set.prototype.isSupersetOf ( other )
-		final Value<?> other = argument(0, arguments);
-
-		// 1. Let O be the `this` value.
-		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
-		final SetObject O = requireSetData(interpreter, "isSupersetOf");
-		// 3. Let otherRec be ? GetSetRecord(other).
-		final SetRecord otherRec = getSetRecord(interpreter, other);
-		// 4. Let thisSize be the number of elements in O.[[SetData]].
-		final int thisSize = O.setData.size();
-		// 5. If thisSize < otherRec.[[Size]], return false.
-		if (thisSize < otherRec.size()) return BooleanValue.FALSE;
-		// 6. Let keysIter be ? GetKeysIterator(otherRec).
-		final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
-		// 7. Let next be true.
-		ObjectValue next;
-		// 8. Repeat, while next is not false,
-		do {
-			// a. Set next to ? IteratorStep(keysIter).
-			next = keysIter.step(interpreter);
-			// b. If next is not false, then
-			if (next != null) {
-				// i. Let nextValue be ? IteratorValue(next).
-				final Value<?> nextValue = iteratorValue(interpreter, next);
-				// ii. If SetDataHas(O.[[SetData]], nextValue) is false, return false.
-				if (!setDataHas(O.setData, nextValue)) return BooleanValue.FALSE;
-			}
-		} while (next != null);
-
-		// 9. Return true.
-		return BooleanValue.TRUE;
-	}
-
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set.prototype.isdisjointfrom")
-	public static BooleanValue isDisjointFrom(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 7 Set.prototype.isDisjointFrom ( other )
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.isdisjointfrom")
+	private static BooleanValue isDisjointFrom(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 24.2.4.10 Set.prototype.isDisjointFrom ( other )
 		final Value<?> other = argument(0, arguments);
 
 		// 1. Let O be the `this` value.
 		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
 		final SetObject O = requireSetData(interpreter, "isDisjointFrom");
 		// 3. Let otherRec be ? GetSetRecord(other).
-		final SetRecord otherRec = getSetRecord(interpreter, other);
-		// 4. Let thisSize be the number of elements in O.[[SetData]].
-		final int thisSize = O.setData.size();
-		// 5. If thisSize ≤ otherRec.[[Size]], then
-		if (thisSize <= otherRec.size()) {
-			// a. For each element e of O.[[SetData]], do
-			for (final Value<?> e : O.setData) {
-				// i. If e is not empty, then
+		final SetRecord otherRec = getSetRecord(interpreter, other, "isDisjointFrom");
+		// 4. If SetDataSize(O.[[SetData]]) ≤ otherRec.[[Size]], then
+		if (O.size() <= otherRec.size()) {
+			// a. Let thisSize be the number of elements in O.[[SetData]].
+			int thisSize = O.setData.size();
+			// b. Let index be 0.
+			int index = 0;
+			// c. Repeat, while index < thisSize,
+			while (index < thisSize) {
+				// i. Let e be O.[[SetData]][index].
+				final Value<?> e = O.setData.get(index);
+				// ii. Set index to index + 1.
+				index++;
+				// iii. If e is not EMPTY, then
 				if (e != null) {
-					// 1. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[Set]], « e »)).
-					final boolean inOther = otherRec.has().call(interpreter, otherRec.set(), e).isTruthy(interpreter);
+					// 1. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[SetObject]], « e »)).
+					final boolean inOther = otherRec.has().call(interpreter, otherRec.setObject(), e).isTruthy(interpreter);
 					// 2. If inOther is true, return false.
 					if (inOther) return BooleanValue.FALSE;
+					// 3. NOTE: The number of elements in O.[[SetData]] may have increased during execution of otherRec.[[Has]].
+					// 4. Set thisSize to the number of elements in O.[[SetData]].
+					thisSize = O.setData.size();
 				}
 			}
+
 		}
-		// 6. Else,
+		// 5. Else,
 		else {
-			// a. Let keysIter be ? GetKeysIterator(otherRec).
-			final IteratorRecord keysIter = otherRec.getKeysIterator(interpreter);
-			// b. Let next be true.
-			ObjectValue next;
-			// c. Repeat, while next is not false,
+			// a. Let keysIter be ? GetIteratorFromMethod(otherRec.[[SetObject]], otherRec.[[Keys]]).
+			final IteratorRecord keysIter = getIteratorFromMethod(interpreter, otherRec.setObject(), otherRec.keys());
+			// b. Let next be NOT-STARTED.
+			Value<?> next;
+			// c. Repeat, while next is not DONE,
 			do {
-				// i. Set next to ? IteratorStep(keysIter).
-				next = keysIter.step(interpreter);
-				// ii. If next is not false, then
+				// i. Set next to ? IteratorStepValue(keysIter).
+				next = keysIter.stepValue(interpreter);
+				// ii. If next is not DONE, then
 				if (next != null) {
-					// 1. Let nextValue be ? IteratorValue(next).
-					final Value<?> nextValue = iteratorValue(interpreter, next);
-					// 2. If SetDataHas(O.[[SetData]], nextValue) is true, return false.
-					if (setDataHas(O.setData, nextValue)) return BooleanValue.FALSE;
+					// 1. If SetDataHas(O.[[SetData]], next) is true, then
+					if (setDataHas(O.setData, next)) {
+						// TODO: a. Perform ? IteratorClose(keysIter, NormalCompletion(UNUSED)).
+						// b. Return false.
+						return BooleanValue.FALSE;
+					}
 				}
 			} while (next != null);
 		}
 
-		// 7. Return true.
+		// 6. Return true.
 		return BooleanValue.TRUE;
 	}
 
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-set-records")
-	private record SetRecord(ObjectValue set, int size, Executable has, Executable keys) {
-		@SpecificationURL("https://tc39.es/proposal-set-methods/#sec-getkeysiterator")
-		private IteratorRecord getKeysIterator(Interpreter interpreter) throws AbruptCompletion {
-			// 1. Let keysIter be ? Call(setRec.[[Keys]], setRec.[[Set]]).
-			final Value<?> keysIter_ = this.keys.call(interpreter, set());
-			// 2. If keysIter is not an Object, throw a TypeError exception.
-			if (!(keysIter_ instanceof final ObjectValue keysIter))
-				throw error(new TypeError(interpreter, "SetRec.keys() did not return an object"));
-			// 3. Let nextMethod be ? Get(keysIter, "next").
-			final Value<?> nextMethod_ = keysIter.get(interpreter, Names.next);
-			// 4. If IsCallable(nextMethod) is false, throw a TypeError exception.
-			final Executable nextMethod = Executable.getExecutable(interpreter, nextMethod_);
-			// 5. Return a new Iterator Record { [[Iterator]]: keysIter, [[NextMethod]]: nextMethod, [[Done]]: false }.
-			return new IteratorRecord(keysIter, nextMethod);
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.issubsetof")
+	private static BooleanValue isSubsetOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 24.2.4.11 Set.prototype.isSubsetOf ( other )
+		final Value<?> other = argument(0, arguments);
+
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "isDisjointFrom");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final SetRecord otherRec = getSetRecord(interpreter, other, "isDisjointFrom");
+		// 4. If SetDataSize(O.[[SetData]]) > otherRec.[[Size]], return false.
+		if (O.size() > otherRec.size()) return BooleanValue.FALSE;
+		// 5. Let thisSize be the number of elements in O.[[SetData]].
+		int thisSize = O.setData.size();
+		// 6. Let index be 0.
+		int index = 0;
+		// 7. Repeat, while index < thisSize,
+		while (index < thisSize) {
+			// a. Let e be O.[[SetData]][index].
+			final Value<?> e = O.setData.get(index);
+			// b. Set index to index + 1.
+			index++;
+			// c. If e is not EMPTY, then
+			if (e != null) {
+				// i. Let inOther be ToBoolean(? Call(otherRec.[[Has]], otherRec.[[SetObject]], « e »)).
+				final boolean inOther = otherRec.has().call(interpreter, otherRec.setObject(), e).isTruthy(interpreter);
+				// ii. If inOther is false, return false.
+				if (!inOther) return BooleanValue.FALSE;
+				// iii. NOTE: The number of elements in O.[[SetData]] may have increased during execution of otherRec.[[Has]].
+				// iv. Set thisSize to the number of elements in O.[[SetData]].
+				thisSize = O.setData.size();
+			}
 		}
+
+		// 8. Return true.
+		return BooleanValue.TRUE;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.issupersetof")
+	private static BooleanValue isSupersetOf(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 24.2.4.12 Set.prototype.isSupersetOf ( other )
+		final Value<?> other = argument(0, arguments);
+
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "isSupersetOf");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final var otherRec = getSetRecord(interpreter, other, "isSupersetOf");
+		// 4. If SetDataSize(O.[[SetData]]) < otherRec.[[Size]], return false.
+		if (O.setData.size() < otherRec.size()) return BooleanValue.FALSE;
+		// 5. Let keysIter be ? GetIteratorFromMethod(otherRec.[[SetObject]], otherRec.[[Keys]]).
+		final IteratorRecord keysIter = getIteratorFromMethod(interpreter, otherRec.setObject(), otherRec.keys());
+		// 6. Let next be NOT-STARTED.
+		Value<?> next;
+		// 7. Repeat, while next is not DONE,
+		do {
+			// a. Set next to ? IteratorStepValue(keysIter).
+			next = keysIter.stepValue(interpreter);
+			// b. If next is not DONE, then
+			if (next != null) {
+				// i. If SetDataHas(O.[[SetData]], next) is false, then
+				if (!setDataHas(O.setData, next)) {
+					// TODO: 1. Perform ? IteratorClose(keysIter, NormalCompletion(UNUSED)).
+					// 2. Return false.
+					return BooleanValue.FALSE;
+				}
+			}
+		} while (next != null);
+
+		// 8. Return true.
+		return BooleanValue.TRUE;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.symmetricdifference")
+	private static SetObject symmetricDifference(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 24.2.4.15 Set.prototype.symmetricDifference ( other )
+		final Value<?> other = argument(0, arguments);
+
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final SetObject O = requireSetData(interpreter, "symmetricDifference");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final SetRecord otherRec = getSetRecord(interpreter, other, "symmetricDifference");
+		// 4. Let keysIter be ? GetIteratorFromMethod(otherRec.[[SetObject]], otherRec.[[Keys]]).
+		final IteratorRecord keysIter = getIteratorFromMethod(interpreter, otherRec.setObject(), otherRec.keys());
+		// 5. Let resultSetData be a copy of O.[[SetData]].
+		final ArrayList<Value<?>> resultSetData = new ArrayList<>(O.setData);
+		// 6. Let next be NOT-STARTED.
+		Value<?> next;
+		// 7. Repeat, while next is not DONE,
+		do {
+			// a. Set next to ? IteratorStepValue(keysIter).
+			next = keysIter.stepValue(interpreter);
+			// b. If next is not DONE, then
+			if (next != null) {
+				// i. Set next to CanonicalizeKeyedCollectionKey(next).
+				next = next.canonicalizeKeyedCollectionKey();
+				// ii. Let resultIndex be SetDataIndex(resultSetData, next).
+				final int resultIndex = setDataIndex(resultSetData, next);
+				// iii. If resultIndex is NOT-FOUND, let alreadyInResult be false. Otherwise, let alreadyInResult be true.
+				final boolean alreadyInResult = resultIndex != -1;
+				// iv. If SetDataHas(O.[[SetData]], next) is true, then
+				if (setDataHas(O.setData, next)) {
+					// 1. If alreadyInResult is true, set resultSetData[resultIndex] to EMPTY.
+					if (alreadyInResult) resultSetData.set(resultIndex, null);
+				}
+				// v. Else,
+				else {
+					// 1. If alreadyInResult is false, append next to resultSetData.
+					if (!alreadyInResult) resultSetData.add(next);
+				}
+			}
+
+		} while (next != null);
+
+		// 8. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
+		// 9. Set result.[[SetData]] to resultSetData.
+		// 10. Return result.
+		return new SetObject(interpreter.intrinsics, resultSetData);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set.prototype.union")
+	private static SetObject union(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 24.2.4.16 Set.prototype.union ( other )
+		final Value<?> other = argument(0, arguments);
+		// 1. Let O be the `this` value.
+		// 2. Perform ? RequireInternalSlot(O, [[SetData]]).
+		final var O = requireSetData(interpreter, "union");
+		// 3. Let otherRec be ? GetSetRecord(other).
+		final var otherRec = getSetRecord(interpreter, other, "union");
+		// 4. Let keysIter be ? GetIteratorFromMethod(otherRec.[[SetObject]], otherRec.[[Keys]]).
+		final var keysIter = getIteratorFromMethod(interpreter, otherRec.setObject(), otherRec.keys());
+		// 5. Let resultSetData be a copy of O.[[SetData]].
+		final var resultSetData = new ArrayList<>(O.setData);
+		// 6. Let next be NOT-STARTED.
+		Value<?> next;
+		// 7. Repeat, while next is not DONE,
+		do {
+			// a. Set next to ? IteratorStepValue(keysIter).
+			next = keysIter.stepValue(interpreter);
+			// b. If next is not DONE, then
+			if (next != null) {
+				// i. Set next to CanonicalizeKeyedCollectionKey(next).
+				next = next.canonicalizeKeyedCollectionKey();
+				// ii. If SetDataHas(resultSetData, next) is false, then
+				if (!setDataHas(resultSetData, next)) {
+					// 1. Append next to resultSetData.
+					resultSetData.add(next);
+				}
+			}
+		} while (next != null);
+
+		// 8. Let result be OrdinaryObjectCreate(%Set.prototype%, « [[SetData]] »).
+		// 9. Set result.[[SetData]] to resultSetData.
+		// 10. Return result.
+		return new SetObject(interpreter.intrinsics, resultSetData);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createsetiterator")

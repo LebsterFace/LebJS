@@ -40,12 +40,34 @@ public record IteratorRecord(ObjectValue iteratorObject, Value<?> nextMethod) {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorstep")
 	public ObjectValue step(Interpreter interpreter) throws AbruptCompletion {
 		// 1. Let result be ? IteratorNext(iteratorRecord).
-		final ObjectValue result = next(interpreter, null);
-		// 2. Let done be ? IteratorComplete(result).
-		final boolean done = iteratorComplete(interpreter, result);
-		// 3. If done is true, return false.
-		// 4. Return result.
-		return done ? null : result;
+		final ObjectValue result = this.next(interpreter, null);
+		// 2. Let done be Completion(IteratorComplete(result)).
+		boolean done = iteratorComplete(interpreter, result);
+		// NOTE: Steps 3 & 4 do not need special-casing.
+		// 5. If done is true, then
+		if (done) {
+			// a. Set iteratorRecord.[[Done]] to true.
+			// b. Return DONE.
+			return null;
+		}
+
+		// 6. Return result.
+		return result;
+	}
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorstepvalue")
+	public Value<?> stepValue(Interpreter interpreter) throws AbruptCompletion {
+		// 1. Let result be ? IteratorStep(iteratorRecord).
+		final ObjectValue result = step(interpreter);
+		// 2. If result is DONE, then
+		if (result == null) {
+			// a. Return DONE.
+			return null;
+		}
+
+		// 3. Let value be Completion(IteratorValue(result)).
+		// NOTE: Step 4 does not need special-casing.
+		// 5. Return ? value.
+		return iteratorValue(interpreter, result);
 	}
 
 	public void collect(Interpreter interpreter, List<Value<?>> result) throws AbruptCompletion {

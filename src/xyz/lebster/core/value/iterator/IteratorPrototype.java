@@ -46,6 +46,20 @@ public final class IteratorPrototype extends ObjectValue {
 		putMethod(intrinsics, Names.find, 1, IteratorPrototype::find);
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiteratorfrommethod")
+	public static IteratorRecord getIteratorFromMethod(Interpreter interpreter, Value<?> obj, Executable method) throws AbruptCompletion {
+		// 1. Let iterator be ? Call(method, obj).
+		final Value<?> iterator_ = method.call(interpreter, obj);
+		// 2. If iterator is not an Object, throw a TypeError exception.
+		if (!(iterator_ instanceof final ObjectValue iterator))
+			throw error(new TypeError(interpreter, "Iterator method returned a non-object value"));
+		// 3. Let nextMethod be ? Get(iterator, "next").
+		final Value<?> nextMethod = iterator.get(interpreter, Names.next);
+		// 4. Let iteratorRecord be the Iterator Record { [[Iterator]]: iterator, [[NextMethod]]: nextMethod, [[Done]]: false }.
+		// 5. Return iteratorRecord.
+		return new IteratorRecord(iterator, nextMethod);
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
 	@NonCompliant
 	public static IteratorRecord getIterator(Interpreter interpreter, Expression expression) throws AbruptCompletion {

@@ -1,7 +1,6 @@
 package xyz.lebster.core.value.map;
 
 import xyz.lebster.core.NonCompliant;
-import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -10,10 +9,10 @@ import xyz.lebster.core.value.BuiltinConstructor;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
-import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.map.MapObject.MapEntry;
+import xyz.lebster.core.value.object.ObjectConstructor;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -31,15 +30,14 @@ public final class MapConstructor extends BuiltinConstructor<MapObject, MapProto
 		putMethod(intrinsics, Names.groupBy, 2, MapConstructor::groupBy);
 	}
 
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-map.groupby")
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-map.groupby")
 	private static MapObject groupBy(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 3.1 Map.groupBy ( items, callbackfn )
+		// 24.1.2.1 Map.groupBy ( items, callbackfn )
 		final Value<?> items = argument(0, arguments);
 		final Value<?> callbackfn = argument(1, arguments);
 
-		// 1. Let groups be ? GroupBy(items, callbackfn, zero).
-		final var groups = ArrayPrototype.groupBy(interpreter, items, callbackfn, false);
+		// 1. Let groups be ? GroupBy(items, callbackfn, COLLECTION).
+		final var groups = ObjectConstructor.groupBy(interpreter, items, callbackfn, false);
 		// 2. Let map be ! Construct(%Map%).
 		final ArrayList<MapEntry> mapData = new ArrayList<>();
 		final MapObject map = new MapObject(interpreter.intrinsics, mapData);

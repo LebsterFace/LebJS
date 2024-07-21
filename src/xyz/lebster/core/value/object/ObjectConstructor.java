@@ -1,7 +1,6 @@
 package xyz.lebster.core.value.object;
 
 import xyz.lebster.core.NonCompliant;
-import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
@@ -13,16 +12,22 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.array.ArrayPrototype;
 import xyz.lebster.core.value.error.type.TypeError;
+import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.globals.Null;
 import xyz.lebster.core.value.globals.Undefined;
+import xyz.lebster.core.value.iterator.IteratorRecord;
 import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
+import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.function.NativeFunction.argumentRest;
+import static xyz.lebster.core.value.iterator.IteratorPrototype.getIterator;
+import static xyz.lebster.core.value.object.ObjectPrototype.requireObjectCoercible;
 
 @SpecificationURL("https://tc39.es/ecma262/multipage#sec-object-constructor")
 public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, ObjectPrototype> {
@@ -40,8 +45,8 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		putMethod(intrinsics, Names.getOwnPropertyDescriptors, 1, ObjectConstructor::getOwnPropertyDescriptors);
 		putMethod(intrinsics, Names.getOwnPropertyNames, 1, ObjectConstructor::getOwnPropertyNames);
 		putMethod(intrinsics, Names.getOwnPropertySymbols, 1, ObjectConstructor::getOwnPropertySymbols);
-		putMethod(intrinsics, Names.groupBy, 2, ObjectConstructor::groupBy);
 		putMethod(intrinsics, Names.getPrototypeOf, 1, ObjectConstructor::getPrototypeOf);
+		putMethod(intrinsics, Names.groupBy, 2, ObjectConstructor::groupBy);
 		putMethod(intrinsics, Names.hasOwn, 2, ObjectConstructor::hasOwn);
 		putMethod(intrinsics, Names.is, 2, ObjectConstructor::is);
 		putMethod(intrinsics, Names.isExtensible, 1, ObjectConstructor::isExtensible);
@@ -52,29 +57,6 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		putMethod(intrinsics, Names.seal, 1, ObjectConstructor::seal);
 		putMethod(intrinsics, Names.setPrototypeOf, 2, ObjectConstructor::setPrototypeOf);
 		putMethod(intrinsics, Names.values, 1, ObjectConstructor::values);
-	}
-
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-object.groupby")
-	private static ObjectValue groupBy(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// 2.1 Object.groupBy ( items, callbackfn )
-		final Value<?> items = argument(0, arguments);
-		final Value<?> callbackfn = argument(1, arguments);
-
-		// 1. Let groups be ? GroupBy(items, callbackfn, property).
-		final var groups = ArrayPrototype.groupBy(interpreter, items, callbackfn, true);
-		// TODO: 2. Let obj be OrdinaryObjectCreate(null).
-		final ObjectValue obj = new ObjectValue(Null.instance);
-		// 3. For each Record { [[Key]], [[Elements]] } g of groups, do
-		for (final var g : groups) {
-			// a. Let elements be CreateArrayFromList(g.[[Elements]]).
-			final ArrayObject elements = new ArrayObject(interpreter, g.elements());
-			// TODO: b. Perform ! CreateDataPropertyOrThrow(obj, g.[[Key]], elements).
-			obj.put((Key<?>) g.key(), elements);
-		}
-
-		// 4. Return obj.
-		return obj;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.getownpropertydescriptors")
@@ -242,6 +224,108 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		// 2. Return ? obj.[[GetPrototypeOf]]().
 		final ObjectValue prototype = O.toObjectValue(interpreter).getPrototype();
 		return prototype == null ? Null.instance : prototype;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.groupby")
+	private static ObjectValue groupBy(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// 20.1.2.13 Object.groupBy ( items, callbackfn )
+		final Value<?> items = argument(0, arguments);
+		final Value<?> callbackfn = argument(1, arguments);
+
+		// 1. Let groups be ? GroupBy(items, callbackfn, PROPERTY).
+		final ArrayList<Group> groups = groupBy(interpreter, items, callbackfn, true);
+		// 2. Let obj be OrdinaryObjectCreate(null).
+		final ObjectValue obj = new ObjectValue(Null.instance);
+		// 3. For each Record { [[Key]], [[Elements]] } g of groups, do
+		for (final Group g : groups) {
+			// a. Let elements be CreateArrayFromList(g.[[Elements]]).
+			final ArrayObject elements = new ArrayObject(interpreter, g.elements());
+			// FIXME: b. Perform ! CreateDataPropertyOrThrow(obj, g.[[Key]], elements).
+			obj.set(interpreter, (Key<?>) g.key(), elements);
+		}
+
+		// 4. Return obj.
+		return obj;
+	}
+
+	public record Group(Value<?> key, ArrayList<Value<?>> elements) {
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-groupby")
+	public static ArrayList<Group> groupBy(Interpreter interpreter, Value<?> items, Value<?> callbackfn_, boolean propertyKeyCoercion) throws AbruptCompletion {
+		// 1. Perform ? RequireObjectCoercible(items).
+		requireObjectCoercible(interpreter, items, "groupBy");
+		// 2. If IsCallable(callbackfn) is false, throw a TypeError exception.
+		final Executable callbackfn = Executable.getExecutable(interpreter, callbackfn_);
+		// 3. Let groups be a new empty List.
+		final ArrayList<Group> groups = new ArrayList<>();
+		// 4. Let iteratorRecord be ? GetIterator(items, SYNC).
+		final IteratorRecord iteratorRecord = getIterator(interpreter, items);
+		// 5. Let k be 0.
+		int k = 0;
+		// 6. Repeat,
+		while (true) {
+			// a. If k ≥ 2**53 - 1, then
+			if (k >= ArrayPrototype.MAX_LENGTH) {
+				// i. Let error be ThrowCompletion(a newly created TypeError object).
+				// TODO: ii. Return ? IteratorClose(iteratorRecord, error).
+				throw error(new TypeError(interpreter, "Maximum array size exceeded"));
+			}
+
+			// b. Let next be ? IteratorStepValue(iteratorRecord).
+			final Value<?> next = iteratorRecord.stepValue(interpreter);
+			// c. If next is DONE, then
+			if (next == null) {
+				// i. Return groups.
+				return groups;
+			}
+
+			// d. Let value be next.
+			// e. Let key be Completion(Call(callbackfn, undefined, « value, 𝔽(k) »)).
+			Value<?> key = callbackfn.call(interpreter, Undefined.instance, next, new NumberValue(k));
+			// TODO: f. IfAbruptCloseIterator(key, iteratorRecord).
+			// g. If keyCoercion is PROPERTY, then
+			if (propertyKeyCoercion) {
+				// i. Set key to Completion(ToPropertyKey(key)).
+				key = key.toPropertyKey(interpreter);
+				// TODO: ii. IfAbruptCloseIterator(key, iteratorRecord).
+			}
+			// h. Else,
+			else {
+				// i. Assert: keyCoercion is COLLECTION.
+				// ii. Set key to CanonicalizeKeyedCollectionKey(key).
+				key = key.canonicalizeKeyedCollectionKey();
+			}
+
+			// i. Perform AddValueToKeyedGroup(groups, key, value).
+			addValueToKeyedGroup(groups, key, next);
+
+			// j. Set k to k + 1.
+			k++;
+		}
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-add-value-to-keyed-group")
+	private static void addValueToKeyedGroup(ArrayList<Group> groups, Value<?> key, Value<?> value) {
+		// 1. For each Record { [[Key]], [[Elements]] } g of groups, do
+		for (final Group g : groups) {
+			// a. If SameValue(g.[[Key]], key) is true, then
+			if (g.key().sameValue(key)) {
+				// i. Assert: Exactly one element of groups meets this criterion.
+				// ii. Append value to g.[[Elements]].
+				g.elements().add(value);
+				// iii. Return UNUSED.
+				return;
+			}
+		}
+
+		// 2. Let group be the Record { [[Key]]: key, [[Elements]]: « value » }.
+		final ArrayList<Value<?>> elements = new ArrayList<>(1);
+		elements.add(value);
+		final Group group = new Group(key, elements);
+		// 3. Append group to groups.
+		groups.add(group);
+		// 4. Return UNUSED.
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-object.assign")

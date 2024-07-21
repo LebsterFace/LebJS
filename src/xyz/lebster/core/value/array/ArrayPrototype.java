@@ -1,7 +1,6 @@
 package xyz.lebster.core.value.array;
 
 import xyz.lebster.core.NonCompliant;
-import xyz.lebster.core.Proposal;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.exception.ShouldNotHappen;
@@ -28,9 +27,6 @@ import java.util.List;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.function.NativeFunction.*;
-import static xyz.lebster.core.value.iterator.IteratorPrototype.getIterator;
-import static xyz.lebster.core.value.iterator.IteratorPrototype.iteratorValue;
-import static xyz.lebster.core.value.object.ObjectPrototype.requireObjectCoercible;
 import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
 
 public final class ArrayPrototype extends ObjectValue {
@@ -1367,84 +1363,6 @@ public final class ArrayPrototype extends ObjectValue {
 		return new ArrayIterator(interpreter, O, false, true);
 	}
 
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-group-by")
-	public static List<ArrayGroup> groupBy(Interpreter interpreter, Value<?> items, Value<?> callbackfn_, boolean toObject) throws AbruptCompletion {
-		// 1. Perform ? RequireObjectCoercible(items).
-		requireObjectCoercible(interpreter, items, (toObject ? "Object." : "Map.") + "groupBy");
-		// 2. If IsCallable(callbackfn) is false, throw a TypeError exception.
-		final Executable callbackfn = Executable.getExecutable(interpreter, callbackfn_);
-		// 3. Let groups be a new empty List.
-		final ArrayList<ArrayGroup> groups = new ArrayList<>();
-		// 4. Let iteratorRecord be ? GetIterator(items).
-		final var iteratorRecord = getIterator(interpreter, items);
-		// 5. Let k be 0.
-		int k = 0;
-		// 6. Repeat,
-		while (true) {
-			// a. If k ≥ 2^53 - 1, then
-			if (k >= MAX_LENGTH) {
-				// i. Let error be ThrowCompletion(a newly created TypeError object).
-				// FIXME: ii. Return ? IteratorClose(iteratorRecord, error).
-				throw AbruptCompletion.error(new TypeError(interpreter, "Maximum array size exceeded"));
-			}
-
-			// b. Let next be ? IteratorStep(iteratorRecord).
-			final ObjectValue next = iteratorRecord.step(interpreter);
-			// c. If next is false, then
-			if (next == null) {
-				// i. Return groups.
-				return groups;
-			}
-
-			// d. Let value be ? IteratorValue(next).
-			final Value<?> value = iteratorValue(interpreter, next);
-			// e. Let key be Completion(Call(callbackfn, undefined, « value, 𝔽(k) »)).
-			Value<?> key = callbackfn.call(interpreter, Undefined.instance, value, new NumberValue(k));
-			// FIXME: f. IfAbruptCloseIterator(key, iteratorRecord).
-			// g. If keyCoercion is property, then
-			if (toObject) {
-				// i. Set key to Completion(ToPropertyKey(key)).
-				key = key.toPropertyKey(interpreter);
-				// FIXME: ii. IfAbruptCloseIterator(key, iteratorRecord).
-			}
-			// h. Else,
-			else {
-				// i. Assert: keyCoercion is zero.
-				// ii. If key is -0𝔽, set key to +0𝔽.
-				if (NumberValue.isNegativeZero(key)) key = NumberValue.ZERO;
-			}
-
-			// i. Perform AddValueToKeyedGroup(groups, key, value).
-			addValueToKeyedGroup(groups, key, value);
-			// j. Set k to k + 1.
-			k = k + 1;
-		}
-	}
-
-	@Proposal
-	@SpecificationURL("https://tc39.es/proposal-array-grouping/#sec-add-value-to-keyed-group")
-	private static void addValueToKeyedGroup(ArrayList<ArrayGroup> groups, Value<?> key, Value<?> value) {
-		// 4.2 AddValueToKeyedGroup ( groups, key, value )
-
-		// 1. For each Record { [[Key]], [[Elements]] } g of groups, do
-		for (final ArrayGroup g : groups) {
-			// a. If SameValue(g.[[Key]], key) is true, then
-			if (g.key.sameValue(key)) {
-				// ii. Append value to g.[[Elements]].
-				g.elements.add(value);
-				// iii. Return unused.
-				return;
-			}
-		}
-
-		// 2. Let group be the Record { [[Key]]: key, [[Elements]]: « value » }.
-		final var group = new ArrayGroup(key, new ArrayList<>(List.of(value)));
-		// 3. Append group to groups.
-		groups.add(group);
-		// 4. Return unused.
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.slice")
 	private static ArrayObject slice(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.26 Array.prototype.slice ( start, end )
@@ -1938,9 +1856,6 @@ public final class ArrayPrototype extends ObjectValue {
 	@FunctionalInterface
 	public interface ValueComparator {
 		int compare(Value<?> x, Value<?> y) throws AbruptCompletion;
-	}
-
-	public record ArrayGroup(Value<?> key, ArrayList<Value<?>> elements) {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createarrayiterator")

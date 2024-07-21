@@ -80,6 +80,7 @@ public final class ObjectPrototype extends ObjectValue {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-requireobjectcoercible")
 	public static Value<?> requireObjectCoercible(Interpreter interpreter, Value<?> argument, String methodName) throws AbruptCompletion {
 		if (argument.isNullish()) {
+			// TODO: Use incompatibleReceiver
 			throw error(new TypeError(interpreter, methodName + " called on null or undefined"));
 		} else {
 			return argument;

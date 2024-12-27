@@ -16,7 +16,6 @@ public interface FunctionNode extends ASTNode {
 	BlockStatement body();
 
 	default Value<?> executeBody(Interpreter interpreter, Value<?>[] passedArguments) throws AbruptCompletion {
-		final ExecutionContext context = interpreter.pushContextWithNewEnvironment();
 		try {
 			parameters().declareArguments(interpreter, passedArguments);
 			body().executeWithoutNewContext(interpreter);
@@ -24,8 +23,6 @@ public interface FunctionNode extends ASTNode {
 		} catch (AbruptCompletion e) {
 			if (e.type != AbruptCompletion.Type.Return) throw e;
 			return e.value;
-		} finally {
-			interpreter.exitExecutionContext(context);
 		}
 	}
 }

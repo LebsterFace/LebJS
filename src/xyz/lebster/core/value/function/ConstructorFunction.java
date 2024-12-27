@@ -12,13 +12,17 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ecmascript-function-objects")
-public final class Function extends Constructor {
+/**
+ * Variant of {@link OrdinaryFunction} with {@link #construct(Interpreter, Value[], ObjectValue) construct} method of {@link Constructor}
+ */
+@SpecificationURL("https://tc39.es/ecma262/multipage#constructor")
+public class ConstructorFunction extends Constructor {
 	private final Environment environment;
 	private final FunctionNode code;
 
-	public Function(Intrinsics intrinsics, StringValue name, Environment environment, FunctionNode code) {
-		super(intrinsics, name, code.parameters().expectedArgumentCount());
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ConstructorFunctioncreate")
+	public ConstructorFunction(Intrinsics intrinsics, StringValue name, Environment environment, FunctionNode code) {
+		super(intrinsics, name, code.parameters().expectedArgumentCount(), true);
 		this.environment = environment;
 		this.code = code;
 	}

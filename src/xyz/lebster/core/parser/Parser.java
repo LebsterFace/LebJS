@@ -8,7 +8,6 @@ import xyz.lebster.core.node.declaration.*;
 import xyz.lebster.core.node.expression.*;
 import xyz.lebster.core.node.expression.ClassExpression.ClassConstructorNode;
 import xyz.lebster.core.node.expression.ClassExpression.ClassFieldNode;
-import xyz.lebster.core.node.expression.ClassExpression.ClassMethodNode;
 import xyz.lebster.core.node.expression.ObjectExpression.*;
 import xyz.lebster.core.node.expression.UpdateExpression.UpdateOp;
 import xyz.lebster.core.node.expression.literal.PrimitiveLiteral;
@@ -29,7 +28,6 @@ import java.util.*;
 import static xyz.lebster.core.node.expression.AssignmentExpression.AssignmentOp;
 import static xyz.lebster.core.parser.Associativity.Left;
 import static xyz.lebster.core.parser.Associativity.Right;
-import static xyz.lebster.core.parser.TokenType.Class;
 import static xyz.lebster.core.parser.TokenType.*;
 
 public final class Parser {
@@ -348,7 +346,7 @@ public final class Parser {
 					init = declaration;
 				}
 			} else if (state.token.matchPrimaryExpression()) {
-				final Expression expression = parseExpression(0, Associativity.Right, Collections.singleton(In));
+				final Expression expression = parseExpression(0, Right, Collections.singleton(In));
 				if (state.is(Identifier, "of")) return parseForOfStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
 				if (state.is(In)) return parseForInStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
 				init = new ExpressionStatement(expression);
@@ -510,7 +508,7 @@ public final class Parser {
 			return parseArrayDestructuring(allowMemberExpressions);
 		}
 
-		final Expression expression = parseExpression(2, Associativity.Right, Set.of(Equals, In));
+		final Expression expression = parseExpression(2, Right, Set.of(Equals, In));
 		if (expression instanceof final AssignmentTarget assignmentTarget) {
 			if (allowMemberExpressions || expression instanceof IdentifierExpression) return assignmentTarget;
 			throw new SyntaxError("Illegal property in declaration context", position());
@@ -650,14 +648,22 @@ public final class Parser {
 		return new FunctionDeclaration(range(startIndex), body, name, parameters);
 	}
 
-	private FunctionExpression parseFunctionExpression(boolean isMethod) throws SyntaxError {
+	private FunctionExpression parseFunctionExpression() throws SyntaxError {
 		final int startIndex = startIndex();
-		if (!isMethod) state.require(Function);
+		state.require(Function);
 		if (state.is(Star)) throw new ParserNotImplemented(position(), "Generator function expressions");
-		final PrimitiveLiteral<StringValue> name = isMethod ? null : state.optionalStringLiteral(Identifier);
+		final PrimitiveLiteral<StringValue> name = state.optionalStringLiteral(Identifier);
 		final FunctionParameters parameters = parseFunctionParameters(true);
 		final BlockStatement body = parseFunctionBody();
 		return new FunctionExpression(range(startIndex), body, name, parameters);
+	}
+
+	private MethodNode parseObjectMethod(Expression name) throws SyntaxError {
+		final int startIndex = startIndex();
+		if (state.is(Star)) throw new ParserNotImplemented(position(), "Generator methods");
+		final FunctionParameters parameters = parseFunctionParameters(true);
+		final BlockStatement body = parseFunctionBody();
+		return new MethodNode(name, parameters, body, range(startIndex));
 	}
 
 	private ExpressionList parseExpressionList(boolean expectParens, boolean canHaveEmpty) throws SyntaxError {
@@ -897,7 +903,7 @@ public final class Parser {
 			case StringLiteral -> state.consume().asStringLiteral();
 			case NumericLiteral -> parseNumericLiteral();
 			case BigIntLiteral -> parseBigIntLiteral();
-			case Function -> parseFunctionExpression(false);
+			case Function -> parseFunctionExpression();
 			case True -> new PrimitiveLiteral<>(state.consume().range(), BooleanValue.TRUE);
 			case False -> new PrimitiveLiteral<>(state.consume().range(), BooleanValue.FALSE);
 			case This -> new ThisKeyword(state.consume().range());
@@ -1030,13 +1036,15 @@ public final class Parser {
 
 		if (!key.computed()) {
 			final String prefix = key.nonComputedKey().value;
-			if (state.token.matchObjectExpressionKey()) if (prefix.equals("async")) {
-				throw new ParserNotImplemented(position(), "`async` object literal methods");
-			} else if (prefix.equals("get") || prefix.equals("set")) {
-				consumeAllLineTerminators();
-				final ObjectExpressionKey name = parseObjectExpressionKey();
-				final FunctionExpression function = parseFunctionExpression(true);
-				return new GetterSetterNode(prefix.equals("get"), name.expression(), function, name.computed());
+			if (state.token.matchObjectExpressionKey()) {
+				if (prefix.equals("async")) {
+					throw new ParserNotImplemented(position(), "`async` object literal methods");
+				} else if (prefix.equals("get") || prefix.equals("set")) {
+					consumeAllLineTerminators();
+					final ObjectExpressionKey name = parseObjectExpressionKey();
+					final MethodNode method = parseObjectMethod(name.expression());
+					return new GetterSetterNode(prefix.equals("get"), method);
+				}
 			}
 		}
 
@@ -1052,14 +1060,13 @@ public final class Parser {
 		}
 
 		if (state.is(LParen)) {
-			final FunctionExpression function = parseFunctionExpression(true);
-			return new EntryNode(key.expression(), function, key.computed(), true);
+			return parseObjectMethod(key.expression());
 		}
 
 		if (state.optional(Colon)) {
 			consumeAllLineTerminators();
 			final Expression value = parseSpecAssignmentExpression();
-			return new EntryNode(key.expression(), value, key.computed(), false);
+			return new EntryNode(key.expression(), value);
 		}
 
 		return new ShorthandNode(key.nonComputedKey());
@@ -1067,7 +1074,7 @@ public final class Parser {
 
 	private ClassExpression parseClassBody(int startIndex, String className, Expression heritage) throws SyntaxError {
 		ClassConstructorNode constructor = null;
-		final List<ClassMethodNode> methods = new ArrayList<>();
+		final List<MethodNode> methods = new ArrayList<>();
 		final List<ClassFieldNode> fields = new ArrayList<>();
 		state.require(LBrace);
 		consumeAllSeparators();
@@ -1127,7 +1134,7 @@ public final class Parser {
 			if (isConstructor) {
 				constructor = new ClassConstructorNode(className, parameters, body, isDerived, range(elementStartIndex));
 			} else {
-				methods.add(new ClassMethodNode(name, computedName, parameters, body, range(elementStartIndex)));
+				methods.add(new MethodNode(name, parameters, body, range(elementStartIndex)));
 			}
 
 			consumeAllSeparators();

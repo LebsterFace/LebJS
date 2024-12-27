@@ -12,14 +12,16 @@ import xyz.lebster.core.interpreter.environment.FunctionEnvironment;
 import xyz.lebster.core.node.FunctionNode;
 import xyz.lebster.core.node.FunctionParameters;
 import xyz.lebster.core.node.SourceRange;
+import xyz.lebster.core.node.expression.ObjectExpression.MethodNode;
 import xyz.lebster.core.node.expression.literal.PrimitiveLiteral;
 import xyz.lebster.core.node.statement.BlockStatement;
 import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Constructor;
-import xyz.lebster.core.value.function.Executable;
+import xyz.lebster.core.value.function.OrdinaryFunction;
 import xyz.lebster.core.value.globals.Null;
+import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -31,12 +33,12 @@ public record ClassExpression(
 	String className,
 	Expression heritage,
 	ClassConstructorNode constructor,
-	ClassMethodNode[] methods,
+	MethodNode[] methods,
 	ClassFieldNode[] fields,
 	SourceRange range
 ) implements Expression {
-	public ClassExpression(String className, Expression heritage, ClassConstructorNode constructor, List<ClassMethodNode> methods, List<ClassFieldNode> fields, SourceRange range) {
-		this(className, heritage, constructor, methods.toArray(new ClassMethodNode[0]), fields.toArray(new ClassFieldNode[0]), range);
+	public ClassExpression(String className, Expression heritage, ClassConstructorNode constructor, List<MethodNode> methods, List<ClassFieldNode> fields, SourceRange range) {
+		this(className, heritage, constructor, methods.toArray(new MethodNode[0]), fields.toArray(new ClassFieldNode[0]), range);
 	}
 
 	@Override
@@ -62,18 +64,15 @@ public record ClassExpression(
 		prototypeProperty.setPrototype(protoParent);
 		constructorFunction.setPrototype(constructorParent);
 
-		for (final ClassMethodNode method : methods) {
-			prototypeProperty.put(method.name.execute(interpreter).toPropertyKey(interpreter), method.execute(interpreter));
+		for (final MethodNode method : methods) {
+			// TODO: Reduce duplication between this and MethodNode#insertInto
+			final Key<?> propKey = method.name().execute(interpreter).toPropertyKey(interpreter);
+			final OrdinaryFunction function = method.execute(interpreter);
+			function.updateName(propKey.toFunctionName());
+			prototypeProperty.put(propKey, function);
 		}
 
 		return constructorFunction;
-	}
-
-	public record ClassMethodNode(Expression name, boolean computedName, FunctionParameters parameters, BlockStatement body, SourceRange range) implements FunctionNode {
-		@Override
-		public ClassMethod execute(Interpreter interpreter) throws AbruptCompletion {
-			return new ClassMethod(interpreter, name.execute(interpreter).toStringValue(interpreter), this);
-		}
 	}
 
 	public record ClassConstructorNode(String className, FunctionParameters parameters, BlockStatement body, boolean isDerived, SourceRange range) implements FunctionNode {
@@ -96,7 +95,7 @@ public record ClassExpression(
 	public record ClassFieldNode(Expression name, Expression initializer, SourceRange range) {
 	}
 
-	// A wrapper of core.value.function.Function, without the call method - class constructors cannot be called without 'new'
+	// A wrapper of core.value.function.ConstructorFunction, without the call method - class constructors cannot be called without 'new'
 	private static final class ClassConstructor extends Constructor {
 		private final Environment environment;
 		private final ClassConstructorNode code;
@@ -109,8 +108,7 @@ public record ClassExpression(
 			boolean isDerived,
 			String name
 		) {
-			// FIXME: Pass in proper prototype here
-			super(intrinsics, name == null ? Names.EMPTY : new StringValue(name), code.parameters.expectedArgumentCount());
+			super(intrinsics, name == null ? Names.EMPTY : new StringValue(name), code.parameters.expectedArgumentCount(), false);
 			this.environment = environment;
 			this.code = code;
 			this.isDerived = isDerived;
@@ -157,33 +155,6 @@ public record ClassExpression(
 				"Class constructors cannot be invoked without 'new'" :
 				"Class constructor %s cannot be invoked without 'new'".formatted(this.name.value);
 			throw error(new TypeError(interpreter, message));
-		}
-	}
-
-	// TODO: Find way to reduce duplication of code between this and Function
-	private static final class ClassMethod extends Executable {
-		private final Environment environment;
-		private final ClassMethodNode code;
-
-		public ClassMethod(Interpreter interpreter, StringValue name, ClassExpression.ClassMethodNode code) {
-			super(interpreter.intrinsics, name, code.parameters.expectedArgumentCount());
-			this.environment = interpreter.environment();
-			this.code = code;
-		}
-
-		@Override
-		public StringValue toStringMethod() {
-			return new StringValue(code.range.getText());
-		}
-
-		@Override
-		public Environment savedEnvironment(Interpreter interpreter) {
-			return environment;
-		}
-
-		@Override
-		public Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
-			return code.executeBody(interpreter, arguments);
 		}
 	}
 }

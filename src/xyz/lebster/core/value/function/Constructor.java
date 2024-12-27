@@ -11,7 +11,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 public abstract class Constructor extends Executable {
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-makeconstructor")
-	public Constructor(Intrinsics intrinsics, StringValue name, int expectedArgumentCount) {
+	public Constructor(Intrinsics intrinsics, StringValue name, int expectedArgumentCount, boolean writablePrototype) {
 		super(intrinsics, name, expectedArgumentCount);
 		ObjectValue prototypeProperty = new ObjectValue(intrinsics);
 		prototypeProperty.put(Names.constructor, this);

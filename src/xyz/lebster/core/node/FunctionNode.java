@@ -11,10 +11,6 @@ import xyz.lebster.core.value.globals.Undefined;
 public interface FunctionNode extends ASTNode {
 	Expression name();
 
-	default boolean computedName() {
-		return false;
-	}
-
 	FunctionParameters parameters();
 
 	BlockStatement body();

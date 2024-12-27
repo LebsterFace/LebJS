@@ -696,10 +696,9 @@ public final class Parser {
 	}
 
 	private CallExpression parseCallExpression(Expression left) throws SyntaxError {
-		final int startIndex = startIndex();
 		final ExpressionList arguments = parseExpressionList(false, false);
 		state.require(RParen);
-		return new CallExpression(range(startIndex), left, arguments);
+		return new CallExpression(range(left.range().startIndex), left, arguments);
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-UnaryExpression")

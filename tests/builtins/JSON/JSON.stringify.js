@@ -106,7 +106,7 @@ Test.expect(`{
         ]
     }
 }`, JSON.stringify(o, null, 4)); */
-Test.expect(`{
+Test.expect(JSON.stringify(o, null, 4), `{
     "bar": "baz",
     "qux": {
         "arr": [
@@ -117,9 +117,9 @@ Test.expect(`{
         "x": 10
     },
     "foo": 1
-}`, JSON.stringify(o, null, 4));
+}`.replaceAll("\r\n", "\n"));
 
-Test.expect(`{
+Test.expect(JSON.stringify(o, null, "abcd"), `{
 abcd"bar": "baz",
 abcd"qux": {
 abcdabcd"arr": [
@@ -130,7 +130,7 @@ abcdabcd],
 abcdabcd"x": 10
 abcd},
 abcd"foo": 1
-}`, JSON.stringify(o, null, "abcd"));
+}`.replaceAll("\r\n", "\n"));
 
 o = {
 	var1: "foo",

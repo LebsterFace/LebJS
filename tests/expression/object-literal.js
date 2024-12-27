@@ -25,7 +25,7 @@ let object = {
 }
 
 Test.expect("example", object.stringconcatenation)
-
+Test.expectError("SyntaxError", "Unexpected token ','", () => Test.parse("({ [console.log('!'), 'bar']() {} })"));
 
 const env = {
 	...object,

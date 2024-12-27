@@ -575,7 +575,11 @@ public final class Parser {
 					pairs.put(key, parseInitializer(new IdentifierExpression(key.range(), key.value())));
 				}
 			} else {
-				pairs.put(parseComputedKeyExpression(), parseInitializer(parseAssignmentTarget(allowMemberExpressions)));
+				final Expression key = parseComputedKeyExpression();
+				state.require(Colon);
+				consumeAllLineTerminators();
+				final AssignmentPattern value = parseInitializer(parseAssignmentTarget(allowMemberExpressions));
+				pairs.put(key, value);
 			}
 
 			consumeAllLineTerminators();
@@ -590,10 +594,8 @@ public final class Parser {
 
 	private Expression parseComputedKeyExpression() throws SyntaxError {
 		state.require(LBracket);
-		final Expression keyExpression = parseExpression();
+		final Expression keyExpression = parseSpecAssignmentExpression();
 		state.require(RBracket);
-		consumeAllLineTerminators();
-		state.require(Colon);
 		consumeAllLineTerminators();
 		return keyExpression;
 	}
@@ -995,10 +997,8 @@ public final class Parser {
 			computedKey = null;
 			nonComputedKey = new StringValue(state.consume().value());
 		} else {
-			state.require(LBracket);
-			computedKey = parseExpression();
+			computedKey = parseComputedKeyExpression();
 			nonComputedKey = null;
-			state.require(RBracket);
 		}
 
 		consumeAllLineTerminators();

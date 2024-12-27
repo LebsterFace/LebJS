@@ -32,7 +32,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 
 	Executable(FunctionPrototype functionPrototype, StringValue name, int expectedArgumentCount) {
 		super(functionPrototype);
-		updateName(name);
+		this.setName(name);
 		this.put(Names.length, new NumberValue(expectedArgumentCount), false, false, true);
 	}
 
@@ -66,7 +66,7 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 
 		if (Executable.isAnonymousFunctionDefinition(expression) && executedValue instanceof final Executable function) {
 			// TODO: Do this when creating the function, not after.
-			function.updateName(name.toFunctionName());
+			function.setName(name.toFunctionName());
 		}
 
 		return executedValue;
@@ -101,8 +101,9 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 		}
 	}
 
-	// FIXME: Hacky. Remove the need for this
-	public final void updateName(StringValue newName) {
+	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-setfunctionname")
+	public final void setName(StringValue newName) {
 		this.name = newName;
 		this.put(Names.name, newName, false, false, true);
 	}

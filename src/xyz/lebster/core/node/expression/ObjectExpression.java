@@ -1,5 +1,6 @@
 package xyz.lebster.core.node.expression;
 
+import xyz.lebster.core.NonCompliant;
 import xyz.lebster.core.SpecificationURL;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
@@ -52,13 +53,14 @@ public final class ObjectExpression implements Expression {
 		}
 	}
 
+	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#prod-MethodDefinition")
 	public record MethodNode(Expression name, FunctionParameters parameters, BlockStatement body, SourceRange range) implements FunctionNode, ObjectEntryNode {
 		@Override
 		@SpecificationURL("https://tc39.es/ecma262/multipage#sec-runtime-semantics-definemethod")
 		public OrdinaryFunction execute(Interpreter interpreter) throws AbruptCompletion {
 			// 1. Let propKey be ? Evaluation of ClassElementName.
-			// NOTE: This is handled by the caller
+			// NOTE: This is handled by {@link #define}
 			// 2. Let env be the running execution context's LexicalEnvironment.
 			final Environment env = interpreter.environment();
 			// TODO: 3. Let privateEnv be the running execution context's PrivateEnvironment.
@@ -73,12 +75,22 @@ public final class ObjectExpression implements Expression {
 			return new OrdinaryFunction(interpreter.intrinsics, env, this);
 		}
 
+		@SpecificationURL("https://tc39.es/ecma262/multipage#sec-runtime-semantics-methoddefinitionevaluation")
+		public void define(Interpreter interpreter, ObjectValue object, boolean enumerable) throws AbruptCompletion {
+			// 1. Let methodDef be ? DefineMethod of MethodDefinition with argument object.
+			final Key<?> propKey = name().execute(interpreter).toPropertyKey(interpreter);
+			final OrdinaryFunction closure = execute(interpreter);
+			// 2. Perform SetFunctionName(methodDef.[[Closure]], methodDef.[[Key]]).
+			closure.setName(propKey.toFunctionName());
+			// 3. Return ? DefineMethodProperty(object, methodDef.[[Key]], methodDef.[[Closure]], enumerable).
+			// a. Let desc be the PropertyDescriptor { [[Value]]: closure, [[Writable]]: true, [[Enumerable]]: enumerable, [[Configurable]]: true }.
+			// b. Perform ? DefinePropertyOrThrow(homeObject, key, desc).
+			object.put(propKey, closure, true, enumerable, true);
+		}
+
 		@Override
 		public void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion {
-			final Key<?> key = name.execute(interpreter).toPropertyKey(interpreter);
-			final OrdinaryFunction value = execute(interpreter);
-			value.updateName(key.toFunctionName());
-			result.put(key, value, true, true, true);
+			define(interpreter, result, true);
 		}
 	}
 
@@ -88,7 +100,7 @@ public final class ObjectExpression implements Expression {
 			final OrdinaryFunction function = this.value.execute(interpreter);
 			final Key<?> key = this.value.name.execute(interpreter).toPropertyKey(interpreter);
 			final String newName = "%s %s".formatted(getter ? "get" : "set", key.toFunctionName().value);
-			function.updateName(new StringValue(newName));
+			function.setName(new StringValue(newName));
 			result.put(key, function, true, true, true);
 			final var existing = result.value.get(key) instanceof AccessorDescriptor A ? A : null;
 			final var descriptor = existing == null ? new AccessorDescriptor(null, null, true, true) : existing;

@@ -19,9 +19,7 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Constructor;
-import xyz.lebster.core.value.function.OrdinaryFunction;
 import xyz.lebster.core.value.globals.Null;
-import xyz.lebster.core.value.object.Key;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -65,11 +63,7 @@ public record ClassExpression(
 		constructorFunction.setPrototype(constructorParent);
 
 		for (final MethodNode method : methods) {
-			// TODO: Reduce duplication between this and MethodNode#insertInto
-			final Key<?> propKey = method.name().execute(interpreter).toPropertyKey(interpreter);
-			final OrdinaryFunction function = method.execute(interpreter);
-			function.updateName(propKey.toFunctionName());
-			prototypeProperty.put(propKey, function);
+			method.define(interpreter, prototypeProperty, false);
 		}
 
 		return constructorFunction;

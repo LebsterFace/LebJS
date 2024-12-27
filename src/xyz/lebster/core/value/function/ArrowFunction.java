@@ -15,7 +15,7 @@ public final class ArrowFunction extends Executable {
 	private final ArrowFunctionExpression expression;
 
 	public ArrowFunction(Intrinsics intrinsics, ArrowFunctionExpression expression, ExecutionContext context) {
-		super(intrinsics.functionPrototype, Names.EMPTY, expression.parameters().expectedArgumentCount());
+		super(intrinsics, Names.EMPTY, expression.parameters().expectedArgumentCount());
 		this.expression = expression;
 		this.context = context;
 	}

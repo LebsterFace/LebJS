@@ -14,10 +14,10 @@ public final class OrdinaryFunction extends Executable {
 	private final Environment environment;
 	private final FunctionNode code;
 
-	/** Note that the {@link #name} of this function must be initialised separately with {@link #updateName(StringValue)} */
+	/** Note that the {@link #name} of this function must be initialised separately with {@link #setName(StringValue)} */
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-ordinaryfunctioncreate")
 	public OrdinaryFunction(Intrinsics intrinsics, Environment environment, FunctionNode code) {
-		super(intrinsics, null, code.parameters().expectedArgumentCount());
+		super(intrinsics.functionPrototype, null, code.parameters().expectedArgumentCount());
 		this.environment = environment;
 		this.code = code;
 	}

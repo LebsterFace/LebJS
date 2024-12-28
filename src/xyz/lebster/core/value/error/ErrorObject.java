@@ -9,16 +9,15 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 public class ErrorObject extends ObjectValue implements HasBuiltinTag {
 	public final String message;
+	public final String stack; // TODO: Array of objects
 
-	public ErrorObject(ObjectValue prototype, String message) {
+	public ErrorObject(Interpreter interpreter, ObjectValue prototype, String message) {
 		super(prototype);
 		this.message = ANSI.stripFormatting(message);
+		this.stack = interpreter.stackTrace();
 		put(Names.message, new StringValue(message));
 		put(Names.name, new StringValue(getName()));
-	}
-
-	public ErrorObject(Interpreter interpreter, String message) {
-		this(interpreter.intrinsics.errorPrototype, message);
+		put(Names.stack, new StringValue(stack));
 	}
 
 	@Override
@@ -43,7 +42,7 @@ public class ErrorObject extends ObjectValue implements HasBuiltinTag {
 
 	@Override
 	public String toString() {
-		return getName() + ": " + message;
+		return getName() + ": " + message + (stack.isBlank() ? "" : "\n" + stack);
 	}
 
 	@Override

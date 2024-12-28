@@ -5,6 +5,6 @@ import xyz.lebster.core.value.error.ErrorObject;
 
 public final class TypeError extends ErrorObject {
 	public TypeError(Interpreter interpreter, String message) {
-		super(interpreter.intrinsics.typeErrorPrototype, message);
+		super(interpreter, interpreter.intrinsics.typeErrorPrototype, message);
 	}
 }

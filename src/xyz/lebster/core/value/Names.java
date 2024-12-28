@@ -232,6 +232,7 @@ public final class Names {
 	public static final StringValue splice = new StringValue("splice");
 	public static final StringValue split = new StringValue("split");
 	public static final StringValue sqrt = new StringValue("sqrt");
+	public static final StringValue stack = new StringValue("stack");
 	public static final StringValue startsWith = new StringValue("startsWith");
 	public static final StringValue sticky = new StringValue("sticky");
 	public static final StringValue string = new StringValue("string");

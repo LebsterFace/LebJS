@@ -5,7 +5,7 @@ import xyz.lebster.core.value.error.ErrorObject;
 
 public final class SyntaxErrorObject extends ErrorObject {
 	public SyntaxErrorObject(Interpreter interpreter, String message) {
-		super(interpreter.intrinsics.syntaxErrorPrototype, message);
+		super(interpreter, interpreter.intrinsics.syntaxErrorPrototype, message);
 	}
 
 	@Override

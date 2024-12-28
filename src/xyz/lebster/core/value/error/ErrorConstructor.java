@@ -18,6 +18,6 @@ public final class ErrorConstructor extends BuiltinConstructor<ErrorObject, Erro
 
 	@Override
 	public ErrorObject construct(Interpreter interpreter, Value<?>[] arguments, ObjectValue newTarget) throws AbruptCompletion {
-		return new ErrorObject(interpreter, argumentString(0, "", interpreter, arguments));
+		return new ErrorObject(interpreter, interpreter.intrinsics.errorPrototype, argumentString(0, "", interpreter, arguments));
 	}
 }

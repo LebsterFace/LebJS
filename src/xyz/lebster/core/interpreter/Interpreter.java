@@ -18,6 +18,7 @@ import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.ArrayDeque;
+import java.util.StringJoiner;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 import static xyz.lebster.core.value.primitive.string.StringValue.isValidIdentifier;
@@ -196,6 +197,18 @@ public final class Interpreter {
 		}
 
 		return new TypeError(this, "%s requires that 'this' be %s.".formatted(methodName, requirement));
+	}
+
+	public String stackTrace() {
+		final StringJoiner joiner = new StringJoiner("\n");
+		for (final var e : executionContextStack) {
+			if (e.environment() instanceof final FunctionEnvironment f) {
+				final String name = f.functionObject.name.value;
+				joiner.add("\tat %s".formatted(name));
+			}
+		}
+
+		return joiner.toString();
 	}
 
 	private enum Mode { Normal, Strict, Checked }

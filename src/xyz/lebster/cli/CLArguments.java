@@ -25,7 +25,7 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 				System.out.printf("%s--no-buffer%s           Do not buffer test outputs%n", ANSI.CYAN, ANSI.RESET);
 				System.out.printf("%s--hide-passing%s        Only output skipped / failing tests (ignored if %s--no-buffer%s specified)%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
 				System.out.printf("%s--disable-prompt%s      Disable the %s'> '%s prompt in the REPL%n", ANSI.CYAN, ANSI.RESET, ANSI.BRIGHT_GREEN, ANSI.RESET);
-				System.out.printf("%s--harness %s[value]%s     Test harness. Valid options: %sserenity%s%n", ANSI.CYAN, ANSI.MAGENTA, ANSI.RESET, ANSI.MAGENTA, ANSI.RESET);
+				System.out.printf("%s--harness %s[value]%s     Test harness. Valid options: %sladybird%s%n", ANSI.CYAN, ANSI.MAGENTA, ANSI.RESET, ANSI.MAGENTA, ANSI.RESET);
 				System.out.printf("%s-t%s, %s--test%s            Run tests%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);
 				System.out.printf("%s--gif%s                 Enable GIF rendering mode (No error handling, no prompt, print delimiter after execution)%n", ANSI.CYAN, ANSI.RESET);
 				System.exit(0);

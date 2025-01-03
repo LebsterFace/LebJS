@@ -44,8 +44,8 @@ public final class Testing {
 
 		if (arguments.options().harness() == null) {
 			harness = new DefaultTestHarness();
-		} else if ("serenity".equals(arguments.options().harness())) {
-			harness = new SerenityTestHarness(arguments);
+		} else if ("ladybird".equals(arguments.options().harness())) {
+			harness = new LadybirdTestHarness(arguments);
 		} else {
 			throw new IllegalStateException("Unknown test harness name: " + arguments.options().harness());
 		}

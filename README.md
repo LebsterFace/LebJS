@@ -35,6 +35,6 @@ lebjs
 - `--no-buffer` - Do not buffer test outputs
 - `--hide-passing` - Only output skipped / failing tests (ignored if `--no-buffer` specified)
 - `--disable-prompt` - Disable the `> ` prompt in the REPL
-- `--harness [value]` - Test harness. Valid options: `serenity`
+- `--harness [value]` - Test harness. Valid options: `ladybird`
 - `-t`, `--test` - Run tests
 - `--gif` - Enable GIF rendering mode (No error handling, no prompt, print delimiter after execution, print AST)

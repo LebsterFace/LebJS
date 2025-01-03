@@ -20,13 +20,13 @@ import java.nio.file.Path;
 
 import static xyz.lebster.cli.TestStatus.*;
 
-final class SerenityTestHarness implements TestHarness {
+final class LadybirdTestHarness implements TestHarness {
 	private final Program testCommon;
 	private final Path commonPath;
 
-	SerenityTestHarness(CLArguments arguments) throws SyntaxError, CLArgumentException {
+	LadybirdTestHarness(CLArguments arguments) throws SyntaxError, CLArgumentException {
 		final Path path = arguments.filePathOrNull();
-		if (path == null) throw new CLArgumentException("Test path is required for Serenity test harness");
+		if (path == null) throw new CLArgumentException("Test path is required for Ladybird test harness");
 		this.commonPath = path.resolve("test-common.js");
 		this.testCommon = Parser.parse(Main.readFile(commonPath));
 	}

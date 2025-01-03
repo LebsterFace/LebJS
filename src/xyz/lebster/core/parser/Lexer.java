@@ -222,7 +222,6 @@ public final class Lexer {
 		} else if (codePoint < 0x80) {
 			// Optimization: the first codepoint with the ID_Start property after A-Za-z is outside the
 			// ASCII range (0x00AA), so we can skip isUnicodeIdentifierStart() for any ASCII characters.
-			// (Thanks Serenity!)
 			return false;
 		} else {
 			return Character.isUnicodeIdentifierStart(codePoint);
@@ -237,7 +236,6 @@ public final class Lexer {
 		} else if (codePoint < 0x80) {
 			// Optimization: the first codepoint with the ID_Continue property after A-Za-z0-9_ is outside the
 			// ASCII range (0x00AA), so we can skip isUnicodeIdentifierPart() for any ASCII characters.
-			// (Thanks Serenity!)
 			return false;
 		} else {
 			return Character.isUnicodeIdentifierPart(codePoint);

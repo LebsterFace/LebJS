@@ -3,5 +3,5 @@ out
 *.iml
 real-tests
 test262
-serenity-tests
+ladybird-tests
 missing-tests

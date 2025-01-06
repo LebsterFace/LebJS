@@ -28,7 +28,12 @@ final class LadybirdTestHarness implements TestHarness {
 		final Path path = arguments.filePathOrNull();
 		if (path == null) throw new CLArgumentException("Test path is required for Ladybird test harness");
 		this.commonPath = path.resolve("test-common.js");
-		this.testCommon = Parser.parse(Main.readFile(commonPath));
+		try {
+			this.testCommon = Parser.parse(Main.readFile(commonPath));
+		} catch (Throwable e) {
+			System.out.println("Failed while parsing test-common.js");
+			throw e;
+		}
 	}
 
 	private ObjectValue getTestResults(Interpreter interpreter) throws AbruptCompletion {

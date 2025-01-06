@@ -524,7 +524,6 @@ public final class ArrayPrototype extends ObjectValue {
 		throw new NotImplemented("Array.prototype.toLocaleString()");
 	}
 
-	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-array.prototype.concat")
 	private static ArrayObject concat(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
 		// 23.1.3.2 Array.prototype.concat ( ...items )
@@ -551,15 +550,15 @@ public final class ArrayPrototype extends ObjectValue {
 				int k = 0;
 				// iv. Repeat, while k < len,
 				while (k < len) {
-					// 1. Let P be ! ToString(𝔽(k)).
-					final StringValue P = new StringValue(k);
-					// 2. Let exists be ? HasProperty(E, P).
-					final boolean exists = object.hasProperty(P);
+					// 1. Let Pk be ! ToString(𝔽(k)).
+					final StringValue Pk = new StringValue(k);
+					// 2. Let exists be ? HasProperty(E, Pk).
+					final boolean exists = object.hasProperty(Pk);
 					// 3. If exists is true, then
 					if (exists) {
-						// a. Let subElement be ? Get(E, P).
-						final Value<?> subElement = object.get(interpreter, P);
-						// b. Perform ? CreateDataPropertyOrThrow(A, ! ToString(𝔽(n)), subElement).
+						// a. Let subElement be ? Get(E, Pk).
+						final Value<?> subElement = object.get(interpreter, Pk);
+						// FIXME: b. Perform ? CreateDataPropertyOrThrow(A, ! ToString(𝔽(n)), subElement).
 						A.set(interpreter, new StringValue(n), subElement);
 					}
 
@@ -591,7 +590,7 @@ public final class ArrayPrototype extends ObjectValue {
 		// 23.1.3.2.1 IsConcatSpreadable ( O )
 
 		// 1. If O is not an Object, return false.
-		// 2. Let spreadable be ? Get(O, @@isConcatSpreadable).
+		// 2. Let spreadable be ? Get(O, %Symbol.isConcatSpreadable%).
 		final Value<?> spreadable = O.get(interpreter, SymbolValue.isConcatSpreadable);
 		// 3. If spreadable is not undefined, return ToBoolean(spreadable).
 		if (spreadable != Undefined.instance) return spreadable.isTruthy(interpreter);

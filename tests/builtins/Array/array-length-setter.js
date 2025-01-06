@@ -12,6 +12,11 @@ array = [1, 2, 3];
 array.length = 5;
 Test.equals([1, 2, 3, , ,], array);
 
+// extend array by setting property
+array[9] = 'A';
+Test.equals([1, 2, 3, , , , , , , 'A'], array);
+Test.expect(10, array.length);
+
 // truncate array by setting length
 array = [1, 2, 3];
 array.length = 2;

@@ -122,7 +122,7 @@ public final class ArrayObject extends ObjectValue implements HasBuiltinTag, Ite
 			final int index = (int) indexLong;
 			final int delta = (index + 1) - arrayValues.size();
 			for (int i = 0; i < delta; i++)
-				arrayValues.add(new DataDescriptor(Undefined.instance, true, true, true));
+				arrayValues.add(null);
 			arrayValues.set(index, Desc);
 			return true;
 		}

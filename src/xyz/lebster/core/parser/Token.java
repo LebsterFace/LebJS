@@ -55,6 +55,13 @@ public record Token(SourceRange range, TokenType type, String value) {
 		return new PrimitiveLiteral<>(range, new StringValue(value));
 	}
 
+	int unaryPrecedence() {
+		return switch (type) {
+			case Plus, Minus -> 17;
+			default -> precedence();
+		};
+	}
+
 	@SpecificationURL("https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#table")
 	int precedence() {
 		return switch (type) {
@@ -63,7 +70,6 @@ public record Token(SourceRange range, TokenType type, String value) {
 			// TODO: `new` (without argument list)
 			// TODO: Distinguish between postfix / prefix
 			case PlusPlus, MinusMinus -> 15;
-			// TODO: Distinguish between unary/binary '+'/'-'
 			case Bang, Tilde, Typeof, Void, Delete, Await -> 14;
 			case Exponent -> 13;
 			case Star, Slash, Percent -> 12;

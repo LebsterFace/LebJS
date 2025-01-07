@@ -706,7 +706,7 @@ public final class Parser {
 		final int startIndex = startIndex();
 		final Token token = state.consume();
 		final Associativity assoc = token.associativity();
-		final int minPrecedence = token.precedence();
+		final int minPrecedence = token.unaryPrecedence();
 
 		final UnaryExpression.UnaryOp op = switch (token.type()) {
 			case Delete -> UnaryExpression.UnaryOp.Delete;

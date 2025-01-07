@@ -47,7 +47,7 @@ final class LadybirdTestHarness implements TestHarness {
 
 	@Override
 	public TestResult run(File file, CLArguments arguments) {
-		if (file.toPath().equals(commonPath))
+		if (file.toPath().equals(commonPath) || file.getName().endsWith(".js.skip"))
 			return new TestResult(SKIPPED, null);
 
 		try {

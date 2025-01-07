@@ -13,7 +13,8 @@ public class ErrorObject extends ObjectValue implements HasBuiltinTag {
 
 	public ErrorObject(Interpreter interpreter, ObjectValue prototype, String message) {
 		super(prototype);
-		this.message = ANSI.stripFormatting(message);
+		message = ANSI.stripFormatting(message);
+		this.message = message;
 		this.stack = interpreter.stackTrace();
 		put(Names.message, new StringValue(message));
 		put(Names.name, new StringValue(getName()));

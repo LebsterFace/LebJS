@@ -14,8 +14,8 @@
       return array
     }
 
-    Test.equals([1], append(1))
-    Test.equals([2], append(2))
+    Test.expectEqual([1], append(1))
+    Test.expectEqual([2], append(2))
 }
 
 // Earlier parameters are available to later default parameters
@@ -24,8 +24,8 @@
       return [name, greeting, message]
     }
 
-    Test.equals(["David", "Hi", "Hi David"], greet('David', 'Hi'))
-    Test.equals(["David", "Hi", "Happy Birthday!"], greet('David', 'Hi', 'Happy Birthday!'))
+    Test.expectEqual(["David", "Hi", "Hi David"], greet('David', 'Hi'))
+    Test.expectEqual(["David", "Hi", "Happy Birthday!"], greet('David', 'Hi', 'Happy Birthday!'))
 }
 
 // Scope Effects
@@ -45,8 +45,8 @@
       return [x, y]
     }
 
-    Test.equals([1, undefined], f())
-    Test.equals([2, undefined], f(2))
+    Test.expectEqual([1, undefined], f())
+    Test.expectEqual([2, undefined], f(2))
 }
 
 // Destructured parameter with default value assignment

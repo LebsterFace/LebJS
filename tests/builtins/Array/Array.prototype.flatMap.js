@@ -10,9 +10,9 @@ Test.expect(1, Array.prototype.flatMap.length);
 
     const array1 = [1, 2, [3, 4]];
     const array2 = [1, 2, [3, 4, [5, 6]]];
-    Test.equals([1, 2, 3, 4], array1.flatMap(identity));
+    Test.expectEqual([1, 2, 3, 4], array1.flatMap(identity));
     // only goes to depth 1
-    Test.equals([1, 2, 3, 4, [5, 6]], array2.flatMap(identity));
+    Test.expectEqual([1, 2, 3, 4, [5, 6]], array2.flatMap(identity));
 }
 
 // flattens return values
@@ -23,10 +23,10 @@ Test.expect(1, Array.prototype.flatMap.length);
 
     const array1 = [1, 2];
     const array2 = [1, [3]];
-    Test.equals([1, 2, 2, 4], array1.flatMap(double));
+    Test.expectEqual([1, 2, 2, 4], array1.flatMap(double));
 
     // looks weird but it is correct
-    Test.equals([1, 2, [3], 6], array2.flatMap(double));
+    Test.expectEqual([1, 2, [3], 6], array2.flatMap(double));
 }
 
 // binds this value
@@ -37,7 +37,7 @@ Test.expect(1, Array.prototype.flatMap.length);
     }
     const this_arg = { "hello?": "always" };
     [0].flatMap(callable, this_arg);
-    Test.equals(this_arg, this_);
+    Test.expectEqual(this_arg, this_);
 }
 
 // gives secondary arguments
@@ -56,10 +56,10 @@ Test.expect(1, Array.prototype.flatMap.length);
     const array = ["a", "b", "c"];
     array.flatMap(callable, this_arg);
 
-    Test.equals(["a", "b", "c"], found_values);
-    Test.equals([0, 1, 2], found_indices);
-    Test.equals([array, array, array], found_array_values);
-    Test.equals([this_arg, this_arg, this_arg], found_this_values);
+    Test.expectEqual(["a", "b", "c"], found_values);
+    Test.expectEqual([0, 1, 2], found_indices);
+    Test.expectEqual([array, array, array], found_array_values);
+    Test.expectEqual([this_arg, this_arg, this_arg], found_this_values);
 }
 
 // empty array means no calls

@@ -21,6 +21,6 @@ const values = [
 for (const [index, value, expected] of values) {
     const b = a.with(index, value);
     Test.expect(true, b !== a);
-    Test.equals([1, 2, 3, 4, 5], a);
-    Test.equals(expected, b);
+    Test.expectEqual([1, 2, 3, 4, 5], a);
+    Test.expectEqual(expected, b);
 }

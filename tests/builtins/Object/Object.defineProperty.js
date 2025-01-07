@@ -11,7 +11,7 @@ let s = Symbol("foo");
 	Test.expectError("TypeError", "Cannot assign to read-only property 'foo'", () => o.foo = 2);
 	Test.expect(1, o.foo);
 
-	Test.equals({ value: 1, writable: false, enumerable: false, configurable: false }, Object.getOwnPropertyDescriptor(o, 'foo'));
+	Test.expectEqual({ value: 1, writable: false, enumerable: false, configurable: false }, Object.getOwnPropertyDescriptor(o, 'foo'));
 }
 
 // non-configurable symbol property
@@ -23,7 +23,7 @@ let s = Symbol("foo");
 	Test.expectError("TypeError", "Cannot assign to read-only property Symbol(foo)", () => o[s] = 2);
 	Test.expect(1, o[s]);
 
-	Test.equals({ value: 1, writable: false, enumerable: false, configurable: false }, Object.getOwnPropertyDescriptor(o, s));
+	Test.expectEqual({ value: 1, writable: false, enumerable: false, configurable: false }, Object.getOwnPropertyDescriptor(o, s));
 }
 
 // array index getter
@@ -49,7 +49,7 @@ let s = Symbol("foo");
 	o.foo = "ho";
 	Test.expect("ho", o.foo);
 
-	Test.equals({ value: "ho", writable: true, enumerable: true, configurable: false }, Object.getOwnPropertyDescriptor(o, 'foo'));
+	Test.expectEqual({ value: "ho", writable: true, enumerable: true, configurable: false }, Object.getOwnPropertyDescriptor(o, 'foo'));
 }
 
 // configurable symbol property
@@ -61,7 +61,7 @@ let s = Symbol("foo");
 	o[s] = "ho";
 	Test.expect("ho", o[s]);
 
-	Test.equals({ value: "ho", writable: true, enumerable: true, configurable: false }, Object.getOwnPropertyDescriptor(o, s));
+	Test.expectEqual({ value: "ho", writable: true, enumerable: true, configurable: false }, Object.getOwnPropertyDescriptor(o, s));
 }
 
 // reconfigure configurable string property
@@ -70,7 +70,7 @@ let s = Symbol("foo");
 	Object.defineProperty(o, "foo", { value: 9, configurable: true, writable: false });
 	Object.defineProperty(o, "foo", { configurable: true, writable: true });
 
-	Test.equals({ value: 9, writable: true, enumerable: false, configurable: true }, Object.getOwnPropertyDescriptor(o, 'foo'));
+	Test.expectEqual({ value: 9, writable: true, enumerable: false, configurable: true }, Object.getOwnPropertyDescriptor(o, 'foo'));
 }
 
 // reconfigure configurable symbol property
@@ -79,7 +79,7 @@ let s = Symbol("foo");
 	Object.defineProperty(o, s, { value: 9, configurable: true, writable: false });
 	Object.defineProperty(o, s, { configurable: true, writable: true });
 
-	Test.equals({ value: 9, writable: true, enumerable: false, configurable: true }, Object.getOwnPropertyDescriptor(o, s));
+	Test.expectEqual({ value: 9, writable: true, enumerable: false, configurable: true }, Object.getOwnPropertyDescriptor(o, s));
 }
 
 // define string accessor

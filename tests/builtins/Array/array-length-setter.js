@@ -10,19 +10,19 @@ for (const value of [undefined, "foo", -1, Infinity, -Infinity, NaN]) {
 // extend array by setting length
 array = [1, 2, 3];
 array.length = 5;
-Test.equals([1, 2, 3, , ,], array);
+Test.expectEqual([1, 2, 3, , ,], array);
 
 // extend array by setting property
 array[9] = 'A';
-Test.equals([1, 2, 3, , , , , , , 'A'], array);
+Test.expectEqual([1, 2, 3, , , , , , , 'A'], array);
 Test.expect(10, array.length);
 
 // truncate array by setting length
 array = [1, 2, 3];
 array.length = 2;
-Test.equals([1, 2], array);
+Test.expectEqual([1, 2], array);
 array.length = 0;
-Test.equals([], array);
+Test.expectEqual([], array);
 
 // length value is coerced to number if possible
 array = [1, 2, 3];

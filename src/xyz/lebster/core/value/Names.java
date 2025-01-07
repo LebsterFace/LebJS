@@ -109,6 +109,7 @@ public final class Names {
 	public static final StringValue exec = new StringValue("exec");
 	public static final StringValue exp = new StringValue("exp");
 	public static final StringValue expect = new StringValue("expect");
+	public static final StringValue expectEquals = new StringValue("expectEquals");
 	public static final StringValue expectError = new StringValue("expectError");
 	public static final StringValue expm1 = new StringValue("expm1");
 	public static final StringValue fail = new StringValue("fail");

@@ -9,9 +9,9 @@ const original = [
 ];
 const a = new Map(original);
 const it = a.entries();
-Test.equals({ value: ["a", 0], done: false }, it.next());
-Test.equals({ value: ["b", 1], done: false }, it.next());
-Test.equals({ value: ["c", 2], done: false }, it.next());
-Test.equals({ value: undefined, done: true }, it.next());
-Test.equals({ value: undefined, done: true }, it.next());
-Test.equals({ value: undefined, done: true }, it.next());
+Test.expectEqual({ value: ["a", 0], done: false }, it.next());
+Test.expectEqual({ value: ["b", 1], done: false }, it.next());
+Test.expectEqual({ value: ["c", 2], done: false }, it.next());
+Test.expectEqual({ value: undefined, done: true }, it.next());
+Test.expectEqual({ value: undefined, done: true }, it.next());
+Test.expectEqual({ value: undefined, done: true }, it.next());

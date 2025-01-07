@@ -11,12 +11,12 @@ Test.expect(0, Map.prototype.values.length);
 
     const a = new Map(original);
     const it = a.values();
-    Test.equals({ value: 0, done: false }, it.next());
-    Test.equals({ value: 1, done: false }, it.next());
-    Test.equals({ value: 2, done: false }, it.next());
-    Test.equals({ value: undefined, done: true }, it.next());
-    Test.equals({ value: undefined, done: true }, it.next());
-    Test.equals({ value: undefined, done: true }, it.next());
+    Test.expectEqual({ value: 0, done: false }, it.next());
+    Test.expectEqual({ value: 1, done: false }, it.next());
+    Test.expectEqual({ value: 2, done: false }, it.next());
+    Test.expectEqual({ value: undefined, done: true }, it.next());
+    Test.expectEqual({ value: undefined, done: true }, it.next());
+    Test.expectEqual({ value: undefined, done: true }, it.next());
 }
 
 // empty maps give no values
@@ -25,8 +25,8 @@ Test.expect(0, Map.prototype.values.length);
 	const map = new Map();
 	const iterator = map.values();
 
-	Test.equals({ done: true, value: undefined }, iterator.next());
-	Test.equals({ done: true, value: undefined }, iterator.next());
+	Test.expectEqual({ done: true, value: undefined }, iterator.next());
+	Test.expectEqual({ done: true, value: undefined }, iterator.next());
 }
 
 // just emptied map
@@ -41,8 +41,8 @@ Test.expect(0, Map.prototype.values.length);
 	Test.expect(true, map.delete(1));
 	Test.expect(true, map.delete(3));
 
-	Test.equals({ done: true, value: undefined }, iterator.next());
-	Test.equals({ done: true, value: undefined }, iterator.next());
+	Test.expectEqual({ done: true, value: undefined }, iterator.next());
+	Test.expectEqual({ done: true, value: undefined }, iterator.next());
 }
 
 // cleared map
@@ -56,8 +56,8 @@ Test.expect(0, Map.prototype.values.length);
 
 	map.clear();
 
-	Test.equals({ done: true, value: undefined }, iterator.next());
-	Test.equals({ done: true, value: undefined }, iterator.next());
+	Test.expectEqual({ done: true, value: undefined }, iterator.next());
+	Test.expectEqual({ done: true, value: undefined }, iterator.next());
 }
 
 // added and then removed elements
@@ -77,6 +77,6 @@ Test.expect(0, Map.prototype.values.length);
 
 	Test.expect(0, map.size);
 
-	Test.equals({ done: true, value: undefined }, iterator.next());
-	Test.equals({ done: true, value: undefined }, iterator.next());
+	Test.expectEqual({ done: true, value: undefined }, iterator.next());
+	Test.expectEqual({ done: true, value: undefined }, iterator.next());
 }

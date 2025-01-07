@@ -4,7 +4,7 @@
 	for (const property in "") {
 		a.push(property);
 	}
-	Test.equals(a, []);
+	Test.expectEqual(a, []);
 }
 
 
@@ -14,7 +14,7 @@
 	for (const property in 123) {
 		a.push(property);
 	}
-	Test.equals(a, []);
+	Test.expectEqual(a, []);
 }
 
 for (
@@ -38,7 +38,7 @@ Test.expectError("ReferenceError", "property is not defined", () => property);
 	for (const property in "hello") {
 		a.push(property);
 	}
-	Test.equals(a, ["0", "1", "2", "3", "4"]);
+	Test.expectEqual(a, ["0", "1", "2", "3", "4"]);
 }
 
 
@@ -48,7 +48,7 @@ Test.expectError("ReferenceError", "property is not defined", () => property);
 	for (const property in { a: 1, b: 2, c: 2 }) {
 		a.push(property);
 	}
-	Test.equals(a, ["a", "b", "c"]);
+	Test.expectEqual(a, ["a", "b", "c"]);
 }
 
 
@@ -88,7 +88,7 @@ for (const prop in from) {
 	to.push(prop);
 	from.pop();
 }
-Test.equals(['0', '1'], to);
+Test.expectEqual(['0', '1'], to);
 
 
 // duplicated properties in prototype
@@ -100,5 +100,5 @@ Test.equals(['0', '1'], to);
 	for (const prop in object) {
 		a.push(prop);
 	}
-	Test.equals(a, ["a"]);
+	Test.expectEqual(a, ["a"]);
 }

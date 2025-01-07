@@ -40,9 +40,9 @@ const array = ["hello"];
     Test.expect("hello", concatenated[0]);
     Test.expect(false, concatenated[1]);
     Test.expect("world", concatenated[2]);
-    Test.equals({ name: "lebjs" }, concatenated[3]);
+    Test.expectEqual({ name: "lebjs" }, concatenated[3]);
     Test.expect(1, concatenated[4]);
-    Test.equals([2, 3], concatenated[5]);
+    Test.expectEqual([2, 3], concatenated[5]);
 }
 
 /* TODO: Proxy is concatenated as array

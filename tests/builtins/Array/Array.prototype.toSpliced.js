@@ -21,8 +21,8 @@ Test.expectError("TypeError", "Cannot convert null to object", () => Array.proto
 	const a = [1, 2, 3, 4, 5];
 	const b = a.toSpliced();
 	Test.expect(false, a === b);
-	Test.equals([1, 2, 3, 4, 5], a);
-	Test.equals([1, 2, 3, 4, 5], b);
+	Test.expectEqual([1, 2, 3, 4, 5], a);
+	Test.expectEqual([1, 2, 3, 4, 5], b);
 };
 
 // only start argument
@@ -39,8 +39,8 @@ Test.expectError("TypeError", "Cannot convert null to object", () => Array.proto
 	for (const [start, expected] of values) {
 		const b = a.toSpliced(start);
 		Test.expect(false, a === b);
-		Test.equals([1, 2, 3, 4, 5], a);
-		Test.equals(expected, b);
+		Test.expectEqual([1, 2, 3, 4, 5], a);
+		Test.expectEqual(expected, b);
 	}
 };
 
@@ -58,8 +58,8 @@ Test.expectError("TypeError", "Cannot convert null to object", () => Array.proto
 	for (const [start, deleteCount, expected] of values) {
 		const b = a.toSpliced(start, deleteCount);
 		Test.expect(false, a === b);
-		Test.equals([1, 2, 3, 4, 5], a);
-		Test.equals(expected, b);
+		Test.expectEqual([1, 2, 3, 4, 5], a);
+		Test.expectEqual(expected, b);
 	}
 }
 
@@ -78,7 +78,7 @@ Test.expectError("TypeError", "Cannot convert null to object", () => Array.proto
 		const b = a.toSpliced(start, deleteCount, ...items);
 
 		Test.expect(false, a === b);
-		Test.equals([1, 2, 3, 4, 5], a);
-		Test.equals(expected, b);
+		Test.expectEqual([1, 2, 3, 4, 5], a);
+		Test.expectEqual(expected, b);
 	}
 }

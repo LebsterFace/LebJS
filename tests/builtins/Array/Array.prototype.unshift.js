@@ -7,19 +7,19 @@ Test.expect(1, Array.prototype.unshift.length);
 {
     var a = ["hello"];
     Test.expect(1, a.unshift());
-    Test.equals(["hello"], a);
+    Test.expectEqual(["hello"], a);
 }
 
 // single argument
 {
     var a = ["hello"];
     Test.expect(2, a.unshift("friends"));
-    Test.equals(["friends", "hello"], a);
+    Test.expectEqual(["friends", "hello"], a);
 }
 
 // multiple arguments
 {
     var a = ["friends", "hello"];
     Test.expect(5, a.unshift(1, 2, 3));
-    Test.equals([1, 2, 3, "friends", "hello"], a);
+    Test.expectEqual([1, 2, 3, "friends", "hello"], a);
 }

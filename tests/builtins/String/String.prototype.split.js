@@ -2,8 +2,8 @@
 {
     Test.expect(2, String.prototype.split.length);
 
-    Test.equals(["hello friends"], "hello friends".split());
-    Test.equals([
+    Test.expectEqual(["hello friends"], "hello friends".split());
+    Test.expectEqual([
         "h",
         "e",
         "l",
@@ -18,22 +18,22 @@
         "d",
         "s",
     ], "hello friends".split(""));
-    Test.equals(["hello", "friends"], "hello friends".split(" "));
+    Test.expectEqual(["hello", "friends"], "hello friends".split(" "));
 
-    Test.equals(["a", "b", "c", "d"], "a,b,c,d".split(","));
-    Test.equals(["", "a", "b", "c", "d"], ",a,b,c,d".split(","));
-    Test.equals(["a", "b", "c", "d", ""], "a,b,c,d,".split(","));
-    Test.equals(["a", "b", "", "c", "d"], "a,b,,c,d".split(","));
-    Test.equals(["", "a", "b", "", "c", "d", ""], ",a,b,,c,d,".split(","));
-    Test.equals([",a,b", ",c,d,"], ",a,b,,,c,d,".split(",,"));
+    Test.expectEqual(["a", "b", "c", "d"], "a,b,c,d".split(","));
+    Test.expectEqual(["", "a", "b", "c", "d"], ",a,b,c,d".split(","));
+    Test.expectEqual(["a", "b", "c", "d", ""], "a,b,c,d,".split(","));
+    Test.expectEqual(["a", "b", "", "c", "d"], "a,b,,c,d".split(","));
+    Test.expectEqual(["", "a", "b", "", "c", "d", ""], ",a,b,,c,d,".split(","));
+    Test.expectEqual([",a,b", ",c,d,"], ",a,b,,,c,d,".split(",,"));
 };
 
 // limits
 {
-    Test.equals([], "a b c d".split(" ", 0));
-    Test.equals(["a"], "a b c d".split(" ", 1));
-    Test.equals(["a", "b", "c"], "a b c d".split(" ", 3));
-    Test.equals(["a", "b", "c", "d"], "a b c d".split(" ", 100));
+    Test.expectEqual([], "a b c d".split(" ", 0));
+    Test.expectEqual(["a"], "a b c d".split(" ", 1));
+    Test.expectEqual(["a", "b", "c"], "a b c d".split(" ", 3));
+    Test.expectEqual(["a", "b", "c", "d"], "a b c d".split(" ", 100));
 };
 
 // regex split
@@ -46,15 +46,15 @@
         }
     }
 
-    Test.equals(["(2016, "2016-01-02".split(new RegExp1("-")))", "(01)", "(02)"]);
-    Test.equals(["2016", "01", "02"], "2016-01-02".split(new RegExp("-")));
+    Test.expectEqual(["(2016, "2016-01-02".split(new RegExp1("-")))", "(01)", "(02)"]);
+    Test.expectEqual(["2016", "01", "02"], "2016-01-02".split(new RegExp("-")));
     */
 
-    // Test.equals(["a", "b"], /a*?/[Symbol.split]("ab"));
-    // Test.equals(["", "b"], /a*/[Symbol.split]("ab"));
+    // Test.expectEqual(["a", "b"], /a*?/[Symbol.split]("ab"));
+    // Test.expectEqual(["", "b"], /a*/[Symbol.split]("ab"));
 
     // let captureResult = /<(\/)?([^<>]+)>/[Symbol.split]("A<B>bold</B>and<CODE>coded</CODE>");
-    /* Test.equals([
+    /* Test.expectEqual([
         "A",
         undefined,
         "B",
@@ -74,15 +74,15 @@
 // UTF-16
 {
     var s = "😀";
-    Test.equals(["😀"], s.split());
-    Test.equals(["", ""], s.split("😀"));
-    Test.equals(["", "\ude00"], s.split("\ud83d"));
-    Test.equals(["\ud83d", ""], s.split("\ude00"));
+    Test.expectEqual(["😀"], s.split());
+    Test.expectEqual(["", ""], s.split("😀"));
+    Test.expectEqual(["", "\ude00"], s.split("\ud83d"));
+    Test.expectEqual(["\ud83d", ""], s.split("\ude00"));
 
-    // TODO: Test.equals(["", "\ude00"], s.split(/\ud83d/));
-    // TODO: Test.equals(["\ud83d", ""], s.split(/\ude00/));
+    // TODO: Test.expectEqual(["", "\ude00"], s.split(/\ud83d/));
+    // TODO: Test.expectEqual(["\ud83d", ""], s.split(/\ude00/));
 
     s = "😀😀😀";
-    // TODO: Test.equals(["", "\ude00", "\ude00", "\ude00"], s.split(/\ud83d/));
-    // TODO: Test.equals(["\ud83d", "\ud83d", "\ud83d", ""], s.split(/\ude00/));
+    // TODO: Test.expectEqual(["", "\ude00", "\ude00", "\ude00"], s.split(/\ud83d/));
+    // TODO: Test.expectEqual(["\ud83d", "\ud83d", "\ud83d", ""], s.split(/\ude00/));
 };

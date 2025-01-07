@@ -1,6 +1,6 @@
 const o = {};
 Test.expect(o, o.valueOf());
-// Non-standard excluded: Test.equals(new Number(42), Object.prototype.valueOf.call(42));
+// Non-standard excluded: Test.expectEqual(new Number(42), Object.prototype.valueOf.call(42));
 Test.expect(NaN, {} - 10);
 Test.expect(90, {
     toString: () => "100"

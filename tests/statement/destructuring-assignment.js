@@ -75,7 +75,7 @@ let obj = { a: 'a', b: 'b', c: [1, 2, 3] };
 {
 	let object = { bar: 'hi' };
 	([ object.bar ] = [ 999 ]);
-	Test.equals({ bar: 999 }, object);
+	Test.expectEqual({ bar: 999 }, object);
 }
 
 Test.expectError("SyntaxError", "Invalid left-hand side in assignment", () => Test.parse("(({ a, b, c }) = obj)"));

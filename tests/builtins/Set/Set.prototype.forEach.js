@@ -40,7 +40,7 @@ Test.expectError("TypeError", "undefined is not a function", () => new Set().for
         });
         Test.expect(4, set.size);
 
-        Test.equals([1, 2, 4, 8], visited);
+        Test.expectEqual([1, 2, 4, 8], visited);
     }
 
     // removing an item before it is visited means it doesn't get visited
@@ -57,7 +57,7 @@ Test.expectError("TypeError", "undefined is not a function", () => new Set().for
             }
         });
         Test.expect(2, set.size);
-        Test.equals([1, 3], visited);
+        Test.expectEqual([1, 3], visited);
     }
 
     // removing an item after it was visited and adding it again means it gets visited twice
@@ -75,7 +75,7 @@ Test.expectError("TypeError", "undefined is not a function", () => new Set().for
             }
         });
         Test.expect(3, set.size);
-        Test.equals([1, 2, 3, 1], visited);
+        Test.expectEqual([1, 2, 3, 1], visited);
     }
 
     // adding a new item and removing it before it gets visited means it never gets visited
@@ -95,7 +95,7 @@ Test.expectError("TypeError", "undefined is not a function", () => new Set().for
             if (val === 3) Test.fail();
         });
         Test.expect(2, set.size);
-        Test.equals([1, 2], visited);
+        Test.expectEqual([1, 2], visited);
     }
 
     // removing and adding in the same iterations
@@ -114,7 +114,7 @@ Test.expectError("TypeError", "undefined is not a function", () => new Set().for
         });
         Test.expect(3, set.size);
 
-        Test.equals([1, 2, 3, 1], visited);
+        Test.expectEqual([1, 2, 3, 1], visited);
     }
 
     // removing and readding the same item means it can get visited n times
@@ -133,7 +133,7 @@ Test.expectError("TypeError", "undefined is not a function", () => new Set().for
         });
 
         Test.expect(2, set.size);
-        Test.equals([1, 2, 1, 2, 1], visited);
+        Test.expectEqual([1, 2, 1, 2, 1], visited);
     }
 }
 

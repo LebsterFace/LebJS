@@ -8,12 +8,12 @@ Test.expectError("TypeError", "Cannot convert undefined to object", () => Object
 let o = {};
 Test.expect(o, Object.assign(o));
 Test.expect(o, Object.assign(o, {}));
-Test.equals(Object(42), Object.assign(42));
+Test.expectEqual(Object(42), Object.assign(42));
 
 // alters first argument object if sources are given
 o = { foo: 0 };
 Test.expect(o, Object.assign(o, { foo: 1 }));
-Test.equals({ foo: 1 }, o);
+Test.expectEqual({ foo: 1 }, o);
 
 // merges objects
 const s = Symbol();
@@ -24,4 +24,4 @@ const result = Object.assign({},
     { [42]: "test" }
 );
 
-Test.equals({ foo: 1, bar: "baz", [s]: [1, 2, 3], 42: "test" }, result);
+Test.expectEqual({ foo: 1, bar: "baz", [s]: [1, 2, 3], 42: "test" }, result);

@@ -19,11 +19,11 @@ Test.expectError("TypeError", "1 is not iterable", () => [...1]);
 Test.expectError("TypeError", "{ } is not iterable", () => [...{ }]);
 
 // basic functionality
-Test.equals([1, 2, 3, 4], [1, ...[2, 3], 4]);
+Test.expectEqual([1, 2, 3, 4], [1, ...[2, 3], 4]);
 
 let a = [2, 3];
-Test.equals([1, 2, 3, 4], [1, ...a, 4]);
+Test.expectEqual([1, 2, 3, 4], [1, ...a, 4]);
 
 let obj = { a: [ 2, 3 ] };
-Test.equals([1, 2, 3, 4], [1, ...obj.a, 4]);
-Test.equals([1, 2, 3, 4], [...[], ...[...[1, 2, 3]], 4]);
+Test.expectEqual([1, 2, 3, 4], [1, ...obj.a, 4]);
+Test.expectEqual([1, 2, 3, 4], [...[], ...[...[1, 2, 3]], 4]);

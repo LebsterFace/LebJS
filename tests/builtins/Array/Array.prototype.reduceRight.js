@@ -77,7 +77,7 @@ result = ["foo", 1, true].reduceRight((a, v, i) => {
     indices.push(i);
 }, "foo");
 Test.expect(undefined, result);
-Test.equals([2, 1, 0], indices);
+Test.expectEqual([2, 1, 0], indices);
 
 const mutable = {
     prop: 0

@@ -16,6 +16,7 @@ public abstract class PrimitiveValue<JType> extends Value<JType> {
 	public abstract BigIntValue toBigIntValue(Interpreter interpreter) throws AbruptCompletion;
 
 	protected abstract String displayColor();
+
 	protected abstract String rawDisplayString();
 
 	@Override

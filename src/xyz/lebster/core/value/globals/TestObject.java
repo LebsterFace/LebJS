@@ -132,8 +132,8 @@ public final class TestObject extends ObjectValue {
 
 			return true;
 		} else if (
-			a instanceof final PrimitiveWrapper<?,?> expected &&
-			b instanceof final PrimitiveWrapper<?,?> received &&
+			a instanceof final PrimitiveWrapper<?, ?> expected &&
+			b instanceof final PrimitiveWrapper<?, ?> received &&
 			equals(interpreter, expected.getPrototype(), received.getPrototype()) &&
 			equals(interpreter, expected.data, received.data)
 		) {

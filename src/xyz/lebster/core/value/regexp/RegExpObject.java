@@ -46,7 +46,7 @@ public final class RegExpObject extends ObjectValue implements HasBuiltinTag {
 	 * Returns the source in a {@link java.util.regex.Pattern}-compatible form
 	 * NOTE: This still isn't perfect; there are features of Patterns which
 	 * should not be exposed by RegExpObjects.
-	 * */
+	 */
 	private String sourceForPattern() {
 		return source
 			.replaceAll("\\[]", "(?!)") // Empty class -> negative lookahead

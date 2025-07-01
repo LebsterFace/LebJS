@@ -9,7 +9,7 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.HashMap;
 
-import static xyz.lebster.core.parser.TokenType.*;
+import static xyz.lebster.core.parser.TokenType.EOF;
 
 public final class ParserState {
 	public final Token[] tokens;

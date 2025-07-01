@@ -54,6 +54,7 @@ public record IteratorRecord(ObjectValue iteratorObject, Value<?> nextMethod) {
 		// 6. Return result.
 		return result;
 	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-iteratorstepvalue")
 	public Value<?> stepValue(Interpreter interpreter) throws AbruptCompletion {
 		// 1. Let result be ? IteratorStep(iteratorRecord).

@@ -9,9 +9,6 @@ import xyz.lebster.core.node.SourceRange;
 import java.math.BigInteger;
 import java.util.*;
 
-import static xyz.lebster.core.parser.TokenType.Class;
-import static xyz.lebster.core.parser.TokenType.Enum;
-import static xyz.lebster.core.parser.TokenType.Void;
 import static xyz.lebster.core.parser.TokenType.*;
 
 public final class Lexer {
@@ -343,6 +340,7 @@ public final class Lexer {
 	}
 
 	private static final int[] REGEXP_FLAGS = new int[] { 'd', 'g', 'i', 'm', 's', 'u', 'v', 'y' };
+
 	public Token next() throws SyntaxError {
 		if (lastTokenType == RegexpPattern) {
 			final Set<Integer> flags = new HashSet<>();

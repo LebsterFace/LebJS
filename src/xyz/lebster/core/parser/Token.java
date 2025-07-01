@@ -24,12 +24,9 @@ import static xyz.lebster.core.node.expression.RelationalExpression.RelationalOp
 import static xyz.lebster.core.node.expression.RelationalExpression.RelationalOp.LessThanEquals;
 import static xyz.lebster.core.node.expression.UpdateExpression.UpdateOp.PostDecrement;
 import static xyz.lebster.core.node.expression.UpdateExpression.UpdateOp.PostIncrement;
-import static xyz.lebster.core.parser.TokenType.Class;
-import static xyz.lebster.core.parser.TokenType.Enum;
+import static xyz.lebster.core.parser.TokenType.*;
 import static xyz.lebster.core.parser.TokenType.LeftShift;
 import static xyz.lebster.core.parser.TokenType.UnsignedRightShift;
-import static xyz.lebster.core.parser.TokenType.Void;
-import static xyz.lebster.core.parser.TokenType.*;
 
 /**
  * Represents one token of some source text.<br>
@@ -84,9 +81,9 @@ public record Token(SourceRange range, TokenType type, String value) {
 			case LogicalOr, NullishCoalescing -> 3;
 			// TODO: yield*
 			case Equals, PlusEquals, MinusEquals, ExponentEquals, MultiplyEquals, DivideEquals,
-				PercentEquals, LeftShiftEquals, RightShiftEquals, UnsignedRightShiftEquals,
-				AmpersandEquals, CaretEquals, PipeEquals, LogicalAndEquals, LogicalOrEquals,
-				NullishCoalescingEquals, QuestionMark, Arrow, Yield -> 2;
+				 PercentEquals, LeftShiftEquals, RightShiftEquals, UnsignedRightShiftEquals,
+				 AmpersandEquals, CaretEquals, PipeEquals, LogicalAndEquals, LogicalOrEquals,
+				 NullishCoalescingEquals, QuestionMark, Arrow, Yield -> 2;
 			case Comma -> 1;
 			default -> throw new ShouldNotHappen("Attempting to get precedence for token type '" + type + "'");
 		};
@@ -97,14 +94,14 @@ public record Token(SourceRange range, TokenType type, String value) {
 		// TOOD: Confirm this is accurate
 		return switch (type) {
 			case Period, LBracket, LParen, OptionalChain, Star, Slash, Percent, Plus, Minus, LeftShift, RightShift,
-				UnsignedRightShift, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf, LooseEqual,
-				NotEqual, StrictEqual, StrictNotEqual, Typeof, Void, Delete, Await, Ampersand, Caret, Pipe,
-				NullishCoalescing, LogicalAnd, LogicalOr, Comma -> Associativity.Left;
+				 UnsignedRightShift, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf, LooseEqual,
+				 NotEqual, StrictEqual, StrictNotEqual, Typeof, Void, Delete, Await, Ampersand, Caret, Pipe,
+				 NullishCoalescing, LogicalAnd, LogicalOr, Comma -> Associativity.Left;
 
 			case New, PlusPlus, MinusMinus, Bang, Tilde, Exponent, QuestionMark, Equals, PlusEquals, MinusEquals,
-				ExponentEquals, NullishCoalescingEquals, LogicalOrEquals, LogicalAndEquals, PipeEquals, CaretEquals,
-				AmpersandEquals, UnsignedRightShiftEquals, RightShiftEquals, LeftShiftEquals, PercentEquals,
-				DivideEquals, MultiplyEquals, Yield -> Associativity.Right;
+				 ExponentEquals, NullishCoalescingEquals, LogicalOrEquals, LogicalAndEquals, PipeEquals, CaretEquals,
+				 AmpersandEquals, UnsignedRightShiftEquals, RightShiftEquals, LeftShiftEquals, PercentEquals,
+				 DivideEquals, MultiplyEquals, Yield -> Associativity.Right;
 
 			default -> throw new ShouldNotHappen("Attempting to get associativity for token type '" + type + "'");
 		};

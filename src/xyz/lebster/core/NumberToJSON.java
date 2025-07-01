@@ -84,7 +84,6 @@ public final class NumberToJSON {
 	 * <p>
 	 * This code is emulating 7.1.12.1 of the EcmaScript V6 specification.
 	 * </p>
-	 *
 	 * @param value Value to be formatted
 	 * @return String representation
 	 */

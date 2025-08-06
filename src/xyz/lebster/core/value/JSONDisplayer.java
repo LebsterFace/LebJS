@@ -81,7 +81,7 @@ public final class JSONDisplayer {
 		default void display(StringBuilder builder) {
 			final var firstAttempt = new StringBuilder();
 			display(firstAttempt, true);
-			if (firstAttempt.length() >= 72) {
+			if (ANSI.stripFormatting(firstAttempt.toString()).length() >= 72) {
 				display(builder, false);
 			} else {
 				builder.append(firstAttempt);

@@ -12,18 +12,18 @@ import xyz.lebster.core.value.primitive.string.StringValue;
 
 public interface AssignmentTarget extends Assignable, Declarable {
 	default Value<?> assign(Interpreter interpreter, Expression expression) throws AbruptCompletion {
-		return this.assign(interpreter, getValue(interpreter, expression));
+		return this.assign(interpreter, namedEvaluation(interpreter, expression));
 	}
 
 	default void declare(Interpreter interpreter, Kind kind, Expression expression) throws AbruptCompletion {
-		this.declare(interpreter, kind, getValue(interpreter, expression));
+		this.declare(interpreter, kind, namedEvaluation(interpreter, expression));
 	}
 
-	private Value<?> getValue(Interpreter interpreter, Expression expression) throws AbruptCompletion {
+	default Value<?> namedEvaluation(Interpreter interpreter, Expression expression) throws AbruptCompletion {
 		if (expression == null) return Undefined.instance;
 
-		if (this instanceof final IdentifierExpression identifierAssignmentTarget) {
-			final StringValue name = identifierAssignmentTarget.name();
+		if (this instanceof final IdentifierExpression identifierExpression) {
+			final StringValue name = identifierExpression.name();
 			return Executable.namedEvaluation(interpreter, expression, name);
 		}
 

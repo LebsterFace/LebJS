@@ -867,14 +867,13 @@ public final class Parser {
 		return new ConditionalExpression(range(startIndex), test, left, right);
 	}
 
-	private Assignable ensureAssignable(Expression left_expr, AssignmentOp op) throws SyntaxError {
-		if (left_expr instanceof final Assignable assignable) {
+	private AssignmentTarget ensureAssignable(Expression left_expr, AssignmentOp op) throws SyntaxError {
+		if (left_expr instanceof final AssignmentTarget assignmentTarget) {
 			if (left_expr instanceof LeftHandSideExpression || op == AssignmentOp.Assign) {
-				return assignable;
+				return assignmentTarget;
 			}
 		} else if (op == AssignmentOp.Assign && (left_expr instanceof ArrayExpression || left_expr instanceof ObjectExpression)) {
-			// left_expr is a destructuring pattern we mis-parsed as an array / object literal
-			// TODO: Convert to DestructuringAssignmentTarget manually, rather than re-parsing the source
+			// left_expr is a destructuring pattern we misparsed as an array / object literal
 			return new Parser(left_expr.range().getText()).parseAssignmentTarget(true);
 		}
 

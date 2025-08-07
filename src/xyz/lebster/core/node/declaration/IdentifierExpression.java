@@ -9,7 +9,7 @@ import xyz.lebster.core.node.expression.LeftHandSideExpression;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-public record IdentifierExpression(SourceRange range, StringValue name) implements AssignmentTarget, LeftHandSideExpression {
+public record IdentifierExpression(SourceRange range, StringValue name) implements LeftHandSideExpression {
 	public IdentifierExpression(SourceRange range, String name) {
 		this(range, new StringValue(name));
 	}

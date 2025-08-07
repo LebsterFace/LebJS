@@ -52,9 +52,10 @@ public record Token(SourceRange range, TokenType type, String value) {
 		return new PrimitiveLiteral<>(range, new StringValue(value));
 	}
 
+	// TODO: Better testing for precedence
 	int unaryPrecedence() {
 		return switch (type) {
-			case Plus, Minus -> 17;
+			case Plus, Minus -> 14;
 			default -> precedence();
 		};
 	}

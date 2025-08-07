@@ -1,7 +1,8 @@
 /*
  *  Copyright 2018 Ulf Adams.
  *
- *  Modifications for ES6/JCS by Anders Rundgren
+ *  Modifications for ECMAScript / RFC 8785 by Anders Rundgren
+ *  Further Modifications by Lebster, 2025.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,18 +18,16 @@
  *
  */
 
-// NOTE: This file comes from https://github.com/cyberphone/json-canonicalization
-// Specifically: java/canonicalizer/src/org/webpki/jcs/NumberToJSON.java
-// Full credit goes to all original authors.
+// NOTE: This file is a combination of files from https://github.com/cyberphone/json-canonicalization
+// Specifically: java/canonicalizer/src/org/webpki/jcs/NumberToJSON.java and DoubleCoreSerializer.java
+// Further modifications were made to adapt it to LebJS
+// Full credit goes to the original authors.
 
 package xyz.lebster.core;
 
 import java.math.BigInteger;
 
-/**
- * An implementation of Ryu for serializing IEEE-754 double precision values for
- * JSON as specified by ES6
- */
+/** An implementation of Ryu for serializing IEEE-754 double precision values as specified by ECMAScript */
 public final class NumberToJSON {
 	private static final int DOUBLE_MANTISSA_BITS = 52;
 	private static final long DOUBLE_MANTISSA_MASK = (1L << DOUBLE_MANTISSA_BITS) - 1;
@@ -39,8 +38,6 @@ public final class NumberToJSON {
 
 	private static final int POS_TABLE_SIZE = 326;
 	private static final int NEG_TABLE_SIZE = 291;
-
-	private static final long ZERO_PATTERN = 0x7fffffffffffffffL;
 
 	private static final int POW5_BITCOUNT = 121; // max 3*31 = 124
 	private static final int POW5_QUARTER_BITCOUNT = 31;
@@ -61,7 +58,7 @@ public final class NumberToJSON {
 				throw new IllegalStateException(pow5len + " != " + expectedPow5Bits);
 			}
 			for (int j = 0; j < 4; j++) {
-				POW5_SPLIT[i][j] = pow.shiftRight(pow5len - POW5_BITCOUNT + (3 - j) * POW5_QUARTER_BITCOUNT).and(mask).intValueExact();
+				POW5_SPLIT[i][j] = pow.shiftRight(pow5len - POW5_BITCOUNT + (3 - j) * POW5_QUARTER_BITCOUNT).and(mask).intValue();
 			}
 
 			if (i < POW5_INV_SPLIT.length) {
@@ -70,9 +67,9 @@ public final class NumberToJSON {
 				BigInteger inv = BigInteger.ONE.shiftLeft(j).divide(pow).add(BigInteger.ONE);
 				for (int k = 0; k < 4; k++) {
 					if (k == 0) {
-						POW5_INV_SPLIT[i][k] = inv.shiftRight((3 - k) * POW5_INV_QUARTER_BITCOUNT).intValueExact();
+						POW5_INV_SPLIT[i][k] = inv.shiftRight((3 - k) * POW5_INV_QUARTER_BITCOUNT).intValue();
 					} else {
-						POW5_INV_SPLIT[i][k] = inv.shiftRight((3 - k) * POW5_INV_QUARTER_BITCOUNT).and(invMask).intValueExact();
+						POW5_INV_SPLIT[i][k] = inv.shiftRight((3 - k) * POW5_INV_QUARTER_BITCOUNT).and(invMask).intValue();
 					}
 				}
 			}
@@ -80,7 +77,7 @@ public final class NumberToJSON {
 	}
 
 	/**
-	 * Formats a number according to ES6.
+	 * Formats a number according to ECMAScript.
 	 * <p>
 	 * This code is emulating 7.1.12.1 of the EcmaScript V6 specification.
 	 * </p>
@@ -88,20 +85,13 @@ public final class NumberToJSON {
 	 * @return String representation
 	 */
 	public static String serializeNumber(double value) {
-		// Step 1: Decode the floating point number, and unify normalized and
-		// subnormal cases.
-		// First, handle all the trivial cases.
-		long bits = Double.doubleToLongBits(value);
-		if ((bits & ZERO_PATTERN) == 0) return "0";
-		// LebJS modification: NaN + Infinity need to be supported
-		// - If the argument is positive infinity, the result is 0x7ff0000000000000L.
-		if (bits == 0x7ff0000000000000L) return "Infinity";
-		// - If the argument is negative infinity, the result is 0xfff0000000000000L.
-		if (bits == 0xfff0000000000000L) return "-Infinity";
-		// - If the argument is NaN, the result is 0x7ff8000000000000L.
-		if (bits == 0x7ff8000000000000L) return "NaN";
+		if (value == 0.0) return "0";
+		if (value == Double.POSITIVE_INFINITY) return "Infinity";
+		if (value == Double.NEGATIVE_INFINITY) return "-Infinity";
+		if (Double.isNaN(value)) return "NaN";
 
-		// Otherwise extract the mantissa and exponent bits and run the full algorithm.
+		// Step 1: Decode the floating point number, and unify normalized and subnormal cases.
+		long bits = Double.doubleToLongBits(value);
 		int ieeeExponent = (int) ((bits >>> DOUBLE_MANTISSA_BITS) & DOUBLE_EXPONENT_MASK);
 		long ieeeMantissa = bits & DOUBLE_MANTISSA_MASK;
 		int e2;
@@ -171,21 +161,18 @@ public final class NumberToJSON {
 			}
 		}
 
-		// Step 4: Find the shortest decimal representation in the interval of
-		// legal representations.
+		// Step 4: Find the shortest decimal representation in the interval of legal representations.
 		//
-		// We do some extra work here in order to follow ES6 semantics. In
-		// particular, that requires printing in scientific format if and only
+		// We do some extra work here in order to follow ECMAScript semantics.
+		// In particular, that requires printing in scientific format if and only
 		// if the exponent is between -6 and 21, and it requires suppressing .0
 		//
-		// Above, we moved the decimal dot all the way to the right, so now we
-		// need to count digits to figure out the correct exponent for scientific
-		// notation.
+		// Above, we moved the decimal dot all the way to the right, so now we need to count digits to
+		// figure out the correct exponent for scientific notation.
 		final int vplength = decimalLength(dp);
 		int exp = e10 + vplength - 1;
 
-		// ES6/JCS semantics requires using scientific notation if and only if
-		// outside this range.
+		// ECMAScript/JCS semantics requires using scientific notation if and only if outside this range.
 		boolean scientificNotation = !((exp >= -6) && (exp < 21));
 
 		int removed = 0;
@@ -230,7 +217,7 @@ public final class NumberToJSON {
 		int olength = vplength - removed;
 
 		// Step 5: Print the decimal representation.
-		// We follow ES6/JCS semantics here.
+		// We follow ECMAScript/JCS semantics here.
 		char[] result = new char[25]; // becbf647612f3696 required changing to 25
 		int index = 0;
 		if (sign) {
@@ -244,10 +231,10 @@ public final class NumberToJSON {
 				result[index + olength - i] = (char) ('0' + c);
 			}
 			result[index] = (char) ('0' + output % 10);
-			// If there are no decimals, suppress .0
 			if (olength > 1) {
 				result[index + 1] = '.';
 			} else {
+				// If there are no decimals, suppress .0
 				index--;
 			}
 			index += olength + 1;
@@ -269,7 +256,7 @@ public final class NumberToJSON {
 			result[index++] = (char) ('0' + exp % 10);
 			return new String(result, 0, index);
 		} else {
-			// Otherwise follow the ES6 spec.
+			// Otherwise follow the ECMAScript spec.
 			if (exp < 0) {
 				// Decimal dot is before any of the digits.
 				result[index++] = '0';
@@ -359,22 +346,21 @@ public final class NumberToJSON {
 	}
 
 	/**
-	 * Compute the high digits of m * 5^p / 10^q = m * 5^(p - q) / 2^q = m * 5^i
-	 * / 2^j, with q chosen such that m * 5^i / 2^j has sufficiently many
-	 * decimal digits to represent the original floating point number.
+	 * Compute the high digits of m * 5^p / 10^q = m * 5^(p - q) / 2^q = m * 5^i / 2^j, with q chosen
+	 * such that m * 5^i / 2^j has sufficiently many decimal digits to represent the original floating point number.
 	 */
 	private static long mulPow5divPow2(long m, int i, int j) {
 		// m has at most 55 bits.
 		long mHigh = m >>> 31;
 		long mLow = m & 0x7fffffff;
 		long bits13 = mHigh * POW5_SPLIT[i][0]; // 124
-		long bits03 = mLow * POW5_SPLIT[i][0]; // 93
+		long bits03 = mLow * POW5_SPLIT[i][0];  // 93
 		long bits12 = mHigh * POW5_SPLIT[i][1]; // 93
-		long bits02 = mLow * POW5_SPLIT[i][1]; // 62
+		long bits02 = mLow * POW5_SPLIT[i][1];  // 62
 		long bits11 = mHigh * POW5_SPLIT[i][2]; // 62
-		long bits01 = mLow * POW5_SPLIT[i][2]; // 31
+		long bits01 = mLow * POW5_SPLIT[i][2];  // 31
 		long bits10 = mHigh * POW5_SPLIT[i][3]; // 31
-		long bits00 = mLow * POW5_SPLIT[i][3]; // 0
+		long bits00 = mLow * POW5_SPLIT[i][3];  // 0
 		int actualShift = j - 3 * 31 - 21;
 		if (actualShift < 0) {
 			throw new IllegalArgumentException("" + actualShift);
@@ -383,8 +369,8 @@ public final class NumberToJSON {
 	}
 
 	/**
-	 * Compute the high digits of m / 5^i / 2^j such that the result is accurate
-	 * to at least 9 decimal digits. i and j are already chosen appropriately.
+	 * Compute the high digits of m / 5^i / 2^j such that the result is accurate to at least 9
+	 * decimal digits. i and j are already chosen appropriately.
 	 */
 	private static long mulPow5InvDivPow2(long m, int i, int j) {
 		// m has at most 55 bits.

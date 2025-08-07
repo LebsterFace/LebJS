@@ -763,6 +763,7 @@ public final class Lexer {
 		return new Token(range(startIndex), type);
 	}
 
+	// FIXME: Performance
 	private Token tokenizeSymbol(int startIndex) throws SyntaxError {
 		for (int i = 4; i >= 1; i--) {
 			final HashMap<String, TokenType> symbolSize = symbols.get(i - 1);

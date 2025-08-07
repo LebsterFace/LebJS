@@ -26,7 +26,7 @@ public final class TestObject extends ObjectValue {
 
 		putMethod(intrinsics, Names.expect, 2, TestObject::expect);
 		putMethod(intrinsics, Names.equals, 2, TestObject::equalsMethod);
-		putMethod(intrinsics, Names.expectEquals, 2, TestObject::expectEquals);
+		putMethod(intrinsics, Names.expectEqual, 2, TestObject::expectEqual);
 		putMethod(intrinsics, Names.fail, 0, TestObject::fail);
 		putMethod(intrinsics, Names.expectError, 3, TestObject::expectError);
 		putMethod(intrinsics, Names.parse, 1, TestObject::parse);
@@ -71,8 +71,8 @@ public final class TestObject extends ObjectValue {
 		throw new ShouldNotHappen("Callback did not throw. Expecting " + StringEscapeUtils.quote(name.value + ": " + messageStarter.value, true));
 	}
 
-	private static Undefined expectEquals(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
-		// Test.expectEquals(a: unknown, b: unknown): void
+	private static Undefined expectEqual(Interpreter interpreter, Value<?>[] arguments) throws AbruptCompletion {
+		// Test.expectEqual(a: unknown, b: unknown): void
 		final Value<?> a = argument(0, arguments);
 		final Value<?> b = argument(1, arguments);
 

@@ -28,14 +28,12 @@ public final class Interpreter {
 	public final Intrinsics intrinsics;
 	public final GlobalObject globalObject;
 	private final ArrayDeque<ExecutionContext> executionContextStack;
-	private final Mode mode;
 
 	public Interpreter() {
 		this.intrinsics = new Intrinsics();
 		this.globalObject = new GlobalObject(intrinsics);
 		this.executionContextStack = new ArrayDeque<>();
 		this.executionContextStack.addFirst(new ExecutionContext(new GlobalEnvironment(globalObject)));
-		this.mode = Mode.Strict;
 	}
 
 	public Program runtimeParse(String sourceText) throws AbruptCompletion {
@@ -60,14 +58,6 @@ public final class Interpreter {
 		}
 
 		executionContextStack.removeFirst();
-	}
-
-	public boolean isStrictMode() {
-		return this.mode == Mode.Checked || this.mode == Mode.Strict;
-	}
-
-	public boolean isCheckedMode() {
-		return this.mode == Mode.Checked;
 	}
 
 	public void declareVariable(Kind kind, StringValue name, Value<?> value) throws AbruptCompletion {
@@ -210,6 +200,4 @@ public final class Interpreter {
 
 		return joiner.toString();
 	}
-
-	private enum Mode { Normal, Strict, Checked }
 }

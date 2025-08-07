@@ -165,7 +165,6 @@ public final class Names {
 	public static final StringValue isPrototypeOf = new StringValue("isPrototypeOf");
 	public static final StringValue isSafeInteger = new StringValue("isSafeInteger");
 	public static final StringValue isSealed = new StringValue("isSealed");
-	public static final StringValue isStrictMode = new StringValue("isStrictMode");
 	public static final StringValue isSubsetOf = new StringValue("isSubsetOf");
 	public static final StringValue isSupersetOf = new StringValue("isSupersetOf");
 	public static final StringValue iterator = new StringValue("iterator");

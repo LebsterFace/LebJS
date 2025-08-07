@@ -9,7 +9,6 @@ import xyz.lebster.core.value.Names;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.globals.Undefined;
 import xyz.lebster.core.value.object.ObjectValue;
-import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
@@ -62,11 +61,6 @@ public final class GlobalObject extends ObjectValue {
 		put(Names.Test, intrinsics.testObject);
 		put(Names.fs, intrinsics.fileSystemObject);
 		put(Names.console, intrinsics.consoleObject);
-		putMethod(intrinsics, Names.isStrictMode, 0, GlobalObject::isStrictMode);
-	}
-
-	private static BooleanValue isStrictMode(Interpreter interpreter, Value<?>[] arguments) {
-		return BooleanValue.of(interpreter.isStrictMode());
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-parseint-string-radix")

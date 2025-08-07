@@ -11,7 +11,6 @@ import xyz.lebster.core.interpreter.Intrinsics;
 import xyz.lebster.core.value.*;
 import xyz.lebster.core.value.array.ArrayObject;
 import xyz.lebster.core.value.array.ArrayPrototype;
-import xyz.lebster.core.value.error.CheckedError;
 import xyz.lebster.core.value.error.type.TypeError;
 import xyz.lebster.core.value.function.Executable;
 import xyz.lebster.core.value.function.FunctionPrototype;
@@ -281,18 +280,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 
 	public final Value<?> get(Interpreter interpreter, Key<?> key) throws AbruptCompletion {
 		final PropertyDescriptor property = this.getProperty(key);
-		if (property == null) {
-			if (interpreter.isCheckedMode()) {
-				final StringBuilder builder = new StringBuilder();
-				builder.append("Property ");
-				key.displayForObjectKey(builder);
-				builder.append(" does not exist on object.");
-				throw error(new CheckedError(interpreter, builder.toString()));
-			} else {
-				return Undefined.instance;
-			}
-		}
-
+		if (property == null) return Undefined.instance;
 		return property.get(interpreter, this);
 	}
 

@@ -1,7 +1,6 @@
 package xyz.lebster.core.node.expression;
 
 import xyz.lebster.core.SpecificationURL;
-import xyz.lebster.core.exception.NotImplemented;
 import xyz.lebster.core.interpreter.AbruptCompletion;
 import xyz.lebster.core.interpreter.Interpreter;
 import xyz.lebster.core.node.SourceRange;
@@ -16,9 +15,8 @@ public record EqualityExpression(SourceRange range, Expression left, Expression 
 		final Value<?> y = right.execute(interpreter);
 
 		return BooleanValue.of(switch (op) {
-			case StrictEquals -> x.isStrictlyEqual(y);
-			case StrictNotEquals -> !x.isStrictlyEqual(y);
-			default -> throw new NotImplemented("EqualityOp: " + op);
+			case StrictEquals, LooseEquals -> x.isStrictlyEqual(y);
+			case StrictNotEquals, LooseNotEquals -> !x.isStrictlyEqual(y);
 		});
 	}
 

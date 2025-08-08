@@ -80,7 +80,7 @@ final class LadybirdTestHarness implements TestHarness {
 					} else if (resultString.equals("fail")) {
 						if (!(testValue.value.get(Names.details) instanceof final DataDescriptor testDetailsProperty)) throw new ShouldNotHappen("Test details property was not data descriptor");
 						if (!(testDetailsProperty.value() instanceof final StringValue testDetails)) throw new ShouldNotHappen("Test details property was not a string");
-						return new TestResult(FAILED, new ShouldNotHappen(testDetails.value));
+						if (!arguments.options().parseOnly()) return new TestResult(FAILED, new ShouldNotHappen(testDetails.value));
 					} else {
 						// skip
 					}

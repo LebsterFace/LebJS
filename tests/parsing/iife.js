@@ -1,4 +1,5 @@
 Test.expectError("SyntaxError", "Unexpected token '('", () => Test.parse("let a = () => { return 1 }();"))
+Test.expectError("SyntaxError", "Unexpected token '('", () => Test.parse("function foo() { return 1 }();"))
 let b = (() => { return 1 })();
 Test.expect(1, b);
 let c = function() { return 2 }()

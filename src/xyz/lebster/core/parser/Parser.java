@@ -758,6 +758,10 @@ public final class Parser {
 		Expression latestExpr = parsePrimaryExpression();
 		consumeAllLineTerminators();
 
+		if (latestExpr instanceof ArrowFunctionExpression /* TODO: || latestExpr instanceof YieldExpression */) {
+			return latestExpr;
+		}
+
 		while (state.token.matchSecondaryExpression(forbidden)) {
 			final int newPrecedence = state.token.precedence();
 			final var newAssoc = state.token.associativity();

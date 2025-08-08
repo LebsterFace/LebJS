@@ -37,10 +37,6 @@ import static xyz.lebster.core.parser.TokenType.UnsignedRightShift;
  * @param value Conceptual value which this token represents.
  */
 public record Token(SourceRange range, TokenType type, String value) {
-	public Token(SourceRange range, TokenType type) {
-		this(range, type, range.getText());
-	}
-
 	@Override
 	public String toString() {
 		if (type == EOF) return "[EOF]";

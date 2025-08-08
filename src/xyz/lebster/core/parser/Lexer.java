@@ -185,7 +185,7 @@ public final class Lexer {
 
 	private Token eof() {
 		if (inBounds()) throw new ShouldNotHappen("Creating EOF token before consuming all codepoints");
-		return new Token(range(index), EOF);
+		return new Token(range(index), EOF, null);
 	}
 
 	private static boolean isDecimalDigit(int codepoint) {
@@ -330,17 +330,17 @@ public final class Lexer {
 
 	public Token next() throws SyntaxError {
 		if (lastTokenType == RegexpPattern) {
-			final Set<Integer> flags = new HashSet<>();
+			final StringBuilder flags = new StringBuilder();
 			final int startIndex = index;
 			while (isIdentifierPart()) {
-				if (flags.contains(codePoints[index]))
+				if (flags.indexOf(Character.toString(codePoints[index])) != -1)
 					throw new SyntaxError("Duplicate flag %s in regular expression literal".formatted(quoteCodePoint(codePoints[index])), position());
 				if (Arrays.binarySearch(REGEXP_FLAGS, codePoints[index]) < 0)
 					throw new SyntaxError("Invalid regular expression flag %s".formatted(quoteCodePoint(codePoints[index])), position());
-				flags.add(consume());
+				collect(flags);
 			}
 
-			return new Token(range(startIndex), RegexpFlags);
+			return new Token(range(startIndex), RegexpFlags, flags.toString());
 		} else if (lastTokenType == NumericLiteral && isIdentifierStart(codePoints[index])) {
 			throw new SyntaxError("Identifier starts immediately after numeric literal", position());
 		}
@@ -355,10 +355,10 @@ public final class Lexer {
 		if (accept('`')) {
 			if (notInTemplateSpan()) {
 				templateLiteralStates.push(new TemplateLiteralState());
-				return new Token(range(startIndex), TemplateStart);
+				return new Token(range(startIndex), TemplateStart, "`");
 			} else {
 				templateLiteralStates.pop();
-				return new Token(range(startIndex), TemplateEnd);
+				return new Token(range(startIndex), TemplateEnd, "`");
 			}
 		}
 
@@ -373,7 +373,7 @@ public final class Lexer {
 
 			if (accept('$', '{')) {
 				templateLiteralStates.getFirst().inExpression = true;
-				return new Token(range(startIndex), TemplateExpressionStart);
+				return new Token(range(startIndex), TemplateExpressionStart, "${");
 			} else {
 				return tokenizeTemplateLiteralSpan(startIndex);
 			}
@@ -383,7 +383,7 @@ public final class Lexer {
 			return null;
 		} else if (isLineTerminator()) {
 			consumeLineTerminators();
-			return new Token(range(startIndex), LineTerminator);
+			return new Token(range(startIndex), LineTerminator, null);
 		} else if (isIdentifierStart(codePoints[index])) {
 			return tokenizeKeywordOrIdentifier(startIndex);
 		} else if (isDecimalDigit(codePoints[index]) || (is('.') && isDecimalDigit(peekNext()))) {
@@ -527,7 +527,7 @@ public final class Lexer {
 
 	private Token tokenizeTemplateLiteralEnd(int startIndex) {
 		templateLiteralStates.getFirst().inExpression = false;
-		return new Token(range(startIndex), TemplateExpressionEnd);
+		return new Token(range(startIndex), TemplateExpressionEnd, "`");
 	}
 
 	private Token tokenizeStringLiteral(int startIndex) throws SyntaxError {
@@ -741,8 +741,9 @@ public final class Lexer {
 	private Token tokenizeKeywordOrIdentifier(int startIndex) throws SyntaxError {
 		final StringBuilder builder = new StringBuilder();
 		while (isIdentifierPart()) collect(builder);
-		final TokenType type = keywords.getOrDefault(builder.toString(), Identifier);
-		return new Token(range(startIndex), type);
+		final String keyword = builder.toString();
+		final TokenType type = keywords.getOrDefault(keyword, Identifier);
+		return new Token(range(startIndex), type, keyword);
 	}
 
 	private Token tokenizeSymbol(int startIndex) throws SyntaxError {

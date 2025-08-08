@@ -1119,10 +1119,14 @@ public final class Parser {
 			consumeAllLineTerminators();
 
 			// FieldDefinition
-			if (state.optional(Equals)) {
-				consumeAllLineTerminators();
-				final Expression initializer = parseSpecAssignmentExpression();
-				consumeAllLineTerminators();
+			if (state.is(Equals, Semicolon)) {
+				Expression initializer = null;
+				if (state.optional(Equals)) {
+					consumeAllLineTerminators();
+					initializer = parseSpecAssignmentExpression();
+					consumeAllLineTerminators();
+				}
+
 				fields.add(new ClassFieldNode(name, initializer, range(elementStartIndex)));
 
 				consumeAllSeparators();

@@ -156,7 +156,7 @@ public final class Lexer {
 		this.codePointCount = unpaddedCodePoints.length;
 		this.codePoints = Arrays.copyOf(unpaddedCodePoints, codePointCount + 3); // Padding for branchless lookahead
 		this.sourceText = sourceText;
-		if (accept("#!")) {
+		if (accept('#', '!')) {
 			consumeSingleLineComment();
 		}
 	}
@@ -245,11 +245,11 @@ public final class Lexer {
 	}
 
 	private boolean is(int c) {
-		return inBounds() && codePoints[index] == c;
+		return index < codePointCount && codePoints[index] == c;
 	}
 
-	private boolean is(String compare) {
-		return sourceText.startsWith(compare, sourceText.offsetByCodePoints(0, index));
+	private boolean is(int first, int second) {
+		return index + 1 < codePointCount && codePoints[index] == first && codePoints[index + 1] == second;
 	}
 
 	private boolean isLineTerminator() {
@@ -285,10 +285,22 @@ public final class Lexer {
 		return codePoints[index + 1];
 	}
 
-	private boolean accept(String s) {
-		final boolean result = is(s);
-		if (result) index += s.codePointCount(0, s.length());
-		return result;
+	private boolean accept(int first) {
+		if (index < codePointCount && codePoints[index] == first) {
+			index += 1;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean accept(int first, int second) {
+		if (index + 1 < codePointCount && codePoints[index] == first && codePoints[index + 1] == second) {
+			index += 2;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private boolean slashMeansDivision() {
@@ -340,7 +352,7 @@ public final class Lexer {
 		}
 
 		final int startIndex = index;
-		if (accept("`")) {
+		if (accept('`')) {
 			if (notInTemplateSpan()) {
 				templateLiteralStates.push(new TemplateLiteralState());
 				return new Token(range(startIndex), TemplateStart);
@@ -359,7 +371,7 @@ public final class Lexer {
 				throw new SyntaxError("Unterminated template literal", position());
 			}
 
-			if (accept("${")) {
+			if (accept('$', '{')) {
 				templateLiteralStates.getFirst().inExpression = true;
 				return new Token(range(startIndex), TemplateExpressionStart);
 			} else {
@@ -462,14 +474,14 @@ public final class Lexer {
 	}
 
 	private void consumeComment() throws SyntaxError {
-		if (accept("//")) {
+		if (accept('/', '/')) {
 			consumeSingleLineComment();
 			return;
 		}
 
-		if (accept("/*")) {
+		if (accept('/', '*')) {
 			while (inBounds()) {
-				if (accept("*/")) break;
+				if (accept('*', '/')) break;
 				consume();
 			}
 		}
@@ -484,7 +496,7 @@ public final class Lexer {
 	private Token tokenizeTemplateLiteralSpan(int startIndex) throws SyntaxError {
 		final StringBuilder builder = new StringBuilder();
 		boolean escaped = false;
-		while (inBounds() && (escaped || !is("${"))) {
+		while (inBounds() && (escaped || !is('$', '{'))) {
 			if (escaped) {
 				escaped = false;
 				if (isLineTerminator()) {
@@ -510,7 +522,7 @@ public final class Lexer {
 	}
 
 	private boolean currentTemplateLiteralIsEnding() {
-		return templateLiteralStates.getFirst().inExpression && templateLiteralStates.getFirst().bracketCount == 0 && accept("}");
+		return templateLiteralStates.getFirst().inExpression && templateLiteralStates.getFirst().bracketCount == 0 && accept('}');
 	}
 
 	private Token tokenizeTemplateLiteralEnd(int startIndex) {
@@ -564,7 +576,8 @@ public final class Lexer {
 	}
 
 	private void consumeLineContinuation() throws SyntaxError {
-		if (accept("\n") || accept("\u2028") || accept("\u2029") || accept("\r\n")) return;
+		if (accept('\n') || accept('\u2028') || accept('\u2029') || accept('\r', '\n'))
+			return;
 
 		if (codePoints[index] == '\r') {
 			consume();
@@ -639,9 +652,9 @@ public final class Lexer {
 
 	private Token tokenizeNumericLiteral(int startIndex) throws SyntaxError {
 		final int radix;
-		if (accept("0x") || accept("0X")) radix = 16;
-		else if (accept("0b") || accept("0B")) radix = 2;
-		else if (accept("0o") || accept("0O")) radix = 8;
+		if (accept('0', 'x') || accept('0', 'X')) radix = 16;
+		else if (accept('0', 'b') || accept('0', 'B')) radix = 2;
+		else if (accept('0', 'o') || accept('0', 'O')) radix = 8;
 		else radix = 10;
 
 		final StringBuilder builder = new StringBuilder();
@@ -683,7 +696,7 @@ public final class Lexer {
 			}
 		}
 
-		final TokenType type = accept("n") ? BigIntLiteral : NumericLiteral;
+		final TokenType type = accept('n') ? BigIntLiteral : NumericLiteral;
 		return new Token(range(startIndex), type, new BigInteger(builder.toString(), radix).toString());
 	}
 

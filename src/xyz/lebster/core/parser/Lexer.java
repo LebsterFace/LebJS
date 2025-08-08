@@ -152,8 +152,9 @@ public final class Lexer {
 	private TokenType lastTokenType;
 
 	private Lexer(String sourceText) throws SyntaxError {
-		this.codePoints = sourceText.codePoints().toArray();
-		this.codePointCount = codePoints.length;
+		final int[] unpaddedCodePoints = sourceText.codePoints().toArray();
+		this.codePointCount = unpaddedCodePoints.length;
+		this.codePoints = Arrays.copyOf(unpaddedCodePoints, codePointCount + 3); // Padding for branchless lookahead
 		this.sourceText = sourceText;
 		if (accept("#!")) {
 			consumeSingleLineComment();
@@ -277,13 +278,6 @@ public final class Lexer {
 		)) {
 			index++;
 		}
-	}
-
-	private String peekNext(int length) {
-		return sourceText.substring(
-			sourceText.offsetByCodePoints(0, index),
-			sourceText.offsetByCodePoints(0, Math.min(index + length, codePointCount))
-		);
 	}
 
 	private int peekNext() throws SyntaxError {
@@ -738,11 +732,10 @@ public final class Lexer {
 		return new Token(range(startIndex), type);
 	}
 
-	// FIXME: Performance
 	private Token tokenizeSymbol(int startIndex) throws SyntaxError {
 		for (int i = 4; i >= 1; i--) {
 			final HashMap<String, TokenType> symbolSize = symbols.get(i - 1);
-			final String key = peekNext(i);
+			final String key = new String(codePoints, index, i);
 			final TokenType value = symbolSize.get(key);
 			if (value != null) {
 				index += i;

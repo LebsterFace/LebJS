@@ -13,7 +13,7 @@ import static xyz.lebster.core.parser.TokenType.*;
 
 public final class Lexer {
 	private static final HashMap<String, TokenType> keywords = new HashMap<>();
-	private static final List<HashMap<String, TokenType>> symbols = new ArrayList<>();
+	private static final HashMap<String, TokenType> symbols = new HashMap<>();
 
 	static {
 		keywords.put("async", Async);
@@ -58,86 +58,72 @@ public final class Lexer {
 		keywords.put("yield", Yield);
 		// TODO: get / set keywords
 
-		final HashMap<String, TokenType> symbols_length_4 = new HashMap<>();
-		symbols_length_4.put(">>>=", UnsignedRightShiftEquals);
-
-		final HashMap<String, TokenType> symbols_length_3 = new HashMap<>();
-		symbols_length_3.put("||=", LogicalOrEquals);
-		symbols_length_3.put(">>>", UnsignedRightShift);
-		symbols_length_3.put(">>=", RightShiftEquals);
-		symbols_length_3.put("===", StrictEqual);
-		symbols_length_3.put("<<=", LeftShiftEquals);
-		symbols_length_3.put("&&=", LogicalAndEquals);
-		symbols_length_3.put("**=", ExponentEquals);
-		symbols_length_3.put("??=", NullishCoalescingEquals);
-		symbols_length_3.put("!==", StrictNotEqual);
-		symbols_length_3.put("...", DotDotDot);
-
-		final HashMap<String, TokenType> symbols_length_2 = new HashMap<>();
-		symbols_length_2.put("||", LogicalOr);
-		symbols_length_2.put("|=", PipeEquals);
-		symbols_length_2.put(">>", RightShift);
-		symbols_length_2.put(">=", GreaterThanEqual);
-		symbols_length_2.put("=>", Arrow);
-		symbols_length_2.put("==", LooseEqual);
-		symbols_length_2.put("<=", LessThanEqual);
-		symbols_length_2.put("<<", LeftShift);
-		symbols_length_2.put("+=", PlusEquals);
-		symbols_length_2.put("++", PlusPlus);
-		symbols_length_2.put("^=", CaretEquals);
-		symbols_length_2.put("%=", PercentEquals);
-		symbols_length_2.put("&=", AmpersandEquals);
-		symbols_length_2.put("&&", LogicalAnd);
-		symbols_length_2.put("/=", DivideEquals);
-		symbols_length_2.put("*=", MultiplyEquals);
-		symbols_length_2.put("**", Exponent);
-		symbols_length_2.put("?.", OptionalChain);
-		symbols_length_2.put("??", NullishCoalescing);
-		symbols_length_2.put("!=", NotEqual);
-		symbols_length_2.put("-=", MinusEquals);
-		symbols_length_2.put("--", MinusMinus);
-
-		final HashMap<String, TokenType> symbols_length_1 = new HashMap<>();
-		symbols_length_1.put("~", Tilde);
-		symbols_length_1.put("|", Pipe);
-		symbols_length_1.put(">", GreaterThan);
-		symbols_length_1.put("=", Equals);
-		symbols_length_1.put("<", LessThan);
-		symbols_length_1.put("+", Plus);
-		symbols_length_1.put("^", Caret);
-		symbols_length_1.put("%", Percent);
-		symbols_length_1.put("&", Ampersand);
-		symbols_length_1.put("/", Slash);
-		symbols_length_1.put("*", Star);
-		symbols_length_1.put("}", RBrace);
-		symbols_length_1.put("{", LBrace);
-		symbols_length_1.put("]", RBracket);
-		symbols_length_1.put("[", LBracket);
-		symbols_length_1.put(")", RParen);
-		symbols_length_1.put("(", LParen);
-		symbols_length_1.put(".", Period);
-		symbols_length_1.put("!", Bang);
-		symbols_length_1.put("?", QuestionMark);
-		symbols_length_1.put(";", Semicolon);
-		symbols_length_1.put(",", Comma);
-		symbols_length_1.put("-", Minus);
-		symbols_length_1.put(":", Colon);
-		symbols_length_1.put("\\", Backslash);
-		symbols_length_1.put("@", At);
-		symbols_length_1.put("#", Hashtag);
-
-		symbols.add(symbols_length_1);
-		symbols.add(symbols_length_2);
-		symbols.add(symbols_length_3);
-		symbols.add(symbols_length_4);
+		symbols.put(">>>=", UnsignedRightShiftEquals);
+		symbols.put("||=", LogicalOrEquals);
+		symbols.put(">>>", UnsignedRightShift);
+		symbols.put(">>=", RightShiftEquals);
+		symbols.put("===", StrictEqual);
+		symbols.put("<<=", LeftShiftEquals);
+		symbols.put("&&=", LogicalAndEquals);
+		symbols.put("**=", ExponentEquals);
+		symbols.put("??=", NullishCoalescingEquals);
+		symbols.put("!==", StrictNotEqual);
+		symbols.put("...", DotDotDot);
+		symbols.put("||", LogicalOr);
+		symbols.put("|=", PipeEquals);
+		symbols.put(">>", RightShift);
+		symbols.put(">=", GreaterThanEqual);
+		symbols.put("=>", Arrow);
+		symbols.put("==", LooseEqual);
+		symbols.put("<=", LessThanEqual);
+		symbols.put("<<", LeftShift);
+		symbols.put("+=", PlusEquals);
+		symbols.put("++", PlusPlus);
+		symbols.put("^=", CaretEquals);
+		symbols.put("%=", PercentEquals);
+		symbols.put("&=", AmpersandEquals);
+		symbols.put("&&", LogicalAnd);
+		symbols.put("/=", DivideEquals);
+		symbols.put("*=", MultiplyEquals);
+		symbols.put("**", Exponent);
+		symbols.put("?.", OptionalChain);
+		symbols.put("??", NullishCoalescing);
+		symbols.put("!=", NotEqual);
+		symbols.put("-=", MinusEquals);
+		symbols.put("--", MinusMinus);
+		symbols.put("~", Tilde);
+		symbols.put("|", Pipe);
+		symbols.put(">", GreaterThan);
+		symbols.put("=", Equals);
+		symbols.put("<", LessThan);
+		symbols.put("+", Plus);
+		symbols.put("^", Caret);
+		symbols.put("%", Percent);
+		symbols.put("&", Ampersand);
+		symbols.put("/", Slash);
+		symbols.put("*", Star);
+		symbols.put("}", RBrace);
+		symbols.put("{", LBrace);
+		symbols.put("]", RBracket);
+		symbols.put("[", LBracket);
+		symbols.put(")", RParen);
+		symbols.put("(", LParen);
+		symbols.put(".", Period);
+		symbols.put("!", Bang);
+		symbols.put("?", QuestionMark);
+		symbols.put(";", Semicolon);
+		symbols.put(",", Comma);
+		symbols.put("-", Minus);
+		symbols.put(":", Colon);
+		symbols.put("\\", Backslash);
+		symbols.put("@", At);
+		symbols.put("#", Hashtag);
 	}
 
 	public static String valueForSymbol(TokenType type) {
-		for (final var map : symbols) {
-			for (final var entry : map.entrySet()) {
-				if (Objects.equals(type, entry.getValue())) {
-					return entry.getKey();
-				}
+		for (final var entry : symbols.entrySet()) {
+			if (Objects.equals(type, entry.getValue())) {
+				return entry.getKey();
 			}
 		}
 
@@ -748,9 +734,8 @@ public final class Lexer {
 
 	private Token tokenizeSymbol(int startIndex) throws SyntaxError {
 		for (int i = 4; i >= 1; i--) {
-			final HashMap<String, TokenType> symbolSize = symbols.get(i - 1);
 			final String key = new String(codePoints, index, i);
-			final TokenType value = symbolSize.get(key);
+			final TokenType value = symbols.get(key);
 			if (value != null) {
 				index += i;
 				return new Token(range(startIndex), value, key);

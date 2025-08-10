@@ -12,7 +12,10 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import java.util.ArrayList;
 import java.util.Scanner;
+
+import static xyz.lebster.core.parser.TokenType.EOF;
 
 public record REPL(CLArguments.ExecutionOptions options, Scanner scanner, Interpreter interpreter) {
 	public REPL(CLArguments.ExecutionOptions options) {
@@ -82,8 +85,10 @@ public record REPL(CLArguments.ExecutionOptions options, Scanner scanner, Interp
 			if (!result.isEmpty()) result.append('\n');
 			final String line = readLine(indent);
 			if (line == null) return null;
-			final Token[] tokens = Lexer.tokenize(line);
-			for (final Token token : tokens) {
+			final Lexer lexer = new Lexer(line);
+			while (true) {
+				final Token token = lexer.next();
+				if (token.type() == EOF) break;
 				switch (token.type()) {
 					case LParen, LBrace, LBracket -> indent++;
 					case RParen, RBrace, RBracket -> indent--;

@@ -7,7 +7,10 @@ import xyz.lebster.core.node.SourcePosition;
 import xyz.lebster.core.node.SourceRange;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Objects;
 
 import static xyz.lebster.core.parser.TokenType.*;
 
@@ -137,7 +140,7 @@ public final class Lexer {
 	private int index = 0;
 	private TokenType lastTokenType;
 
-	private Lexer(String sourceText) throws SyntaxError {
+	public Lexer(String sourceText) throws SyntaxError {
 		final int[] unpaddedCodePoints = sourceText.codePoints().toArray();
 		this.codePointCount = unpaddedCodePoints.length;
 		this.codePoints = Arrays.copyOf(unpaddedCodePoints, codePointCount + 3); // Padding for branchless lookahead
@@ -147,26 +150,22 @@ public final class Lexer {
 		}
 	}
 
-	public static Token[] tokenize(String sourceText) throws SyntaxError {
-		final var instance = new Lexer(sourceText);
-		final ArrayList<Token> tokens = new ArrayList<>();
-		while (instance.inBounds()) {
-			final Token next = instance.next();
-			if (next == null) break;
-			instance.lastTokenType = next.type();
-			if (!instance.templateLiteralStates.isEmpty() && instance.templateLiteralStates.getFirst().inExpression) {
-				if (next.type() == LBrace) {
-					instance.templateLiteralStates.getFirst().bracketCount++;
-				} else if (next.type() == RBrace) {
-					instance.templateLiteralStates.getFirst().bracketCount--;
-				}
-			}
+	private Lexer(String sourceText, int[] codePoints, int codePointCount, int index, TokenType lastTokenType) {
+		this.sourceText = sourceText;
+		this.codePoints = codePoints;
+		this.codePointCount = codePointCount;
+		this.index = index;
+		this.lastTokenType = lastTokenType;
+	}
 
-			tokens.add(next);
-		}
-
-		tokens.add(instance.eof());
-		return tokens.toArray(new Token[0]);
+	public Lexer copy() {
+		return new Lexer(
+			sourceText,
+			codePoints,
+			codePointCount,
+			index,
+			lastTokenType
+		);
 	}
 
 	private Token eof() {
@@ -315,6 +314,12 @@ public final class Lexer {
 	private static final int[] REGEXP_FLAGS = new int[] { 'd', 'g', 'i', 'm', 's', 'u', 'v', 'y' };
 
 	public Token next() throws SyntaxError {
+		final Token result = nextToken();
+		lastTokenType = result.type();
+		return result;
+	}
+
+	private Token nextToken() throws SyntaxError {
 		if (lastTokenType == RegexpPattern) {
 			final StringBuilder flags = new StringBuilder();
 			final int startIndex = index;
@@ -366,7 +371,7 @@ public final class Lexer {
 		}
 
 		if (!inBounds()) {
-			return null;
+			return eof();
 		} else if (isLineTerminator()) {
 			consumeLineTerminators();
 			return new Token(range(startIndex), LineTerminator, null);
@@ -733,16 +738,30 @@ public final class Lexer {
 	}
 
 	private Token tokenizeSymbol(int startIndex) throws SyntaxError {
+		TokenType type = null;
+		String key = null;
 		for (int i = 4; i >= 1; i--) {
-			final String key = new String(codePoints, index, i);
-			final TokenType value = symbols.get(key);
-			if (value != null) {
+			key = new String(codePoints, index, i);
+			type = symbols.get(key);
+			if (type != null) {
 				index += i;
-				return new Token(range(startIndex), value, key);
+				break;
 			}
 		}
 
-		throw new SyntaxError("Cannot tokenize character %s".formatted(quoteCodePoint(codePoints[index])), position());
+		if (type == null) {
+			throw new SyntaxError("Cannot tokenize character %s".formatted(quoteCodePoint(codePoints[index])), position());
+		}
+
+		if (!templateLiteralStates.isEmpty() && templateLiteralStates.getFirst().inExpression) {
+			if (type == LBrace) {
+				templateLiteralStates.getFirst().bracketCount++;
+			} else if (type == RBrace) {
+				templateLiteralStates.getFirst().bracketCount--;
+			}
+		}
+
+		return new Token(range(startIndex), type, key);
 	}
 
 	private SourcePosition position() {

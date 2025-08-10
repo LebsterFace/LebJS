@@ -38,7 +38,7 @@ public final class Parser {
 
 	public Parser(String sourceText) throws SyntaxError {
 		this.sourceText = sourceText;
-		this.state = new ParserState(Lexer.tokenize(sourceText));
+		this.state = new ParserState(new Lexer(sourceText));
 	}
 
 	public static Program parse(String sourceText) throws SyntaxError {
@@ -60,7 +60,15 @@ public final class Parser {
 	}
 
 	private int startIndex() {
-		return state.token.range().startIndex;
+		return state.startIndex();
+	}
+
+	private SourcePosition position() {
+		return state.token.range().start();
+	}
+
+	private SourceRange range(int startIndex) {
+		return new SourceRange(sourceText, startIndex, state.lastEndIndex());
 	}
 
 	private Program parse() throws SyntaxError {
@@ -73,7 +81,7 @@ public final class Parser {
 		final List<Statement> result = new ArrayList<>();
 
 		boolean isFirstStatement = true;
-		while (state.index < state.tokens.length && !state.is(end)) {
+		while (!state.is(end)) {
 			if (isFirstStatement) {
 				isFirstStatement = false;
 				consumeAllSeparators();
@@ -115,14 +123,14 @@ public final class Parser {
 		}
 	}
 
-	private void consumeAllSeparators() {
+	private void consumeAllSeparators() throws SyntaxError {
 		while (!state.is(EOF) && state.is(LineTerminator, Semicolon)) {
 			hasConsumedSeparator = true;
 			state.consume();
 		}
 	}
 
-	private void consumeAllLineTerminators() {
+	private void consumeAllLineTerminators() throws SyntaxError {
 		while (!state.is(EOF) && state.is(LineTerminator)) {
 			hasConsumedSeparator = true;
 			state.consume();
@@ -443,14 +451,6 @@ public final class Parser {
 			case Class -> parseClassDeclaration();
 			default -> throw state.unexpected();
 		};
-	}
-
-	private SourcePosition position() {
-		return state.token.range().start();
-	}
-
-	private SourceRange range(int startIndex) {
-		return new SourceRange(sourceText, startIndex, state.previousToken().range().endIndex);
 	}
 
 	private VariableDeclaration parseVariableDeclaration() throws SyntaxError {

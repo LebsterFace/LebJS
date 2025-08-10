@@ -12,26 +12,37 @@ import java.util.HashMap;
 import static xyz.lebster.core.parser.TokenType.EOF;
 
 public final class ParserState {
-	public final Token[] tokens;
+	private final Lexer lexer;
+	private Token previousToken;
+
+	public final HashMap<ObjectExpression, SourcePosition> invalidProperties = new HashMap<>();
 	public Token token;
-	public int index = -1;
 	public boolean inBreakContext = false;
 	public boolean inContinueContext = false;
-	public HashMap<ObjectExpression, SourcePosition> invalidProperties = new HashMap<>();
 
-	public ParserState(Token[] tokens) {
-		this.tokens = tokens;
-		this.consume();
+	public ParserState(Lexer lexer) throws SyntaxError {
+		this.lexer = lexer;
+		this.token = lexer.next();
 	}
 
-	private ParserState(Token[] tokens, int index, Token token) {
-		this.tokens = tokens;
+	private ParserState(Lexer lexer, Token token, Token previousToken, boolean inBreakContext, boolean inContinueContext) {
+		this.lexer = lexer;
 		this.token = token;
-		this.index = index;
+		this.previousToken = previousToken;
+		this.inBreakContext = inBreakContext;
+		this.inContinueContext = inContinueContext;
 	}
 
-	public Token previousToken() {
-		return tokens[index - 1];
+	int startIndex() {
+		return token.range().startIndex;
+	}
+
+	int lastEndIndex() {
+		if (previousToken == null) {
+			return token.range().startIndex;
+		} else {
+			return previousToken.range().endIndex;
+		}
 	}
 
 	public SyntaxError expected(TokenType type) {
@@ -44,7 +55,7 @@ public final class ParserState {
 	}
 
 	public SyntaxError unexpected() {
-		return unexpected(this.token);
+		return unexpected(token);
 	}
 
 	public SyntaxError unexpected(Token unexpectedToken) {
@@ -52,11 +63,10 @@ public final class ParserState {
 		return new SyntaxError("Unexpected token " + unexpectedToken, unexpectedToken.range().start());
 	}
 
-	Token consume() {
-		final Token oldToken = token;
-		if (index + 1 != tokens.length) index++;
-		token = tokens[index];
-		return oldToken;
+	Token consume() throws SyntaxError {
+		previousToken = token;
+		token = lexer.next();
+		return previousToken;
 	}
 
 	String require(TokenType type) throws SyntaxError {
@@ -64,11 +74,11 @@ public final class ParserState {
 		return consume().value();
 	}
 
-	Token accept(TokenType type) {
+	Token accept(TokenType type) throws SyntaxError {
 		return token.type() == type ? consume() : null;
 	}
 
-	boolean optional(TokenType type) {
+	boolean optional(TokenType type) throws SyntaxError {
 		if (token.type() == type) {
 			consume();
 			return true;
@@ -77,7 +87,7 @@ public final class ParserState {
 		return false;
 	}
 
-	boolean optional(TokenType type, String value) {
+	boolean optional(TokenType type, String value) throws SyntaxError {
 		if (token.type() == type && token.value().equals(value)) {
 			consume();
 			return true;
@@ -86,13 +96,13 @@ public final class ParserState {
 		return false;
 	}
 
-	PrimitiveLiteral<StringValue> optionalStringLiteral(TokenType type) {
+	PrimitiveLiteral<StringValue> optionalStringLiteral(TokenType type) throws SyntaxError {
 		final Token token = accept(type);
 		if (token == null) return null;
 		return token.asStringLiteral();
 	}
 
-	boolean optional(TokenType... types) {
+	boolean optional(TokenType... types) throws SyntaxError {
 		if (is(types)) {
 			consume();
 			return true;
@@ -119,9 +129,12 @@ public final class ParserState {
 	}
 
 	public ParserState copy() {
-		final ParserState cloned = new ParserState(tokens, index, token);
-		cloned.inContinueContext = this.inContinueContext;
-		cloned.inBreakContext = this.inBreakContext;
-		return cloned;
+		return new ParserState(
+			lexer.copy(),
+			token,
+			previousToken,
+			inBreakContext,
+			inContinueContext
+		);
 	}
 }

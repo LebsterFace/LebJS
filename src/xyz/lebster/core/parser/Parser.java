@@ -139,7 +139,7 @@ public final class Parser {
 
 	private Statement parseLine() throws SyntaxError {
 		consumeAllLineTerminators();
-		final Statement result = parseStatementOrExpression();
+		final Statement result = parseStatement();
 		consumeAllSeparators();
 		return result;
 	}
@@ -148,7 +148,7 @@ public final class Parser {
 		if (state.token().matchDeclaration()) {
 			return parseDeclaration();
 		} else if (state.token().matchPrimaryExpression() || state.token().matchStatement()) {
-			return parseStatementOrExpression();
+			return parseStatement();
 		} else {
 			throw state.unexpected();
 		}
@@ -161,7 +161,7 @@ public final class Parser {
 		return new BlockStatement(range(startIndex), children);
 	}
 
-	private Statement parseStatementOrExpression() throws SyntaxError {
+	private Statement parseStatement() throws SyntaxError {
 		return switch (state.token().type()) {
 			case Import, Export -> throw new ParserNotImplemented(position(), "import / export statements");
 

@@ -64,7 +64,7 @@ public final class Parser {
 	}
 
 	private SourcePosition position() {
-		return state.token.range().start();
+		return state.token().range().start();
 	}
 
 	private SourceRange range(int startIndex) {
@@ -145,9 +145,9 @@ public final class Parser {
 	}
 
 	private Statement parseAny() throws SyntaxError {
-		if (state.token.matchDeclaration()) {
+		if (state.token().matchDeclaration()) {
 			return parseDeclaration();
-		} else if (state.token.matchPrimaryExpression() || state.token.matchStatement()) {
+		} else if (state.token().matchPrimaryExpression() || state.token().matchStatement()) {
 			return parseStatementOrExpression();
 		} else {
 			throw state.unexpected();
@@ -162,7 +162,7 @@ public final class Parser {
 	}
 
 	private Statement parseStatementOrExpression() throws SyntaxError {
-		return switch (state.token.type()) {
+		return switch (state.token().type()) {
 			case Import, Export -> throw new ParserNotImplemented(position(), "import / export statements");
 
 			case Function -> parseFunctionDeclaration();
@@ -184,7 +184,7 @@ public final class Parser {
 	}
 
 	private ExpressionStatement parseExpressionStatement() throws SyntaxError {
-		if (!state.token.matchPrimaryExpression()) throw state.unexpected();
+		if (!state.token().matchPrimaryExpression()) throw state.unexpected();
 		final Expression expression = parseExpression();
 		if (state.is(Colon)) throw new ParserNotImplemented(position(), "labels");
 		return new ExpressionStatement(expression);
@@ -201,7 +201,7 @@ public final class Parser {
 		final int startIndex = startIndex();
 		state.consume();
 		// FIXME: Proper automatic semicolon insertion
-		final Expression value = state.token.matchPrimaryExpression() ? parseExpression() : null;
+		final Expression value = state.token().matchPrimaryExpression() ? parseExpression() : null;
 		return new ReturnStatement(range(startIndex), value);
 	}
 
@@ -335,7 +335,7 @@ public final class Parser {
 
 		Statement init = null;
 		if (!state.is(Semicolon)) {
-			if (state.token.matchVariableDeclaration()) {
+			if (state.token().matchVariableDeclaration()) {
 				// TODO: for_loop_variable_declaration
 				final VariableDeclaration declaration = parseVariableDeclaration(/* true */);
 				if (state.is(Identifier, "of")) {
@@ -353,7 +353,7 @@ public final class Parser {
 				} else {
 					init = declaration;
 				}
-			} else if (state.token.matchPrimaryExpression()) {
+			} else if (state.token().matchPrimaryExpression()) {
 				final Expression expression = parseExpression(0, Right, Collections.singleton(In));
 				if (state.is(Identifier, "of")) return parseForOfStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
 				if (state.is(In)) return parseForInStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
@@ -366,11 +366,11 @@ public final class Parser {
 		state.require(Semicolon);
 		consumeAllLineTerminators();
 
-		final Expression test = state.token.matchPrimaryExpression() ? parseExpression() : null;
+		final Expression test = state.token().matchPrimaryExpression() ? parseExpression() : null;
 		state.require(Semicolon);
 		consumeAllLineTerminators();
 
-		final Expression update = state.token.matchPrimaryExpression() ? parseExpression() : null;
+		final Expression update = state.token().matchPrimaryExpression() ? parseExpression() : null;
 		state.require(RParen);
 
 		final Statement body = parseContextualStatement(true, true);
@@ -445,7 +445,7 @@ public final class Parser {
 	}
 
 	private Declaration parseDeclaration() throws SyntaxError {
-		return switch (state.token.type()) {
+		return switch (state.token().type()) {
 			case Let, Var, Const -> parseVariableDeclaration();
 			case Function -> parseFunctionDeclaration();
 			case Class -> parseClassDeclaration();
@@ -456,7 +456,7 @@ public final class Parser {
 	private VariableDeclaration parseVariableDeclaration() throws SyntaxError {
 		final int startIndex = startIndex();
 		// TODO: Missing init in 'const' declaration
-		final var kind = switch (state.token.type()) {
+		final var kind = switch (state.token().type()) {
 			case Var -> Kind.Var;
 			case Let -> Kind.Let;
 			case Const -> Kind.Const;
@@ -562,7 +562,7 @@ public final class Parser {
 				}
 			}
 
-			final Token keyToken = state.token;
+			final Token keyToken = state.token();
 			if (keyToken.matchIdentifierName() || keyToken.type() == NumericLiteral || keyToken.type() == StringLiteral) {
 				final PrimitiveLiteral<StringValue> key = state.consume().asStringLiteral();
 				consumeAllLineTerminators();
@@ -673,7 +673,7 @@ public final class Parser {
 		if (expectParens) state.require(LParen);
 		consumeAllLineTerminators();
 
-		while (state.token.matchPrimaryExpression() || state.is(DotDotDot, Comma)) {
+		while (state.token().matchPrimaryExpression() || state.is(DotDotDot, Comma)) {
 			consumeAllLineTerminators();
 			if (state.optional(DotDotDot)) {
 				result.addSpreadExpression(parseSpecAssignmentExpression());
@@ -762,9 +762,9 @@ public final class Parser {
 			return latestExpr;
 		}
 
-		while (state.token.matchSecondaryExpression(forbidden)) {
-			final int newPrecedence = state.token.precedence();
-			final var newAssoc = state.token.associativity();
+		while (state.token().matchSecondaryExpression(forbidden)) {
+			final int newPrecedence = state.token().precedence();
+			final var newAssoc = state.token().associativity();
 			if (newPrecedence < minPrecedence) break;
 			if (newPrecedence == minPrecedence && assoc == Left) break;
 
@@ -857,7 +857,7 @@ public final class Parser {
 	}
 
 	private MemberExpression parseNonComputedMemberExpression(int startIndex, Expression left) throws SyntaxError {
-		if (!state.token.matchIdentifierName()) throw state.expected("IdentifierName");
+		if (!state.token().matchIdentifierName()) throw state.expected("IdentifierName");
 		final PrimitiveLiteral<StringValue> property = state.consume().asStringLiteral();
 		return new MemberExpression(range(startIndex), left, property, false);
 	}
@@ -885,13 +885,13 @@ public final class Parser {
 	}
 
 	private Expression parsePrimaryExpression() throws SyntaxError {
-		if (state.token.matchPrefixedUpdateExpression()) {
+		if (state.token().matchPrefixedUpdateExpression()) {
 			return parsePrefixedUpdateExpression();
-		} else if (state.token.matchUnaryPrefixedExpression()) {
+		} else if (state.token().matchUnaryPrefixedExpression()) {
 			return parseUnaryPrefixedExpression();
 		}
 
-		return switch (state.token.type()) {
+		return switch (state.token().type()) {
 			case Await -> throw new ParserNotImplemented(position(), "`await` expressions");
 			case Async -> throw new ParserNotImplemented(position(), "`async` functions");
 			case Super -> throw new ParserNotImplemented(position(), "Super property access");
@@ -918,11 +918,11 @@ public final class Parser {
 	}
 
 	private PrimitiveLiteral<NumberValue> parseNumericLiteral() throws SyntaxError {
-		return new PrimitiveLiteral<>(state.token.range(), new NumberValue(Double.parseDouble(state.require(NumericLiteral))));
+		return new PrimitiveLiteral<>(state.token().range(), new NumberValue(Double.parseDouble(state.require(NumericLiteral))));
 	}
 
 	private PrimitiveLiteral<BigIntValue> parseBigIntLiteral() throws SyntaxError {
-		return new PrimitiveLiteral<>(state.token.range(), new BigIntValue(state.require(BigIntLiteral)));
+		return new PrimitiveLiteral<>(state.token().range(), new BigIntValue(state.require(BigIntLiteral)));
 	}
 
 	private RegExpLiteral parseRegexpLiteral() throws SyntaxError {
@@ -934,7 +934,7 @@ public final class Parser {
 
 	private Expression parseIdentifierOrArrowFunctionExpression() throws SyntaxError {
 		final int startIndex = startIndex();
-		final IdentifierExpression identifier = new IdentifierExpression(state.token.range(), state.consume().value());
+		final IdentifierExpression identifier = new IdentifierExpression(state.token().range(), state.consume().value());
 		if (state.is(TemplateStart)) throw new ParserNotImplemented(position(), "tagged template literals");
 		if (!state.optional(Arrow)) return identifier;
 		return parseArrowFunctionBody(startIndex, new FunctionParameters(identifier));
@@ -991,7 +991,7 @@ public final class Parser {
 
 	private ObjectExpressionKey parseObjectExpressionKey() throws SyntaxError {
 		final SourcePosition start = position();
-		final boolean isIdentifier = state.token.matchIdentifierName();
+		final boolean isIdentifier = state.token().matchIdentifierName();
 		final boolean nonComputed = isIdentifier || state.is(NumericLiteral, StringLiteral);
 		final Expression computedKey;
 		final StringValue nonComputedKey;
@@ -1038,7 +1038,7 @@ public final class Parser {
 
 		if (!key.computed()) {
 			final String prefix = key.nonComputedKey().value;
-			if (state.token.matchObjectExpressionKey()) {
+			if (state.token().matchObjectExpressionKey()) {
 				if (prefix.equals("async")) {
 					throw new ParserNotImplemented(position(), "`async` object literal methods");
 				} else if (prefix.equals("get") || prefix.equals("set")) {
@@ -1089,7 +1089,7 @@ public final class Parser {
 			if (state.optional(Static)) throw new ParserNotImplemented(position(), "`static` class elements");
 			if (state.optional(Star)) throw new ParserNotImplemented(position(), "generator class methods");
 
-			if (!state.token.matchClassElementName()) {
+			if (!state.token().matchClassElementName()) {
 				if (state.is(Hashtag)) throw new ParserNotImplemented(position(), "private class fields");
 				throw state.unexpected();
 			}
@@ -1101,7 +1101,7 @@ public final class Parser {
 
 			// TODO: Remove duplication with parseObjectExpression
 			final Expression name;
-			final boolean computedName = !state.token.matchIdentifierName() && !state.is(NumericLiteral, StringLiteral);
+			final boolean computedName = !state.token().matchIdentifierName() && !state.is(NumericLiteral, StringLiteral);
 			final boolean isConstructor = state.is(Identifier, "constructor");
 
 			if (isConstructor && constructor != null)
@@ -1161,7 +1161,7 @@ public final class Parser {
 	private Expression parseClassHeritage() throws SyntaxError {
 		if (!state.optional(Extends)) return null;
 		consumeAllLineTerminators();
-		if (!state.token.matchPrimaryExpression()) throw state.unexpected();
+		if (!state.token().matchPrimaryExpression()) throw state.unexpected();
 		return parseExpression();
 	}
 
@@ -1216,7 +1216,7 @@ public final class Parser {
 		if (state.is(LBrace)) {
 			final BlockStatement body = parseBlockStatement();
 			return new ArrowFunctionExpression(range(startIndex), body, parameters);
-		} else if (state.token.matchPrimaryExpression()) {
+		} else if (state.token().matchPrimaryExpression()) {
 			final Expression implicitReturn = parseSpecAssignmentExpression();
 			return new ArrowFunctionExpression(range(startIndex), implicitReturn, parameters);
 		} else {

@@ -15,10 +15,10 @@ public final class ParserState {
 	private final Lexer lexer;
 	private Token previousToken;
 
-	public final HashMap<ObjectExpression, SourcePosition> invalidProperties = new HashMap<>();
-	public Token token;
-	public boolean inBreakContext = false;
-	public boolean inContinueContext = false;
+	final HashMap<ObjectExpression, SourcePosition> invalidProperties = new HashMap<>();
+	private Token token;
+	boolean inBreakContext = false;
+	boolean inContinueContext = false;
 
 	public ParserState(Lexer lexer) throws SyntaxError {
 		this.lexer = lexer;
@@ -33,53 +33,57 @@ public final class ParserState {
 		this.inContinueContext = inContinueContext;
 	}
 
+	Token token() {
+		return token;
+	}
+
 	int startIndex() {
-		return token.range().startIndex;
+		return token().range().startIndex;
 	}
 
 	int lastEndIndex() {
 		if (previousToken == null) {
-			return token.range().startIndex;
+			return token().range().startIndex;
 		} else {
 			return previousToken.range().endIndex;
 		}
 	}
 
-	public SyntaxError expected(TokenType type) {
+	SyntaxError expected(TokenType type) {
 		return expected(StringEscapeUtils.quote(Lexer.valueForSymbol(type), false));
 	}
 
-	public SyntaxError expected(String value) {
-		if (token.type() == EOF) return new SyntaxError("Unexpected end of input, expected %s".formatted(value), token.range().start());
-		return new SyntaxError("Unexpected token %s, expected %s".formatted(token, value), token.range().start());
+	SyntaxError expected(String value) {
+		if (token().type() == EOF) return new SyntaxError("Unexpected end of input, expected %s".formatted(value), token().range().start());
+		return new SyntaxError("Unexpected token %s, expected %s".formatted(token(), value), token().range().start());
 	}
 
-	public SyntaxError unexpected() {
-		return unexpected(token);
+	SyntaxError unexpected() {
+		return unexpected(token());
 	}
 
-	public SyntaxError unexpected(Token unexpectedToken) {
+	SyntaxError unexpected(Token unexpectedToken) {
 		if (unexpectedToken.type() == EOF) return new SyntaxError("Unexpected end of input", unexpectedToken.range().start());
 		return new SyntaxError("Unexpected token " + unexpectedToken, unexpectedToken.range().start());
 	}
 
 	Token consume() throws SyntaxError {
-		previousToken = token;
+		previousToken = token();
 		token = lexer.next();
 		return previousToken;
 	}
 
 	String require(TokenType type) throws SyntaxError {
-		if (token.type() != type) throw expected(type);
+		if (token().type() != type) throw expected(type);
 		return consume().value();
 	}
 
 	Token accept(TokenType type) throws SyntaxError {
-		return token.type() == type ? consume() : null;
+		return token().type() == type ? consume() : null;
 	}
 
 	boolean optional(TokenType type) throws SyntaxError {
-		if (token.type() == type) {
+		if (token().type() == type) {
 			consume();
 			return true;
 		}
@@ -88,7 +92,7 @@ public final class ParserState {
 	}
 
 	boolean optional(TokenType type, String value) throws SyntaxError {
-		if (token.type() == type && token.value().equals(value)) {
+		if (token().type() == type && token().value().equals(value)) {
 			consume();
 			return true;
 		}
@@ -113,7 +117,7 @@ public final class ParserState {
 
 	boolean is(TokenType... types) {
 		for (final TokenType type : types) {
-			if (token.type() == type)
+			if (token().type() == type)
 				return true;
 		}
 
@@ -121,17 +125,17 @@ public final class ParserState {
 	}
 
 	boolean is(TokenType type) {
-		return token.type() == type;
+		return token().type() == type;
 	}
 
 	boolean is(TokenType type, String value) {
-		return token.type() == type && token.value().equals(value);
+		return token().type() == type && token().value().equals(value);
 	}
 
-	public ParserState copy() {
+	ParserState copy() {
 		return new ParserState(
 			lexer.copy(),
-			token,
+			token(),
 			previousToken,
 			inBreakContext,
 			inContinueContext

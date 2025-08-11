@@ -16,7 +16,7 @@ public record ForStatement(SourceRange range, Statement init, Expression test, E
 			if (init != null) init.execute(interpreter);
 			final Value<?> result = Undefined.instance;
 
-			while (test.execute(interpreter).isTruthy(interpreter)) {
+			while (test == null || test.execute(interpreter).isTruthy(interpreter)) {
 				try {
 					body.execute(interpreter);
 				} catch (AbruptCompletion completion) {

@@ -79,3 +79,16 @@ Test.expect(-4.666666666666667, (-14) / 3);
 Test.expect(-1.0769230769230769, (-14) / 13);
 Test.expect(NaN, (-14) / 'str');
 Test.expect(1, (-14) / (-14));
+Test.expect(0.5, 1
+/2);
+Test.expect(0.5, true / 2);
+Test.expect(0, false / 2);
+Test.expect(NaN, this / 2);
+{
+    let object = { in: 1, foo: 2};
+    Test.expect(1, object.foo / 2);
+    Test.expect(0.5, object.in / 2);
+}
+Test.expect(0, null / 2);
+Test.expect(NaN, undefined / 2);
+Test.expect(Infinity, Infinity / 2);

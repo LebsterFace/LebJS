@@ -13,19 +13,19 @@ Test.parse("const { a: a1 = aDefault, b = bDefault } = obj;");
 Test.parse("const { a, b, ...rest } = obj;");
 Test.parse("const { a: a1, b: b1, ...rest } = obj;");
 
-Test.parse("[a, b] = array;")
-Test.parse("[a, , b] = array;")
-Test.parse("[a = aDefault, b] = array;")
-Test.parse("[a, b, ...rest] = array;")
-Test.parse("[a, , b, ...rest] = array;")
-Test.parse("[a, b, ...{ pop, push }] = array;")
-Test.parse("[a, b, ...[c, d]] = array;")
+Test.parse("[a, b] = array;");
+Test.parse("[a, , b] = array;");
+Test.parse("[a = aDefault, b] = array;");
+Test.parse("[a, b, ...rest] = array;");
+Test.parse("[a, , b, ...rest] = array;");
+Test.parse("[a, b, ...{ pop, push }] = array;");
+Test.parse("[a, b, ...[c, d]] = array;");
 
-Test.parse("({ a, b } = obj);")
-Test.parse("({ a: a1, b: b1 } = obj);")
-Test.parse("({ a: a1 = aDefault, b = bDefault } = obj);")
-Test.parse("({ a, b, ...rest } = obj);")
-Test.parse("({ a: a1, b: b1, ...rest } = obj);")
+Test.parse("({ a, b } = obj);");
+Test.parse("({ a: a1, b: b1 } = obj);");
+Test.parse("({ a: a1 = aDefault, b = bDefault } = obj);");
+Test.parse("({ a, b, ...rest } = obj);");
+Test.parse("({ a: a1, b: b1, ...rest } = obj);");
 
 // With spaces
 let object = { 'hello world': 123 };
@@ -43,10 +43,10 @@ let obj = { a: 'a', b: 'b', c: [1, 2, 3] };
 }
 
 {
-    let a, foo;
-    ({ a, foo = 1 } = obj);
-    Test.expect(a, obj.a);
-    Test.expect(foo, 1);
+	let a, foo;
+	({ a, foo = 1 } = obj);
+	Test.expect(a, obj.a);
+	Test.expect(foo, 1);
 }
 
 {
@@ -80,5 +80,8 @@ let obj = { a: 'a', b: 'b', c: [1, 2, 3] };
 
 Test.expectError("SyntaxError", "Invalid left-hand side in assignment", () => Test.parse("(({ a, b, c }) = obj)"));
 Test.expectError("SyntaxError", "Unexpected token 'else'", () => Test.parse("let { else } = { else: 1 };"));
-Test.expectError("SyntaxError", 'Invalid shorthand property initializer', () => Test.parse("let bar = { foo = 1 };"))
-Test.expectError("SyntaxError", 'Invalid shorthand property initializer', () => Test.parse("let { foo = 1 } = (1, 2, { a: 1, b: 2, c: 3, foo = 1 });"))
+Test.expectError("SyntaxError", 'Invalid shorthand property initializer', () => Test.parse("let bar = { foo = 1 };"));
+Test.expectError("SyntaxError", 'Invalid shorthand property initializer', () => Test.parse("let { foo = 1 } = (1, 2, { a: 1, b: 2, c: 3, foo = 1 });"));
+Test.expectError("SyntaxError", 'Illegal property in declaration context', () => Test.parse("let foo.bar = {};"));
+Test.expectError("SyntaxError", 'Illegal property in declaration context', () => Test.parse("let [foo.bar] = [];"));
+Test.expectError("SyntaxError", 'Illegal property in declaration context', () => Test.parse("let foo['bar'] = {};"));

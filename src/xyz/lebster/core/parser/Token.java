@@ -40,6 +40,7 @@ public record Token(SourceRange range, TokenType type, String value) {
 	@Override
 	public String toString() {
 		if (type == EOF) return "[EOF]";
+		if (type == LineTerminator) return "<newline>";
 		return StringEscapeUtils.quote(value, false);
 	}
 

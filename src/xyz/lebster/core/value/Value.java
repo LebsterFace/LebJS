@@ -141,6 +141,10 @@ public abstract class Value<JType> implements Displayable {
 		this.display(builder);
 	}
 
+	public void displayForUncaughtError(StringBuilder builder) {
+		this.display(builder);
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toprimitive")
 	public PrimitiveValue<?> toPrimitive(Interpreter interpreter, PreferredType preferredType) throws AbruptCompletion {
 		if (this instanceof PrimitiveValue) {

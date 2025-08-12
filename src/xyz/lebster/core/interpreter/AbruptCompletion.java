@@ -16,7 +16,10 @@ public final class AbruptCompletion extends Throwable {
 	}
 
 	public String getValue() {
-		return value == null ? "" : value.toString();
+		if (value == null) return "";
+		final StringBuilder builder = new StringBuilder();
+		value.displayForUncaughtError(builder);
+		return builder.toString();
 	}
 
 	@Override

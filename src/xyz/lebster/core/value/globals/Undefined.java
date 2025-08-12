@@ -22,11 +22,6 @@ public final class Undefined extends PrimitiveValue<Void> {
 	}
 
 	@Override
-	public String toString() {
-		return "undefined";
-	}
-
-	@Override
 	public StringValue toStringValue(Interpreter interpreter) {
 		return Names.undefined;
 	}

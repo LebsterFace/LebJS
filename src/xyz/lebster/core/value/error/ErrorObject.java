@@ -42,8 +42,14 @@ public class ErrorObject extends ObjectValue implements HasBuiltinTag {
 	}
 
 	@Override
-	public String toString() {
-		return getName() + ": " + message + (stack.isBlank() ? "" : "\n" + stack);
+	public void displayForUncaughtError(StringBuilder builder) {
+		builder.append(getName());
+		builder.append(": ");
+		builder.append(message);
+		if (!stack.isBlank()) {
+			builder.append("\n");
+			builder.append(stack);
+		}
 	}
 
 	@Override

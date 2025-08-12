@@ -22,11 +22,6 @@ public final class Null extends PrimitiveValue<Void> {
 	}
 
 	@Override
-	public String toString() {
-		return "null";
-	}
-
-	@Override
 	public StringValue toStringValue(Interpreter interpreter) {
 		return Names.null_;
 	}

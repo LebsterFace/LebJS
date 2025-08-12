@@ -135,13 +135,14 @@ public final class Lexer {
 
 	private final String sourceText;
 	private final int[] codePoints;
-	private final ArrayDeque<TemplateLiteralState> templateLiteralStates = new ArrayDeque<>();
+	private final ArrayDeque<TemplateLiteralState> templateLiteralStates;
 	private final int codePointCount;
 	private int index = 0;
 	private TokenType lastTokenType;
 
 	public Lexer(String sourceText) throws SyntaxError {
 		final int[] unpaddedCodePoints = sourceText.codePoints().toArray();
+		this.templateLiteralStates = new ArrayDeque<>();
 		this.codePointCount = unpaddedCodePoints.length;
 		this.codePoints = Arrays.copyOf(unpaddedCodePoints, codePointCount + 3); // Padding for branchless lookahead
 		this.sourceText = sourceText;
@@ -150,18 +151,25 @@ public final class Lexer {
 		}
 	}
 
-	private Lexer(String sourceText, int[] codePoints, int codePointCount, int index, TokenType lastTokenType) {
+	private Lexer(String sourceText, int[] codePoints, ArrayDeque<TemplateLiteralState> templateLiteralStates, int codePointCount, int index, TokenType lastTokenType) {
 		this.sourceText = sourceText;
 		this.codePoints = codePoints;
+		this.templateLiteralStates = templateLiteralStates;
 		this.codePointCount = codePointCount;
 		this.index = index;
 		this.lastTokenType = lastTokenType;
 	}
 
 	public Lexer copy() {
+		final ArrayDeque<TemplateLiteralState> templateLiteralStatesClone = new ArrayDeque<>();
+		for (TemplateLiteralState templateLiteralState : templateLiteralStates) {
+			templateLiteralStatesClone.add(templateLiteralState.copy());
+		}
+
 		return new Lexer(
 			sourceText,
 			codePoints,
+			templateLiteralStatesClone,
 			codePointCount,
 			index,
 			lastTokenType
@@ -518,7 +526,7 @@ public final class Lexer {
 
 	private Token tokenizeTemplateLiteralEnd(int startIndex) {
 		templateLiteralStates.getFirst().inExpression = false;
-		return new Token(range(startIndex), TemplateExpressionEnd, "`");
+		return new Token(range(startIndex), TemplateExpressionEnd, "}");
 	}
 
 	private Token tokenizeStringLiteral(int startIndex) throws SyntaxError {
@@ -779,5 +787,17 @@ public final class Lexer {
 	private static final class TemplateLiteralState {
 		public boolean inExpression = false;
 		public int bracketCount = 0;
+
+		public TemplateLiteralState() {
+		}
+
+		private TemplateLiteralState(boolean inExpression, int bracketCount) {
+			this.inExpression = inExpression;
+			this.bracketCount = bracketCount;
+		}
+
+		public TemplateLiteralState copy() {
+			return new TemplateLiteralState(inExpression, bracketCount);
+		}
 	}
 }

@@ -130,7 +130,7 @@ public final class Lexer {
 			}
 		}
 
-		throw new ShouldNotHappen("TokenType %s has no corresponding value.".formatted(type));
+		return null;
 	}
 
 	private final String sourceText;

@@ -50,7 +50,9 @@ public final class ParserState {
 	}
 
 	SyntaxError expected(TokenType type) {
-		return expected(StringEscapeUtils.quote(Lexer.valueForSymbol(type), false));
+		final String symbol = Lexer.valueForSymbol(type);
+		if (symbol == null) return expected(type.name());
+		return expected(StringEscapeUtils.quote(symbol, false));
 	}
 
 	SyntaxError expected(String value) {

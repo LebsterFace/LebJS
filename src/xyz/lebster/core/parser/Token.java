@@ -199,7 +199,10 @@ public record Token(SourceRange range, TokenType type, String value) {
 			   || type == StringLiteral
 			   || type == Super
 			   || type == Yield
-			   || type == TemplateStart;
+			   || type == TemplateStart
+			   // The start of a RegexpPattern that we misparsed
+			   || type == Slash
+			   || type == DivideEquals;
 	}
 
 	boolean matchSecondaryExpression(Set<TokenType> forbidden) {

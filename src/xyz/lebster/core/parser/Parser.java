@@ -180,6 +180,12 @@ public final class Parser {
 			case Return -> parseReturnStatement();
 			case Throw -> parseThrowStatement();
 			case Debugger -> parseDebuggerStatement();
+
+			case Slash, DivideEquals -> {
+				state.lexer.treatAsRegexpLiteral();
+				yield parseExpressionStatement();
+			}
+
 			default -> parseExpressionStatement();
 		};
 	}

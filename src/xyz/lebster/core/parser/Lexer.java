@@ -307,24 +307,24 @@ public final class Lexer {
 		final TokenType lastTokenType = latestToken.type();
 		return lastTokenType == Identifier // However if a reserved word is handled by treatAsIdentifier() (e.g. a.in), it is allowed
 			   || lastTokenType == BigIntLiteral
-			|| lastTokenType == True
-			|| lastTokenType == False
-			|| lastTokenType == RBrace
-			|| lastTokenType == RBracket
+			   || lastTokenType == True
+			   || lastTokenType == False
+			   || lastTokenType == RBrace
+			   || lastTokenType == RBracket
 			   || lastTokenType == LineTerminator
 			   || lastTokenType == Undefined
 			   || lastTokenType == Infinity
 			   || lastTokenType == NaN
-			|| lastTokenType == MinusMinus
-			|| lastTokenType == NullLiteral
-			|| lastTokenType == NumericLiteral
-			|| lastTokenType == RParen
-			|| lastTokenType == PlusPlus
-			|| lastTokenType == PrivateIdentifier
+			   || lastTokenType == MinusMinus
+			   || lastTokenType == NullLiteral
+			   || lastTokenType == NumericLiteral
+			   || lastTokenType == RParen
+			   || lastTokenType == PlusPlus
+			   || lastTokenType == PrivateIdentifier
 			   || lastTokenType == RegexpFlags
-			|| lastTokenType == StringLiteral
+			   || lastTokenType == StringLiteral
 			   || lastTokenType == TemplateEnd
-			|| lastTokenType == This;
+			   || lastTokenType == This;
 	}
 
 	private static final int[] REGEXP_FLAGS = new int[] { 'd', 'g', 'i', 'm', 's', 'u', 'v', 'y' };
@@ -416,6 +416,11 @@ public final class Lexer {
 		while (isLineTerminator()) {
 			consume();
 		}
+	}
+
+	public void treatAsRegexpLiteral() throws SyntaxError {
+		index = latestToken.range().startIndex;
+		latestToken = tokenizeRegexpLiteral(index);
 	}
 
 	public void treatAsIdentifier() throws SyntaxError {

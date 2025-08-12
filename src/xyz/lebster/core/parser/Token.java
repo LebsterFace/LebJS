@@ -196,6 +196,7 @@ public record Token(SourceRange range, TokenType type, String value) {
 			   || type == RegexpPattern
 			   || type == StringLiteral
 			   || type == Super
+			   || type == Yield
 			   || type == TemplateStart
 			   || type == This
 			   || type == True

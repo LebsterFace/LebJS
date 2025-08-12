@@ -179,8 +179,13 @@ public final class Parser {
 			case Continue -> parseContinueStatement();
 			case Return -> parseReturnStatement();
 			case Throw -> parseThrowStatement();
+			case Debugger -> parseDebuggerStatement();
 			default -> parseExpressionStatement();
 		};
+	}
+
+	private Statement parseDebuggerStatement() {
+		throw new ParserNotImplemented(position(), "debugger statements");
 	}
 
 	private ExpressionStatement parseExpressionStatement() throws SyntaxError {
@@ -895,6 +900,7 @@ public final class Parser {
 			case Await -> throw new ParserNotImplemented(position(), "`await` expressions");
 			case Async -> throw new ParserNotImplemented(position(), "`async` functions");
 			case Super -> throw new ParserNotImplemented(position(), "Super property access");
+			case Yield -> throw new ParserNotImplemented(position(), "`yield` expressions");
 
 			case Class -> parseClassExpression();
 			case LBracket -> parseArrayExpression();

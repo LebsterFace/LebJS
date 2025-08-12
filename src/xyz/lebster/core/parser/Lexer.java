@@ -301,29 +301,30 @@ public final class Lexer {
 		}
 	}
 
+	// Division is not allowed after reserved words
 	private boolean slashMeansDivision() {
 		if (latestToken == null) return false;
 		final TokenType lastTokenType = latestToken.type();
-		final boolean isAcceptedType =
-			lastTokenType == BigIntLiteral
+		return lastTokenType == Identifier // However if a reserved word is handled by treatAsIdentifier() (e.g. a.in), it is allowed
+			   || lastTokenType == BigIntLiteral
 			|| lastTokenType == True
 			|| lastTokenType == False
 			|| lastTokenType == RBrace
 			|| lastTokenType == RBracket
-			|| lastTokenType == Identifier
-			|| lastTokenType == In
-			|| lastTokenType == InstanceOf
+			   || lastTokenType == LineTerminator
+			   || lastTokenType == Undefined
+			   || lastTokenType == Infinity
+			   || lastTokenType == NaN
 			|| lastTokenType == MinusMinus
 			|| lastTokenType == NullLiteral
 			|| lastTokenType == NumericLiteral
 			|| lastTokenType == RParen
 			|| lastTokenType == PlusPlus
 			|| lastTokenType == PrivateIdentifier
-			|| lastTokenType == RegexpPattern
+			   || lastTokenType == RegexpFlags
 			|| lastTokenType == StringLiteral
-			|| lastTokenType == TemplateExpressionEnd
+			   || lastTokenType == TemplateEnd
 			|| lastTokenType == This;
-		return lastTokenType != null && isAcceptedType;
 	}
 
 	private static final int[] REGEXP_FLAGS = new int[] { 'd', 'g', 'i', 'm', 's', 'u', 'v', 'y' };
@@ -391,7 +392,7 @@ public final class Lexer {
 			consumeLineTerminators();
 			return new Token(range(startIndex), LineTerminator, null);
 		} else if (isIdentifierStart(codePoints[index])) {
-			return tokenizeKeywordOrIdentifier(startIndex);
+			return tokenizeKeywordOrIdentifier(startIndex, false);
 		} else if (isDecimalDigit(codePoints[index]) || (is('.') && isDecimalDigit(peekNext()))) {
 			return tokenizeNumericLiteral(startIndex);
 		} else if (is('"') || is('\'')) {
@@ -415,6 +416,11 @@ public final class Lexer {
 		while (isLineTerminator()) {
 			consume();
 		}
+	}
+
+	public void treatAsIdentifier() throws SyntaxError {
+		index = latestToken.range().startIndex;
+		latestToken = tokenizeKeywordOrIdentifier(index, true);
 	}
 
 	private Token tokenizeRegexpLiteral(int startIndex) throws SyntaxError {
@@ -744,11 +750,11 @@ public final class Lexer {
 		return StringEscapeUtils.quote(codePoint == -1 ? "[-1]" : Character.toString(codePoint), false);
 	}
 
-	private Token tokenizeKeywordOrIdentifier(int startIndex) throws SyntaxError {
+	private Token tokenizeKeywordOrIdentifier(int startIndex, boolean forceIdentifier) throws SyntaxError {
 		final StringBuilder builder = new StringBuilder();
 		while (isIdentifierPart()) collect(builder);
 		final String keyword = builder.toString();
-		final TokenType type = keywords.getOrDefault(keyword, Identifier);
+		final TokenType type = forceIdentifier ? Identifier : keywords.getOrDefault(keyword, Identifier);
 		return new Token(range(startIndex), type, keyword);
 	}
 

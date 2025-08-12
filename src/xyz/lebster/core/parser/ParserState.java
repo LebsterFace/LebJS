@@ -8,6 +8,7 @@ import xyz.lebster.core.node.expression.ObjectExpression;
 import java.util.HashMap;
 
 import static xyz.lebster.core.parser.TokenType.EOF;
+import static xyz.lebster.core.parser.TokenType.Identifier;
 
 public final class ParserState {
 	final Lexer lexer;
@@ -120,8 +121,8 @@ public final class ParserState {
 		return token().type() == type;
 	}
 
-	boolean is(TokenType type, String value) {
-		return token().type() == type && token().value().equals(value);
+	boolean is(String value) {
+		return token().type() == Identifier && token().value().equals(value);
 	}
 
 	ParserState copy() {

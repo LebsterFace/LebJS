@@ -538,6 +538,7 @@ public final class Parser {
 
 	private IdentifierExpression parseIdentifierExpression() throws SyntaxError {
 		if (!state.token().matchIdentifier()) throw state.unexpected();
+		state.lexer.treatAsIdentifier();
 		return new IdentifierExpression(state.token().range(), state.consume().value());
 	}
 
@@ -888,6 +889,7 @@ public final class Parser {
 
 	private MemberExpression parseNonComputedMemberExpression(int startIndex, Expression left) throws SyntaxError {
 		if (!state.token().matchIdentifierName()) throw state.expected("IdentifierName");
+		state.lexer.treatAsIdentifier();
 		final PrimitiveLiteral<StringValue> property = state.consume().asStringLiteral();
 		return new MemberExpression(range(startIndex), left, property, false);
 	}
@@ -1140,7 +1142,7 @@ public final class Parser {
 			// TODO: Remove duplication with parseObjectExpression
 			final Expression name;
 			final boolean computedName = !state.token().matchIdentifierName() && !state.is(NumericLiteral, StringLiteral);
-			final boolean isConstructor = state.is(Identifier, "constructor");
+			final boolean isConstructor = state.is("constructor");
 
 			if (isConstructor && constructor != null)
 				throw new SyntaxError("A class may only have one constructor", position());

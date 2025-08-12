@@ -2,20 +2,14 @@ package xyz.lebster.cli;
 
 import xyz.lebster.Main;
 import xyz.lebster.core.ANSI;
-import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.interpreter.Interpreter;
-import xyz.lebster.core.parser.Lexer;
 import xyz.lebster.core.parser.Parser;
-import xyz.lebster.core.parser.Token;
 import xyz.lebster.core.value.JSONDisplayer;
 import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
-import java.util.ArrayList;
 import java.util.Scanner;
-
-import static xyz.lebster.core.parser.TokenType.EOF;
 
 public record REPL(CLArguments.ExecutionOptions options, Scanner scanner, Interpreter interpreter) {
 	public REPL(CLArguments.ExecutionOptions options) {
@@ -66,38 +60,10 @@ public record REPL(CLArguments.ExecutionOptions options, Scanner scanner, Interp
 		}
 	}
 
-	private String readLine(int indent) {
-		if (indent == 0 && options.showPrompt()) {
-			System.out.print("> ");
-		} else {
-			for (int i = 0; i < indent; i++)
-				System.out.print('\t');
-		}
-
-		return this.scanner.hasNextLine() ? this.scanner.nextLine() : null;
-	}
-
-	private String readNextInput() throws SyntaxError {
-		final StringBuilder result = new StringBuilder();
-		int indent = 0;
-
-		do {
-			if (!result.isEmpty()) result.append('\n');
-			final String line = readLine(indent);
-			if (line == null) return null;
-			final Lexer lexer = new Lexer(line);
-			while (true) {
-				final Token token = lexer.next();
-				if (token.type() == EOF) break;
-				switch (token.type()) {
-					case LParen, LBrace, LBracket -> indent++;
-					case RParen, RBrace, RBracket -> indent--;
-				}
-			}
-
-			result.append(line);
-		} while (indent > 0);
-
-		return result.toString();
+	// FIXME: Allow multi-line inputs again
+	private String readNextInput() {
+		if (options.showPrompt()) System.out.print("> ");
+		if (!scanner.hasNextLine()) return null;
+		return scanner.nextLine();
 	}
 }

@@ -12,29 +12,27 @@ import java.util.HashMap;
 import static xyz.lebster.core.parser.TokenType.EOF;
 
 public final class ParserState {
-	private final Lexer lexer;
+	final Lexer lexer;
 	private Token previousToken;
 
 	final HashMap<ObjectExpression, SourcePosition> invalidProperties = new HashMap<>();
-	private Token token;
 	boolean inBreakContext = false;
 	boolean inContinueContext = false;
 
-	public ParserState(Lexer lexer) throws SyntaxError {
+	ParserState(Lexer lexer) throws SyntaxError {
 		this.lexer = lexer;
-		this.token = lexer.next();
+		lexer.next();
 	}
 
-	private ParserState(Lexer lexer, Token token, Token previousToken, boolean inBreakContext, boolean inContinueContext) {
+	private ParserState(Lexer lexer, Token previousToken, boolean inBreakContext, boolean inContinueContext) {
 		this.lexer = lexer;
-		this.token = token;
 		this.previousToken = previousToken;
 		this.inBreakContext = inBreakContext;
 		this.inContinueContext = inContinueContext;
 	}
 
 	Token token() {
-		return token;
+		return lexer.latestToken;
 	}
 
 	int startIndex() {
@@ -71,7 +69,7 @@ public final class ParserState {
 
 	Token consume() throws SyntaxError {
 		previousToken = token();
-		token = lexer.next();
+		lexer.next();
 		return previousToken;
 	}
 
@@ -137,7 +135,6 @@ public final class ParserState {
 	ParserState copy() {
 		return new ParserState(
 			lexer.copy(),
-			token(),
 			previousToken,
 			inBreakContext,
 			inContinueContext

@@ -138,7 +138,7 @@ public final class Lexer {
 	private final ArrayDeque<TemplateLiteralState> templateLiteralStates;
 	private final int codePointCount;
 	private int index = 0;
-	private TokenType lastTokenType;
+	Token latestToken;
 
 	public Lexer(String sourceText) throws SyntaxError {
 		final int[] unpaddedCodePoints = sourceText.codePoints().toArray();
@@ -151,13 +151,13 @@ public final class Lexer {
 		}
 	}
 
-	private Lexer(String sourceText, int[] codePoints, ArrayDeque<TemplateLiteralState> templateLiteralStates, int codePointCount, int index, TokenType lastTokenType) {
+	private Lexer(String sourceText, int[] codePoints, ArrayDeque<TemplateLiteralState> templateLiteralStates, int codePointCount, int index, Token latestToken) {
 		this.sourceText = sourceText;
 		this.codePoints = codePoints;
 		this.templateLiteralStates = templateLiteralStates;
 		this.codePointCount = codePointCount;
 		this.index = index;
-		this.lastTokenType = lastTokenType;
+		this.latestToken = latestToken;
 	}
 
 	public Lexer copy() {
@@ -172,7 +172,7 @@ public final class Lexer {
 			templateLiteralStatesClone,
 			codePointCount,
 			index,
-			lastTokenType
+			latestToken
 		);
 	}
 
@@ -297,6 +297,8 @@ public final class Lexer {
 	}
 
 	private boolean slashMeansDivision() {
+		if (latestToken == null) return false;
+		final TokenType lastTokenType = latestToken.type();
 		final boolean isAcceptedType =
 			lastTokenType == BigIntLiteral
 			|| lastTokenType == True
@@ -323,12 +325,12 @@ public final class Lexer {
 
 	public Token next() throws SyntaxError {
 		final Token result = nextToken();
-		lastTokenType = result.type();
+		latestToken = result;
 		return result;
 	}
 
 	private Token nextToken() throws SyntaxError {
-		if (lastTokenType == RegexpPattern) {
+		if (latestToken != null && latestToken.type() == RegexpPattern) {
 			final StringBuilder flags = new StringBuilder();
 			final int startIndex = index;
 			while (isIdentifierPart()) {
@@ -340,7 +342,7 @@ public final class Lexer {
 			}
 
 			return new Token(range(startIndex), RegexpFlags, flags.toString());
-		} else if (lastTokenType == NumericLiteral && isIdentifierStart(codePoints[index])) {
+		} else if (latestToken != null && latestToken.type() == NumericLiteral && isIdentifierStart(codePoints[index])) {
 			throw new SyntaxError("Identifier starts immediately after numeric literal", position());
 		}
 

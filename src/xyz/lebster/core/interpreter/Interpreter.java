@@ -40,7 +40,7 @@ public final class Interpreter {
 		try {
 			return Parser.parse(sourceText);
 		} catch (SyntaxError e) {
-			throw error(new SyntaxErrorObject(this, e.getMessage()));
+			throw error(new SyntaxErrorObject(this, e.getMessage() + "\n\tRuntime Parsing: " + StringEscapeUtils.quote(sourceText, true)));
 		}
 	}
 

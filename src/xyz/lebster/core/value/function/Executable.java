@@ -140,7 +140,6 @@ public abstract class Executable extends ObjectValue implements HasBuiltinTag {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-built-in-function-objects-call-thisargument-argumentslist")
 	public final Value<?> call(Interpreter interpreter, Value<?> thisValue, Value<?>... arguments) throws AbruptCompletion {
-		// TODO: binding undefined/null in non-strict mode binds the global object
 		final var env = new FunctionEnvironment(savedEnvironment(interpreter), thisValue, this, this);
 		final ExecutionContext context = interpreter.pushContextWithEnvironment(env);
 		try {

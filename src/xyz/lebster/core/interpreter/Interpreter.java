@@ -194,7 +194,7 @@ public final class Interpreter {
 		for (final var e : executionContextStack) {
 			if (e.environment() instanceof final FunctionEnvironment f) {
 				final String name = f.functionObject.name.value;
-				joiner.add("\tat %s".formatted(name));
+				joiner.add("\tat %s".formatted(name.isBlank() ? "<anonymous>" : name));
 			}
 		}
 

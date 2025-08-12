@@ -4,8 +4,6 @@ import xyz.lebster.core.StringEscapeUtils;
 import xyz.lebster.core.exception.SyntaxError;
 import xyz.lebster.core.node.SourcePosition;
 import xyz.lebster.core.node.expression.ObjectExpression;
-import xyz.lebster.core.node.expression.literal.PrimitiveLiteral;
-import xyz.lebster.core.value.primitive.string.StringValue;
 
 import java.util.HashMap;
 
@@ -98,12 +96,6 @@ public final class ParserState {
 		}
 
 		return false;
-	}
-
-	PrimitiveLiteral<StringValue> optionalStringLiteral(TokenType type) throws SyntaxError {
-		final Token token = accept(type);
-		if (token == null) return null;
-		return token.asStringLiteral();
 	}
 
 	boolean optional(TokenType... types) throws SyntaxError {

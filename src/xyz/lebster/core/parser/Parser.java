@@ -343,7 +343,7 @@ public final class Parser {
 			if (state.token().matchVariableDeclaration()) {
 				// TODO: for_loop_variable_declaration
 				final VariableDeclaration declaration = parseVariableDeclaration(/* true */);
-				if (state.is(Identifier, "of")) {
+				if (state.is(Of)) {
 					// for ( LetOrConst ForBinding of AssignmentExpression ) Statement
 					if (declaration.declarations().length != 1) throw new SyntaxError("Invalid left-hand side in for-of loop: Must have a single binding.", position());
 					if (declaration.declarations()[0].init() != null) throw new SyntaxError("for-of loop variable declaration may not have an init.", position());
@@ -360,7 +360,7 @@ public final class Parser {
 				}
 			} else if (state.token().matchPrimaryExpression()) {
 				final Expression expression = parseExpression(0, Right, Collections.singleton(In));
-				if (state.is(Identifier, "of")) return parseForOfStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
+				if (state.is(Of)) return parseForOfStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
 				if (state.is(In)) return parseForInStatement(ensureLHS(expression, "Invalid left-hand side in for-loop"));
 				init = new ExpressionStatement(expression);
 			} else {
@@ -514,13 +514,31 @@ public final class Parser {
 			return parseArrayDestructuring(allowMemberExpressions);
 		}
 
-		final Expression expression = parseExpression(2, Right, Set.of(Equals, In));
-		if (expression instanceof final AssignmentTarget assignmentTarget) {
-			if (allowMemberExpressions || expression instanceof IdentifierExpression) return assignmentTarget;
-			throw new SyntaxError("Illegal property in declaration context", position());
-		} else {
-			throw new SyntaxError("Invalid destructuring assignment target", position());
+		final int startIndex = startIndex();
+		Expression expression = parseIdentifierExpression();
+		consumeAllLineTerminators();
+
+		while (state.token().type() == LBracket || state.token().type() == Period) {
+			if (!allowMemberExpressions) throw new SyntaxError("Illegal property in declaration context", position());
+
+			final Token token = state.consume();
+			consumeAllLineTerminators();
+
+			expression = switch (token.type()) {
+				case Period -> parseNonComputedMemberExpression(startIndex, expression);
+				case LBracket -> parseComputedMemberExpression(startIndex, expression);
+				default -> throw state.unexpected();
+			};
+
+			consumeAllLineTerminators();
 		}
+
+		return (AssignmentTarget) expression;
+	}
+
+	private IdentifierExpression parseIdentifierExpression() throws SyntaxError {
+		if (!state.token().matchIdentifier()) throw state.unexpected();
+		return new IdentifierExpression(state.token().range(), state.consume().value());
 	}
 
 	private ArrayDestructuring parseArrayDestructuring(boolean allowMemberExpressions) throws SyntaxError {
@@ -646,7 +664,11 @@ public final class Parser {
 		state.require(Function);
 		if (state.is(Star)) throw new ParserNotImplemented(position(), "Generator function declarations");
 		consumeAllLineTerminators();
-		if (!state.token().matchIdentifier()) throw new SyntaxError("Function declarations require a function name", position());
+		if (!state.token().matchIdentifier()) {
+			if (state.token().matchIdentifierName()) throw new SyntaxError("Function name cannot be a reserved word", position());
+			if (state.is(LParen)) throw new SyntaxError("Function declarations require a function name", position());
+			throw state.unexpected();
+		}
 
 		final PrimitiveLiteral<StringValue> name = state.consume().asStringLiteral();
 		consumeAllLineTerminators();
@@ -660,6 +682,8 @@ public final class Parser {
 		final int startIndex = startIndex();
 		state.require(Function);
 		if (state.is(Star)) throw new ParserNotImplemented(position(), "Generator function expressions");
+		if (!state.token().matchIdentifier() && state.token().matchIdentifierName())
+			throw new SyntaxError("Function name cannot be a reserved word", position());
 		final var name = state.token().matchIdentifier() ? state.consume().asStringLiteral() : null;
 		final FunctionParameters parameters = parseFunctionParameters(true);
 		final BlockStatement body = parseFunctionBody();
@@ -913,6 +937,8 @@ public final class Parser {
 			case TemplateStart -> parseTemplateLiteral();
 			case New -> parseNewExpression();
 			case LParen -> parseParenthesizedOrArrowFunctionExpression();
+			// TODO: See tests/parsing/variable-names.js:42
+			case NaN, Undefined, Infinity -> new IdentifierExpression(state.token().range(), state.consume().value());
 			case RegexpPattern -> parseRegexpLiteral();
 			case StringLiteral -> state.consume().asStringLiteral();
 			case NumericLiteral -> parseNumericLiteral();
@@ -944,7 +970,7 @@ public final class Parser {
 
 	private Expression parseIdentifierOrArrowFunctionExpression() throws SyntaxError {
 		final int startIndex = startIndex();
-		final IdentifierExpression identifier = new IdentifierExpression(state.token().range(), state.consume().value());
+		final IdentifierExpression identifier = parseIdentifierExpression();
 		if (state.is(TemplateStart)) throw new ParserNotImplemented(position(), "tagged template literals");
 		if (!state.optional(Arrow)) return identifier;
 		return parseArrowFunctionBody(startIndex, new FunctionParameters(identifier));
@@ -991,8 +1017,10 @@ public final class Parser {
 		final int startIndex = startIndex();
 		state.require(Class);
 		consumeAllLineTerminators();
-		final Token potentialName = state.accept(Identifier);
-		final String className = potentialName == null ? null : potentialName.value();
+		if (!state.token().matchIdentifier() && state.token().matchIdentifierName())
+			throw new SyntaxError("Class name cannot be a reserved word", position());
+
+		final String className = state.token().matchIdentifierName() ? state.consume().value() : null;
 		consumeAllLineTerminators();
 		final Expression heritage = parseClassHeritage();
 		consumeAllLineTerminators();
@@ -1107,7 +1135,7 @@ public final class Parser {
 			if (state.optional(Async)) throw new ParserNotImplemented(position(), "`async` class methods");
 
 			// FIXME: Methods named get / set
-			if (state.optional(Identifier, "get") || state.optional(Identifier, "set")) throw new ParserNotImplemented(position(), "class getters & setters");
+			if (state.optional(Get) || state.optional(Set)) throw new ParserNotImplemented(position(), "class getters & setters");
 
 			// TODO: Remove duplication with parseObjectExpression
 			final Expression name;

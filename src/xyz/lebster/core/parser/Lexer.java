@@ -39,14 +39,19 @@ public final class Lexer {
 		keywords.put("finally", Finally);
 		keywords.put("for", For);
 		keywords.put("function", Function);
+		keywords.put("get", Get);
 		keywords.put("if", If);
 		keywords.put("import", Import);
 		keywords.put("in", In);
+		keywords.put("Infinity", Infinity);
 		keywords.put("instanceof", InstanceOf);
 		keywords.put("let", Let);
+		keywords.put("NaN", NaN);
 		keywords.put("new", New);
 		keywords.put("null", NullLiteral);
+		keywords.put("of", Of);
 		keywords.put("return", Return);
+		keywords.put("set", Set);
 		keywords.put("static", Static);
 		keywords.put("super", Super);
 		keywords.put("switch", Switch);
@@ -55,11 +60,11 @@ public final class Lexer {
 		keywords.put("true", True);
 		keywords.put("try", Try);
 		keywords.put("typeof", Typeof);
+		keywords.put("undefined", Undefined);
 		keywords.put("var", Var);
 		keywords.put("void", Void);
 		keywords.put("while", While);
 		keywords.put("yield", Yield);
-		// TODO: get / set keywords
 
 		symbols.put(">>>=", UnsignedRightShiftEquals);
 		symbols.put("||=", LogicalOrEquals);

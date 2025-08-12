@@ -53,3 +53,10 @@ Test.parse("this / 1");
 Test.expectError("SyntaxError", "Unexpected end of input", () => Test.parse("this / 1 /"));
 Test.parse("this / 1 / 1");
 
+Test.parse("NaN / 2");
+Test.parse("null / 2");
+Test.parse("undefined / 2");
+Test.parse("Infinity / 2");
+Test.parse("of / 2");
+Test.parse("get / 2");
+Test.parse("set / 2");

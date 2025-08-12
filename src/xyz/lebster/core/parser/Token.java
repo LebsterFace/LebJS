@@ -106,7 +106,10 @@ public record Token(SourceRange range, TokenType type, String value) {
 	}
 
 	public boolean matchIdentifier() {
-		return type == Identifier;
+		return type == Identifier
+			   || type == Get
+			   || type == Set
+			   || type == Of;
 	}
 
 	boolean matchIdentifierName() {
@@ -134,8 +137,10 @@ public record Token(SourceRange range, TokenType type, String value) {
 			   || type == If
 			   || type == Import
 			   || type == In
+			   || type == Infinity
 			   || type == InstanceOf
 			   || type == Let
+			   || type == NaN
 			   || type == New
 			   || type == NullLiteral
 			   || type == Return
@@ -147,6 +152,7 @@ public record Token(SourceRange range, TokenType type, String value) {
 			   || type == True
 			   || type == Try
 			   || type == Typeof
+			   || type == Undefined
 			   || type == Var
 			   || type == Void
 			   || type == While

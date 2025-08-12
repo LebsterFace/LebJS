@@ -105,8 +105,13 @@ public record Token(SourceRange range, TokenType type, String value) {
 		};
 	}
 
+	public boolean matchIdentifier() {
+		return type == Identifier;
+	}
+
 	boolean matchIdentifierName() {
-		return type == Async
+		return matchIdentifier()
+			   || type == Async
 			   || type == Await
 			   || type == Break
 			   || type == Case
@@ -126,7 +131,6 @@ public record Token(SourceRange range, TokenType type, String value) {
 			   || type == Finally
 			   || type == For
 			   || type == Function
-			   || type == Identifier
 			   || type == If
 			   || type == Import
 			   || type == In
@@ -179,28 +183,17 @@ public record Token(SourceRange range, TokenType type, String value) {
 
 	boolean matchPrimaryExpression() {
 		if (matchUnaryPrefixedExpression() || matchPrefixedUpdateExpression()) return true;
-		return type == Async
-			   || type == Class
-			   || type == False
-			   || type == Function
-			   || type == Identifier
-			   || type == Infinity
+		return matchIdentifierName()
 			   || type == LBrace
 			   || type == LBracket
 			   || type == LParen
-			   || type == NaN
-			   || type == New
-			   || type == NullLiteral
 			   || type == BigIntLiteral
 			   || type == NumericLiteral
 			   || type == RegexpPattern
 			   || type == StringLiteral
 			   || type == Super
 			   || type == Yield
-			   || type == TemplateStart
-			   || type == This
-			   || type == True
-			   || type == Undefined;
+			   || type == TemplateStart;
 	}
 
 	boolean matchSecondaryExpression(Set<TokenType> forbidden) {

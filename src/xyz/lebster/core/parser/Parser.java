@@ -418,7 +418,8 @@ public final class Parser {
 		final boolean hasCatch = state.optional(Catch);
 		if (hasCatch) {
 			if (state.optional(LParen)) {
-				catchParameter = new StringValue(state.require(Identifier));
+				if (!state.token().matchIdentifier()) throw state.unexpected();
+				catchParameter = new StringValue(state.consume().value());
 				state.require(RParen);
 			}
 
@@ -556,7 +557,7 @@ public final class Parser {
 		while (!state.is(RBrace)) {
 			if (state.optional(DotDotDot)) {
 				consumeAllLineTerminators();
-				if (state.is(Identifier)) {
+				if (state.token().matchIdentifier()) {
 					restName = new StringValue(state.consume().value());
 					consumeAllLineTerminators();
 					if (!state.optional(Comma)) break;
@@ -576,7 +577,7 @@ public final class Parser {
 					consumeAllLineTerminators();
 					pairs.put(key, parseInitializer(parseAssignmentTarget(allowMemberExpressions)));
 				} else {
-					if (keyToken.type() != Identifier) throw state.unexpected(keyToken);
+					if (!keyToken.matchIdentifier()) throw state.unexpected(keyToken);
 					pairs.put(key, parseInitializer(new IdentifierExpression(key.range(), key.value())));
 				}
 			} else {
@@ -645,7 +646,7 @@ public final class Parser {
 		state.require(Function);
 		if (state.is(Star)) throw new ParserNotImplemented(position(), "Generator function declarations");
 		consumeAllLineTerminators();
-		if (!state.is(Identifier)) throw new SyntaxError("Function declarations require a function name", position());
+		if (!state.token().matchIdentifier()) throw new SyntaxError("Function declarations require a function name", position());
 
 		final PrimitiveLiteral<StringValue> name = state.consume().asStringLiteral();
 		consumeAllLineTerminators();
@@ -659,7 +660,7 @@ public final class Parser {
 		final int startIndex = startIndex();
 		state.require(Function);
 		if (state.is(Star)) throw new ParserNotImplemented(position(), "Generator function expressions");
-		final PrimitiveLiteral<StringValue> name = state.optionalStringLiteral(Identifier);
+		final var name = state.token().matchIdentifier() ? state.consume().asStringLiteral() : null;
 		final FunctionParameters parameters = parseFunctionParameters(true);
 		final BlockStatement body = parseFunctionBody();
 		return new FunctionExpression(range(startIndex), body, name, parameters);
@@ -896,6 +897,10 @@ public final class Parser {
 			return parseUnaryPrefixedExpression();
 		}
 
+		if (state.token().matchIdentifier()) {
+			return parseIdentifierOrArrowFunctionExpression();
+		}
+
 		return switch (state.token().type()) {
 			case Await -> throw new ParserNotImplemented(position(), "`await` expressions");
 			case Async -> throw new ParserNotImplemented(position(), "`async` functions");
@@ -908,7 +913,6 @@ public final class Parser {
 			case TemplateStart -> parseTemplateLiteral();
 			case New -> parseNewExpression();
 			case LParen -> parseParenthesizedOrArrowFunctionExpression();
-			case Identifier -> parseIdentifierOrArrowFunctionExpression();
 			case RegexpPattern -> parseRegexpLiteral();
 			case StringLiteral -> state.consume().asStringLiteral();
 			case NumericLiteral -> parseNumericLiteral();
@@ -951,7 +955,7 @@ public final class Parser {
 		state.require(LParen);
 
 		consumeAllLineTerminators();
-		if (state.is(RParen, Identifier, DotDotDot, LBrace, LBracket)) {
+		if (state.token().matchIdentifier() || state.is(RParen, DotDotDot, LBrace, LBracket)) {
 			final ArrowFunctionExpression result = tryParseArrowFunctionExpression(startIndex);
 			if (result != null) return result;
 		}

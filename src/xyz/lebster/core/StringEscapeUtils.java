@@ -48,7 +48,7 @@ public final class StringEscapeUtils {
 				appendUnicode(res, c);
 				if (c > 0xffff) res.append('}');
 			} else {
-				if (c == '\\' || c == quoteType) {
+				if (str.length() > 1 && c == '\\' || c == quoteType) {
 					res.append('\\');
 				}
 

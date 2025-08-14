@@ -91,20 +91,7 @@ public record BinaryExpression(SourceRange range, Expression left, Expression ri
 			case BitwiseXOR -> (double) (x.toInt32() ^ y.toInt32());
 			case LeftShift -> (double) (x.toInt32() << (y.toUint32() % 32));
 			case SignedRightShift -> (double) (x.toInt32() >> (y.toUint32() % 32));
-			case UnsignedRightShift -> {
-				// (NaN|0|+-Infinity) >>> x = 0
-				if (Double.isNaN(x.value) || x.value == 0.0 || Double.isInfinite(x.value)) yield 0.0D;
-
-				final int left_int32 = (int) ((long) (double) x.value % NumberValue.TWO_TO_THE_32);
-				// x >>> (NaN|0|+-Infinity) = uint32(x)
-				if (Double.isNaN(y.value) || y.value == 0.0 || Double.isInfinite(y.value)) {
-					yield (double) (left_int32 & NumberValue.UINT32_LIMIT);
-				}
-
-				final long right_uint32 = (long) (double) y.value % NumberValue.TWO_TO_THE_32;
-				final long shiftCount = right_uint32 % 32;
-				yield (double) ((left_int32 >>> shiftCount) & NumberValue.UINT32_LIMIT);
-			}
+			case UnsignedRightShift -> (double) (x.toUint32() >>> (y.toUint32() % 32));
 		});
 
 		throw new ShouldNotHappen("Attempting to mix BigInts and Numbers");

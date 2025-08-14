@@ -23,6 +23,7 @@ import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 public final class NumberValue extends NumericValue<Double> {
 	private static final String DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
 
+	private static final int TWO_TO_THE_16 = 65536;
 	public static final long TWO_TO_THE_31 = 2147483648L;
 	public static final long TWO_TO_THE_32 = 4294967296L;
 	public static final long UINT32_LIMIT = TWO_TO_THE_32 - 1;
@@ -112,7 +113,7 @@ public final class NumberValue extends NumericValue<Double> {
 		if (decimalPart != 0.0) {
 			characters.append('.');
 
-			// An approximation of the best formula, based on rough test data :^)
+			// An approximation of the best formula, based on rough test data
 			final int precision = ((int) Math.ceil(Math.log(Math.pow(2, 150)) / Math.log(radix)));
 			for (int i = 0; i < precision; ++i) {
 				decimalPart *= radix;
@@ -145,7 +146,8 @@ public final class NumberValue extends NumericValue<Double> {
 
 	@Override
 	protected String rawDisplayString() {
-		return stringValueOf(10);
+		if (isNegativeZero(value)) return "-0";
+		return NumberToJSON.serializeNumber(value);
 	}
 
 	@Override
@@ -183,8 +185,8 @@ public final class NumberValue extends NumericValue<Double> {
 		}
 	}
 
-	public static long modulo(long x, long y) {
-		final long result = x % y;
+	private static double modulo(double x, double y) {
+		final double result = x % y;
 		return result < 0 ? result + y : result;
 	}
 
@@ -192,28 +194,27 @@ public final class NumberValue extends NumericValue<Double> {
 	public int toInt32() {
 		// 1. Let number be ? ToNumber(argument).
 		// 2. If number is not finite or number is either +0𝔽 or -0𝔽, return +0𝔽.
-		if (!Double.isFinite(value) || value == 0) return 0;
+		if (value.isInfinite() || value.isNaN() || value == 0.0) return 0;
 		// 3. Let int be truncate(ℝ(number)).
-		final long Int = (long) truncate(value);
-		// 4. Let int32bit be int modulo 2^32.
-		final long int32bit = modulo(Int, TWO_TO_THE_32);
-		// 5. If int32bit ≥ 2^31, return 𝔽(int32bit - 2^32);
+		final double int_ = truncate(value);
+		// 4. Let int32bit be int modulo 2**32.
+		final double int32bit = modulo(int_, TWO_TO_THE_32);
+		// 5. If int32bit ≥ 2**31, return 𝔽(int32bit - 2**32); otherwise return 𝔽(int32bit).
 		if (int32bit >= TWO_TO_THE_31) return (int) (int32bit - TWO_TO_THE_32);
-		// otherwise return 𝔽(int32bit).
 		return (int) int32bit;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-touint32")
 	public long toUint32() {
 		// 1. Let number be ? ToNumber(argument).
-		// 2. If number is NaN, +0𝔽, -0𝔽, +∞𝔽, or -∞𝔽, return +0𝔽.
-		if (value.isNaN() || value == 0.0 || value.isInfinite()) return 0;
-		// 3. Let int be the mathematical value whose sign is the sign of number
-		// and whose magnitude is floor(abs(ℝ(number))).
-		long int_ = ((long) Math.floor(Math.abs(value))) * (long) Math.signum(value);
-		// 4. Let int32bit be int modulo 2^32.
+		// 2. If number is not finite or number is either +0𝔽 or -0𝔽, return +0𝔽.
+		if (value.isInfinite() || value.isNaN() || value == 0.0) return 0;
+		// 3. Let int be truncate(ℝ(number)).
+		final double int_ = truncate(value);
+		// 4. Let int32bit be int modulo 2**32.
+		final double int32bit = modulo(int_, TWO_TO_THE_32);
 		// 5. Return 𝔽(int32bit).
-		return modulo(int_, TWO_TO_THE_32);
+		return (long) int32bit;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-lessThan")

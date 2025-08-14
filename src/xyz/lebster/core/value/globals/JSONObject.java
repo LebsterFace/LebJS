@@ -40,7 +40,6 @@ import static xyz.lebster.core.value.array.ArrayPrototype.isArray;
 import static xyz.lebster.core.value.array.ArrayPrototype.lengthOfArrayLike;
 import static xyz.lebster.core.value.function.NativeFunction.argument;
 import static xyz.lebster.core.value.primitive.number.NumberPrototype.toIntegerOrInfinity;
-import static xyz.lebster.core.value.primitive.number.NumberValue.modulo;
 import static xyz.lebster.core.value.primitive.string.StringPrototype.stringPad;
 
 public final class JSONObject extends ObjectValue {
@@ -444,7 +443,7 @@ public final class JSONObject extends ObjectValue {
 		// 3. Let cu1 be the code unit whose numeric value is floor((cp - 0x10000) / 0x400) + 0xD800.
 		final int cu1 = toIntExact(Math.floor((double) (cp - 0x10000) / 0x400)) + 0xD800;
 		// 4. Let cu2 be the code unit whose numeric value is ((cp - 0x10000) modulo 0x400) + 0xDC00.
-		final int cu2 = (int) (modulo((cp - 0x10000), 0x400) + 0xDC00);
+		final int cu2 = ((cp - 0x10000) % 0x400) + 0xDC00;
 		// 5. Return the string-concatenation of cu1 and cu2.
 		return new String(new int[] { cu1, cu2 }, 0, 2);
 	}

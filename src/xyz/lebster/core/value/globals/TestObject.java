@@ -144,14 +144,14 @@ public final class TestObject extends ObjectValue {
 	}
 
 	private static Undefined expect(Interpreter interpreter, Value<?>... arguments) {
-		// Test.expect(a: unknown, b: unknown): void
+		// Test.expect(expected: unknown, received: unknown): void
 		if (arguments.length != 2) throw new ShouldNotHappen("Test.expect() must be called with exactly two arguments");
-		return expect(arguments[0], arguments[1]);
-	}
+		final Value<?> expected = arguments[0];
+		final Value<?> received = arguments[1];
 
-	private static Undefined expect(Value<?> a, Value<?> b) {
-		if (!a.equals(b)) {
-			throw assertionFailed(a, b);
+		if (!expected.equals(received)) {
+			System.out.printf("%sExpected: %s\n%sReceived: %s%n", ANSI.BRIGHT_MAGENTA, displayExplicit(expected), ANSI.BRIGHT_MAGENTA, displayExplicit(received));
+			throw assertionFailed(expected, received);
 		}
 
 		return Undefined.instance;

@@ -25,6 +25,8 @@ public final class Main {
 	private static final Charset[] supportedCharsets = { StandardCharsets.UTF_8, StandardCharsets.UTF_16 };
 
 	public static void main(String[] args) {
+		System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
+
 		CLArguments arguments;
 		try {
 			arguments = CLArguments.from(args);

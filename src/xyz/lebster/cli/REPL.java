@@ -9,11 +9,12 @@ import xyz.lebster.core.value.Value;
 import xyz.lebster.core.value.object.ObjectValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public record REPL(CLArguments.ExecutionOptions options, Scanner scanner, Interpreter interpreter) {
 	public REPL(CLArguments.ExecutionOptions options) {
-		this(options, new Scanner(System.in), new Interpreter());
+		this(options, new Scanner(System.in, StandardCharsets.UTF_8), new Interpreter());
 	}
 
 	public void run() {

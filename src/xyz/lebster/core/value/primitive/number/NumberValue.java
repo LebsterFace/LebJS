@@ -217,6 +217,19 @@ public final class NumberValue extends NumericValue<Double> {
 		return (long) int32bit;
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-touint16")
+	public int toUint16() {
+		// 1. Let number be ? ToNumber(argument).
+		// 2. If number is not finite or number is either +0𝔽 or -0𝔽, return +0𝔽.
+		if (value.isInfinite() || value.isNaN() || value == 0.0) return 0;
+		// 3. Let int be truncate(ℝ(number)).
+		final double int_ = truncate(value);
+		// 4. Let int32bit be int modulo 2**32.
+		final double int32bit = modulo(int_, TWO_TO_THE_16);
+		// 5. Return 𝔽(int32bit).
+		return (int) int32bit;
+	}
+
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-lessThan")
 	public BooleanValue lessThan(NumberValue other) {
 		// 1. If x is NaN, return undefined.

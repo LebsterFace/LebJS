@@ -127,6 +127,8 @@ public final class Names {
 	public static final StringValue forEach = new StringValue("forEach");
 	public static final StringValue freeze = new StringValue("freeze");
 	public static final StringValue from = new StringValue("from");
+	public static final StringValue fromCharCode = new StringValue("fromCharCode");
+	public static final StringValue fromCodePoint = new StringValue("fromCodePoint");
 	public static final StringValue fromEntries = new StringValue("fromEntries");
 	public static final StringValue fs = new StringValue("fs");
 	public static final StringValue get = new StringValue("get");
@@ -204,6 +206,7 @@ public final class Names {
 	public static final StringValue radians = new StringValue("radians");
 	public static final StringValue random = new StringValue("random");
 	public static final StringValue range = new StringValue("range");
+	public static final StringValue raw = new StringValue("raw");
 	public static final StringValue readDir = new StringValue("readDir");
 	public static final StringValue readFile = new StringValue("readFile");
 	public static final StringValue reduce = new StringValue("reduce");

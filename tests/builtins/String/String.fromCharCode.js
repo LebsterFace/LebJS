@@ -1,0 +1,14 @@
+Test.expect(1, String.fromCharCode.length);
+Test.expect("", String.fromCharCode());
+Test.expect("\u0000", String.fromCharCode(0));
+Test.expect("\u0000", String.fromCharCode(false));
+Test.expect("\u0000", String.fromCharCode(null));
+Test.expect("\u0000", String.fromCharCode(undefined));
+Test.expect("\u0001", String.fromCharCode(1));
+Test.expect("\u0001", String.fromCharCode(true));
+Test.expect("\uffff", String.fromCharCode(-1));
+Test.expect("\uffff", String.fromCharCode(0xffff));
+Test.expect("\uffff", String.fromCharCode(0x123ffff));
+Test.expect("A", String.fromCharCode(65));
+Test.expect("ABC", String.fromCharCode(65, 66, 67));
+Test.expect("äöü", String.fromCharCode(228, 246, 252));

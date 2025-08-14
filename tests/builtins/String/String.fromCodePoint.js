@@ -1,0 +1,14 @@
+Test.expect(1, String.fromCodePoint.length);
+Test.expect("", String.fromCodePoint());
+Test.expect("\u0000", String.fromCodePoint(0));
+Test.expect("\u0000", String.fromCodePoint(false));
+Test.expect("\u0000", String.fromCodePoint(null));
+Test.expect("\u0001", String.fromCodePoint(1));
+Test.expect("\u0001", String.fromCodePoint(true));
+Test.expect("\uffff", String.fromCodePoint(0xffff));
+Test.expect("A", String.fromCodePoint(65));
+Test.expect("ABC", String.fromCodePoint(65, 66, 67));
+Test.expect("äöü", String.fromCodePoint(228, 246, 252));
+Test.expectError("RangeError", "Invalid code point NaN", () => String.fromCodePoint(NaN));
+Test.expectError("RangeError", "Invalid code point -5", () => String.fromCodePoint(-5));
+Test.expectError("RangeError", "Invalid code point 19136511", () => String.fromCodePoint(0x123ffff));

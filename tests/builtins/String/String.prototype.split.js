@@ -2,23 +2,15 @@
 {
     Test.expect(2, String.prototype.split.length);
 
-    Test.expectEqual(["hello friends"], "hello friends".split());
+    Test.expectEqual(["hello world"], "hello world".split());
+    Test.expectEqual(["h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d"], "hello world".split(""));
+    Test.expectEqual(["hello", "world"], "hello world".split(" "));
+
     Test.expectEqual([
-        "h",
-        "e",
-        "l",
-        "l",
-        "o",
-        " ",
-        "f",
-        "r",
-        "i",
-        "e",
-        "n",
-        "d",
-        "s",
-    ], "hello friends".split(""));
-    Test.expectEqual(["hello", "friends"], "hello friends".split(" "));
+        '\ud83d', '\udc69', '\ud83c', '\udfff', '‍',
+        '\ud83d', '\udc67', '\ud83c', '\udffd', '‍',
+        '\ud83d', '\udc66', '\ud83c', '\udffb'
+    ], "👩🏿‍👧🏽‍👦🏻".split(""));
 
     Test.expectEqual(["a", "b", "c", "d"], "a,b,c,d".split(","));
     Test.expectEqual(["", "a", "b", "c", "d"], ",a,b,c,d".split(","));
@@ -73,7 +65,7 @@
 
 // UTF-16
 {
-    var s = "😀";
+    const s = "😀";
     Test.expectEqual(["😀"], s.split());
     Test.expectEqual(["", ""], s.split("😀"));
     Test.expectEqual(["", "\ude00"], s.split("\ud83d"));

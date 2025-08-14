@@ -20,7 +20,6 @@ import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.symbol.SymbolValue;
 import xyz.lebster.core.value.regexp.RegExpObject;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.PrimitiveIterator;
 import java.util.regex.Matcher;
@@ -528,10 +527,9 @@ public final class StringPrototype extends ObjectValue {
 			// a. Let head be the substring of S from 0 to lim.
 			final String head = S.value.substring(0, Math.toIntExact(Math.min(lim, S.value.length())));
 			// b. Let codeUnits be a List consisting of the sequence of code units that are the elements of head.
-			final byte[] codeUnits_bytes = head.getBytes(StandardCharsets.UTF_8);
 			final ArrayList<StringValue> codeUnits = new ArrayList<>();
-			for (final byte b : codeUnits_bytes) {
-				codeUnits.add(new StringValue((char) b));
+			for (final char b : head.toCharArray()) {
+				codeUnits.add(new StringValue(b));
 			}
 
 			// c. Return CreateArrayFromList(codeUnits).

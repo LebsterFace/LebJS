@@ -60,8 +60,9 @@ public final class IteratorPrototype extends ObjectValue {
 		return new IteratorRecord(iterator, nextMethod);
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
 	@NonCompliant
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
+	// FIXME: Performance
 	public static IteratorRecord getIterator(Interpreter interpreter, Expression expression) throws AbruptCompletion {
 		final ObjectValue objectValue = expression.execute(interpreter).toObjectValue(interpreter);
 		final String sourceText = expression.range().getText();
@@ -70,6 +71,7 @@ public final class IteratorPrototype extends ObjectValue {
 
 	@NonCompliant
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-getiterator")
+	// FIXME: Performance
 	public static IteratorRecord getIterator(Interpreter interpreter, Value<?> obj) throws AbruptCompletion {
 		final ObjectValue objectValue = obj.toObjectValue(interpreter);
 		return getObjectIterator(interpreter, objectValue, objectValue.toDisplayString(true));

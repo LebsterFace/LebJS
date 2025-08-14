@@ -1,42 +1,58 @@
 package xyz.lebster.core;
 
-import java.util.Set;
-
 public final class StringEscapeUtils {
-	private static String hex(char character) {
-		return Integer.toHexString(character).toUpperCase();
+	private static void appendHex(StringBuilder builder, int ch) {
+		if (ch < 0x10) builder.append('0');
+		builder.append(Integer.toHexString(ch).toUpperCase());
 	}
 
-	public static String escape(String str, Set<Character> additionalEscapes) {
-		if (str == null) return null;
-		final int length = str.length();
-		final StringBuilder res = new StringBuilder(length);
+	private static void appendUnicode(StringBuilder builder, int ch) {
+		if (ch < 0x1000) builder.append('0');
+		if (ch < 0x100) builder.append('0');
+		if (ch < 0x10) builder.append('0');
+		builder.append(Integer.toHexString(ch).toUpperCase());
+	}
 
-		for (int i = 0; i < length; i++) {
-			final char ch = str.charAt(i);
-			if (ch > 0xfff) {
-				res.append("\\u").append(hex(ch));
-			} else if (ch > 0xff) {
-				res.append("\\u0").append(hex(ch));
-			} else if (ch > 0x7f) {
-				res.append("\\u00").append(hex(ch));
-			} else if (ch < 32) {
-				switch (ch) {
-					case '\b' -> res.append('\\').append('b');
-					case '\n' -> res.append('\\').append('n');
-					case '\t' -> res.append('\\').append('t');
-					case '\f' -> res.append('\\').append('f');
-					case '\r' -> res.append('\\').append('r');
-					case 0x0B -> res.append('\\').append('v'); // \x0B -> \v
+	private static boolean shouldEscape(int codePoint) {
+		if (!Character.isValidCodePoint(codePoint)) return false;
+		final int type = Character.getType(codePoint);
+		return type == Character.UNASSIGNED ||
+			   type == Character.PRIVATE_USE ||
+			   type == Character.SURROGATE ||
+			   (codePoint & 0xFFFE) == 0xFFFE || // noncharacters
+			   (codePoint >= 0xFDD0 && codePoint <= 0xFDEF); // also noncharacters
+	}
+
+	public static String escape(String str, char quoteType) {
+		if (str == null) return null;
+		final StringBuilder res = new StringBuilder(str.length() * 2);
+
+		for (final int c : str.codePoints().toArray()) {
+			if (c < 32 || (c >= 127 && c <= 159)) {
+				res.append('\\');
+				switch (c) {
+					case '\b' -> res.append('b');
+					case '\n' -> res.append('n');
+					case '\t' -> res.append('t');
+					case '\f' -> res.append('f');
+					case '\r' -> res.append('r');
+					case 0x0B -> res.append('v');
 					default -> {
-						res.append("\\x");
-						if (ch <= 0xf) res.append('0');
-						res.append(hex(ch));
+						res.append('x');
+						appendHex(res, c);
 					}
 				}
+			} else if (shouldEscape(c)) {
+				res.append("\\u");
+				if (c > 0xffff) res.append('{');
+				appendUnicode(res, c);
+				if (c > 0xffff) res.append('}');
 			} else {
-				if (additionalEscapes != null && additionalEscapes.contains(ch)) res.append('\\');
-				res.append(ch);
+				if (c == '\\' || c == quoteType) {
+					res.append('\\');
+				}
+
+				res.appendCodePoint(c);
 			}
 		}
 
@@ -47,15 +63,15 @@ public final class StringEscapeUtils {
 		final boolean containsDoubleQuotes = str.indexOf('"') != -1;
 		final boolean containsSingleQuotes = str.indexOf('\'') != -1;
 
-		if (containsSingleQuotes && containsDoubleQuotes) {
-			final char quoteType = preferDoubleQuotes ? '"' : '\'';
-			return quoteType + escape(str, Set.of(quoteType)) + quoteType;
+		final char quoteType;
+		if (containsSingleQuotes == containsDoubleQuotes) {
+			quoteType = preferDoubleQuotes ? '"' : '\'';
+		} else if (containsDoubleQuotes) {
+			quoteType = '\'';
+		} else {
+			quoteType = '"';
 		}
 
-		final char quoteType;
-		if (containsDoubleQuotes) quoteType = '\'';
-		else if (containsSingleQuotes) quoteType = '"';
-		else quoteType = preferDoubleQuotes ? '"' : '\'';
-		return quoteType + escape(str, null) + quoteType;
+		return quoteType + escape(str, quoteType) + quoteType;
 	}
 }

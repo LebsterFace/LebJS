@@ -12,7 +12,9 @@ import xyz.lebster.core.value.primitive.boolean_.BooleanValue;
 import xyz.lebster.core.value.primitive.number.NumberValue;
 import xyz.lebster.core.value.primitive.string.StringValue;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
@@ -123,7 +125,7 @@ public final class BigIntValue extends NumericValue<BigInteger> {
 		// 1. If y < 0ℤ, then
 		if (y.compareTo(BigInteger.ZERO) < 0) {
 			// a. Return ℤ(floor(ℝ(x) / 2^(-ℝ(y)))).
-			return x.divide(BigInteger.TWO.pow(-y.intValueExact()));
+			return new BigDecimal(x).divide(new BigDecimal(BigInteger.TWO.pow(-y.intValueExact())), RoundingMode.FLOOR).toBigIntegerExact();
 		}
 
 		// 2. Return x × 2ℤ^y.

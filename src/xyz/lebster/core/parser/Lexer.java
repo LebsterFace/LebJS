@@ -144,6 +144,7 @@ public final class Lexer {
 	private final int codePointCount;
 	private int index = 0;
 	Token latestToken;
+	private Token latestNonLineTerminator;
 
 	public Lexer(String sourceText) throws SyntaxError {
 		final int[] unpaddedCodePoints = sourceText.codePoints().toArray();
@@ -156,13 +157,14 @@ public final class Lexer {
 		}
 	}
 
-	private Lexer(String sourceText, int[] codePoints, ArrayDeque<TemplateLiteralState> templateLiteralStates, int codePointCount, int index, Token latestToken) {
+	private Lexer(String sourceText, int[] codePoints, ArrayDeque<TemplateLiteralState> templateLiteralStates, int codePointCount, int index, Token latestToken, Token latestNonLineTerminator) {
 		this.sourceText = sourceText;
 		this.codePoints = codePoints;
 		this.templateLiteralStates = templateLiteralStates;
 		this.codePointCount = codePointCount;
 		this.index = index;
 		this.latestToken = latestToken;
+		this.latestNonLineTerminator = latestNonLineTerminator;
 	}
 
 	public Lexer copy() {
@@ -177,7 +179,8 @@ public final class Lexer {
 			templateLiteralStatesClone,
 			codePointCount,
 			index,
-			latestToken
+			latestToken,
+			latestNonLineTerminator
 		);
 	}
 
@@ -303,28 +306,27 @@ public final class Lexer {
 
 	// Division is not allowed after reserved words
 	private boolean slashMeansDivision() {
-		if (latestToken == null) return false;
-		final TokenType lastTokenType = latestToken.type();
+		if (latestNonLineTerminator == null) return false;
+		final TokenType lastTokenType = latestNonLineTerminator.type();
 		return lastTokenType == Identifier // However if a reserved word is handled by treatAsIdentifier() (e.g. a.in), it is allowed
-			   || lastTokenType == BigIntLiteral
-			   || lastTokenType == True
-			   || lastTokenType == False
-			   || lastTokenType == RBrace
-			   || lastTokenType == RBracket
-			   || lastTokenType == LineTerminator
-			   || lastTokenType == Undefined
-			   || lastTokenType == Infinity
-			   || lastTokenType == NaN
-			   || lastTokenType == MinusMinus
-			   || lastTokenType == NullLiteral
-			   || lastTokenType == NumericLiteral
-			   || lastTokenType == RParen
-			   || lastTokenType == PlusPlus
-			   || lastTokenType == PrivateIdentifier
-			   || lastTokenType == RegexpFlags
-			   || lastTokenType == StringLiteral
-			   || lastTokenType == TemplateEnd
-			   || lastTokenType == This;
+		       || lastTokenType == BigIntLiteral
+		       || lastTokenType == True
+		       || lastTokenType == False
+		       || lastTokenType == RBrace
+		       || lastTokenType == RBracket
+		       || lastTokenType == Undefined
+		       || lastTokenType == Infinity
+		       || lastTokenType == NaN
+		       || lastTokenType == MinusMinus
+		       || lastTokenType == NullLiteral
+		       || lastTokenType == NumericLiteral
+		       || lastTokenType == RParen
+		       || lastTokenType == PlusPlus
+		       || lastTokenType == PrivateIdentifier
+		       || lastTokenType == RegexpFlags
+		       || lastTokenType == StringLiteral
+		       || lastTokenType == TemplateEnd
+		       || lastTokenType == This;
 	}
 
 	private static final int[] REGEXP_FLAGS = new int[] { 'd', 'g', 'i', 'm', 's', 'u', 'v', 'y' };
@@ -332,6 +334,9 @@ public final class Lexer {
 	public Token next() throws SyntaxError {
 		final Token result = nextToken();
 		latestToken = result;
+		if (result.type() != LineTerminator) {
+			latestNonLineTerminator = result;
+		}
 		return result;
 	}
 
@@ -421,11 +426,13 @@ public final class Lexer {
 	public void treatAsRegexpLiteral() throws SyntaxError {
 		index = latestToken.range().startIndex;
 		latestToken = tokenizeRegexpLiteral(index);
+		latestNonLineTerminator = latestToken;
 	}
 
 	public void treatAsIdentifier() throws SyntaxError {
 		index = latestToken.range().startIndex;
 		latestToken = tokenizeKeywordOrIdentifier(index, true);
+		latestNonLineTerminator = latestToken;
 	}
 
 	private Token tokenizeRegexpLiteral(int startIndex) throws SyntaxError {

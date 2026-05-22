@@ -29,12 +29,15 @@ lebjs
 ```
 
 ## Flags
-- `-v`, `--verbose` - Don't hide stack traces
+- `-t`, `--test` - Run tests
+- `-v`, `--verbose` - Show stack traces for errors
+- `--harness [value]` - Test harness. Valid options: `ladybird`
 - `--parse-only` - Ignore test failures from parsing
 - `--ignore-not-impl` - Ignore test failures from unimplemented features
-- `--no-buffer` - Do not buffer test outputs
 - `--hide-passing` - Only output skipped / failing tests (ignored if `--no-buffer` specified)
+- `--no-buffer` - Do not buffer test outputs
 - `--disable-prompt` - Disable the `> ` prompt in the REPL
-- `--harness [value]` - Test harness. Valid options: `ladybird`
-- `-t`, `--test` - Run tests
-- `--gif` - Enable GIF rendering mode (No error handling, no prompt, print delimiter after execution, print AST)
+- `--gif` - Enable GIF rendering mode (No error handling, no prompt, print delimiter after execution)
+
+## Spec compliance
+Obviously, do not use this in production. The engine chooses to deviate from the specification in a number of places. *Some* of these instances are marked with the `@NonCompliant` annotation :^)

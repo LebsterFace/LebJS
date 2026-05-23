@@ -148,12 +148,7 @@ public final class TestObject extends ObjectValue {
 		if (arguments.length != 2) throw new ShouldNotHappen("Test.expect() must be called with exactly two arguments");
 		final Value<?> expected = arguments[0];
 		final Value<?> received = arguments[1];
-
-		if (!expected.equals(received)) {
-			System.out.printf("%sExpected: %s\n%sReceived: %s%n", ANSI.BRIGHT_MAGENTA, displayExplicit(expected), ANSI.BRIGHT_MAGENTA, displayExplicit(received));
-			throw assertionFailed(expected, received);
-		}
-
+		if (!expected.equals(received)) throw assertionFailed(expected, received);
 		return Undefined.instance;
 	}
 

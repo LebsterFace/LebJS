@@ -76,15 +76,7 @@ public final class NumberToJSON {
 		}
 	}
 
-	/**
-	 * Formats a number according to ECMAScript.
-	 * <p>
-	 * This code is emulating 7.1.12.1 of the EcmaScript V6 specification.
-	 * </p>
-	 * @param value Value to be formatted
-	 * @return String representation
-	 */
-	public static String serializeNumber(double value) {
+	public static String serializeNumber(double value, boolean forceScientificNotation) {
 		if (value == 0.0) return "0";
 		if (value == Double.POSITIVE_INFINITY) return "Infinity";
 		if (value == Double.NEGATIVE_INFINITY) return "-Infinity";
@@ -172,9 +164,7 @@ public final class NumberToJSON {
 		final int vplength = decimalLength(dp);
 		int exp = e10 + vplength - 1;
 
-		// ECMAScript/JCS semantics requires using scientific notation if and only if outside this range.
-		boolean scientificNotation = !((exp >= -6) && (exp < 21));
-
+		boolean scientificNotation = forceScientificNotation || exp < -6 || exp >= 21;
 		int removed = 0;
 
 		int lastRemovedDigit = 0;

@@ -86,7 +86,7 @@ public final class NumberValue extends NumericValue<Double> {
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-number-tostring")
 	public String stringValueOf(int radix) {
-		if (radix == 10) return NumberToJSON.serializeNumber(value);
+		if (radix == 10) return NumberToJSON.serializeNumber(value, false);
 
 		// Doesn't always produce identical output to other engines, but should be good enough for the foreseeable future.
 		double number = this.value;
@@ -147,7 +147,7 @@ public final class NumberValue extends NumericValue<Double> {
 	@Override
 	protected String rawDisplayString() {
 		if (isNegativeZero(value)) return "-0";
-		return NumberToJSON.serializeNumber(value);
+		return NumberToJSON.serializeNumber(value, false);
 	}
 
 	@Override

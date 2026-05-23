@@ -24,7 +24,7 @@ public record MemberExpression(SourceRange range, Expression base, Expression pr
 		final Key<?> executedProp = property.execute(interpreter).toPropertyKey(interpreter);
 
 		if (executedBase.isNullish()) {
-			final String msg = "Cannot read property '" + executedProp.value + "' of " + executedBase;
+			final String msg = "Cannot read property '" + executedProp.value + "' of " + executedBase.toDisplayString(true);
 			throw error(new TypeError(interpreter, msg));
 		}
 

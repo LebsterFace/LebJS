@@ -113,8 +113,8 @@ public final class TestObject extends ObjectValue {
 
 			return true;
 		} else if (
-			a.getClass() == ObjectValue.class &&
-			b.getClass() == ObjectValue.class
+				   a.getClass() == ObjectValue.class &&
+			       b.getClass() == ObjectValue.class
 		) {
 			final ObjectValue expected = (ObjectValue) a;
 			final ObjectValue received = (ObjectValue) b;
@@ -132,10 +132,10 @@ public final class TestObject extends ObjectValue {
 
 			return true;
 		} else if (
-			a instanceof final PrimitiveWrapper<?, ?> expected &&
-			b instanceof final PrimitiveWrapper<?, ?> received &&
-			equals(interpreter, expected.getPrototype(), received.getPrototype()) &&
-			equals(interpreter, expected.data, received.data)
+				   a instanceof final PrimitiveWrapper<?, ?> expected &&
+			       b instanceof final PrimitiveWrapper<?, ?> received &&
+			       equals(interpreter, expected.getPrototype(), received.getPrototype()) &&
+			       equals(interpreter, expected.data, received.data)
 		) {
 			return true;
 		} else {

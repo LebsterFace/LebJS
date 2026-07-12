@@ -146,8 +146,8 @@ public record ClassExpression(
 		@Override
 		public Value<?> internalCall(Interpreter interpreter, Value<?>... arguments) throws AbruptCompletion {
 			final String message = this.name.value.isEmpty() ?
-				"Class constructors cannot be invoked without 'new'" :
-				"Class constructor %s cannot be invoked without 'new'".formatted(this.name.value);
+									   "Class constructors cannot be invoked without 'new'" :
+									   "Class constructor %s cannot be invoked without 'new'".formatted(this.name.value);
 			throw error(new TypeError(interpreter, message));
 		}
 	}

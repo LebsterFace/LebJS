@@ -613,9 +613,9 @@ public final class JSONObject extends ObjectValue {
 	private static final class JSONSerializationRecord {
 		public final Executable replacerFunction;
 		public final ArrayDeque<ObjectValue> stack;
-		public String indent;
 		public final String gap;
 		public final List<StringValue> propertyList;
+		public String indent;
 
 		public JSONSerializationRecord(Executable replacerFunction, ArrayDeque<ObjectValue> stack, String indent, String gap, HashSet<StringValue> propertyList) {
 			this.replacerFunction = replacerFunction;
@@ -673,13 +673,13 @@ public final class JSONObject extends ObjectValue {
 					}
 				}
 			} else if (!optional('"')
-					   && !optional('\\')
-					   && !optional('/')
-					   && !optional('b')
-					   && !optional('f')
-					   && !optional('n')
-					   && !optional('r')
-					   && !optional('t')
+			           && !optional('\\')
+			           && !optional('/')
+			           && !optional('b')
+			           && !optional('f')
+			           && !optional('n')
+			           && !optional('r')
+			           && !optional('t')
 			) {
 				throw new JSONParseError("Bad escaped character in JSON");
 			}
@@ -788,9 +788,9 @@ public final class JSONObject extends ObjectValue {
 
 		private boolean isWhitespace() {
 			return '\t' == codepoints[index] ||
-				   '\n' == codepoints[index] ||
-				   '\r' == codepoints[index] ||
-				   ' ' == codepoints[index];
+			       '\n' == codepoints[index] ||
+			       '\r' == codepoints[index] ||
+			       ' ' == codepoints[index];
 		}
 
 		private boolean is(int codepoint) {

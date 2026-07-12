@@ -12,11 +12,10 @@ import static xyz.lebster.core.parser.TokenType.Identifier;
 
 public final class ParserState {
 	final Lexer lexer;
-	private Token previousToken;
-
 	final HashMap<ObjectExpression, SourcePosition> invalidProperties = new HashMap<>();
 	boolean inBreakContext = false;
 	boolean inContinueContext = false;
+	private Token previousToken;
 
 	ParserState(Lexer lexer) throws SyntaxError {
 		this.lexer = lexer;

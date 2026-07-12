@@ -114,7 +114,7 @@ public final class NumberConstructor extends PrimitiveConstructor {
 			final NumericValue<?> prim = value.toNumeric(interpreter);
 			// b. If prim is a BigInt, let n be 𝔽(ℝ(prim)).
 			if (prim instanceof final BigIntValue B) n = new NumberValue(B.value.doubleValue());
-			// c. Otherwise, let n be prim.
+				// c. Otherwise, let n be prim.
 			else n = (NumberValue) prim;
 		}
 		// 2. Else,

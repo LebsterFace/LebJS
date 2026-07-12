@@ -49,8 +49,8 @@ public final class RegExpObject extends ObjectValue implements HasBuiltinTag {
 	 */
 	private String sourceForPattern() {
 		return source
-			.replaceAll("\\[]", "(?!)") // Empty class -> negative lookahead
-			.replaceAll("\\[\\^]", "(?:\\\\u000D\\\\u000A|.|[\\\\u000A\\\\u000B\\\\u000C\\\\u000D\\\\u0085\\\\u2028\\\\u2029])"); // Negated empty class -> any char class
+				   .replaceAll("\\[]", "(?!)") // Empty class -> negative lookahead
+				   .replaceAll("\\[\\^]", "(?:\\\\u000D\\\\u000A|.|[\\\\u000A\\\\u000B\\\\u000C\\\\u000D\\\\u0085\\\\u2028\\\\u2029])"); // Negated empty class -> any char class
 	}
 
 	@Override

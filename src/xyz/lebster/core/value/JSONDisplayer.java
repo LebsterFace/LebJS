@@ -17,6 +17,11 @@ public final class JSONDisplayer {
 	private JSONDisplayer() {
 	}
 
+	public static void display(StringBuilder builder, ObjectValue object, boolean forceJSON) {
+		final DisplayNode rootNode = new JSONDisplayer().buildTreeFromValue(object, forceJSON);
+		rootNode.display(builder);
+	}
+
 	private void indent() {
 		currentIndent++;
 	}
@@ -27,11 +32,6 @@ public final class JSONDisplayer {
 
 	private void appendIndent(StringBuilder builder) {
 		builder.append("\t".repeat(currentIndent));
-	}
-
-	public static void display(StringBuilder builder, ObjectValue object, boolean forceJSON) {
-		final DisplayNode rootNode = new JSONDisplayer().buildTreeFromValue(object, forceJSON);
-		rootNode.display(builder);
 	}
 
 	private DisplayNode buildTreeFromValue(Value<?> current, boolean forceJSON) {
@@ -131,7 +131,7 @@ public final class JSONDisplayer {
 		private static boolean hidePrefix(ObjectValue value) {
 			if (value.getPrototype() == null) return false;
 			return value.getClass() == ObjectValue.class ||
-				   value.getClass() == ArrayObject.class;
+			       value.getClass() == ArrayObject.class;
 		}
 
 		private static void appendDelimiter(StringBuilder builder, boolean singleLine, boolean more) {

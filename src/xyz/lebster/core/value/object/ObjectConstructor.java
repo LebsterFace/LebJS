@@ -248,9 +248,6 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		return obj;
 	}
 
-	public record Group(Value<?> key, ArrayList<Value<?>> elements) {
-	}
-
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-groupby")
 	public static ArrayList<Group> groupBy(Interpreter interpreter, Value<?> items, Value<?> callbackfn_, boolean propertyKeyCoercion) throws AbruptCompletion {
 		// 1. Perform ? RequireObjectCoercible(items).
@@ -453,5 +450,8 @@ public final class ObjectConstructor extends BuiltinConstructor<ObjectValue, Obj
 		if (value.isNullish()) return new ObjectValue(interpreter.intrinsics);
 		// 3. Return ! ToObject(value).
 		return value.toObjectValue(interpreter);
+	}
+
+	public record Group(Value<?> key, ArrayList<Value<?>> elements) {
 	}
 }

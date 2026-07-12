@@ -21,13 +21,9 @@ import java.math.BigInteger;
 import static xyz.lebster.core.interpreter.AbruptCompletion.error;
 
 public final class NumberValue extends NumericValue<Double> {
-	private static final String DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
-
-	private static final int TWO_TO_THE_16 = 65536;
 	public static final long TWO_TO_THE_31 = 2147483648L;
 	public static final long TWO_TO_THE_32 = 4294967296L;
 	public static final long UINT32_LIMIT = TWO_TO_THE_32 - 1;
-
 	public static final long NEGATIVE_ZERO_BITS = 0x8000000000000000L;
 	public static final long POSITIVE_ZERO_BITS = 0;
 	public static final NumberValue EPSILON = new NumberValue(Math.ulp(1.0D));
@@ -42,6 +38,8 @@ public final class NumberValue extends NumericValue<Double> {
 	public static final NumberValue ONE = new NumberValue(1.0D);
 	public static final NumberValue POSITIVE_INFINITY = new NumberValue(Double.POSITIVE_INFINITY);
 	public static final NumberValue ZERO = new NumberValue(0.0D);
+	private static final String DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz";
+	private static final int TWO_TO_THE_16 = 65536;
 
 	public NumberValue(double num) {
 		super(num);
@@ -69,6 +67,21 @@ public final class NumberValue extends NumericValue<Double> {
 
 	public static boolean isPositiveZero(double d) {
 		return Double.doubleToRawLongBits(d) == POSITIVE_ZERO_BITS;
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#eqn-truncate")
+	public static double truncate(double x) {
+		// The mathematical function truncate(x) removes the fractional part of x by rounding towards zero
+		if (x < 0) {
+			return Math.ceil(x);
+		} else {
+			return Math.floor(x);
+		}
+	}
+
+	private static double modulo(double x, double y) {
+		final double result = x % y;
+		return result < 0 ? result + y : result;
 	}
 
 	@NonStandard
@@ -173,21 +186,6 @@ public final class NumberValue extends NumericValue<Double> {
 	@Override
 	public String typeOf() {
 		return "number";
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#eqn-truncate")
-	public static double truncate(double x) {
-		// The mathematical function truncate(x) removes the fractional part of x by rounding towards zero
-		if (x < 0) {
-			return Math.ceil(x);
-		} else {
-			return Math.floor(x);
-		}
-	}
-
-	private static double modulo(double x, double y) {
-		final double result = x % y;
-		return result < 0 ? result + y : result;
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-toint32")

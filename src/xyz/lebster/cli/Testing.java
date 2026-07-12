@@ -10,22 +10,18 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 public final class Testing {
-	private int total = 0;
-
-	private int passed = 0;
 	private final ByteArrayOutputStream passedOutput;
 	private final PrintStream passedStream;
-
-	private int skipped = 0;
 	private final ByteArrayOutputStream skippedOutput;
 	private final PrintStream skippedStream;
-
-	private int failed = 0;
 	private final ByteArrayOutputStream failedOutput;
 	private final PrintStream failedStream;
-
 	private final TestHarness harness;
 	private final CLArguments arguments;
+	private int total = 0;
+	private int passed = 0;
+	private int skipped = 0;
+	private int failed = 0;
 
 	public Testing(CLArguments arguments) throws SyntaxError, CLArgumentException {
 		this.arguments = arguments;

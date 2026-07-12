@@ -70,10 +70,10 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 		if (usingIterator != null) {
 			// a. If IsConstructor(C) is true, then
 			ObjectValue A = C instanceof final Constructor constructor ?
-				// i. Let A be ? Construct(C).
-				constructor.construct(interpreter, new Value[0], constructor) :
-				// b. Else, i. Let A be ! ArrayCreate(0).
-				arrayCreate(interpreter, 0, interpreter.intrinsics.arrayPrototype);
+								// i. Let A be ? Construct(C).
+								constructor.construct(interpreter, new Value[0], constructor) :
+								// b. Else, i. Let A be ! ArrayCreate(0).
+								arrayCreate(interpreter, 0, interpreter.intrinsics.arrayPrototype);
 
 			// c. Let iteratorRecord be ? GetIterator(items, sync, usingIterator).
 			final var iteratorRecord = getIterator(interpreter, items);
@@ -105,11 +105,11 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 				final var nextValue = iteratorValue(interpreter, next);
 				// vi. If mapping is true, then
 				final Value<?> mappedValue = mapping ?
-					// FIXME: 1. Let mappedValue be Completion(Call(mapfn, thisArg, « nextValue, 𝔽(k) »)).
-					// FIXME: 2. IfAbruptCloseIterator(mappedValue, iteratorRecord).
-					mapFn.call(interpreter, thisArg, nextValue, new NumberValue(k)) :
-					// vii. Else, let mappedValue be nextValue.
-					nextValue;
+												 // FIXME: 1. Let mappedValue be Completion(Call(mapfn, thisArg, « nextValue, 𝔽(k) »)).
+												 // FIXME: 2. IfAbruptCloseIterator(mappedValue, iteratorRecord).
+												 mapFn.call(interpreter, thisArg, nextValue, new NumberValue(k)) :
+												 // vii. Else, let mappedValue be nextValue.
+												 nextValue;
 
 				// FIXME: viii. Let defineStatus be Completion(CreateDataPropertyOrThrow(A, Pk, mappedValue)).
 				// FIXME: ix. IfAbruptCloseIterator(defineStatus, iteratorRecord).
@@ -127,10 +127,10 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 		final long len = lengthOfArrayLike(interpreter, arrayLike);
 		// 9. If IsConstructor(C) is true, then
 		final ObjectValue A = C instanceof final Constructor constructor ?
-			// a. Let A be ? Construct(C, « 𝔽(len) »).
-			constructor.construct(interpreter, new Value[] { new NumberValue(len) }, constructor) :
-			// 10. Else, a. Let A be ? ArrayCreate(len).
-			arrayCreate(interpreter, Math.toIntExact(len), interpreter.intrinsics.arrayPrototype);
+								  // a. Let A be ? Construct(C, « 𝔽(len) »).
+								  constructor.construct(interpreter, new Value[] { new NumberValue(len) }, constructor) :
+								  // 10. Else, a. Let A be ? ArrayCreate(len).
+								  arrayCreate(interpreter, Math.toIntExact(len), interpreter.intrinsics.arrayPrototype);
 
 		// 11. Let k be 0.
 		int k = 0;
@@ -142,10 +142,10 @@ public class ArrayConstructor extends BuiltinConstructor<ArrayObject, ArrayProto
 			final Value<?> kValue = arrayLike.get(interpreter, Pk);
 			// c. If mapping is true, then
 			final Value<?> mappedValue = mapping ?
-				// i. Let mappedValue be ? Call(mapfn, thisArg, « kValue, 𝔽(k) »).
-				mapFn.call(interpreter, thisArg, kValue, new NumberValue(k)) :
-				// d. Else, let mappedValue be kValue.
-				kValue;
+											 // i. Let mappedValue be ? Call(mapfn, thisArg, « kValue, 𝔽(k) »).
+											 mapFn.call(interpreter, thisArg, kValue, new NumberValue(k)) :
+											 // d. Else, let mappedValue be kValue.
+											 kValue;
 			// FIXME: e. Perform ? CreateDataPropertyOrThrow(A, Pk, mappedValue).
 			A.set(interpreter, Pk, mappedValue);
 			// f. Set k to k + 1.

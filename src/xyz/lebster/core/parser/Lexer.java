@@ -17,6 +17,7 @@ import static xyz.lebster.core.parser.TokenType.*;
 public final class Lexer {
 	private static final HashMap<String, TokenType> keywords = new HashMap<>();
 	private static final HashMap<String, TokenType> symbols = new HashMap<>();
+	private static final int[] REGEXP_FLAGS = new int[] { 'd', 'g', 'i', 'm', 's', 'u', 'v', 'y' };
 
 	static {
 		keywords.put("async", Async);
@@ -128,22 +129,12 @@ public final class Lexer {
 		symbols.put("#", Hashtag);
 	}
 
-	public static String valueForSymbol(TokenType type) {
-		for (final var entry : symbols.entrySet()) {
-			if (Objects.equals(type, entry.getValue())) {
-				return entry.getKey();
-			}
-		}
-
-		return null;
-	}
-
 	private final String sourceText;
 	private final int[] codePoints;
 	private final ArrayDeque<TemplateLiteralState> templateLiteralStates;
 	private final int codePointCount;
-	private int index = 0;
 	Token latestToken;
+	private int index = 0;
 	private Token latestNonLineTerminator;
 
 	public Lexer(String sourceText) throws SyntaxError {
@@ -167,26 +158,14 @@ public final class Lexer {
 		this.latestNonLineTerminator = latestNonLineTerminator;
 	}
 
-	public Lexer copy() {
-		final ArrayDeque<TemplateLiteralState> templateLiteralStatesClone = new ArrayDeque<>();
-		for (TemplateLiteralState templateLiteralState : templateLiteralStates) {
-			templateLiteralStatesClone.add(templateLiteralState.copy());
+	public static String valueForSymbol(TokenType type) {
+		for (final var entry : symbols.entrySet()) {
+			if (Objects.equals(type, entry.getValue())) {
+				return entry.getKey();
+			}
 		}
 
-		return new Lexer(
-			sourceText,
-			codePoints,
-			templateLiteralStatesClone,
-			codePointCount,
-			index,
-			latestToken,
-			latestNonLineTerminator
-		);
-	}
-
-	private Token eof() {
-		if (inBounds()) throw new ShouldNotHappen("Creating EOF token before consuming all codepoints");
-		return new Token(range(index), EOF, null);
+		return null;
 	}
 
 	private static boolean isDecimalDigit(int codepoint) {
@@ -239,6 +218,28 @@ public final class Lexer {
 		} else {
 			return Character.isUnicodeIdentifierPart(codePoint);
 		}
+	}
+
+	public Lexer copy() {
+		final ArrayDeque<TemplateLiteralState> templateLiteralStatesClone = new ArrayDeque<>();
+		for (TemplateLiteralState templateLiteralState : templateLiteralStates) {
+			templateLiteralStatesClone.add(templateLiteralState.copy());
+		}
+
+		return new Lexer(
+			sourceText,
+			codePoints,
+			templateLiteralStatesClone,
+			codePointCount,
+			index,
+			latestToken,
+			latestNonLineTerminator
+		);
+	}
+
+	private Token eof() {
+		if (inBounds()) throw new ShouldNotHappen("Creating EOF token before consuming all codepoints");
+		return new Token(range(index), EOF, null);
 	}
 
 	private boolean isIdentifierPart() {
@@ -328,8 +329,6 @@ public final class Lexer {
 		       || lastTokenType == TemplateEnd
 		       || lastTokenType == This;
 	}
-
-	private static final int[] REGEXP_FLAGS = new int[] { 'd', 'g', 'i', 'm', 's', 'u', 'v', 'y' };
 
 	public Token next() throws SyntaxError {
 		final Token result = nextToken();

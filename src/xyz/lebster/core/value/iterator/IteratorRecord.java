@@ -24,10 +24,10 @@ public record IteratorRecord(ObjectValue iteratorObject, Value<?> nextMethod) {
 
 		// 1. If value is not present, then
 		final Value<?> result = value == null ?
-			// a. Let result be ? Call(iteratorRecord.[[NextMethod]], iteratorRecord.[[Iterator]]).
-			executable.call(interpreter, iteratorObject) :
-			// 2. Else, a. Let result be ? Call(iteratorRecord.[[NextMethod]], iteratorRecord.[[Iterator]], « value »).
-			executable.call(interpreter, iteratorObject, value);
+									// a. Let result be ? Call(iteratorRecord.[[NextMethod]], iteratorRecord.[[Iterator]]).
+									executable.call(interpreter, iteratorObject) :
+									// 2. Else, a. Let result be ? Call(iteratorRecord.[[NextMethod]], iteratorRecord.[[Iterator]], « value »).
+									executable.call(interpreter, iteratorObject, value);
 
 		// 3. If result is not an Object, throw a TypeError exception.
 		if (!(result instanceof final ObjectValue next))

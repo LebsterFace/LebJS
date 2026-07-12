@@ -17,10 +17,10 @@ public final class StringEscapeUtils {
 		if (!Character.isValidCodePoint(codePoint)) return false;
 		final int type = Character.getType(codePoint);
 		return type == Character.UNASSIGNED ||
-			   type == Character.PRIVATE_USE ||
-			   type == Character.SURROGATE ||
-			   (codePoint & 0xFFFE) == 0xFFFE || // noncharacters
-			   (codePoint >= 0xFDD0 && codePoint <= 0xFDEF); // also noncharacters
+		       type == Character.PRIVATE_USE ||
+		       type == Character.SURROGATE ||
+		       (codePoint & 0xFFFE) == 0xFFFE || // noncharacters
+		       (codePoint >= 0xFDD0 && codePoint <= 0xFDEF); // also noncharacters
 	}
 
 	public static String escape(String str, char quoteType) {

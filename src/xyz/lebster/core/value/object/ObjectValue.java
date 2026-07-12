@@ -132,7 +132,7 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 		if (exoticToPrim_property != null) {
 			final Executable exoticToPrim = Executable.getExecutable(interpreter, exoticToPrim_property.get(interpreter, this));
 			final StringValue hint = preferredType == null ? Names.default_ :
-				preferredType == PreferredType.String ? Names.string : Names.number;
+										 preferredType == PreferredType.String ? Names.string : Names.number;
 			// iv. Let result be ? Call(exoticToPrim, input, hint).
 			final Value<?> result = exoticToPrim.call(interpreter, this, hint);
 			// v. If Type(result) is not Object, return result.
@@ -154,9 +154,9 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 
 		// 3. If hint is string, then Let methodNames be "toString", "valueOf".
 		final StringValue[] methodNames = hint == PreferredType.String ?
-			new StringValue[] { Names.toString, Names.valueOf } :
-			// 4. Else, Let methodNames be "valueOf", "toString".
-			new StringValue[] { Names.valueOf, Names.toString };
+											  new StringValue[] { Names.toString, Names.valueOf } :
+											  // 4. Else, Let methodNames be "valueOf", "toString".
+											  new StringValue[] { Names.valueOf, Names.toString };
 
 		// 5. For each element name of methodNames, do
 		for (final StringValue name : methodNames) {
@@ -353,11 +353,11 @@ public class ObjectValue extends Value<Map<Key<?>, PropertyDescriptor>> {
 	// TODO: Setter can return void?
 	public final void putAccessor(Intrinsics intrinsics, Key<?> key, NativeCode getter, NativeCode setter, boolean enumerable, boolean configurable) {
 		final String name = getter == null && setter == null ? null :
-			key.toFunctionName().value;
+								key.toFunctionName().value;
 		final NativeFunction getterFn = getter == null ? null :
-			new NativeFunction(intrinsics, new StringValue("get " + name), getter, 0);
+											new NativeFunction(intrinsics, new StringValue("get " + name), getter, 0);
 		final NativeFunction setterFn = setter == null ? null :
-			new NativeFunction(intrinsics, new StringValue("set " + name), setter, 1);
+											new NativeFunction(intrinsics, new StringValue("set " + name), setter, 1);
 
 		value.put(key, new AccessorDescriptor(getterFn, setterFn, enumerable, configurable));
 	}

@@ -79,6 +79,18 @@ public final class BigIntValue extends NumericValue<BigInteger> {
 		return new BigIntValue(mv);
 	}
 
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-bigint-leftShift")
+	public static BigInteger leftShift(BigInteger x, BigInteger y) {
+		// 1. If y < 0ℤ, then
+		if (y.compareTo(BigInteger.ZERO) < 0) {
+			// a. Return ℤ(floor(ℝ(x) / 2^(-ℝ(y)))).
+			return new BigDecimal(x).divide(new BigDecimal(BigInteger.TWO.pow(-y.intValueExact())), RoundingMode.FLOOR).toBigIntegerExact();
+		}
+
+		// 2. Return x × 2ℤ^y.
+		return x.multiply(BigInteger.TWO.pow(y.intValueExact()));
+	}
+
 	@Override
 	protected String displayColor() {
 		return ANSI.BRIGHT_CYAN;
@@ -118,17 +130,5 @@ public final class BigIntValue extends NumericValue<BigInteger> {
 	@Override
 	public String typeOf() {
 		return "bigint";
-	}
-
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-numeric-types-bigint-leftShift")
-	public static BigInteger leftShift(BigInteger x, BigInteger y) {
-		// 1. If y < 0ℤ, then
-		if (y.compareTo(BigInteger.ZERO) < 0) {
-			// a. Return ℤ(floor(ℝ(x) / 2^(-ℝ(y)))).
-			return new BigDecimal(x).divide(new BigDecimal(BigInteger.TWO.pow(-y.intValueExact())), RoundingMode.FLOOR).toBigIntegerExact();
-		}
-
-		// 2. Return x × 2ℤ^y.
-		return x.multiply(BigInteger.TWO.pow(y.intValueExact()));
 	}
 }

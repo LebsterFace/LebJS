@@ -35,6 +35,23 @@ public final class StringValue extends Key<String> {
 		super(Long.toString(value));
 	}
 
+	public static boolean isValidIdentifier(String string) {
+		final PrimitiveIterator.OfInt iterator = string.codePoints().iterator();
+		if (iterator.hasNext() && Lexer.isIdentifierStart(iterator.next())) {
+			while (iterator.hasNext()) {
+				if (Lexer.isIdentifierPart(iterator.next())) {
+					continue;
+				}
+
+				return false;
+			}
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	@Override
 	public StringValue toStringValue(Interpreter interpreter) {
 		return this;
@@ -86,23 +103,6 @@ public final class StringValue extends Key<String> {
 			builder.append(value);
 		} else {
 			display(builder);
-		}
-	}
-
-	public static boolean isValidIdentifier(String string) {
-		final PrimitiveIterator.OfInt iterator = string.codePoints().iterator();
-		if (iterator.hasNext() && Lexer.isIdentifierStart(iterator.next())) {
-			while (iterator.hasNext()) {
-				if (Lexer.isIdentifierPart(iterator.next())) {
-					continue;
-				}
-
-				return false;
-			}
-
-			return true;
-		} else {
-			return false;
 		}
 	}
 

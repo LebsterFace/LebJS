@@ -14,9 +14,8 @@ public record CLArguments(Path filePathOrNull, ExecutionMode mode, ExecutionOpti
 		while (iterator.hasNext()) {
 			final String argument = iterator.next();
 			if (argument.equalsIgnoreCase("--help") ||
-				argument.equalsIgnoreCase("-h") ||
-				argument.equals("/?") || argument.equals("-?")
-			) {
+			    argument.equalsIgnoreCase("-h") ||
+			    argument.equals("/?") || argument.equals("-?")) {
 				// Special case for help:
 				System.out.printf("%sLebJS Usage: %slebjs %s[parameters] %s[path]%s%n", ANSI.RED, ANSI.RESET, ANSI.CYAN, ANSI.GREEN, ANSI.RESET);
 				System.out.printf("%s-v%s, %s--verbose%s         Don't hide stack traces%n", ANSI.CYAN, ANSI.RESET, ANSI.CYAN, ANSI.RESET);

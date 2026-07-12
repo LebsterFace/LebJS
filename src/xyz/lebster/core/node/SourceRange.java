@@ -1,9 +1,9 @@
 package xyz.lebster.core.node;
 
 public final class SourceRange {
-	private final String sourceText;
 	public final int startIndex;
 	public final int endIndex;
+	private final String sourceText;
 	private SourcePosition start;
 	private SourcePosition end;
 

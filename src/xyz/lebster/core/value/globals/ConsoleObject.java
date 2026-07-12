@@ -52,9 +52,9 @@ public final class ConsoleObject extends ObjectValue {
 		final String input = scanner.nextLine();
 
 		return switch (inputType.toUpperCase()) {
-			default -> new StringValue(input);
 			case "NUMBER" -> new StringValue(input).toNumberValue(interpreter);
 			case "BOOLEAN" -> BooleanValue.of(input.equalsIgnoreCase("yes") || input.equalsIgnoreCase("true") || input.equalsIgnoreCase("y"));
+			default -> new StringValue(input);
 		};
 	}
 

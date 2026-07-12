@@ -55,10 +55,6 @@ public final class SetPrototype extends ObjectValue {
 		putAccessor(intrinsics, Names.size, ($, __) -> requireSetData($).getSize(), null, false, true);
 	}
 
-	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set-records")
-	private record SetRecord(ObjectValue setObject, int size, Executable has, Executable keys) {
-	}
-
 	private static SetObject requireSetData(Interpreter interpreter) throws AbruptCompletion {
 		if (interpreter.thisValue() instanceof final SetObject S) return S;
 		throw error(interpreter.incompatibleReceiver("Set.prototype", "a Set"));
@@ -624,6 +620,10 @@ public final class SetPrototype extends ObjectValue {
 		// 9. Set result.[[SetData]] to resultSetData.
 		// 10. Return result.
 		return new SetObject(interpreter.intrinsics, resultSetData);
+	}
+
+	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-set-records")
+	private record SetRecord(ObjectValue setObject, int size, Executable has, Executable keys) {
 	}
 
 	@SpecificationURL("https://tc39.es/ecma262/multipage#sec-createsetiterator")

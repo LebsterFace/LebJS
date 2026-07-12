@@ -427,7 +427,7 @@ public final class StringPrototype extends ObjectValue {
 		final String truncatedStringFiller = fillString.repeat((fillLen / fillString.length()) + 1).substring(0, fillLen);
 		// 6. If placement is start, return the string-concatenation of truncatedStringFiller and S.
 		if (start) return truncatedStringFiller + S;
-		// 7. Else, return the string-concatenation of S and truncatedStringFiller.
+			// 7. Else, return the string-concatenation of S and truncatedStringFiller.
 		else return S + truncatedStringFiller;
 	}
 

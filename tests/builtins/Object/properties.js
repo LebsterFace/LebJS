@@ -16,3 +16,7 @@ Test.expect('world', object_of_proto.hello);
 object_of_proto.hello = 1234;
 Test.expect(1234, object_of_proto.hello);
 Test.expect('world', proto.hello);
+
+const proto2 = Object.create(null, { foo: { value: "bar", writable: false } });
+const object2 = Object.create(proto);
+Test.expectError("TypeError", "Cannot assign to read-only property 'foo'", () => object2.foo = 123);

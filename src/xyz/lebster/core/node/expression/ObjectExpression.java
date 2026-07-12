@@ -35,13 +35,13 @@ public final class ObjectExpression implements Expression {
 		return result;
 	}
 
-	public interface ObjectEntryNode {
-		void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion;
-	}
-
 	@Override
 	public SourceRange range() {
 		return range;
+	}
+
+	public interface ObjectEntryNode {
+		void insertInto(ObjectValue result, Interpreter interpreter) throws AbruptCompletion;
 	}
 
 	public record EntryNode(Expression key, Expression value) implements ObjectEntryNode {

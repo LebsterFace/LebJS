@@ -79,9 +79,9 @@ public record Token(SourceRange range, TokenType type, String value) {
 			case LogicalOr, NullishCoalescing -> 3;
 			// TODO: yield*
 			case Equals, PlusEquals, MinusEquals, ExponentEquals, MultiplyEquals, DivideEquals,
-				 PercentEquals, LeftShiftEquals, RightShiftEquals, UnsignedRightShiftEquals,
-				 AmpersandEquals, CaretEquals, PipeEquals, LogicalAndEquals, LogicalOrEquals,
-				 NullishCoalescingEquals, QuestionMark, Arrow, Yield -> 2;
+			     PercentEquals, LeftShiftEquals, RightShiftEquals, UnsignedRightShiftEquals,
+			     AmpersandEquals, CaretEquals, PipeEquals, LogicalAndEquals, LogicalOrEquals,
+			     NullishCoalescingEquals, QuestionMark, Arrow, Yield -> 2;
 			case Comma -> 1;
 			default -> throw new ShouldNotHappen("Attempting to get precedence for token type '" + type + "'");
 		};
@@ -92,14 +92,14 @@ public record Token(SourceRange range, TokenType type, String value) {
 		// TOOD: Confirm this is accurate
 		return switch (type) {
 			case Period, LBracket, LParen, OptionalChain, Star, Slash, Percent, Plus, Minus, LeftShift, RightShift,
-				 UnsignedRightShift, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf, LooseEqual,
-				 NotEqual, StrictEqual, StrictNotEqual, Typeof, Void, Delete, Await, Ampersand, Caret, Pipe,
-				 NullishCoalescing, LogicalAnd, LogicalOr, Comma -> Associativity.Left;
+			     UnsignedRightShift, LessThan, LessThanEqual, GreaterThan, GreaterThanEqual, In, InstanceOf, LooseEqual,
+			     NotEqual, StrictEqual, StrictNotEqual, Typeof, Void, Delete, Await, Ampersand, Caret, Pipe,
+			     NullishCoalescing, LogicalAnd, LogicalOr, Comma -> Associativity.Left;
 
 			case New, PlusPlus, MinusMinus, Bang, Tilde, Exponent, QuestionMark, Equals, PlusEquals, MinusEquals,
-				 ExponentEquals, NullishCoalescingEquals, LogicalOrEquals, LogicalAndEquals, PipeEquals, CaretEquals,
-				 AmpersandEquals, UnsignedRightShiftEquals, RightShiftEquals, LeftShiftEquals, PercentEquals,
-				 DivideEquals, MultiplyEquals, Yield -> Associativity.Right;
+			     ExponentEquals, NullishCoalescingEquals, LogicalOrEquals, LogicalAndEquals, PipeEquals, CaretEquals,
+			     AmpersandEquals, UnsignedRightShiftEquals, RightShiftEquals, LeftShiftEquals, PercentEquals,
+			     DivideEquals, MultiplyEquals, Yield -> Associativity.Right;
 
 			default -> throw new ShouldNotHappen("Attempting to get associativity for token type '" + type + "'");
 		};
@@ -107,191 +107,191 @@ public record Token(SourceRange range, TokenType type, String value) {
 
 	public boolean matchIdentifier() {
 		return type == Identifier
-			   || type == Get
-			   || type == Set
-			   || type == Of;
+		       || type == Get
+		       || type == Set
+		       || type == Of;
 	}
 
 	boolean matchIdentifierName() {
 		return matchIdentifier()
-			   || type == Async
-			   || type == Await
-			   || type == Break
-			   || type == Case
-			   || type == Catch
-			   || type == Class
-			   || type == Const
-			   || type == Continue
-			   || type == Debugger
-			   || type == Default
-			   || type == Delete
-			   || type == Do
-			   || type == Else
-			   || type == Enum
-			   || type == Export
-			   || type == Extends
-			   || type == False
-			   || type == Finally
-			   || type == For
-			   || type == Function
-			   || type == If
-			   || type == Import
-			   || type == In
-			   || type == Infinity
-			   || type == InstanceOf
-			   || type == Let
-			   || type == NaN
-			   || type == New
-			   || type == NullLiteral
-			   || type == Return
-			   || type == Static
-			   || type == Super
-			   || type == Switch
-			   || type == This
-			   || type == Throw
-			   || type == True
-			   || type == Try
-			   || type == Typeof
-			   || type == Undefined
-			   || type == Var
-			   || type == Void
-			   || type == While
-			   || type == Yield;
+		       || type == Async
+		       || type == Await
+		       || type == Break
+		       || type == Case
+		       || type == Catch
+		       || type == Class
+		       || type == Const
+		       || type == Continue
+		       || type == Debugger
+		       || type == Default
+		       || type == Delete
+		       || type == Do
+		       || type == Else
+		       || type == Enum
+		       || type == Export
+		       || type == Extends
+		       || type == False
+		       || type == Finally
+		       || type == For
+		       || type == Function
+		       || type == If
+		       || type == Import
+		       || type == In
+		       || type == Infinity
+		       || type == InstanceOf
+		       || type == Let
+		       || type == NaN
+		       || type == New
+		       || type == NullLiteral
+		       || type == Return
+		       || type == Static
+		       || type == Super
+		       || type == Switch
+		       || type == This
+		       || type == Throw
+		       || type == True
+		       || type == Try
+		       || type == Typeof
+		       || type == Undefined
+		       || type == Var
+		       || type == Void
+		       || type == While
+		       || type == Yield;
 	}
 
 	boolean matchDeclaration() {
 		return type == Function
-			   || type == Class
-			   || type == Let
-			   || type == Var
-			   || type == Const;
+		       || type == Class
+		       || type == Let
+		       || type == Var
+		       || type == Const;
 	}
 
 	boolean matchStatement() {
 		return type == Return
-			   || type == Yield
-			   || type == Do
-			   || type == If
-			   || type == Throw
-			   || type == Try
-			   || type == While
-			   || type == For
-			   || type == LBrace
-			   || type == Switch
-			   || type == Break
-			   || type == Continue
-			   || type == Var
-			   || type == Import
-			   || type == Export
-			   || type == Debugger
-			   || type == Semicolon;
+		       || type == Yield
+		       || type == Do
+		       || type == If
+		       || type == Throw
+		       || type == Try
+		       || type == While
+		       || type == For
+		       || type == LBrace
+		       || type == Switch
+		       || type == Break
+		       || type == Continue
+		       || type == Var
+		       || type == Import
+		       || type == Export
+		       || type == Debugger
+		       || type == Semicolon;
 	}
 
 	boolean matchPrimaryExpression() {
 		if (matchUnaryPrefixedExpression() || matchPrefixedUpdateExpression()) return true;
 		return matchIdentifierName()
-			   || type == LBrace
-			   || type == LBracket
-			   || type == LParen
-			   || type == BigIntLiteral
-			   || type == NumericLiteral
-			   || type == RegexpPattern
-			   || type == StringLiteral
-			   || type == Super
-			   || type == Yield
-			   || type == TemplateStart
-			   // The start of a RegexpPattern that we misparsed
-			   || type == Slash
-			   || type == DivideEquals;
+		       || type == LBrace
+		       || type == LBracket
+		       || type == LParen
+		       || type == BigIntLiteral
+		       || type == NumericLiteral
+		       || type == RegexpPattern
+		       || type == StringLiteral
+		       || type == Super
+		       || type == Yield
+		       || type == TemplateStart
+		       // The start of a RegexpPattern that we misparsed
+		       || type == Slash
+		       || type == DivideEquals;
 	}
 
 	boolean matchSecondaryExpression(Set<TokenType> forbidden) {
 		if (forbidden.contains(type)) return false;
 		return type == Ampersand
-			   || type == AmpersandEquals
-			   || type == Caret
-			   || type == CaretEquals
-			   || type == Comma
-			   || type == DivideEquals
-			   || type == Equals
-			   || type == Exponent
-			   || type == ExponentEquals
-			   || type == GreaterThan
-			   || type == GreaterThanEqual
-			   || type == In
-			   || type == InstanceOf
-			   || type == LBracket
-			   || type == LParen
-			   || type == LeftShift
-			   || type == LeftShiftEquals
-			   || type == LessThan
-			   || type == LessThanEqual
-			   || type == LogicalAnd
-			   || type == LogicalAndEquals
-			   || type == LogicalOr
-			   || type == LogicalOrEquals
-			   || type == LooseEqual
-			   || type == Minus
-			   || type == MinusEquals
-			   || type == MinusMinus
-			   || type == MultiplyEquals
-			   || type == NotEqual
-			   || type == NullishCoalescing
-			   || type == NullishCoalescingEquals
-			   || type == Percent
-			   || type == PercentEquals
-			   || type == Period
-			   || type == Pipe
-			   || type == PipeEquals
-			   || type == Plus
-			   || type == PlusEquals
-			   || type == PlusPlus
-			   || type == QuestionMark
-			   || type == RightShift
-			   || type == RightShiftEquals
-			   || type == Slash
-			   || type == Star
-			   || type == StrictEqual
-			   || type == StrictNotEqual
-			   || type == UnsignedRightShift
-			   || type == OptionalChain
-			   || type == UnsignedRightShiftEquals;
+		       || type == AmpersandEquals
+		       || type == Caret
+		       || type == CaretEquals
+		       || type == Comma
+		       || type == DivideEquals
+		       || type == Equals
+		       || type == Exponent
+		       || type == ExponentEquals
+		       || type == GreaterThan
+		       || type == GreaterThanEqual
+		       || type == In
+		       || type == InstanceOf
+		       || type == LBracket
+		       || type == LParen
+		       || type == LeftShift
+		       || type == LeftShiftEquals
+		       || type == LessThan
+		       || type == LessThanEqual
+		       || type == LogicalAnd
+		       || type == LogicalAndEquals
+		       || type == LogicalOr
+		       || type == LogicalOrEquals
+		       || type == LooseEqual
+		       || type == Minus
+		       || type == MinusEquals
+		       || type == MinusMinus
+		       || type == MultiplyEquals
+		       || type == NotEqual
+		       || type == NullishCoalescing
+		       || type == NullishCoalescingEquals
+		       || type == Percent
+		       || type == PercentEquals
+		       || type == Period
+		       || type == Pipe
+		       || type == PipeEquals
+		       || type == Plus
+		       || type == PlusEquals
+		       || type == PlusPlus
+		       || type == QuestionMark
+		       || type == RightShift
+		       || type == RightShiftEquals
+		       || type == Slash
+		       || type == Star
+		       || type == StrictEqual
+		       || type == StrictNotEqual
+		       || type == UnsignedRightShift
+		       || type == OptionalChain
+		       || type == UnsignedRightShiftEquals;
 	}
 
 	boolean matchPrefixedUpdateExpression() {
 		return type == PlusPlus ||
-			   type == MinusMinus;
+		       type == MinusMinus;
 	}
 
 	boolean matchUnaryPrefixedExpression() {
 		return type == Bang
-			   || type == Delete
-			   || type == Minus
-			   || type == Plus
-			   || type == Tilde
-			   || type == Typeof
-			   || type == Void;
+		       || type == Delete
+		       || type == Minus
+		       || type == Plus
+		       || type == Tilde
+		       || type == Typeof
+		       || type == Void;
 	}
 
 	boolean matchVariableDeclaration() {
 		return type == Var ||
-			   type == Let ||
-			   type == Const;
+		       type == Let ||
+		       type == Const;
 	}
 
 	boolean matchClassElementName() {
 		return type == LBracket
-			   || type == NumericLiteral
-			   || type == PrivateIdentifier
-			   || type == StringLiteral
-			   || matchIdentifierName();
+		       || type == NumericLiteral
+		       || type == PrivateIdentifier
+		       || type == StringLiteral
+		       || matchIdentifierName();
 	}
 
 	boolean matchObjectExpressionKey() {
 		return type == NumericLiteral
-			   || type == StringLiteral
-			   || type == LBracket
-			   || matchIdentifierName();
+		       || type == StringLiteral
+		       || type == LBracket
+		       || matchIdentifierName();
 	}
 
 	UpdateOp getUpdateOp(ParserState state) throws SyntaxError {
